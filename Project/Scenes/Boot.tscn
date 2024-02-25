@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://it0x18qe03km"]
+
+[ext_resource type="Script" path="res://Scripts/Boot.gd" id="1_ypo6r"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_ypo6r")
+server_forced = true
