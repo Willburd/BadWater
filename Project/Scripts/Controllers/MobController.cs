@@ -1,18 +1,18 @@
 using Godot;
 using System;
 
-public partial class MapController : DeligateController
+public partial class MobController : DeligateController
 {
-    public static MapController controller;
+    public static MobController controller;
 
     public override bool CanInit()
     {
-        return true;
+        return IsSubControllerInit(MapController.controller); // waiting on the map controller first
     }
 
     public override bool Init()
     {
-        tick_rate = 3;
+        tick_rate = 4;
         controller = this;
         FinishInit();
         return true;

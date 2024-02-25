@@ -1,3 +1,6 @@
+using Godot;
+using System;
+
 public partial class AtmoController : DeligateController
 {
     public static AtmoController controller;
@@ -9,6 +12,7 @@ public partial class AtmoController : DeligateController
 
     public override bool Init()
     {
+        tick_rate = 5;
         controller = this;
         FinishInit();
         return true;
@@ -16,7 +20,7 @@ public partial class AtmoController : DeligateController
 
     public override void Fire()
     {
-        
+        //GD.Print(Name + " Fired");
     }
 
     public override void Shutdown()
