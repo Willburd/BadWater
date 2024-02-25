@@ -8,6 +8,8 @@ public partial class MainController : Node
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
 
+	private Node entity_container;
+
 	public static int tick_rate = 40;
 	private static double tick_internal;	// delta_time counter for tick_rate calculation
 	private static bool setup_phase = true;
@@ -17,6 +19,7 @@ public partial class MainController : Node
 	public override void _Ready()
 	{
 		// self singleton for all the others.
+		GD.Print("Starting Server");
 		controller = this;
 
 		// Create subcontrollers!
@@ -24,6 +27,18 @@ public partial class MainController : Node
 		subcontrollers.Add(new AtmoController());
 		subcontrollers.Add(new MachineController());
 		subcontrollers.Add(new MobController());
+		
+		// Get entity container from godot
+		Node main_scene = GetParent();
+		for(int i = 0; i < main_scene.GetChildCount(); i++) 
+		{
+			Node nd = main_scene.GetChild(i);
+			if(nd.Name == "Entities")
+			{
+				GD.Print("Entity Container Linked");
+				entity_container = nd;
+			}
+		}
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
