@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://8hd1b6makew6"]
-
-[ext_resource type="Script" path="res://Scripts/Entity.cs" id="1_pyv0f"]
-
-[node name="Entity" type="Node3D"]
-script = ExtResource("1_pyv0f")

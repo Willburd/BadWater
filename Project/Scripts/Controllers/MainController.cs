@@ -10,6 +10,7 @@ public partial class MainController : Node
 	private static List<Entity> entities = new List<Entity>();
 
 	private Node entity_container;
+	private Node client_container;
 
 	public static int tick_rate = 40;
 	private static double tick_internal;	// delta_time counter for tick_rate calculation
@@ -38,6 +39,11 @@ public partial class MainController : Node
 			{
 				GD.Print("Entity Container Linked");
 				entity_container = nd;
+			}
+			if(nd.Name == "Clients")
+			{
+				GD.Print("Client Container Linked");
+				client_container = nd;
 			}
 		}
 	}
