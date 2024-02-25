@@ -10,6 +10,9 @@ public class DeligateController
         ready       // All setup finished
     }
 
+
+    public static DeligateController controller;
+
     private State current_state = State.not_init;
     protected int tick_rate = 1;                    // Ticks needed to Fire()
     private int ticks = 0;                          // Resets to 0 when it hits the tick_rate.

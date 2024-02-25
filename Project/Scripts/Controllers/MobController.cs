@@ -3,8 +3,6 @@ using System;
 
 public partial class MobController : DeligateController
 {
-    public static MobController controller;
-
     public override bool CanInit()
     {
         return IsSubControllerInit(MapController.controller); // waiting on the map controller first

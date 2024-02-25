@@ -3,8 +3,6 @@ using System;
 
 public partial class MachineController : DeligateController
 {
-    public static MachineController controller;
-
     public override bool CanInit()
     {
         return IsSubControllerInit(MapController.controller); // waiting on the map controller first

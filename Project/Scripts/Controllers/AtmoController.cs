@@ -3,8 +3,6 @@ using System;
 
 public partial class AtmoController : DeligateController
 {
-    public static AtmoController controller;
-
     public override bool CanInit()
     {
         return IsSubControllerInit(MapController.controller); // waiting on the map controller first

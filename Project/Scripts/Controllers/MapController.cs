@@ -3,8 +3,6 @@ using System;
 
 public partial class MapController : DeligateController
 {
-    public static MapController controller;
-
     public override bool CanInit()
     {
         return true;
