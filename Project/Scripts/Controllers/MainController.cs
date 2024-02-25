@@ -7,6 +7,7 @@ public partial class MainController : Node
 	public static MainController controller;
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
+	private static List<Entity> entities = new List<Entity>();
 
 	private Node entity_container;
 
@@ -96,5 +97,24 @@ public partial class MainController : Node
 			subcontrollers[i].Tick();
 		}
 		ticks += 1;
+	}
+
+	public void AddEntity(Entity ent, WorldPos pos, bool map_spawn = false)
+	{
+		entities.Add(ent);
+		if(map_spawn)
+		{
+			ent.MapInit(pos);
+		}
+		else
+		{
+			ent.Spawn(pos);
+		}
+	}
+
+	public void RemoveEntity(Entity ent)
+	{
+		ent.Destroy();
+		entities.Add(ent);
 	}
 }
