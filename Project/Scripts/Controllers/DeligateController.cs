@@ -11,7 +11,7 @@ public class DeligateController
     }
 
 
-    public static DeligateController controller;
+    public static DeligateController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
 
     private State current_state = State.not_init;
     protected int tick_rate = 1;                    // Ticks needed to Fire()
@@ -36,6 +36,7 @@ public class DeligateController
 
     public virtual bool Init()          // Called when setting up, if returns true, calls Started() to prevent multiple inits
     {
+        controller = this;
         FinishInit();
         return true;
     }
