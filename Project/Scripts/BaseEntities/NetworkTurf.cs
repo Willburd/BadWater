@@ -6,6 +6,8 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkTurf : NetworkEntity
 {
+    TurfData turf_type;
+
     AtmoController.AtmoCell air_mix = null;
     private AreaNetworkData area = null;
     private string grid_lookup;
@@ -43,7 +45,7 @@ public partial class NetworkTurf : NetworkEntity
         MapController.turf_at_location[grid_lookup] = this; // UPDATE MAP!
     }
 
-    
+
     public AreaNetworkData Area
     {
         get {return area;}

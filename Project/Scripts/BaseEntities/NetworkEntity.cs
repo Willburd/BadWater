@@ -1,6 +1,6 @@
 using Godot;
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 
 [GlobalClass] 
 public partial class NetworkEntity : Node3D
@@ -54,12 +54,7 @@ public partial class NetworkEntity : Node3D
     }
 
     [Export]
-    protected string map_id_string;
-
-    public string GetMapID
-    {
-        get {return map_id_string;}
-    }
+    public string map_id_string;
     
     [Export]
     public long id = 0;
@@ -68,7 +63,20 @@ public partial class NetworkEntity : Node3D
     [Export]
     public Vector3 velocity = Vector3.Zero;
     [Export]
-    public bool hidden;
+    public bool hidden;                 // doesn't render
+    [Export]
+    public bool density;                // blocks movement
+    [Export]
+    public bool occludes;               // blocks vision
+
+
+    NetworkEntity location; // Current NetworkEntity that this entity is inside of, including turf.
+    private List<NetworkEntity> contains_entities = new List<NetworkEntity>();
+    public List<NetworkEntity> Contains
+    {
+        get {return contains_entities;}
+    }
+
 
     public virtual void Init()          // Called upon creation to set variables or state, usually detected by map information.
     {
@@ -89,18 +97,37 @@ public partial class NetworkEntity : Node3D
     {
         // Handle the tick!
         Tick();
+        ProcessVelocity();
+    }
+
+    private void ProcessVelocity()
+    {
         // Containers don't update velocity, and don't move...
-        if(hidden)
+        if(location is not NetworkTurf) 
         {
-            velocity = Vector3.Zero;
-            Position = new Vector3(0,0,-1000);
+            velocity *= 0;
+            return;
         }
-        else
+        // Update position if it has velocity
+        if(velocity.Length() < 0.01) velocity *= 0;
+        if(velocity != Vector3.Zero)
         {
-            // Update position if it has velocity
-            if(velocity.Length() < 0.01) velocity *= 0;
-            Position += velocity;
+            Move(map_id_string, Position + velocity);
         }
+    }
+
+    public void Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
+    {
+        // If on same turf, don't bother with entrance/exit actions.
+        if(MapController.FormatWorldPosition(map_id_string,Position) == MapController.FormatWorldPosition(new_mapID,new_pos)) return;
+        // Leave old turf
+        NetworkTurf old_turf = MapController.GetTurfAtPosition(map_id_string,Position);
+        old_turf.EntityExited(this,perform_turf_actions);
+        // Enter new turf
+        map_id_string = new_mapID;
+        Position = new_pos;
+        NetworkTurf new_turf = MapController.GetTurfAtPosition(map_id_string,Position);
+        new_turf.EntityEntered(this,perform_turf_actions);
     }
 
     public void Kill()
@@ -128,5 +155,42 @@ public partial class NetworkEntity : Node3D
     public NetworkTurf GetTurf()
     {
         return MapController.GetTurfAtPosition(map_id_string,Position);
+    }
+
+
+    public void EntityEntered(NetworkEntity ent, bool perform_action)
+    {
+        if(perform_action)
+        {
+            for(int i = 0; i < contains_entities.Count; i++) 
+            {
+                contains_entities[i].Crossed(ent);
+            }
+        }
+        
+        contains_entities.Add(ent);
+        ent.location = this;
+    }
+
+    public void EntityExited(NetworkEntity ent, bool perform_action)
+    {
+        contains_entities.Remove(ent);
+        if(perform_action)
+        {
+            for(int i = 0; i < contains_entities.Count; i++) 
+            {
+                contains_entities[i].UnCrossed(ent);
+            }
+        }
+    }
+
+    public virtual void Crossed(NetworkEntity crosser)
+    {
+        
+    }
+
+    public virtual void UnCrossed(NetworkEntity crosser)
+    {
+        
     }
 }

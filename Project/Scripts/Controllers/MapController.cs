@@ -24,6 +24,7 @@ public partial class MapController : DeligateController
         InitMap("MAP",100,100,1); // TODO - Decode map data from mapper, when it exists
         InitAreas();
         InitTurfs();
+        InitEntities();
         FinishInit();
         return true;
     }
@@ -60,6 +61,27 @@ public partial class MapController : DeligateController
         for(int i = 0; i < all_turfs.Count; i++) 
         {
             all_turfs[i].Init();
+        }
+    }
+
+    private void InitEntities()
+    {
+        // Directly add to turf's contents, we're still initting, no need to call Crossed() or Entered()
+        // Map controller handles the other controllers setup for this too, instead of spagetti. So those controllers can assume the work is done!
+        for(int i = 0; i < entities.Count; i++) 
+        {
+            NetworkTurf turf = entities[i].GetTurf();
+            turf.EntityEntered(entities[i],false);
+        }
+        for(int i = 0; i < MachineController.entities.Count; i++) 
+        {
+            NetworkTurf turf = entities[i].GetTurf();
+            turf.EntityEntered(entities[i],false);
+        }
+        for(int i = 0; i < MobController.entities.Count; i++) 
+        {
+            NetworkTurf turf = entities[i].GetTurf();
+            turf.EntityEntered(entities[i],false);
         }
     }
 
@@ -104,7 +126,7 @@ public partial class MapController : DeligateController
     public static void RemoveTurf(NetworkTurf turf, bool make_area_baseturf = true)
     {
         // Get data for later
-        string mapID = turf.GetMapID;
+        string mapID = turf.map_id_string;
         AreaNetworkData get_area = turf.Area;
         Vector3 grid_pos = turf.GetGridPosition();
 

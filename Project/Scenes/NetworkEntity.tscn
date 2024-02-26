@@ -17,7 +17,19 @@ properties/3/spawn = true
 properties/3/replication_mode = 2
 properties/4/path = NodePath(".:velocity")
 properties/4/spawn = true
-properties/4/replication_mode = 1
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:hidden")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:density")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath(".:occludes")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath(".:map_id_string")
+properties/8/spawn = true
+properties/8/replication_mode = 2
 
 [node name="NetworkEntity" type="Node3D"]
 script = ExtResource("1_vmmur")
