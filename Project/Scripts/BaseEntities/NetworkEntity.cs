@@ -7,6 +7,7 @@ public partial class NetworkEntity : Node3D
 {
     public enum EntityType
     {
+        Turf,
         Item,
         Structure,
         Machine,
@@ -14,11 +15,16 @@ public partial class NetworkEntity : Node3D
     }
 
     private EntityType entity_type;
-    public static NetworkEntity CreateEntity(EntityType type)
+    public static NetworkEntity CreateEntity(string mapID, EntityType type)
     {
         NetworkEntity newEnt = null;
         switch(type)
         {
+            case EntityType.Turf:
+                // Add to processing list is handled by the turf's creation in MapController.AddTurf()
+                newEnt = new NetworkTurf();
+                newEnt.entity_type = type;
+                break;
             case EntityType.Item:
                 newEnt = new NetworkEntity();
                 newEnt.entity_type = type;
@@ -43,29 +49,38 @@ public partial class NetworkEntity : Node3D
         // Ready for spawn!
         newEnt.id = next_entity_id++;
         newEnt.Init();
+        newEnt.map_id_string = mapID;
         return newEnt;
     }
 
+    [Export]
+    protected string map_id_string;
+
+    public string GetMapID
+    {
+        get {return map_id_string;}
+    }
+    
     [Export]
     public long id = 0;
     [Export]
     private static long next_entity_id = 0;
     [Export]
     public Vector3 velocity = Vector3.Zero;
-    private NetworkEntity container = null;
     [Export]
-    public NetworkEntity InContainer
+    public bool hidden;
+
+    public virtual void Init()          // Called upon creation to set variables or state, usually detected by map information.
     {
-        set { container = value; }
-        get { return container; }
+        
     }
 
-    public virtual void Init()
+    public virtual void Tick()          // Called every process tick on the Fire() tick of the subcontroller that owns them
     {
-
+        
     }
 
-    public virtual void Tick()
+    public virtual void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
     {
         
     }
@@ -75,7 +90,7 @@ public partial class NetworkEntity : Node3D
         // Handle the tick!
         Tick();
         // Containers don't update velocity, and don't move...
-        if(InContainer != null)
+        if(hidden)
         {
             velocity = Vector3.Zero;
             Position = new Vector3(0,0,-1000);
@@ -92,6 +107,9 @@ public partial class NetworkEntity : Node3D
     {
         switch(entity_type)
         {
+            case EntityType.Turf:
+                MapController.RemoveTurf(this as NetworkTurf, false);
+                break;
             case EntityType.Item:
                 MapController.entities.Remove(this);
                 break;
@@ -105,5 +123,10 @@ public partial class NetworkEntity : Node3D
                 MobController.entities.Remove(this);
                 break;
         }
+    }
+
+    public NetworkTurf GetTurf()
+    {
+        return MapController.GetTurfAtPosition(map_id_string,Position);
     }
 }

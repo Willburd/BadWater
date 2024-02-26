@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://ckusjyu1ne236"]
 
-[ext_resource type="Script" path="res://Scripts/NetworkEntity.cs" id="1_vmmur"]
+[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkEntity.cs" id="1_vmmur"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:id")
