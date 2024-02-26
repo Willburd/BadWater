@@ -19,16 +19,17 @@ var max_entities : int = -1		# Set from the EntitySpawners's data
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var args = Array(OS.get_cmdline_args())
-	if args.has("-s") || args.has("--headless"):
-		StartNetwork(true)
+	if args.has("-s") || args.has("-e") || args.has("--headless"):
+		StartNetwork(true,args.has("-e"))
 
-func StartNetwork(server: bool) -> void:
+func StartNetwork(server: bool, edit_mode: bool) -> void:
 	print("Start networking")
 	var peer = ENetMultiplayerPeer.new()
 	if(server):
 		# Start controller
-		var server_scene = preload("res://Scenes/Server.tscn").instantiate()
+		var server_scene: MainController = preload("res://Scenes/Server.tscn").instantiate()
 		add_child.call_deferred(server_scene)
+		server_scene.Init(edit_mode);
 		# Set limits
 		max_players = client_spawner.get_spawn_limit()
 		max_entities = entity_spawner.get_spawn_limit()
@@ -58,8 +59,12 @@ func _PeerLeave(id: int):
 # TEMPS
 func _on_client_pressed():
 	join_menu.hide()
-	StartNetwork(false)
+	StartNetwork(false,false)
 
 func _on_server_pressed():
 	join_menu.hide()
-	StartNetwork(true)
+	StartNetwork(true,false)
+	
+func _on_editor_pressed():
+	join_menu.hide()
+	StartNetwork(true,true)

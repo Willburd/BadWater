@@ -43,5 +43,14 @@ offset_right = 179.0
 offset_bottom = 95.0
 text = "SERVER"
 
+[node name="Editor" type="Button" parent="JoinMenu"]
+offset_left = 7.0
+offset_top = 100.0
+offset_right = 181.0
+offset_bottom = 143.0
+text = "EDIT SERVER
+"
+
 [connection signal="pressed" from="JoinMenu/Client" to="." method="_on_client_pressed"]
 [connection signal="pressed" from="JoinMenu/Server" to="." method="_on_server_pressed"]
+[connection signal="pressed" from="JoinMenu/Editor" to="." method="_on_editor_pressed"]

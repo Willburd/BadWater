@@ -9,22 +9,42 @@ public partial class MainController : Node
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
 
+	public enum ServerConfig
+	{
+		Standard = 0,
+		Editor = 1
+	}
+
+	[Export]
+	public static ServerConfig server_state = ServerConfig.Standard;
+
 	public static int tick_rate = 40;
 	private static double tick_internal;	// delta_time counter for tick_rate calculation
 	private static bool setup_phase = true;
 	private static int ticks = 0;
 
-	public override void _Ready()
+	public void Init(ServerConfig state)
 	{
 		// self singleton for all the others.
-		GD.Print("Starting Server");
+		GD.Print("Starting Server in state: " + state);
+		server_state = state;
 		controller = this;
 
 		// Create subcontrollers!
-		subcontrollers.Add(new MapController());
-		subcontrollers.Add(new AtmoController());
-		subcontrollers.Add(new MachineController());
-		subcontrollers.Add(new MobController());
+		switch(server_state)
+		{
+			case ServerConfig.Standard:
+				subcontrollers.Add(new MapController());
+				subcontrollers.Add(new AtmoController());
+				subcontrollers.Add(new MachineController());
+				subcontrollers.Add(new MobController());
+			break;
+
+			case ServerConfig.Editor:
+				subcontrollers.Add(new MapController());
+				subcontrollers.Add(new EditorController());
+			break;
+		}
 	}
 
 	public override void _Process(double delta)
@@ -80,6 +100,12 @@ public partial class MainController : Node
 		{
 			subcontrollers[i].Tick();
 		}
+		ticks += 1;
+	}
+
+	private void EditorTick()
+	{
+		// TODO - editor mode!
 		ticks += 1;
 	}
 }
