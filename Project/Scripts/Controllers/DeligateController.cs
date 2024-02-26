@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class DeligateController
 {
@@ -10,6 +11,7 @@ public class DeligateController
         ready       // All setup finished
     }
 
+    public static List<NetworkEntity> entities = new List<NetworkEntity>();
 
     public static DeligateController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
 
@@ -78,7 +80,12 @@ public class DeligateController
         // Update!
         if(ticks >= tick_rate)
         {
+            // Fire subsystem, and process entities if the controller has them!
             Fire();
+            for(int i = 0; i < entities.Count; i++) 
+			{
+                entities[i].Process();
+            }
             ticks = 0;
             return true;
         }

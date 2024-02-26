@@ -1,9 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://gcow2uo4uiia"]
+[gd_scene load_steps=3 format=3 uid="uid://gcow2uo4uiia"]
 
-[ext_resource type="Script" path="res://Scripts/NetworkClient.gd" id="1_sr45g"]
+[ext_resource type="Script" path="res://Scripts/NetworkClient.cs" id="1_3ymcw"]
 
-[node name="NetworkClient" type="Node"]
-script = ExtResource("1_sr45g")
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ulbxs"]
+properties/0/path = NodePath(".:id")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+
+[node name="NetworkClient" type="Node3D"]
+script = ExtResource("1_3ymcw")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.12
+replication_config = SubResource("SceneReplicationConfig_ulbxs")

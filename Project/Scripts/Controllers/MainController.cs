@@ -2,22 +2,18 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+[GlobalClass] 
 public partial class MainController : Node
 {
 	public static MainController controller;
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
-	private static List<Entity> entities = new List<Entity>();
-
-	private Node entity_container;
-	private Node client_container;
 
 	public static int tick_rate = 40;
 	private static double tick_internal;	// delta_time counter for tick_rate calculation
 	private static bool setup_phase = true;
 	private static int ticks = 0;
 
-	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		// self singleton for all the others.
@@ -29,26 +25,8 @@ public partial class MainController : Node
 		subcontrollers.Add(new AtmoController());
 		subcontrollers.Add(new MachineController());
 		subcontrollers.Add(new MobController());
-		
-		// Get entity container from godot
-		Node main_scene = GetParent();
-		for(int i = 0; i < main_scene.GetChildCount(); i++) 
-		{
-			Node nd = main_scene.GetChild(i);
-			if(nd.Name == "Entities")
-			{
-				GD.Print("Entity Container Linked");
-				entity_container = nd;
-			}
-			if(nd.Name == "Clients")
-			{
-				GD.Print("Client Container Linked");
-				client_container = nd;
-			}
-		}
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{	
 		// delta threshold for ticks
@@ -103,24 +81,5 @@ public partial class MainController : Node
 			subcontrollers[i].Tick();
 		}
 		ticks += 1;
-	}
-
-	public void AddEntity(Entity ent, WorldPos pos, bool map_spawn = false)
-	{
-		entities.Add(ent);
-		if(map_spawn)
-		{
-			ent.MapInit(pos);
-		}
-		else
-		{
-			ent.Spawn(pos);
-		}
-	}
-
-	public void RemoveEntity(Entity ent)
-	{
-		ent.Destroy();
-		entities.Add(ent);
 	}
 }
