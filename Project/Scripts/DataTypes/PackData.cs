@@ -18,4 +18,8 @@ public partial class PackData : Resource
         get { return mod_prefix + ":" + unique_ID; }
     }
     public string display_name = "Pack";
+
+    // Unique data
+    public bool density = false;
+    public bool opaque = false;
 }

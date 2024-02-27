@@ -13,7 +13,8 @@ public partial class MapData : PackData
         depth = set_depth;
         GD.Print("-" + GetUniqueID + " name: " + display_name + " width: "  + width + " height: " + height + " depth: " + depth);
     }
-
+    
+    // Unique data
     public int width;
     public int height;
     public int depth;

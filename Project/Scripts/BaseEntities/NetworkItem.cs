@@ -6,4 +6,12 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkItem : NetworkEntity
 {
+    // Beginning of template data
+    public override void TemplateClone(PackData data)
+    {
+        template_data = data;
+        density = template_data.density;
+        opaque = template_data.opaque;
+    }
+    // End of template data
 }

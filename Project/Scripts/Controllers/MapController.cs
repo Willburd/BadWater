@@ -10,8 +10,7 @@ public partial class MapController : DeligateController
 
     protected static List<NetworkTurf> all_turfs = new List<NetworkTurf>();
     public static Dictionary<string,NetworkTurf> turf_at_location = new Dictionary<string,NetworkTurf>();
-    public static NetworkArea base_area = new NetworkArea();
-    public static List<NetworkArea> areas = new List<NetworkArea>();
+    public static Dictionary<string,NetworkArea> areas = new Dictionary<string,NetworkArea>();
 
     public override bool CanInit()
     {
@@ -22,6 +21,7 @@ public partial class MapController : DeligateController
     {
         tick_rate = 3;
         controller = this;
+        InitAreas();
         // For each map loaded, init them!
         string[] loaded = MainController.controller.config.loaded_maps;
         for(int i = 0; i < loaded.Length; i++) 
@@ -32,7 +32,6 @@ public partial class MapController : DeligateController
             GD.Print("-Loading map: " + map_data.display_name);
             InitMap(map_data.GetUniqueID,map_data.width,map_data.height,map_data.depth);
         }
-        InitAreas();
         InitTurfs();
         InitEntities();
         FinishInit();
@@ -48,9 +47,11 @@ public partial class MapController : DeligateController
             {
                 for(int t = 0; t < height; t++) 
                 {
-                    NetworkArea area_inside = base_area;
+                    // Base data...
+                    string make_turf_id = "_:_";
+                    string area_id = "_:_";
                     // TODO - Solve for area that should be in this tile...
-                    AddTurf(mapID, new Vector3(i,t,h), area_inside, false);
+                    AddTurf(make_turf_id,mapID, new Vector3(i,t,h), areas[area_id], false);
                 }
             }
         }
@@ -58,12 +59,18 @@ public partial class MapController : DeligateController
 
     private void InitAreas()
     {
-        // Init the areas
-        for(int i = 0; i < areas.Count; i++) 
+        // Create all areas from resources
+        foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
-            areas[i].Init();
+            NetworkArea area = NetworkEntity.CreateEntity("_",entry.Value.GetUniqueID,NetworkEntity.EntityType.Area) as NetworkArea;
+            areas[entry.Value.GetUniqueID] = area;
+            area.Init();
         }
-        base_area.Init(); // base area too!
+        // Init the areas now that they are all prepared
+        foreach(KeyValuePair<string, NetworkArea> entry in areas)
+        {
+            entry.Value.Init();
+        }
     }
 
     private void InitTurfs()
@@ -107,13 +114,11 @@ public partial class MapController : DeligateController
     {
         //GD.Print(Name + " Fired");
         // All areas get their update call
-        for(int i = 0; i < areas.Count; i++) 
+        foreach(KeyValuePair<string, NetworkArea> entry in areas)
         {
-            NetworkArea area = areas[i];
-            area.Tick();
+            // do something with entry.Value or entry.Key
+            entry.Value.Tick();
         }
-        // Handle unsorted too
-        base_area.Tick();
     }
 
     public override void Shutdown()
@@ -121,7 +126,7 @@ public partial class MapController : DeligateController
         
     }
 
-    public static NetworkTurf AddTurf(string mapID, Vector3 grid_pos, NetworkArea area, bool replace = true)
+    public static NetworkTurf AddTurf(string turfID, string mapID, Vector3 grid_pos, NetworkArea area, bool replace = true)
     {
         // Replace old turf
         if(replace)
@@ -133,7 +138,7 @@ public partial class MapController : DeligateController
             }
         }
         // Spawn new turf
-        NetworkTurf turf = NetworkEntity.CreateEntity(mapID,NetworkEntity.EntityType.Turf) as NetworkTurf;
+        NetworkTurf turf = NetworkEntity.CreateEntity(mapID,turfID,NetworkEntity.EntityType.Turf) as NetworkTurf;
         turf.SetGridPosition(grid_pos);
         area.AddTurf(turf);
         all_turfs.Add(turf);
@@ -156,7 +161,7 @@ public partial class MapController : DeligateController
         {
             // Spawn a new turf in the same spot to replace it...
             // TODO - area base turf definitions from mapper
-            AddTurf(mapID,grid_pos,get_area,false);
+            AddTurf(get_area.base_turf_ID, mapID,grid_pos,get_area,false);
         }
         else
         {

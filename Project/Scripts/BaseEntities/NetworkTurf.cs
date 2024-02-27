@@ -6,7 +6,16 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkTurf : NetworkEntity
 {
-    private TurfData data;
+    // Beginning of template data
+    public override void TemplateClone(PackData data)
+    {
+        template_data = data;
+        TurfData temp = template_data as TurfData;
+        density = template_data.density;
+        opaque = template_data.opaque;
+    }
+    // End of template data
+
 
     AtmoController.AtmoCell air_mix = null;
     private NetworkArea area = null;

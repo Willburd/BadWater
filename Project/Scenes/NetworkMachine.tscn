@@ -12,21 +12,18 @@ properties/1/replication_mode = 2
 properties/2/path = NodePath(".:velocity")
 properties/2/spawn = true
 properties/2/replication_mode = 2
-properties/3/path = NodePath(".:hidden")
+properties/3/path = NodePath(".:density")
 properties/3/spawn = true
 properties/3/replication_mode = 2
-properties/4/path = NodePath(".:density")
+properties/4/path = NodePath(".:map_id_string")
 properties/4/spawn = true
 properties/4/replication_mode = 2
-properties/5/path = NodePath(".:occludes")
+properties/5/path = NodePath(".:position")
 properties/5/spawn = true
 properties/5/replication_mode = 2
-properties/6/path = NodePath(".:map_id_string")
+properties/6/path = NodePath(".:opaque")
 properties/6/spawn = true
 properties/6/replication_mode = 2
-properties/7/path = NodePath(".:position")
-properties/7/spawn = true
-properties/7/replication_mode = 2
 
 [node name="NetworkMachine" type="Node3D"]
 script = ExtResource("1_fd0cd")

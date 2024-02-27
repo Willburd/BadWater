@@ -12,7 +12,6 @@ public partial class TurfData : PackData
         opaque = set_opaque;
         GD.Print("-" + GetUniqueID + " name: " + display_name + " density: "  + density + " opaque: " + opaque);
     }
-    // mod_prefix is used to avoid collisions with turfs, by having namespaces for the data
-    public bool density = false;
-    public bool opaque = false;
+    
+    // Unique data
 }

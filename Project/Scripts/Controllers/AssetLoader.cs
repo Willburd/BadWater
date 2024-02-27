@@ -122,6 +122,18 @@ public partial class AssetLoader : Node
                 fileName = dir.GetNext();
             }
         }
+
+        GD.Print("-PREFABS");
+        {   // Base area
+            AreaData area = new AreaData();
+            area.Init("_", "_", "Unknown", "_:_", true, false);
+            loaded_areas[area.GetUniqueID] = area;
+        }
+        {   // Space turf
+            TurfData turf = new TurfData();
+            turf.Init( "_", "_", "Space", false, false);
+            loaded_turfs[turf.GetUniqueID] = turf;
+        }
     }
 
 
@@ -147,7 +159,7 @@ public partial class AssetLoader : Node
         {
             Godot.Collections.Dictionary area_data = (Godot.Collections.Dictionary)data[key];
             AreaData area = new AreaData();
-            area.Init(prefix, key,area_data["name"].AsString(), area_data["is_space"].AsDouble() > 0, area_data["always_powered"].AsDouble() > 0);
+            area.Init(prefix, key,area_data["name"].AsString(), area_data["base_turf"].AsString(), area_data["is_space"].AsDouble() > 0, area_data["always_powered"].AsDouble() > 0);
             loaded_areas[area.GetUniqueID] = area;
         }
     }

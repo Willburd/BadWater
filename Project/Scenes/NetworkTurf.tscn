@@ -6,13 +6,13 @@
 properties/0/path = NodePath(".:density")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath(".:occludes")
+properties/1/path = NodePath(".:map_id_string")
 properties/1/spawn = true
 properties/1/replication_mode = 2
-properties/2/path = NodePath(".:map_id_string")
+properties/2/path = NodePath(".:position")
 properties/2/spawn = true
 properties/2/replication_mode = 2
-properties/3/path = NodePath(".:position")
+properties/3/path = NodePath(".:opaque")
 properties/3/spawn = true
 properties/3/replication_mode = 2
 

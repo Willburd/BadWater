@@ -4,7 +4,25 @@ using System.Collections.Generic;
 
 public partial class NetworkArea : NetworkEntity
 {
-    private AreaData data;
+    // Beginning of template data
+    public override void TemplateClone(PackData data)
+    {
+        template_data = data;
+        AreaData temp = template_data as AreaData;
+        base_turf_ID = temp.base_turf_ID;
+        is_space = temp.is_space;
+        always_powered = temp.always_powered;
+    }
+    
+    // Unique data
+    [Export]
+    public string base_turf_ID;
+    [Export]
+    public bool always_powered;
+    [Export]
+    public bool is_space;
+    // End of template data
+    
 
     public List<NetworkTurf> turfs = new List<NetworkTurf>();
 

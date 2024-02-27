@@ -7,6 +7,27 @@ using System.Runtime.CompilerServices;
 [GlobalClass] 
 public partial class NetworkEntity : Node3D
 {
+        
+    // Beginning of template data
+    protected PackData template_data;
+    public virtual void TemplateClone(PackData data)
+    {
+        template_data = data;
+        density = template_data.density;
+        opaque = template_data.opaque;
+    }
+    [Export]
+    public bool density;                // blocks movement
+    [Export]
+    public bool opaque;               // blocks vision
+    // End of template data
+    public string GetUniqueID
+    {
+        get { return template_data.GetUniqueID; }
+    }
+
+
+
     public enum EntityType
     {
         Area,
@@ -18,46 +39,52 @@ public partial class NetworkEntity : Node3D
     }
 
     private EntityType entity_type;
-    public static NetworkEntity CreateEntity(string mapID, EntityType type)
+    public static NetworkEntity CreateEntity(string mapID, string type_ID, EntityType type)
     {
+        PackData typeData = null;
         NetworkEntity newEnt = null;
         switch(type)
         {
             case EntityType.Area:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkArea.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
-                MapController.areas.Add(newEnt as NetworkArea);
+                typeData = AssetLoader.loaded_areas[type_ID];
                 break;
             case EntityType.Turf:
                 // Add to processing list is handled by the turf's creation in MapController.AddTurf()
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkTurf.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
+                typeData = AssetLoader.loaded_turfs[type_ID];
                 break;
             case EntityType.Item:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkItem.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
+                //typeData = AssetLoader.loaded_items[type_ID];
                 break;
             case EntityType.Structure:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkStructure.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
+                //typeData = AssetLoader.loaded_structures[type_ID];
                 break;
             case EntityType.Machine:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkMachine.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MachineController.entities.Add(newEnt);
+                //typeData = AssetLoader.loaded_machines[type_ID];
                 break;
             case EntityType.Mob:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkMob.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MobController.entities.Add(newEnt);
+                //typeData = AssetLoader.loaded_mobs[type_ID];
                 break;
         }
         // Entity init
         newEnt.id = next_entity_id++;
         newEnt.map_id_string = mapID;
-        newEnt.Init();
+        newEnt.TemplateClone(typeData);
 
         // Finally add!
         MainController.controller.entity_container.AddChild(newEnt,true);
@@ -73,15 +100,9 @@ public partial class NetworkEntity : Node3D
     private static long next_entity_id = 0;
     [Export]
     public Vector3 velocity = Vector3.Zero;
-    [Export]
-    public bool hidden;                 // doesn't render
-    [Export]
-    public bool density;                // blocks movement
-    [Export]
-    public bool occludes;               // blocks vision
 
 
-    NetworkEntity location; // Current NetworkEntity that this entity is inside of, including turf.
+    NetworkEntity location = null; // Current NetworkEntity that this entity is inside of, including turf.
     private List<NetworkEntity> contains_entities = new List<NetworkEntity>();
     public List<NetworkEntity> Contains
     {
@@ -114,7 +135,7 @@ public partial class NetworkEntity : Node3D
     private void ProcessVelocity()
     {
         // Containers don't update velocity, and don't move...
-        if(location is not NetworkTurf) 
+        if(location != null && location is not NetworkTurf) 
         {
             velocity *= 0;
             return;
@@ -146,7 +167,7 @@ public partial class NetworkEntity : Node3D
         switch(entity_type)
         {
             case EntityType.Area:
-                MapController.areas.Remove(this as NetworkArea);
+                MapController.areas.Remove(this.template_data.GetUniqueID);
                 break;
             case EntityType.Turf:
                 MapController.RemoveTurf(this as NetworkTurf, false);
@@ -197,6 +218,7 @@ public partial class NetworkEntity : Node3D
                 contains_entities[i].UnCrossed(ent);
             }
         }
+        ent.location = null;
     }
 
     public virtual void Crossed(NetworkEntity crosser)
