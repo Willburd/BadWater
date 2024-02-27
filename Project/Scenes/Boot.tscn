@@ -23,7 +23,7 @@ spawn_path = NodePath("../Clients")
 spawn_limit = 64
 
 [node name="EntitySpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://Scenes/NetworkEntity.tscn")
+_spawnable_scenes = PackedStringArray("res://Scenes/NetworkEntity.tscn", "res://Scenes/NetworkArea.tscn", "res://Scenes/NetworkTurf.tscn", "res://Scenes/NetworkStructure.tscn", "res://Scenes/NetworkMachine.tscn", "res://Scenes/NetworkMob.tscn", "res://Scenes/NetworkItem.tscn")
 spawn_path = NodePath("../Entities")
 spawn_limit = 65535
 

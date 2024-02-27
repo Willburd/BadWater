@@ -1,12 +1,15 @@
 using Godot;
+using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 [GlobalClass] 
 public partial class NetworkEntity : Node3D
 {
     public enum EntityType
     {
+        Area,
         Turf,
         Item,
         Structure,
@@ -20,36 +23,44 @@ public partial class NetworkEntity : Node3D
         NetworkEntity newEnt = null;
         switch(type)
         {
+            case EntityType.Area:
+                newEnt = GD.Load<PackedScene>("res://Scenes/NetworkArea.tscn").Instantiate() as NetworkEntity;
+                newEnt.entity_type = type;
+                MapController.areas.Add(newEnt as NetworkArea);
+                break;
             case EntityType.Turf:
                 // Add to processing list is handled by the turf's creation in MapController.AddTurf()
-                newEnt = new NetworkTurf();
+                newEnt = GD.Load<PackedScene>("res://Scenes/NetworkTurf.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 break;
             case EntityType.Item:
-                newEnt = new NetworkEntity();
+                newEnt = GD.Load<PackedScene>("res://Scenes/NetworkItem.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
                 break;
             case EntityType.Structure:
-                newEnt = new NetworkEntity();
+                newEnt = GD.Load<PackedScene>("res://Scenes/NetworkStructure.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
                 break;
             case EntityType.Machine:
-                newEnt = new NetworkMachine();
+                newEnt = GD.Load<PackedScene>("res://Scenes/NetworkMachine.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MachineController.entities.Add(newEnt);
                 break;
             case EntityType.Mob:
-                newEnt = new NetworkMob();
+                newEnt = GD.Load<PackedScene>("res://Scenes/NetworkMob.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MobController.entities.Add(newEnt);
                 break;
         }
-        // Ready for spawn!
+        // Entity init
         newEnt.id = next_entity_id++;
-        newEnt.Init();
         newEnt.map_id_string = mapID;
+        newEnt.Init();
+
+        // Finally add!
+        MainController.controller.entity_container.AddChild(newEnt,true);
         return newEnt;
     }
 
@@ -134,6 +145,9 @@ public partial class NetworkEntity : Node3D
     {
         switch(entity_type)
         {
+            case EntityType.Area:
+                MapController.areas.Remove(this as NetworkArea);
+                break;
             case EntityType.Turf:
                 MapController.RemoveTurf(this as NetworkTurf, false);
                 break;
@@ -150,6 +164,7 @@ public partial class NetworkEntity : Node3D
                 MobController.entities.Remove(this);
                 break;
         }
+        QueueFree();
     }
 
     public NetworkTurf GetTurf()

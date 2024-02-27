@@ -1,0 +1,17 @@
+{
+	"SAND": {
+		"name": "Sand",
+		"density": 0,
+		"opaque": 0
+	},
+	"PLATE": {
+		"name": "Plating",
+		"density": 0,
+		"opaque": 0
+	},
+	"WALL": {
+		"name": "Wall",
+		"density": 1,
+		"opaque": 1
+	}
+}

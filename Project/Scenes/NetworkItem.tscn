@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://ckusjyu1ne236"]
+[gd_scene load_steps=3 format=3 uid="uid://b2612o53aeerg"]
 
-[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkEntity.cs" id="1_vmmur"]
+[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkItem.cs" id="1_k3d4w"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:rotation")
@@ -28,8 +28,8 @@ properties/7/path = NodePath(".:position")
 properties/7/spawn = true
 properties/7/replication_mode = 2
 
-[node name="NetworkEntity" type="Node3D"]
-script = ExtResource("1_vmmur")
+[node name="NetworkItem" type="Node3D"]
+script = ExtResource("1_k3d4w")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25

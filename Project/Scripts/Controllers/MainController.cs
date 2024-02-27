@@ -23,6 +23,9 @@ public partial class MainController : Node
 	private static bool setup_phase = true;
 	private static int ticks = 0;
 
+	[Export]
+	public Node entity_container;
+
 	public void Init(ServerConfig state)
 	{
 		// self singleton for all the others.

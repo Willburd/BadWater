@@ -9,12 +9,12 @@ public partial class MapController : DeligateController
 
     protected static List<NetworkTurf> all_turfs = new List<NetworkTurf>();
     public static Dictionary<string,NetworkTurf> turf_at_location = new Dictionary<string,NetworkTurf>();
-    public static AreaNetworkData base_area = new AreaNetworkData();
-    public static List<AreaNetworkData> areas = new List<AreaNetworkData>();
+    public static NetworkArea base_area = new NetworkArea();
+    public static List<NetworkArea> areas = new List<NetworkArea>();
 
     public override bool CanInit()
     {
-        return true;
+        return IsSubControllerInit(MachineController.controller);
     }
 
     public override bool Init()
@@ -38,7 +38,7 @@ public partial class MapController : DeligateController
             {
                 for(int t = 0; t < height; t++) 
                 {
-                    AreaNetworkData area_inside = base_area;
+                    NetworkArea area_inside = base_area;
                     // TODO - Solve for area that should be in this tile...
                     AddTurf(mapID, new Vector3(i,t,h), area_inside, false);
                 }
@@ -58,30 +58,37 @@ public partial class MapController : DeligateController
 
     private void InitTurfs()
     {
+        // Setup all turfs...
         for(int i = 0; i < all_turfs.Count; i++) 
         {
             all_turfs[i].Init();
+        }
+        // And then give them all a graphics update, lets do this heavy stuff here to get it over with.
+        // Instead of making objects figure it out in the middle of their Init()... Which would get goofy because other stuff might not be init.
+        for(int i = 0; i < all_turfs.Count; i++) 
+        {
+            all_turfs[i].UpdateIcon();
         }
     }
 
     private void InitEntities()
     {
-        // Directly add to turf's contents, we're still initting, no need to call Crossed() or Entered()
-        // Map controller handles the other controllers setup for this too, instead of spagetti. So those controllers can assume the work is done!
-        for(int i = 0; i < entities.Count; i++) 
+        // Map controller handles the other controllers entity lists for this too, instead of spagetti. So those controllers can assume the Init() work has been done!
+        List<NetworkEntity> all_entities = new List<NetworkEntity>();
+        all_entities.AddRange(MapController.entities);
+        all_entities.AddRange(MachineController.entities);
+        all_entities.AddRange(MobController.entities);
+        for(int i = 0; i < all_entities.Count; i++) 
         {
-            NetworkTurf turf = entities[i].GetTurf();
-            turf.EntityEntered(entities[i],false);
+            // Directly add to turf's contents, we're still initting, no need to call Crossed() or Entered()
+            NetworkTurf turf = all_entities[i].GetTurf();
+            turf.Init();
+            turf.EntityEntered(all_entities[i],false);
         }
-        for(int i = 0; i < MachineController.entities.Count; i++) 
+        // Time for their graphical update too!
+        for(int i = 0; i < all_entities.Count; i++) 
         {
-            NetworkTurf turf = entities[i].GetTurf();
-            turf.EntityEntered(entities[i],false);
-        }
-        for(int i = 0; i < MobController.entities.Count; i++) 
-        {
-            NetworkTurf turf = entities[i].GetTurf();
-            turf.EntityEntered(entities[i],false);
+            all_entities[i].UpdateIcon();
         }
     }
 
@@ -92,7 +99,7 @@ public partial class MapController : DeligateController
         // All areas get their update call
         for(int i = 0; i < areas.Count; i++) 
         {
-            AreaNetworkData area = areas[i];
+            NetworkArea area = areas[i];
             area.Tick();
         }
         // Handle unsorted too
@@ -104,7 +111,7 @@ public partial class MapController : DeligateController
         
     }
 
-    public static NetworkTurf AddTurf(string mapID, Vector3 grid_pos, AreaNetworkData area, bool replace = true)
+    public static NetworkTurf AddTurf(string mapID, Vector3 grid_pos, NetworkArea area, bool replace = true)
     {
         // Replace old turf
         if(replace)
@@ -127,7 +134,7 @@ public partial class MapController : DeligateController
     {
         // Get data for later
         string mapID = turf.map_id_string;
-        AreaNetworkData get_area = turf.Area;
+        NetworkArea get_area = turf.Area;
         Vector3 grid_pos = turf.GetGridPosition();
 
         // Remove from area
@@ -165,57 +172,10 @@ public partial class MapController : DeligateController
         return null;
     }
 
-    public static AreaNetworkData GetAreaAtPosition(string mapID, Vector3 pos)
+    public static NetworkArea GetAreaAtPosition(string mapID, Vector3 pos)
     {
         NetworkTurf turf = GetTurfAtPosition(mapID, pos);
         if(turf == null) return null;
         return turf.Area;
-    }
-}
-
-public class AreaNetworkData
-{
-    public string name = "None";
-    bool always_powered;
-    bool is_space;
-
-    public List<NetworkTurf> turfs = new List<NetworkTurf>();
-
-    public void Init()
-    {
-        // setup area's data from the resource script
-    }
-
-    public void Tick()
-    {
-        RandomTurfUpdate(); // Randomly update some turfs, some types of turfs do things when random ticked, atmo also likes these.
-    }
-
-    public void AddTurf(NetworkTurf turf)
-    {
-        // Remove from other areas
-        if(turf.Area != null)
-        {
-            turf.Area.turfs.Remove(turf);
-        }
-        // Make ours!
-        turf.Area = this;
-        turfs.Add(turf);
-    }
-
-    public void RandomTurfUpdate()
-    {
-        // Lower chance of random ticks heavily 
-        if(turfs.Count == 0) return;
-        if((Mathf.Abs((int)GD.Randi()) % 100) < 80) return;
-        // Perform a random number of random turf updates
-        int repeat = Mathf.Clamp(Mathf.Abs((int)GD.Randi()) % Mathf.Max((int)(turfs.Count / 50),1), 1, turfs.Count);
-        while(repeat-- > 0)
-        {
-            int check = Mathf.Abs((int)GD.Randi()) % turfs.Count;
-            NetworkTurf turf = turfs[check];
-            turf.RandomTick();
-            turf.AtmosphericsCheck();
-        }
     }
 }

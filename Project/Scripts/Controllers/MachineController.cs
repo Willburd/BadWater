@@ -5,7 +5,7 @@ public partial class MachineController : DeligateController
 {
     public override bool CanInit()
     {
-        return IsSubControllerInit(MapController.controller); // waiting on the map controller first
+        return true; // waiting on the map controller first
     }
 
     public override bool Init()

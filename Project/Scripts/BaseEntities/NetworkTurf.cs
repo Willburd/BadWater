@@ -6,10 +6,10 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkTurf : NetworkEntity
 {
-    TurfData turf_type;
+    private TurfData data;
 
     AtmoController.AtmoCell air_mix = null;
-    private AreaNetworkData area = null;
+    private NetworkArea area = null;
     private string grid_lookup;
 
     public virtual void RandomTick()                // Some turfs respond to random updates, every area will perform a number of them based on the area's size!
@@ -46,7 +46,7 @@ public partial class NetworkTurf : NetworkEntity
     }
 
 
-    public AreaNetworkData Area
+    public NetworkArea Area
     {
         get {return area;}
         set {area = value;} // SET USING Area.AddTurf() DO NOT SET DIRECTLY

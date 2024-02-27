@@ -13,14 +13,20 @@ class_name BootController
 @export var port : int	= 2532
 var max_players : int = -1		# Set from the ClientSpawner's data
 var max_entities : int = -1		# Set from the EntitySpawners's data
+var asset_library : AssetLoader
 
 @export var join_menu : CanvasLayer # TEMP
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# Load asset library
+	asset_library = AssetLoader.new()
+	asset_library.Load()
+	# Spawn server from launch options
 	var args = Array(OS.get_cmdline_args())
 	if args.has("-s") || args.has("-e") || args.has("--headless"):
 		StartNetwork(true,args.has("-e"))
+		join_menu.hide()
 
 func StartNetwork(server: bool, edit_mode: bool) -> void:
 	print("Start networking")
@@ -30,6 +36,7 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 		var server_scene: MainController = preload("res://Scenes/Server.tscn").instantiate()
 		add_child.call_deferred(server_scene)
 		server_scene.Init(edit_mode);
+		server_scene.entity_container = entity_container
 		# Set limits
 		max_players = client_spawner.get_spawn_limit()
 		max_entities = entity_spawner.get_spawn_limit()
