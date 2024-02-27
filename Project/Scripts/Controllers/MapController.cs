@@ -1,4 +1,5 @@
 using Godot;
+using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
@@ -21,7 +22,16 @@ public partial class MapController : DeligateController
     {
         tick_rate = 3;
         controller = this;
-        InitMap("MAP",100,100,1); // TODO - Decode map data from mapper, when it exists
+        // For each map loaded, init them!
+        string[] loaded = MainController.controller.config.loaded_maps;
+        for(int i = 0; i < loaded.Length; i++) 
+        {
+            string map_id = loaded[i];
+            if(!AssetLoader.loaded_maps.ContainsKey(map_id)) continue;
+            MapData map_data = AssetLoader.loaded_maps[map_id];
+            GD.Print("-Loading map: " + map_data.display_name);
+            InitMap(map_data.GetUniqueID,map_data.width,map_data.height,map_data.depth);
+        }
         InitAreas();
         InitTurfs();
         InitEntities();

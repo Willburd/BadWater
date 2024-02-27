@@ -10,15 +10,19 @@ class_name BootController
 @export var entity_spawner : MultiplayerSpawner
 
 @export var join_address : String = "localhost"
-@export var port : int	= 2532
 var max_players : int = -1		# Set from the ClientSpawner's data
 var max_entities : int = -1		# Set from the EntitySpawners's data
 var asset_library : AssetLoader
+
+var config : ConfigData
 
 @export var join_menu : CanvasLayer # TEMP
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# Load config
+	config = ConfigData.new()
+	config.Load("res://Config/Setup.json")
 	# Load asset library
 	asset_library = AssetLoader.new()
 	asset_library.Load()
@@ -37,6 +41,9 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 		add_child.call_deferred(server_scene)
 		server_scene.Init(edit_mode);
 		server_scene.entity_container = entity_container
+		server_scene.config = config
+		client_spawner.set_spawn_limit(config.max_clients)
+		entity_spawner.set_spawn_limit(config.max_entities)
 		# Set limits
 		max_players = client_spawner.get_spawn_limit()
 		max_entities = entity_spawner.get_spawn_limit()
@@ -44,10 +51,10 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 		multiplayer.peer_connected.connect(self._PeerJoin)
 		multiplayer.peer_disconnected.connect(self._PeerLeave)
 		# Create godot network server
-		peer.create_server(port,max_players)
+		peer.create_server(config.port,max_players)
 	else:
 		# Create godot client connection to server
-		peer.create_client(join_address,port)
+		peer.create_client(join_address,config.port)
 	multiplayer.set_multiplayer_peer(peer)
 	
 func _PeerJoin(id: int):

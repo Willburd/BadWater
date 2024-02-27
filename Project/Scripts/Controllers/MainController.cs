@@ -5,7 +5,11 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class MainController : Node
 {
+
 	public static MainController controller;
+
+	[Export]
+	public ConfigData config;
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
 
