@@ -1,7 +1,6 @@
 extends Node
 class_name BootController
 
-@export var server_forced : bool = false
 @export var entity_container : Node
 @export var client_container : Node
 
