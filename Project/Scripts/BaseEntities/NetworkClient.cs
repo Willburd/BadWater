@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-[GlobalClass] 
+[GlobalClass]
 public partial class NetworkClient : Node
 {
-	public static List<NetworkClient> clients = new List<NetworkClient>();
+    public static List<NetworkClient> clients = new List<NetworkClient>();
     
     public int PeerID              // Used by main controller to know that all controllers are ready for first game tick
     {
