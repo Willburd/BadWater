@@ -29,6 +29,8 @@ public partial class MainController : Node
 
 	[Export]
 	public Node entity_container;
+	[Export]
+	public Node client_container;
 
 	public void Init(ServerConfig state)
 	{
@@ -106,6 +108,11 @@ public partial class MainController : Node
 		for(int i = 0; i < subcontrollers.Count; i++) 
 		{
 			subcontrollers[i].Tick();
+		}
+		for(int i = 0; i < client_container.GetChildCount(); i++) 
+		{
+			NetworkClient client = client_container.GetChild(i) as NetworkClient;
+			client.Tick();
 		}
 		ticks += 1;
 	}

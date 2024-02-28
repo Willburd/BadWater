@@ -39,9 +39,10 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 		# Start controller
 		var server_scene: MainController = preload("res://Scenes/Server.tscn").instantiate()
 		add_child.call_deferred(server_scene)
-		server_scene.Init(edit_mode);
+		server_scene.client_container = client_container
 		server_scene.entity_container = entity_container
 		server_scene.config = config
+		server_scene.Init(edit_mode);
 		client_spawner.set_spawn_limit(config.max_clients)
 		entity_spawner.set_spawn_limit(config.max_entities)
 		# Set limits
@@ -61,6 +62,7 @@ func _PeerJoin(id: int):
 	print(str("Peer join: ",id))
 	var c : NetworkClient = client_prefab.instantiate()
 	c.name = str(id)
+	c.set_multiplayer_authority(id,false) # Allow the client to have authority of itself, but nothing else.
 	c.Spawn(c.name)
 	client_container.add_child(c)
 
