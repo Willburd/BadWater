@@ -23,7 +23,7 @@ public partial class NetworkEntity : Node3D
     // End of template data
     public string GetUniqueID
     {
-        get { return template_data.GetUniqueID; }
+        get { return template_data.GetUniqueModID; }
     }
 
 
@@ -167,7 +167,7 @@ public partial class NetworkEntity : Node3D
         switch(entity_type)
         {
             case EntityType.Area:
-                MapController.areas.Remove(this.template_data.GetUniqueID);
+                MapController.areas.Remove(this.template_data.GetUniqueModID);
                 break;
             case EntityType.Turf:
                 MapController.RemoveTurf(this as NetworkTurf, false);

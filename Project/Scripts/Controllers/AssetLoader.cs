@@ -126,13 +126,13 @@ public partial class AssetLoader : Node
         GD.Print("-PREFABS");
         {   // Base area
             AreaData area = new AreaData();
-            area.Init("_", "_", "Unknown", "_:_", true, false);
-            loaded_areas[area.GetUniqueID] = area;
+            area.Init( "_", "_", "_", "Unknown", "_:_", true, false);
+            loaded_areas[area.GetUniqueModID] = area;
         }
         {   // Space turf
             TurfData turf = new TurfData();
-            turf.Init( "_", "_", "Space", false, false);
-            loaded_turfs[turf.GetUniqueID] = turf;
+            turf.Init( "_", "_", "_", "Space", false, false);
+            loaded_turfs[turf.GetUniqueModID] = turf;
         }
     }
 
@@ -147,8 +147,8 @@ public partial class AssetLoader : Node
         {
             Godot.Collections.Dictionary map_data = (Godot.Collections.Dictionary)data[key];
             MapData map = new MapData();
-            map.Init(prefix, key,map_data["name"].AsString(), (int)map_data["width"].AsDouble(), (int)map_data["height"].AsDouble(), (int)map_data["depth"].AsDouble());
-            loaded_maps[map.GetUniqueID] = map;
+            map.Init( file_path, prefix, key,map_data["name"].AsString(), (int)map_data["width"].AsDouble(), (int)map_data["height"].AsDouble(), (int)map_data["depth"].AsDouble());
+            loaded_maps[map.GetUniqueModID] = map;
         }
     }
     private void ParseArea(string file_path)
@@ -159,8 +159,8 @@ public partial class AssetLoader : Node
         {
             Godot.Collections.Dictionary area_data = (Godot.Collections.Dictionary)data[key];
             AreaData area = new AreaData();
-            area.Init(prefix, key,area_data["name"].AsString(), area_data["base_turf"].AsString(), area_data["is_space"].AsDouble() > 0, area_data["always_powered"].AsDouble() > 0);
-            loaded_areas[area.GetUniqueID] = area;
+            area.Init( file_path, prefix, key,area_data["name"].AsString(), area_data["base_turf"].AsString(), area_data["is_space"].AsDouble() > 0, area_data["always_powered"].AsDouble() > 0);
+            loaded_areas[area.GetUniqueModID] = area;
         }
     }
     private void ParseTurf(string file_path)
@@ -171,8 +171,8 @@ public partial class AssetLoader : Node
         {
             Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)data[key];
             TurfData turf = new TurfData();
-            turf.Init(prefix, key,turf_data["name"].AsString(), turf_data["density"].AsDouble() > 0, turf_data["opaque"].AsDouble() > 0);
-            loaded_turfs[turf.GetUniqueID] = turf;
+            turf.Init( file_path, prefix, key,turf_data["name"].AsString(), turf_data["density"].AsDouble() > 0, turf_data["opaque"].AsDouble() > 0);
+            loaded_turfs[turf.GetUniqueModID] = turf;
         }
     }
 

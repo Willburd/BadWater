@@ -30,7 +30,7 @@ public partial class MapController : DeligateController
             if(!AssetLoader.loaded_maps.ContainsKey(map_id)) continue;
             MapData map_data = AssetLoader.loaded_maps[map_id];
             GD.Print("-Loading map: " + map_data.display_name);
-            InitMap(map_data.GetUniqueID,map_data.width,map_data.height,map_data.depth);
+            InitMap(map_id,map_data.width,map_data.height,map_data.depth);
         }
         InitTurfs();
         InitEntities();
@@ -38,20 +38,39 @@ public partial class MapController : DeligateController
         return true;
     }
 
-    private void InitMap(string mapID,int width, int height,int depth)
+    private void InitMap(string map_id,int width, int height,int depth)
     {
-        // TODO - Load map tiles, and init them as NetworkTurfs in the proper locations!
+        MapData map_data = AssetLoader.loaded_maps[map_id];
+        Godot.Collections.Dictionary map_list = TOOLS.ParseJson(map_data.GetFilePath);
+        Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
+        Godot.Collections.Dictionary area_data = (Godot.Collections.Dictionary)map_json["area_data"];
+        Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)map_json["turf_data"];
         for(int h = 0; h < depth; h++) 
         {
-            for(int i = 0; i < width; i++) 
+            Godot.Collections.Dictionary area_depth = (Godot.Collections.Dictionary)area_data[h.ToString()];
+            Godot.Collections.Dictionary turf_depth = (Godot.Collections.Dictionary)turf_data[h.ToString()];
+
+            for(int i = 0; i < height; i++) 
             {
-                for(int t = 0; t < height; t++) 
+                string[] area_ylist = area_depth[i.ToString()].AsStringArray();
+                string[] turf_ylist = turf_depth[i.ToString()].AsStringArray();
+
+                for(int t = 0; t < width; t++) 
                 {
                     // Base data...
                     string make_turf_id = "_:_";
                     string area_id = "_:_";
-                    // TODO - Solve for area that should be in this tile...
-                    AddTurf(make_turf_id,mapID, new Vector3(i,t,h), areas[area_id], false);
+                    // Load from current map!
+                    if(t < area_ylist.Length)
+                    {
+                        area_id = area_ylist[t];
+                    }
+                    if(t < turf_ylist.Length)
+                    {
+                        make_turf_id = turf_ylist[t];
+                    }
+                    // It's turfin time... How awful.
+                    AddTurf(make_turf_id,map_id, new Vector3(i,t,h), areas[area_id], false);
                 }
             }
         }
@@ -62,8 +81,8 @@ public partial class MapController : DeligateController
         // Create all areas from resources
         foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
-            NetworkArea area = NetworkEntity.CreateEntity("_",entry.Value.GetUniqueID,NetworkEntity.EntityType.Area) as NetworkArea;
-            areas[entry.Value.GetUniqueID] = area;
+            NetworkArea area = NetworkEntity.CreateEntity("_",entry.Value.GetUniqueModID,NetworkEntity.EntityType.Area) as NetworkArea;
+            areas[entry.Value.GetUniqueModID] = area;
             area.Init();
         }
         // Init the areas now that they are all prepared
