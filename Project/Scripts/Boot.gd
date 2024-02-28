@@ -19,7 +19,7 @@ var config : ConfigData
 @export var join_menu : CanvasLayer # TEMP
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
+func _enter_tree():
 	# Load config
 	config = ConfigData.new()
 	config.Load("res://Config/Setup.json")
@@ -62,10 +62,8 @@ func _PeerJoin(id: int):
 	print(str("Peer join: ",id))
 	var c : NetworkClient = client_prefab.instantiate()
 	c.name = str(id)
-	c.set_multiplayer_authority(id,false) # Allow the client to have authority of itself, but nothing else.
-	c.Spawn(c.name)
-	client_container.add_child(c)
-
+	c.Spawn()
+	
 func _PeerLeave(id: int):
 	print(str("Peer Leave: ",id))
 	var c : NetworkClient = client_container.get_node(str(id))

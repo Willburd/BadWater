@@ -7,9 +7,17 @@ using System.Diagnostics;
 public partial class NetworkClient : Node
 {
 	public static List<NetworkClient> clients = new List<NetworkClient>();
+    
+    public int PeerID              // Used by main controller to know that all controllers are ready for first game tick
+    {
+        get 
+        { 
+            int x;
+            if(Int32.TryParse(Name, out x)) return x;
+            return 1;
+        }
+    }
 
-    [Export]
-    public string id = "";
     [Export]
     public string focused_map_id;
     [Export]
@@ -20,6 +28,10 @@ public partial class NetworkClient : Node
     [Export]
     public Camera3D camera;
 
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(PeerID);
+    }
 
     public void SetFocusedEntity(NetworkEntity ent)
     {
@@ -33,11 +45,10 @@ public partial class NetworkClient : Node
         focused_entity = null;
     }
 
-    public void Spawn(string new_id)
+    public void Spawn()
     {
-        id = new_id;
         clients.Add(this);
-        camera.Current = IsMultiplayerAuthority();
+        camera.Current = false;
     }
 
     public void Tick()

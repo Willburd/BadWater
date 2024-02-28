@@ -2,12 +2,12 @@ using Godot;
 using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 
 [GlobalClass] 
 public partial class NetworkEntity : Node3D
 {
-        
     // Beginning of template data
     protected PackData template_data;
     public virtual void TemplateClone(PackData data)
@@ -120,12 +120,13 @@ public partial class NetworkEntity : Node3D
         
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public virtual void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
     {
 
 
 
-        Rpc("UpdateIcon");
+        Rpc(nameof(UpdateIcon));
     }
 
     public void Process()
