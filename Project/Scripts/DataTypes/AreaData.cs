@@ -4,14 +4,16 @@ using System;
 [GlobalClass] 
 public partial class AreaData : PackData
 {
-    public void Init(string file_path, string set_prefix, string set_ID, string set_name, string set_base_turf_ID, bool set_is_space, bool set_is_always_powered)
+    public override void SetVars(Godot.Collections.Dictionary data)
     {
-        SetIdentity( set_prefix, set_ID,file_path);
-        base_turf_ID = set_base_turf_ID;
-        display_name = set_name;
-        is_space = set_is_space;
-        always_powered = set_is_always_powered;
-        GD.Print("-" + GetUniqueModID + " name: " + display_name + " is_space: "  + is_space + " always_powered: " + always_powered);
+        display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
+        is_space        = TOOLS.ApplyExistingTag(data,"is_space",is_space);
+        always_powered  = TOOLS.ApplyExistingTag(data,"always_powered",always_powered);
+    }
+    public override void ShowVars()
+    {
+        // Print variables of loaded data for debugging
+        GD.Print("-" + GetUniqueModID + " name: " + display_name + " : "  + is_space + " : " + always_powered);
     }
     
     // Unique data

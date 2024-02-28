@@ -4,13 +4,16 @@ using System;
 [GlobalClass] 
 public partial class MapData : PackData
 {
-    public void Init(string file_path,string set_prefix, string set_ID, string set_name, int set_width, int set_height, int set_depth)
+    public override void SetVars(Godot.Collections.Dictionary data)
     {
-        SetIdentity( set_prefix, set_ID, file_path);
-        display_name = set_name;
-        width = set_width;
-        height = set_height;
-        depth = set_depth;
+        display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
+        width           = TOOLS.ApplyExistingTag(data,"width",width);
+        height          = TOOLS.ApplyExistingTag(data,"height",height);
+        depth           = TOOLS.ApplyExistingTag(data,"depth",depth);
+    }
+    public override void ShowVars()
+    {
+        // Print variables of loaded data for debugging
         GD.Print("-" + GetUniqueModID + " name: " + display_name + " width: "  + width + " height: " + height + " depth: " + depth);
     }
     

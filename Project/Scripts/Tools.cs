@@ -14,4 +14,40 @@ static class TOOLS
         jsonLoader.Parse((string)json_dat);
         return (Godot.Collections.Dictionary)jsonLoader.Data;
     }
+
+    public static string ApplyExistingTag(Godot.Collections.Dictionary data, string tag, string current_val)
+    {
+        if(data.ContainsKey(tag)) 
+        {
+            return data[tag].AsString();
+        }
+        return current_val;
+    }
+
+    public static bool ApplyExistingTag(Godot.Collections.Dictionary data, string tag, bool current_val)
+    {
+        if(data.ContainsKey(tag)) 
+        {
+            return data[tag].AsDouble() > 0;
+        }
+        return current_val;
+    }
+
+    public static float ApplyExistingTag(Godot.Collections.Dictionary data, string tag, float current_val)
+    {
+        if(data.ContainsKey(tag)) 
+        {
+            return (float)data[tag].AsDouble();
+        }
+        return current_val;
+    }
+
+    public static int ApplyExistingTag(Godot.Collections.Dictionary data, string tag, int current_val)
+    {
+        if(data.ContainsKey(tag)) 
+        {
+            return data[tag].AsInt32();
+        }
+        return current_val;
+    }
 }

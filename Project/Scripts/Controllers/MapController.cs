@@ -11,6 +11,8 @@ public partial class MapController : DeligateController
     protected static List<NetworkTurf> all_turfs = new List<NetworkTurf>();
     public static Dictionary<string,NetworkTurf> turf_at_location = new Dictionary<string,NetworkTurf>();
     public static Dictionary<string,NetworkArea> areas = new Dictionary<string,NetworkArea>();
+    public static List<NetworkEffect> all_effects = new List<NetworkEffect>();
+    public static Dictionary<string,List<NetworkEffect>> spawners = new Dictionary<string,List<NetworkEffect>>();
 
     public override bool CanInit()
     {
@@ -33,6 +35,7 @@ public partial class MapController : DeligateController
             InitMap(map_id,map_data.width,map_data.height,map_data.depth);
         }
         InitTurfs();
+        InitEffects();
         InitEntities();
         FinishInit();
         return true;
@@ -104,6 +107,22 @@ public partial class MapController : DeligateController
         for(int i = 0; i < all_turfs.Count; i++) 
         {
             all_turfs[i].UpdateIcon();
+        }
+    }
+
+    private void InitEffects()
+    {
+        for(int i = 0; i < all_effects.Count; i++) 
+        {
+            all_effects[i].Init();
+            if(all_effects[i].spawner_id != "")
+            {
+                if(!spawners.ContainsKey(all_effects[i].spawner_id))
+                {
+                    spawners[all_effects[i].spawner_id] = new List<NetworkEffect>();
+                }
+                spawners[all_effects[i].spawner_id].Add(all_effects[i]);
+            }
         }
     }
 

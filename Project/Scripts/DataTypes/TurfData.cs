@@ -4,14 +4,19 @@ using System;
 [GlobalClass] 
 public partial class TurfData : PackData
 {
-    public void Init(string file_path,string set_prefix, string set_ID, string set_name, bool set_density, bool set_opaque)
+    public override void SetVars(Godot.Collections.Dictionary data)
     {
-        SetIdentity( set_prefix, set_ID, file_path);
-        display_name = set_name;
-        density = set_density;
-        opaque = set_opaque;
+        display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
+        density          = TOOLS.ApplyExistingTag(data,"density",density);
+        opaque           = TOOLS.ApplyExistingTag(data,"opaque",opaque);
+    }
+    public override void ShowVars()
+    {
+        // Print variables of loaded data for debugging
         GD.Print("-" + GetUniqueModID + " name: " + display_name + " density: "  + density + " opaque: " + opaque);
     }
     
     // Unique data
+    public bool density = false;
+    public bool opaque = false;
 }

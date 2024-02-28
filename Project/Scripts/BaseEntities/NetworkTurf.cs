@@ -11,9 +11,13 @@ public partial class NetworkTurf : NetworkEntity
     {
         template_data = data;
         TurfData temp = template_data as TurfData;
-        density = template_data.density;
-        opaque = template_data.opaque;
+        density = temp.density;
+        opaque = temp.opaque;
     }
+    [Export]
+    public bool density;                // blocks movement
+    [Export]
+    public bool opaque;               // blocks vision
     // End of template data
     public override void _EnterTree()
     {

@@ -24,6 +24,9 @@ properties/5/replication_mode = 2
 properties/6/path = NodePath(".:opaque")
 properties/6/spawn = true
 properties/6/replication_mode = 2
+properties/7/path = NodePath(".:visible")
+properties/7/spawn = true
+properties/7/replication_mode = 2
 
 [node name="NetworkMachine" type="Node3D"]
 script = ExtResource("1_fd0cd")

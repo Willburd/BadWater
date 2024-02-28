@@ -10,6 +10,7 @@ public partial class AssetLoader : Node
     public static Dictionary<string,MapData> loaded_maps = new Dictionary<string,MapData>();
     public static Dictionary<string,AreaData> loaded_areas = new Dictionary<string,AreaData>();
     public static Dictionary<string,TurfData> loaded_turfs = new Dictionary<string,TurfData>();
+    public static Dictionary<string,EffectData> loaded_effects = new Dictionary<string,EffectData>();
 
     public void Load()
     {
@@ -19,6 +20,7 @@ public partial class AssetLoader : Node
         string turf_path = "res://Library/Turfs";
         string struct_path = "res://Library/Struct";
         string item_path = "res://Library/Items";
+        string effect_path = "res://Library/Effects";
         string mob_path = "res://Library/Mobs";
 
         GD.Print("-MAPS");
@@ -55,7 +57,7 @@ public partial class AssetLoader : Node
             }
         }
 
-        GD.Print("-TURFs");
+        GD.Print("-TURFS");
         dir = DirAccess.Open(turf_path);
         if (dir != null)
         {
@@ -106,6 +108,23 @@ public partial class AssetLoader : Node
             }
         }
 
+        GD.Print("-EFFECTS");
+        dir = DirAccess.Open(effect_path);
+        if (dir != null)
+        {
+            dir.ListDirBegin();
+            string fileName = dir.GetNext();
+            while (fileName != "")
+            {
+                
+                if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
+                {
+                    ParseEffect(effect_path + "/" + fileName);
+                }
+                fileName = dir.GetNext();
+            }
+        }
+
         GD.Print("-MOBS");
         dir = DirAccess.Open(mob_path);
         if (dir != null)
@@ -126,13 +145,30 @@ public partial class AssetLoader : Node
         GD.Print("-PREFABS");
         {   // Base area
             AreaData area = new AreaData();
-            area.Init( "_", "_", "_", "Unknown", "_:_", true, false);
+            Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
+            data["name"] = "Unknown";
+            data["is_space"] = 1.0;
+            data["always_powered"] = 1.0;
+            area.Init( "_", "_", "_", data);
             loaded_areas[area.GetUniqueModID] = area;
         }
         {   // Space turf
             TurfData turf = new TurfData();
-            turf.Init( "_", "_", "_", "Space", false, false);
+            Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
+            data["name"] = "Space";
+            data["density"] = 0.0;
+            data["opaque"] = 0.0;
+            turf.Init( "_", "_", "_", data);
             loaded_turfs[turf.GetUniqueModID] = turf;
+        }
+        {   // Fallback player spawn
+            EffectData effect = new EffectData();
+            Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
+            data["name"] = "Player Spawn";
+            data["spawner_id"] = "PLAYER";
+            data["cleanable"] = 0.0;
+            effect.Init( "_", "_", "PLAYER_SPAWN", data);
+            loaded_effects[effect.GetUniqueModID] = effect;
         }
     }
 
@@ -147,7 +183,7 @@ public partial class AssetLoader : Node
         {
             Godot.Collections.Dictionary map_data = (Godot.Collections.Dictionary)data[key];
             MapData map = new MapData();
-            map.Init( file_path, prefix, key,map_data["name"].AsString(), (int)map_data["width"].AsDouble(), (int)map_data["height"].AsDouble(), (int)map_data["depth"].AsDouble());
+            map.Init( file_path, prefix, key,map_data);
             loaded_maps[map.GetUniqueModID] = map;
         }
     }
@@ -159,7 +195,7 @@ public partial class AssetLoader : Node
         {
             Godot.Collections.Dictionary area_data = (Godot.Collections.Dictionary)data[key];
             AreaData area = new AreaData();
-            area.Init( file_path, prefix, key,area_data["name"].AsString(), area_data["base_turf"].AsString(), area_data["is_space"].AsDouble() > 0, area_data["always_powered"].AsDouble() > 0);
+            area.Init( file_path, prefix, key, area_data);
             loaded_areas[area.GetUniqueModID] = area;
         }
     }
@@ -171,7 +207,7 @@ public partial class AssetLoader : Node
         {
             Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)data[key];
             TurfData turf = new TurfData();
-            turf.Init( file_path, prefix, key,turf_data["name"].AsString(), turf_data["density"].AsDouble() > 0, turf_data["opaque"].AsDouble() > 0);
+            turf.Init( file_path, prefix, key,turf_data);
             loaded_turfs[turf.GetUniqueModID] = turf;
         }
     }
@@ -184,6 +220,19 @@ public partial class AssetLoader : Node
     private void ParseItem(string file_path)
     {
         GD.Print(file_path);
+    }
+
+    private void ParseEffect(string file_path)
+    {
+        Godot.Collections.Dictionary data = TOOLS.ParseJson(file_path);
+        string prefix = Path.GetFileNameWithoutExtension(file_path);
+        foreach( string key in data.Keys )
+        {
+            Godot.Collections.Dictionary effect_data = (Godot.Collections.Dictionary)data[key];
+            EffectData effect = new EffectData();
+            effect.Init( file_path, prefix, key,effect_data);
+            loaded_effects[effect.GetUniqueModID] = effect;
+        }
     }
 
     private void ParseMob(string file_path)

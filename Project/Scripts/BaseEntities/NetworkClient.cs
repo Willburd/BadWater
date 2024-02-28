@@ -23,6 +23,8 @@ public partial class NetworkClient : Node
     [Export]
     public Vector3 focused_position;
 
+    private float zoom_level = 10f;
+
     private NetworkEntity focused_entity;
 
     [Export]
@@ -62,8 +64,11 @@ public partial class NetworkClient : Node
 
     public override void _Process(double delta)
     {
-        camera.Current = IsMultiplayerAuthority();
-        camera.Position = focused_position + new Vector3(0f,10f,0f);
+        if(!IsMultiplayerAuthority()) return;
+        // Client only!
+        camera.Current = true;
+        camera.Position = focused_position + new Vector3(0f,zoom_level,0.3f);
+        camera.LookAt(focused_position);
     }
 
     public void Kill()
