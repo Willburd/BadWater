@@ -122,7 +122,10 @@ public partial class NetworkEntity : Node3D
 
     public virtual void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
     {
-        
+
+
+
+        Rpc("UpdateIcon");
     }
 
     public void Process()

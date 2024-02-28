@@ -33,6 +33,12 @@ public partial class NetworkClient : Node
         focused_entity = null;
     }
 
+    public void Spawn(string new_id)
+    {
+        id = new_id;
+        clients.Add(this);
+        camera.Current = IsMultiplayerAuthority();
+    }
 
     public void Tick()
     {
@@ -47,13 +53,6 @@ public partial class NetworkClient : Node
     {
         camera.Current = IsMultiplayerAuthority();
         camera.Position = focused_position;
-    }
-
-    public void Spawn(string new_id)
-    {
-        id = new_id;
-        clients.Add(this);
-        camera.Current = false;
     }
 
     public void Kill()
