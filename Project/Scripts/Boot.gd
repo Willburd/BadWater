@@ -63,6 +63,7 @@ func _PeerJoin(id: int):
 	var c : NetworkClient = client_prefab.instantiate()
 	c.name = str(id)
 	c.Spawn()
+	client_container.add_child(c,true)
 	
 func _PeerLeave(id: int):
 	print(str("Peer Leave: ",id))

@@ -3,34 +3,18 @@
 [ext_resource type="Script" path="res://Scripts/Boot.gd" id="1_ypo6r"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Scenes/NetworkClient.tscn" id="2_cssdj"]
 
-[node name="Main" type="Node"]
+[node name="Main" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "join_menu")]
 script = ExtResource("1_ypo6r")
-server_forced = true
+entity_container = NodePath("Entities")
+client_container = NodePath("Clients")
 client_prefab = ExtResource("2_cssdj")
-entity_container = Object(Node,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","script":null)
-
-client_container = Object(Node,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","script":null)
-
-client_spawner = Object(MultiplayerSpawner,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","_spawnable_scenes":PackedStringArray("res://Scenes/NetworkClient.tscn"),"spawn_path":NodePath("../Clients"),"spawn_limit":64,"script":null)
-
-entity_spawner = Object(MultiplayerSpawner,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","_spawnable_scenes":PackedStringArray("res://Scenes/NetworkEntity.tscn", "res://Scenes/NetworkArea.tscn", "res://Scenes/NetworkTurf.tscn", "res://Scenes/NetworkStructure.tscn", "res://Scenes/NetworkMachine.tscn", "res://Scenes/NetworkMob.tscn", "res://Scenes/NetworkItem.tscn"),"spawn_path":NodePath("../Entities"),"spawn_limit":65535,"script":null)
-
-join_menu = Object(CanvasLayer,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","layer":1,"visible":true,"offset":Vector2(0, 0),"rotation":0.0,"scale":Vector2(1, 1),"transform":Transform2D(1, 0, 0, 1, 0, 0),"follow_viewport_enabled":false,"follow_viewport_scale":1.0,"script":null)
-
+client_spawner = NodePath("ClientSpawner")
+entity_spawner = NodePath("EntitySpawner")
+join_menu = NodePath("JoinMenu")
 
 [node name="Entities" type="Node" parent="."]
 
 [node name="Clients" type="Node" parent="."]
-
-[node name="ClientSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://Scenes/NetworkClient.tscn")
-spawn_path = NodePath("../Clients")
-spawn_limit = 64
-
-[node name="EntitySpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://Scenes/NetworkEntity.tscn", "res://Scenes/NetworkArea.tscn", "res://Scenes/NetworkTurf.tscn", "res://Scenes/NetworkStructure.tscn", "res://Scenes/NetworkMachine.tscn", "res://Scenes/NetworkMob.tscn", "res://Scenes/NetworkItem.tscn")
-spawn_path = NodePath("../Entities")
-spawn_limit = 65535
 
 [node name="JoinMenu" type="CanvasLayer" parent="."]
 
@@ -55,6 +39,16 @@ offset_right = 181.0
 offset_bottom = 143.0
 text = "EDIT SERVER
 "
+
+[node name="ClientSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://Scenes/NetworkClient.tscn")
+spawn_path = NodePath("../Clients")
+spawn_limit = 64
+
+[node name="EntitySpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://Scenes/NetworkEntity.tscn", "res://Scenes/NetworkArea.tscn", "res://Scenes/NetworkTurf.tscn", "res://Scenes/NetworkStructure.tscn", "res://Scenes/NetworkMachine.tscn", "res://Scenes/NetworkMob.tscn", "res://Scenes/NetworkItem.tscn")
+spawn_path = NodePath("../Entities")
+spawn_limit = 65535
 
 [connection signal="pressed" from="JoinMenu/Client" to="." method="_on_client_pressed"]
 [connection signal="pressed" from="JoinMenu/Server" to="." method="_on_server_pressed"]
