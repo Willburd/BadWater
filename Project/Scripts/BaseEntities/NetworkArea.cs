@@ -22,7 +22,11 @@ public partial class NetworkArea : NetworkEntity
     [Export]
     public bool is_space;
     // End of template data
-    
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(1); // Server
+    }
+
 
     public List<NetworkTurf> turfs = new List<NetworkTurf>();
 

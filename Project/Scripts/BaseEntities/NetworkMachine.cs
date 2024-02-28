@@ -14,4 +14,8 @@ public partial class NetworkMachine : NetworkEntity
         opaque = template_data.opaque;
     }
     // End of template data
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(1); // Server
+    }
 }

@@ -63,6 +63,9 @@ transform = Transform3D(200, 0, 0, 0, 200, 0, 0, 0, 200, 0, -14.2386, 0)
 material_override = SubResource("StandardMaterial3D_8xhvk")
 mesh = SubResource("PlaneMesh_3s7et")
 
+[node name="ServerCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
+
 [connection signal="pressed" from="JoinMenu/Client" to="." method="_on_client_pressed"]
 [connection signal="pressed" from="JoinMenu/Server" to="." method="_on_server_pressed"]
 [connection signal="pressed" from="JoinMenu/Editor" to="." method="_on_editor_pressed"]

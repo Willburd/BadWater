@@ -15,6 +15,10 @@ public partial class NetworkTurf : NetworkEntity
         opaque = template_data.opaque;
     }
     // End of template data
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(1); // Server
+    }
 
 
     AtmoController.AtmoCell air_mix = null;

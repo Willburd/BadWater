@@ -14,6 +14,10 @@ public partial class NetworkMob : NetworkEntity
         opaque = template_data.opaque;
     }
     // End of template data
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(1); // Server
+    }
 
     int health = 100;
     int hunger = 0;

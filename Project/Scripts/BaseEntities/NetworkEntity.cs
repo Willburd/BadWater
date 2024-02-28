@@ -21,13 +21,17 @@ public partial class NetworkEntity : Node3D
     [Export]
     public bool opaque;               // blocks vision
     // End of template data
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(1); // Server
+    }
+
+
     public string GetUniqueID
     {
         get { return template_data.GetUniqueModID; }
     }
-
-
-
+    
     public enum EntityType
     {
         Area,

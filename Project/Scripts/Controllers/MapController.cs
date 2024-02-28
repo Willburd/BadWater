@@ -70,7 +70,7 @@ public partial class MapController : DeligateController
                         make_turf_id = turf_ylist[t];
                     }
                     // It's turfin time... How awful.
-                    AddTurf(make_turf_id,map_id, new Vector3(i,t,h), areas[area_id], false);
+                    AddTurf(make_turf_id,map_id, new Vector3(i,h,t), areas[area_id], false);
                 }
             }
         }
