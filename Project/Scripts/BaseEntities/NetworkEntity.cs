@@ -121,13 +121,14 @@ public partial class NetworkEntity : Node3D
         
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    // RPC stuff commented so I have the formatting.
+    //[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public virtual void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
     {
 
 
 
-        Rpc(nameof(UpdateIcon));
+        //Rpc(nameof(UpdateIcon));
     }
 
     public void Process()

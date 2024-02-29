@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 
 [GlobalClass] 
 public partial class MainController : Node
@@ -33,7 +34,9 @@ public partial class MainController : Node
 	[Export]
 	public static ServerConfig server_state = ServerConfig.Standard;
 
-	public static int tick_rate = 40;
+	public const int max_zoom = 6;
+	public const int tick_rate = 40;
+	
 	private static double tick_internal;	// delta_time counter for tick_rate calculation
 	private static bool setup_phase = true;
 	private static int ticks = 0;

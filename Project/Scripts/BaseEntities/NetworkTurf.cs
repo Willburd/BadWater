@@ -11,6 +11,8 @@ public partial class NetworkTurf : NetworkEntity
     {
         template_data = data;
         TurfData temp = template_data as TurfData;
+        model = temp.model;
+        texture = temp.texture;
         density = temp.density;
         opaque = temp.opaque;
     }
@@ -18,6 +20,10 @@ public partial class NetworkTurf : NetworkEntity
     public bool density;                // blocks movement
     [Export]
     public bool opaque;               // blocks vision
+    [Export]
+    public string model = "Plane";
+    [Export]
+    public string texture = "Error.png";
     // End of template data
     public override void _EnterTree()
     {
@@ -62,10 +68,27 @@ public partial class NetworkTurf : NetworkEntity
         MapController.turf_at_location[grid_lookup] = this; // UPDATE MAP!
     }
 
-
     public NetworkArea Area
     {
         get {return area;}
         set {area = value;} // SET USING Area.AddTurf() DO NOT SET DIRECTLY
+    }
+
+
+
+
+    
+    [Export]
+    public TurfMeshUpdater mesh_updater;
+    public override void UpdateIcon()
+    {
+        
+    }
+
+
+    // AUTO UPDATED, This might be better moved to an RPC?
+    public override void _Process(double delta)
+    {
+        mesh_updater.MeshUpdated(this);
     }
 }

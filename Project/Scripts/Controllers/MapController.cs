@@ -6,7 +6,7 @@ using System.Reflection.Metadata;
 
 public partial class MapController : DeligateController
 {
-    public static int TileSize = 2; // size in 3D units that world tiles are
+    public static int TileSize = 1; // size in 3D units that world tiles are
 
     protected static List<NetworkTurf> all_turfs = new List<NetworkTurf>();
     public static Dictionary<string,NetworkTurf> turf_at_location = new Dictionary<string,NetworkTurf>();
@@ -76,7 +76,7 @@ public partial class MapController : DeligateController
                         embedded_json = construct_strings[1];
                     }
                     // It's turfin time... How awful.
-                    NetworkTurf turf = AddTurf(make_turf_id,map_id, new Vector3(i,h,t), areas[area_id], false);
+                    NetworkTurf turf = AddTurf(make_turf_id,map_id, new Vector3(t,h,i), areas[area_id], false);
                     turf.ApplyMapCustomData(TOOLS.ParseJson(embedded_json)); // Set this object's flags using an embedded string of json!
                 }
             }

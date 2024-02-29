@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://c3chgcopiuygq"]
+
+[ext_resource type="Shader" path="res://Materials/Shaders/Main.gdshader" id="1_pn2la"]
+[ext_resource type="Texture2D" uid="uid://okn4erg005t4" path="res://Library/Textures/BASE/Turf/Floor/Plate.png" id="2_oygy8"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_pn2la")
+shader_parameter/_MainTexture = ExtResource("2_oygy8")

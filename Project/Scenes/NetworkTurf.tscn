@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://csou70imp3wqb"]
+[gd_scene load_steps=5 format=3 uid="uid://csou70imp3wqb"]
 
 [ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkTurf.cs" id="1_7vbmn"]
+[ext_resource type="Script" path="res://Scenes/TurfMeshUpdater.cs" id="3_m85m7"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:density")
@@ -18,16 +19,25 @@ properties/3/replication_mode = 2
 properties/4/path = NodePath(".:visible")
 properties/4/spawn = true
 properties/4/replication_mode = 2
+properties/5/path = NodePath(".:model")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:texture")
+properties/6/spawn = true
+properties/6/replication_mode = 2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_vyood"]
-center_offset = Vector3(1, 0, 1)
+size = Vector2(1, 1)
+center_offset = Vector3(0.5, 0, 0.5)
 
-[node name="NetworkTurf" type="Node3D"]
+[node name="NetworkTurf" type="Node3D" node_paths=PackedStringArray("mesh_updater")]
 script = ExtResource("1_7vbmn")
+mesh_updater = NodePath("TurfMesh")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25
 replication_config = SubResource("SceneReplicationConfig_bnqg0")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="TurfMesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_vyood")
+script = ExtResource("3_m85m7")

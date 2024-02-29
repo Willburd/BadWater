@@ -4,7 +4,7 @@
 		"name": "Sand",
 		"desc": "It's got grit!",
 		"model": "Plane",
-		"texture": "Base/Turf/Floor/Sand.png",
+		"texture": "BASE/Turf/Floor/Sand.png",
 		"density": 0,
 		"opaque": 0
 	},
@@ -13,7 +13,7 @@
 		"name": "Plating",
 		"desc": "It looks unfinished...",
 		"model": "Plane",
-		"texture": "Base/Turf/Floor/Plate.png",
+		"texture": "BASE/Turf/Floor/Plate.png",
 		"density": 0,
 		"opaque": 0
 	},
@@ -22,7 +22,7 @@
 		"name": "Floor",
 		"desc": "How menacing.",
 		"model": "Plane",
-		"texture": "Base/Turf/Floor/Floor.png",
+		"texture": "BASE/Turf/Floor/Floor.png",
 		"density": 0,
 		"opaque": 0
 	},
@@ -31,7 +31,7 @@
 		"name": "Wall",
 		"desc": "It looks solid.",
 		"model": "Plane",
-		"texture": "Base/Turf/Wall/Wall.png",
+		"texture": "BASE/Turf/Wall/Wall.png",
 		"density": 1,
 		"opaque": 1
 	},
@@ -40,7 +40,7 @@
 		"name": "Rock",
 		"desc": "It looks sturdy, but not unbreakable.",
 		"model": "Plane",
-		"texture": "Base/Turf/Wall/Rock.png",
+		"texture": "BASE/Turf/Wall/Rock.png",
 		"density": 1,
 		"opaque": 1
 	}

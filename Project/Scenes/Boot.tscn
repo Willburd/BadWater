@@ -55,16 +55,13 @@ _spawnable_scenes = PackedStringArray("res://Scenes/NetworkEntity.tscn", "res://
 spawn_path = NodePath("../Entities")
 spawn_limit = 65535
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.501314, 0.784094, 0.365896, 0, -0.422871, 0.90619, 0.865265, -0.454286, -0.211992, 2.54494, 1.76568, -3.65829)
-
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(200, 0, 0, 0, 200, 0, 0, 0, 200, 0, -14.2386, 0)
 material_override = SubResource("StandardMaterial3D_8xhvk")
 mesh = SubResource("PlaneMesh_3s7et")
 
 [node name="ServerCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 5, 0)
 
 [connection signal="pressed" from="JoinMenu/Client" to="." method="_on_client_pressed"]
 [connection signal="pressed" from="JoinMenu/Server" to="." method="_on_server_pressed"]

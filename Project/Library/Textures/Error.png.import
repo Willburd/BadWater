@@ -2,21 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://weg7ffufoy5p"
-path.s3tc="res://.godot/imported/FloorWhite.png-c99763539fb846c62c8fbb71ebcf2f0f.s3tc.ctex"
+uid="uid://c1m7jaer0pp6r"
+path="res://.godot/imported/Error.png-42134535d30a69e20eda607a45df7bb4.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
-source_file="res://Library/Textures/BASE/Turf/Floor/FloorWhite.png"
-dest_files=["res://.godot/imported/FloorWhite.png-c99763539fb846c62c8fbb71ebcf2f0f.s3tc.ctex"]
+source_file="res://Library/Textures/Error.png"
+dest_files=["res://.godot/imported/Error.png-42134535d30a69e20eda607a45df7bb4.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
@@ -32,4 +31,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1
