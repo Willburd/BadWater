@@ -1,15 +1,18 @@
 {
 	"SAND": {
+		"parent": "",
 		"name": "Sand",
 		"density": 0,
 		"opaque": 0
 	},
 	"PLATE": {
+		"parent": "",
 		"name": "Plating",
 		"density": 0,
 		"opaque": 0
 	},
 	"WALL": {
+		"parent": "",
 		"name": "Wall",
 		"density": 1,
 		"opaque": 1

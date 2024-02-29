@@ -5,6 +5,17 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class MainController : Node
 {
+    public enum DataType
+    {
+        Map,
+        Area,
+        Turf,
+        Effect,
+        Item,
+        Structure,
+        Machine,
+        Mob
+    }
 
 	public static MainController controller;
 

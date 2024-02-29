@@ -26,61 +26,50 @@ public partial class NetworkEntity : Node3D
         get { return template_data.GetUniqueModID; }
     }
 
-    public enum EntityType
-    {
-        Area,
-        Turf,
-        Effect,
-        Item,
-        Structure,
-        Machine,
-        Mob
-    }
-
-    private EntityType entity_type;
-    public static NetworkEntity CreateEntity(string mapID, string type_ID, EntityType type)
+    private MainController.DataType entity_type;
+    public static NetworkEntity CreateEntity(string mapID, string type_ID, MainController.DataType type)
     {
         PackData typeData = null;
         NetworkEntity newEnt = null;
         switch(type)
         {
-            case EntityType.Area:
+            case MainController.DataType.Area:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkArea.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 typeData = AssetLoader.loaded_areas[type_ID];
                 break;
-            case EntityType.Turf:
+            case MainController.DataType.Turf:
                 // Add to processing list is handled by the turf's creation in MapController.AddTurf()
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkTurf.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 typeData = AssetLoader.loaded_turfs[type_ID];
                 break;
-            case EntityType.Effect:
+            case MainController.DataType.Effect:
                 // Add to processing list is handled by the turf's creation in MapController.AddTurf()
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkEffect.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 typeData = AssetLoader.loaded_effects[type_ID];
                 // No template data here!
                 break;
-            case EntityType.Item:
+            case MainController.DataType.Item:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkItem.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
                 //typeData = AssetLoader.loaded_items[type_ID];
                 break;
-            case EntityType.Structure:
+            case MainController.DataType.Structure:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkStructure.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
                 //typeData = AssetLoader.loaded_structures[type_ID];
                 break;
-            case EntityType.Machine:
+            case MainController.DataType.Machine:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkMachine.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MachineController.entities.Add(newEnt);
                 //typeData = AssetLoader.loaded_machines[type_ID];
                 break;
-            case EntityType.Mob:
+            case MainController.DataType.Mob:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkMob.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MobController.entities.Add(newEnt);
@@ -175,29 +164,29 @@ public partial class NetworkEntity : Node3D
     {
         switch(entity_type)
         {
-            case EntityType.Area:
+            case MainController.DataType.Area:
                 MapController.areas.Remove(this.template_data.GetUniqueModID);
                 break;
-            case EntityType.Turf:
+            case MainController.DataType.Turf:
                 MapController.RemoveTurf(this as NetworkTurf, false);
                 break;
-            case EntityType.Effect:
+            case MainController.DataType.Effect:
                 MapController.all_effects.Remove(this as NetworkEffect);
                 if((this as NetworkEffect).spawner_id != "")
                 {
                     MapController.spawners[(this as NetworkEffect).spawner_id].Remove(this as NetworkEffect);
                 }
                 break;
-            case EntityType.Item:
+            case MainController.DataType.Item:
                 MapController.entities.Remove(this);
                 break;
-            case EntityType.Structure:
+            case MainController.DataType.Structure:
                 MapController.entities.Remove(this);
                 break;
-            case EntityType.Machine:
+            case MainController.DataType.Machine:
                 MachineController.entities.Remove(this);
                 break;
-            case EntityType.Mob:
+            case MainController.DataType.Mob:
                 MobController.entities.Remove(this);
                 break;
         }

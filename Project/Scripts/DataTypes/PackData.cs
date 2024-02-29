@@ -16,12 +16,22 @@ public partial class PackData : Resource
     public void Init(string file_path, string set_prefix, string set_ID, Godot.Collections.Dictionary data)
     {
         SetIdentity( set_prefix, set_ID, file_path, TOOLS.ApplyExistingTag(data,"parent",""));
-        loaded_vars = false; // used by the inheretance setup code. If this is false, we aren't ready to be read... So we defer the parent data loading until we are! 
+        temp_file_data = data;
+        ParentFlag = data_parent == ""; // used by the inheretance setup code. If this is false, we aren't ready to be read... So we defer the parent data loading until we are! 
     }
 
-    public virtual void SetVars(Godot.Collections.Dictionary data)
+    public virtual void SetVars(Godot.Collections.Dictionary data_override = null) // Uses temp_file_data to setup the object...
     {
 
+    }
+
+    public Godot.Collections.Dictionary GetTempData()
+    {
+        return temp_file_data;
+    }
+    public void ClearTempData()
+    {
+        temp_file_data = null;
     }
 
     public virtual void ShowVars()
@@ -29,7 +39,8 @@ public partial class PackData : Resource
         // Print variables of loaded data for debugging
     }
 
-    protected bool loaded_vars;
+    protected Godot.Collections.Dictionary temp_file_data;
+    protected bool loaded_parent;
     protected string data_parent = "";
     protected string mod_prefix = "";
     protected string unique_ID = "Turf";
@@ -46,10 +57,18 @@ public partial class PackData : Resource
     {
         get { return GetModID + ":" + GetUniqueID; }
     }
-    
+    public string GetDataParent
+    {
+        get {return data_parent;}
+    }
     public string GetFilePath
     {
         get { return source_file_path; }
+    }
+    public bool ParentFlag
+    {
+        get { return loaded_parent; }
+        set { loaded_parent = value; }
     }
     public string display_name = "Pack";
 }

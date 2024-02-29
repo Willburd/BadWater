@@ -1,5 +1,6 @@
 {
 	"TEST": {
+		"parent": "",
 		"name": "Testing",
 		"base_turf": "BASE:SAND",
 		"is_space": 0,

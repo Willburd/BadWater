@@ -84,7 +84,7 @@ public partial class MapController : DeligateController
         // Create all areas from resources
         foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
-            NetworkArea area = NetworkEntity.CreateEntity("_",entry.Value.GetUniqueModID,NetworkEntity.EntityType.Area) as NetworkArea;
+            NetworkArea area = NetworkEntity.CreateEntity("_",entry.Value.GetUniqueModID,MainController.DataType.Area) as NetworkArea;
             areas[entry.Value.GetUniqueModID] = area;
             area.Init();
         }
@@ -176,7 +176,7 @@ public partial class MapController : DeligateController
             }
         }
         // Spawn new turf
-        NetworkTurf turf = NetworkEntity.CreateEntity(mapID,turfID,NetworkEntity.EntityType.Turf) as NetworkTurf;
+        NetworkTurf turf = NetworkEntity.CreateEntity(mapID,turfID,MainController.DataType.Turf) as NetworkTurf;
         turf.SetGridPosition(grid_pos);
         area.AddTurf(turf);
         all_turfs.Add(turf);
