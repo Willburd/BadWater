@@ -7,13 +7,12 @@ public partial class ConfigData : Resource
     public void Load(string file_path)
     {
         Godot.Collections.Dictionary data = TOOLS.ParseJsonFile(file_path);
-        string prefix = Path.GetFileNameWithoutExtension(file_path);
-        if(data.ContainsKey("name"))        name = data["name"].AsString();
-        if(data.ContainsKey("port"))        port = (int)data["port"].AsDouble();
-        if(data.ContainsKey("max_clients")) max_clients = (int)data["max_clients"].AsDouble();
-        if(data.ContainsKey("max_entities"))max_entities = (int)data["max_entities"].AsDouble();
-        if(data.ContainsKey("password"))    password = data["password"].AsString();
-        if(data.ContainsKey("loaded_maps")) loaded_maps = data["loaded_maps"].AsStringArray();
+        name            = TOOLS.ApplyExistingTag(data,"name",name);
+        port            = TOOLS.ApplyExistingTag(data,"port",port);
+        max_clients     = TOOLS.ApplyExistingTag(data,"max_clients",max_clients);
+        max_entities    = TOOLS.ApplyExistingTag(data,"max_entities",max_entities);
+        password        = TOOLS.ApplyExistingTag(data,"password",password);
+        loaded_maps     = TOOLS.ApplyExistingTag(data,"loaded_maps",loaded_maps);
     }
 
     [Export]

@@ -14,6 +14,8 @@ static class TOOLS
 
     static public Godot.Collections.Dictionary ParseJson(string json_string)
     {
+        // Nothing here...
+        if(json_string == "") return new Godot.Collections.Dictionary();
         // Parse to dict
         Variant json_dat = Json.ParseString(json_string);
         Json jsonLoader = new Json();
@@ -53,6 +55,15 @@ static class TOOLS
         if(data.ContainsKey(tag)) 
         {
             return data[tag].AsInt32();
+        }
+        return current_val;
+    }
+
+    public static string[]  ApplyExistingTag(Godot.Collections.Dictionary data, string tag, string[] current_val)
+    {
+        if(data.ContainsKey(tag)) 
+        {
+            return data[tag].AsStringArray();
         }
         return current_val;
     }
