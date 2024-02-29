@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public partial class NetworkItem : NetworkEntity
 {
     // Beginning of template data
-    public override void TemplateClone(PackData data)
+    public override void TemplateRead(PackData data)
     {
         template_data = data;
         //density = template_data.density;

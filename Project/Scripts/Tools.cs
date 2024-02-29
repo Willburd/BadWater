@@ -3,13 +3,19 @@ using System;
 
 static class TOOLS
 {
-    static public Godot.Collections.Dictionary ParseJson(string file_path)
+    static public Godot.Collections.Dictionary ParseJsonFile(string file_path)
     {
-        // Read text from file
+        // Read text from file and then call parsejson.
         Godot.FileAccess file = Godot.FileAccess.Open(file_path, Godot.FileAccess.ModeFlags.Read);
-        Variant json_dat = Json.ParseString(file.GetAsText());
+        string json_dat = file.GetAsText();
         file.Close();
+        return ParseJson(json_dat);
+    }
+
+    static public Godot.Collections.Dictionary ParseJson(string json_string)
+    {
         // Parse to dict
+        Variant json_dat = Json.ParseString(json_string);
         Json jsonLoader = new Json();
         jsonLoader.Parse((string)json_dat);
         return (Godot.Collections.Dictionary)jsonLoader.Data;

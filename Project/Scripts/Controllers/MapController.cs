@@ -44,7 +44,7 @@ public partial class MapController : DeligateController
     private void InitMap(string map_id,int width, int height,int depth)
     {
         MapData map_data = AssetLoader.loaded_maps[map_id];
-        Godot.Collections.Dictionary map_list = TOOLS.ParseJson(map_data.GetFilePath);
+        Godot.Collections.Dictionary map_list = TOOLS.ParseJsonFile(map_data.GetFilePath);
         Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
         Godot.Collections.Dictionary area_data = (Godot.Collections.Dictionary)map_json["area_data"];
         Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)map_json["turf_data"];
@@ -56,24 +56,28 @@ public partial class MapController : DeligateController
             for(int i = 0; i < height; i++) 
             {
                 string[] area_ylist = area_depth[i.ToString()].AsStringArray();
-                string[] turf_ylist = turf_depth[i.ToString()].AsStringArray();
+                Godot.Collections.Array<string[]> turf_ylist = (Godot.Collections.Array<string[]>)turf_depth[i.ToString()];
 
                 for(int t = 0; t < width; t++) 
                 {
                     // Base data...
-                    string make_turf_id = "_:_";
                     string area_id = "_:_";
+                    string make_turf_id = "_:_";
+                    string embedded_json = "";
                     // Load from current map!
                     if(t < area_ylist.Length)
                     {
                         area_id = area_ylist[t];
                     }
-                    if(t < turf_ylist.Length)
+                    if(t < turf_ylist.Count)
                     {
-                        make_turf_id = turf_ylist[t];
+                        string[] construct_strings = turf_ylist[t];
+                        make_turf_id = construct_strings[0]; // Set ID
+                        embedded_json = construct_strings[1];
                     }
                     // It's turfin time... How awful.
-                    AddTurf(make_turf_id,map_id, new Vector3(i,h,t), areas[area_id], false);
+                    NetworkTurf turf = AddTurf(make_turf_id,map_id, new Vector3(i,h,t), areas[area_id], false);
+                    turf.ApplyMapCustomData(TOOLS.ParseJson(embedded_json)); // Set this object's flags using an embedded string of json!
                 }
             }
         }

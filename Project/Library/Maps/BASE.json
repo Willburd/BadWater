@@ -6,11 +6,11 @@
 		"depth": 1,
 		"turf_data": {
 			"0":{
-				"0": ["BASE:SAND","BASE:SAND","BASE:SAND","BASE:SAND","BASE:SAND"],
-				"1": ["BASE:SAND","BASE:WALL","BASE:WALL","BASE:WALL","BASE:SAND"],
-				"2": ["BASE:SAND","BASE:WALL","BASE:PLATE","BASE:WALL","BASE:SAND"],
-				"3": ["BASE:SAND","BASE:WALL","BASE:PLATE","BASE:WALL","BASE:SAND"],
-				"4": ["BASE:SAND","BASE:SAND","BASE:SAND","BASE:SAND","BASE:SAND"]
+				"0": [["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""]],
+				"1": [["BASE:SAND",""],["BASE:WALL",""],["BASE:WALL",""],["BASE:WALL",""],["BASE:SAND",""]],
+				"2": [["BASE:SAND",""],["BASE:WALL",""],["BASE:PLATE",""],["BASE:WALL",""],["BASE:SAND",""]],
+				"3": [["BASE:SAND",""],["BASE:WALL",""],["BASE:PLATE",""],["BASE:WALL",""],["BASE:SAND",""]],
+				"4": [["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""]]
 			}
 		},
 		"area_data": {
@@ -22,7 +22,7 @@
 				"4": ["_:_","_:_"		,"_:_"		,"_:_"		,"_:_"]
 			}
 		},
-		"effects": [],
+		"effects": [["_:PLAYER_SPAWN",0.5,2.5,""]],
 		"entities": []
 	}
 }

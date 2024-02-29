@@ -228,7 +228,7 @@ public partial class AssetLoader : Node
                     PackData search_parent = all_packs[parent_search];
                     parent_chain.Push(parent_search);
                     if(search_parent.GetDataParent == "") break;
-                    parent_search = data.GetType().ToString() + ":" +search_parent.GetDataParent;
+                    parent_search = data.GetType().ToString() + ":" + search_parent.GetDataParent;
                 }
                 // Go through all collected parents from the lowest to ourselves, and set values!
                 while(parent_chain.Count > 0)
@@ -247,7 +247,7 @@ public partial class AssetLoader : Node
 
     private void ParseData(string file_path, MainController.DataType type)
     {
-        Godot.Collections.Dictionary data = TOOLS.ParseJson(file_path);
+        Godot.Collections.Dictionary data = TOOLS.ParseJsonFile(file_path);
         string prefix = Path.GetFileNameWithoutExtension(file_path);
         foreach( string key in data.Keys )
         {

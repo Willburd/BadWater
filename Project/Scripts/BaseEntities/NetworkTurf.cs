@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public partial class NetworkTurf : NetworkEntity
 {
     // Beginning of template data
-    public override void TemplateClone(PackData data)
+    public override void TemplateRead(PackData data)
     {
         template_data = data;
         TurfData temp = template_data as TurfData;

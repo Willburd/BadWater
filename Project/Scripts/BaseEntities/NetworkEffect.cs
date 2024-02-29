@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public partial class NetworkEffect : NetworkEntity
 {
     // Beginning of template data
-    public override void TemplateClone(PackData data)
+    public override void TemplateRead(PackData data)
     {
         template_data = data;
         EffectData temp = template_data as EffectData;

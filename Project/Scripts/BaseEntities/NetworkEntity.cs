@@ -10,7 +10,14 @@ public partial class NetworkEntity : Node3D
 {
     // Beginning of template data
     protected PackData template_data;
-    public virtual void TemplateClone(PackData data)
+    public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
+    {
+        // Update our template with newly set variables
+        template_data.SetVars(data);
+        TemplateRead(template_data);
+        
+    }
+    public virtual void TemplateRead(PackData data)
     {
         template_data = data;
     }
@@ -79,7 +86,7 @@ public partial class NetworkEntity : Node3D
         // Entity init
         newEnt.id = next_entity_id++;
         newEnt.map_id_string = mapID;
-        newEnt.TemplateClone(typeData);
+        newEnt.TemplateRead(typeData);
         // Finally add to entity container.
         MainController.controller.entity_container.AddChild(newEnt,true);
         return newEnt;

@@ -6,7 +6,7 @@ public partial class ConfigData : Resource
 {
     public void Load(string file_path)
     {
-        Godot.Collections.Dictionary data = TOOLS.ParseJson(file_path);
+        Godot.Collections.Dictionary data = TOOLS.ParseJsonFile(file_path);
         string prefix = Path.GetFileNameWithoutExtension(file_path);
         if(data.ContainsKey("name"))        name = data["name"].AsString();
         if(data.ContainsKey("port"))        port = (int)data["port"].AsDouble();

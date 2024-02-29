@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public partial class NetworkArea : NetworkEntity
 {
     // Beginning of template data
-    public override void TemplateClone(PackData data)
+    public override void TemplateRead(PackData data)
     {
         template_data = data;
         AreaData temp = template_data as AreaData;
