@@ -28,7 +28,6 @@ static class TOOLS
         if(json_string == "") return new Godot.Collections.Dictionary();
         // cleanup 's
         json_string = json_string.Replace("'", "`");
-        GD.Print(json_string);
         // Parse to dict
         Variant json_dat = Json.ParseString(json_string);
         Json jsonLoader = new Json();
@@ -79,5 +78,13 @@ static class TOOLS
             return data[tag].AsStringArray();
         }
         return current_val;
+    }
+
+    public static void PrintProgress(int steps, int max_steps)
+    {
+        for(int b = 1; b <= 10; b++) 
+        {
+            if(steps == Mathf.Floor(max_steps / (b * 10))) GD.Print("-" + (b * 10) + "%");
+        }
     }
 }

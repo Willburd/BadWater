@@ -1,9 +1,12 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 [GlobalClass]
 public partial class TurfMeshUpdater : MeshInstance3D
 {
+
+    public static Dictionary<string,Resource> texture_cache = new Dictionary<string,Resource>();
 
     private string last_tex = "";
 
@@ -19,8 +22,12 @@ public partial class TurfMeshUpdater : MeshInstance3D
         if(force_update || last_tex != turf.texture)
         {
             string path = "res://Library/Textures/" + turf.texture;
-            if(!Godot.FileAccess.FileExists(path)) path = "res://Library/Textures/Error.png";
-            (MaterialOverride as ShaderMaterial).SetShaderParameter( "_MainTexture", GD.Load( path));
+            if(!texture_cache.ContainsKey(path))
+            {
+                if(!Godot.FileAccess.FileExists(path)) path = "res://Library/Textures/Error.png";
+                texture_cache[path] = GD.Load( path);
+            }
+            (MaterialOverride as ShaderMaterial).SetShaderParameter( "_MainTexture", texture_cache[path]);
             last_tex = turf.texture;
         }
     }

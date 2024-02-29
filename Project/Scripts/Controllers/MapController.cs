@@ -48,16 +48,44 @@ public partial class MapController : DeligateController
         Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
         Godot.Collections.Dictionary area_data = (Godot.Collections.Dictionary)map_json["area_data"];
         Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)map_json["turf_data"];
+        int steps = 0;
+        int max_steps = depth * width * height;
         for(int h = 0; h < depth; h++) 
         {
-            Godot.Collections.Dictionary area_depth = (Godot.Collections.Dictionary)area_data[h.ToString()];
-            Godot.Collections.Dictionary turf_depth = (Godot.Collections.Dictionary)turf_data[h.ToString()];
+            Godot.Collections.Dictionary area_depth = null;
+            if(area_data.ContainsKey(h.ToString())) area_depth = (Godot.Collections.Dictionary)area_data[h.ToString()];
+            Godot.Collections.Dictionary turf_depth = null;
+            if(turf_data.ContainsKey(h.ToString())) turf_depth = (Godot.Collections.Dictionary)turf_data[h.ToString()];
+
+            if(area_depth == null || turf_data == null)
+            {
+                // Empty Z, full fill of empty tiles
+                for(int i = 0; i < height; i++) 
+                {
+                    for(int t = 0; t < width; t++) 
+                    {
+                        NetworkTurf turf = AddTurf("_:_",map_id, new Vector3(t,h,i), areas["_:_"], false);
+                        TOOLS.PrintProgress(steps, max_steps);
+                        steps += 1;
+                    }
+                }
+                continue;
+            }
 
             for(int i = 0; i < height; i++) 
             {
-                string[] area_ylist = area_depth[i.ToString()].AsStringArray();
-                Godot.Collections.Array<string[]> turf_ylist = (Godot.Collections.Array<string[]>)turf_depth[i.ToString()];
-
+                // Assume data will overrun the buffer, and provide dummy lists
+                string[] area_ylist = new string[]{"_:_"};
+                if(area_depth.ContainsKey(i.ToString())) 
+                {
+                    area_ylist = area_depth[i.ToString()].AsStringArray();
+                }
+                Godot.Collections.Array<string[]> turf_ylist = new Godot.Collections.Array<string[]>{ new string[] { "_:_", "" }};
+                if(area_depth.ContainsKey(i.ToString())) 
+                {
+                    turf_ylist = (Godot.Collections.Array<string[]>)turf_depth[i.ToString()];
+                }
+                // Create turfs!
                 for(int t = 0; t < width; t++) 
                 {
                     // Base data...
@@ -78,6 +106,8 @@ public partial class MapController : DeligateController
                     // It's turfin time... How awful.
                     NetworkTurf turf = AddTurf(make_turf_id,map_id, new Vector3(t,h,i), areas[area_id], false);
                     turf.ApplyMapCustomData(TOOLS.ParseJson(embedded_json)); // Set this object's flags using an embedded string of json!
+                    TOOLS.PrintProgress(steps, max_steps);
+                    steps += 1;
                 }
             }
         }

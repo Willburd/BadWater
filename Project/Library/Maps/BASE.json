@@ -2,8 +2,8 @@
 	"TEST": {
 		"name": "Testing",
 		"desc": "A map where terrible things happen.",
-		"width": 5,
-		"height": 5,
+		"width": 50,
+		"height": 50,
 		"depth": 1,
 		"turf_data": {
 			"0":{

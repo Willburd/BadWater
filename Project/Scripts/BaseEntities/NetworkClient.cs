@@ -64,7 +64,7 @@ public partial class NetworkClient : Node
 
     public override void _Process(double delta)
     {
-        if(IsNodeReady() && !IsMultiplayerAuthority()) return;
+        if(!IsMultiplayerAuthority()) return;
         // Client only!
         camera.Current = true;
         camera.Position = focused_position + new Vector3(0f,zoom_level * MainController.max_zoom,0.3f);
