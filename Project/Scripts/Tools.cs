@@ -6,9 +6,19 @@ static class TOOLS
     static public Godot.Collections.Dictionary ParseJsonFile(string file_path)
     {
         // Read text from file and then call parsejson.
+        if(!Godot.FileAccess.FileExists(file_path)) 
+        {
+            GD.Print("Missing file: " + file_path);
+            return new Godot.Collections.Dictionary();
+        }
         Godot.FileAccess file = Godot.FileAccess.Open(file_path, Godot.FileAccess.ModeFlags.Read);
         string json_dat = file.GetAsText();
         file.Close();
+        if(json_dat == "") 
+        {
+            GD.Print("Empty Json passed from: " + file_path);
+            return new Godot.Collections.Dictionary();
+        }
         return ParseJson(json_dat);
     }
 
@@ -16,6 +26,9 @@ static class TOOLS
     {
         // Nothing here...
         if(json_string == "") return new Godot.Collections.Dictionary();
+        // cleanup 's
+        json_string = json_string.Replace("'", "`");
+        GD.Print(json_string);
         // Parse to dict
         Variant json_dat = Json.ParseString(json_string);
         Json jsonLoader = new Json();
