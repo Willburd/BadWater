@@ -42,6 +42,7 @@ public partial class AssetLoader : Node
                 
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
+                    GD.Print("-" + fileName);
                     ParseData(map_path + "/" + fileName, MainController.DataType.Map);
                 }
                 fileName = dir.GetNext();
@@ -59,6 +60,7 @@ public partial class AssetLoader : Node
                 
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
+                    GD.Print("-" + fileName);
                     ParseData(area_path + "/" + fileName, MainController.DataType.Area);
                 }
                 fileName = dir.GetNext();
@@ -76,6 +78,7 @@ public partial class AssetLoader : Node
                 
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
+                    GD.Print("-" + fileName);
                     ParseData(turf_path + "/" + fileName, MainController.DataType.Turf);
                 }
                 fileName = dir.GetNext();
@@ -93,6 +96,7 @@ public partial class AssetLoader : Node
                 
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
+                    GD.Print("-" + fileName);
                     ParseData(struct_path + "/" + fileName, MainController.DataType.Structure);
                 }
                 fileName = dir.GetNext();
@@ -110,6 +114,7 @@ public partial class AssetLoader : Node
                 
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
+                    GD.Print("-" + fileName);
                     ParseData(item_path + "/" + fileName, MainController.DataType.Item);
                 }
                 fileName = dir.GetNext();
@@ -127,6 +132,7 @@ public partial class AssetLoader : Node
                 
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
+                    GD.Print("-" + fileName);
                     ParseData(effect_path + "/" + fileName, MainController.DataType.Effect);
                 }
                 fileName = dir.GetNext();
@@ -144,6 +150,7 @@ public partial class AssetLoader : Node
                 
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
+                    GD.Print("-" + fileName);
                     ParseData(mob_path + "/" + fileName, MainController.DataType.Mob);
                 }
                 fileName = dir.GetNext();
@@ -292,7 +299,7 @@ public partial class AssetLoader : Node
 
                 case MainController.DataType.Item:
                     {
-                        PackData data_pack = new PackData();
+                        ItemData data_pack = new ItemData();
                         data_pack.Init( file_path, prefix, key,dict_data);
                         loaded_items[data_pack.GetUniqueModID] = data_pack;
                         all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;

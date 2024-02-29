@@ -2,6 +2,7 @@
 	"TEST": {
 		"parent": "",
 		"name": "Testing",
+		"desc": "Test zone!",
 		"base_turf": "BASE:SAND",
 		"is_space": 0,
 		"always_powered": 0

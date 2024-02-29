@@ -62,25 +62,25 @@ public partial class NetworkEntity : Node3D
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkItem.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
-                //typeData = AssetLoader.loaded_items[type_ID];
+                typeData = AssetLoader.loaded_items[type_ID];
                 break;
             case MainController.DataType.Structure:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkStructure.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
-                //typeData = AssetLoader.loaded_structures[type_ID];
+                typeData = AssetLoader.loaded_structures[type_ID];
                 break;
             case MainController.DataType.Machine:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkMachine.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MachineController.entities.Add(newEnt);
-                //typeData = AssetLoader.loaded_machines[type_ID];
+                typeData = AssetLoader.loaded_machines[type_ID];
                 break;
             case MainController.DataType.Mob:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkMob.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 MobController.entities.Add(newEnt);
-                //typeData = AssetLoader.loaded_mobs[type_ID];
+                typeData = AssetLoader.loaded_mobs[type_ID];
                 break;
         }
         // Entity init

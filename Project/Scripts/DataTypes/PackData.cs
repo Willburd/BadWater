@@ -78,4 +78,5 @@ public partial class PackData : Resource
         set { loaded_parent = value; }
     }
     public string display_name = "Pack";
+    public string description = "";
 }

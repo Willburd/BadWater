@@ -1,6 +1,7 @@
 {
 	"TEST": {
 		"name": "Testing",
+		"desc": "A map where terrible things happen.",
 		"width": 5,
 		"height": 5,
 		"depth": 1,

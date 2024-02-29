@@ -8,18 +8,23 @@ public partial class TurfData : PackData
     {
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
-        density          = TOOLS.ApplyExistingTag(data,"density",density);
-        opaque           = TOOLS.ApplyExistingTag(data,"opaque",opaque);
+        display_name      = TOOLS.ApplyExistingTag(data,"name",display_name);
+        description       = TOOLS.ApplyExistingTag(data,"desc",description);
+        model             = TOOLS.ApplyExistingTag(data,"model",model);
+        texture           = TOOLS.ApplyExistingTag(data,"texture",texture);
+        density           = TOOLS.ApplyExistingTag(data,"density",density);
+        opaque            = TOOLS.ApplyExistingTag(data,"opaque",opaque);
     }
 
     protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        return " name: " + display_name + " density: "  + density + " opaque: " + opaque;
+        return " name: " + display_name + " description: " + description + " density: "  + density + " model: "  + model + " texture: "  + texture + " opaque: " + opaque;
     }
     
     // Unique data
+    public string model = "Plane";
+    public string texture = "";
     public bool density = false;
     public bool opaque = false;
 }

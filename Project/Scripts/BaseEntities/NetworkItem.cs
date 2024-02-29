@@ -10,14 +10,17 @@ public partial class NetworkItem : NetworkEntity
     public override void TemplateRead(PackData data)
     {
         template_data = data;
-        //density = template_data.density;
-        //opaque = template_data.opaque;
+        ItemData temp = template_data as ItemData;
+        size_category = temp.size_category;
     }
     [Export]
-    public bool density;                // blocks movement
+    public bool density;                    // blocks movement
     [Export]
-    public bool opaque;               // blocks vision
+    public bool opaque;                     // blocks vision
+    [Export]
+    public ItemData.SizeCategory size_category = ItemData.SizeCategory.Tiny;   // Size of item in world and bags
     // End of template data
+
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(1); // Server

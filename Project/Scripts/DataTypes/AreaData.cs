@@ -9,6 +9,7 @@ public partial class AreaData : PackData
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
         display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
+        description    = TOOLS.ApplyExistingTag(data,"desc",description);
         is_space        = TOOLS.ApplyExistingTag(data,"is_space",is_space);
         always_powered  = TOOLS.ApplyExistingTag(data,"always_powered",always_powered);
     }
@@ -16,7 +17,7 @@ public partial class AreaData : PackData
     protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        return " name: " + display_name + " : "  + is_space + " : " + always_powered;
+        return " name: " + display_name + " description: " + description + " is_space: "  + is_space + " always_powered: " + always_powered;
     }
     
     // Unique data

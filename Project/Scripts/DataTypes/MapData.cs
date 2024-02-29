@@ -9,6 +9,7 @@ public partial class MapData : PackData
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
         display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
+        description    = TOOLS.ApplyExistingTag(data,"desc",description);
         width           = TOOLS.ApplyExistingTag(data,"width",width);
         height          = TOOLS.ApplyExistingTag(data,"height",height);
         depth           = TOOLS.ApplyExistingTag(data,"depth",depth);
@@ -17,7 +18,7 @@ public partial class MapData : PackData
     protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        return " name: " + display_name + " width: "  + width + " height: " + height + " depth: " + depth;
+        return " name: " + display_name + " description: " + description + " width: "  + width + " height: " + height + " depth: " + depth;
     }
     
     // Unique data
