@@ -13,10 +13,11 @@ public partial class MapData : PackData
         height          = TOOLS.ApplyExistingTag(data,"height",height);
         depth           = TOOLS.ApplyExistingTag(data,"depth",depth);
     }
-    public override void ShowVars()
+    
+    protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        GD.Print("-" + GetType().ToString() + ":" + GetUniqueModID + " name: " + display_name + " width: "  + width + " height: " + height + " depth: " + depth);
+        return " name: " + display_name + " width: "  + width + " height: " + height + " depth: " + depth;
     }
     
     // Unique data

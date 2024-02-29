@@ -34,10 +34,17 @@ public partial class PackData : Resource
         temp_file_data = null;
     }
 
-    public virtual void ShowVars()
+    protected virtual string GetVarString()
+    {
+        return "";
+    }
+
+    public void ShowVars()
     {
         // Print variables of loaded data for debugging
+        GD.Print("-" + GetType().ToString() + ":" + GetUniqueModID + GetVarString());
     }
+    
 
     protected Godot.Collections.Dictionary temp_file_data;
     protected bool loaded_parent;

@@ -12,10 +12,11 @@ public partial class EffectData : PackData
         spawner_id      = TOOLS.ApplyExistingTag(data,"spawner_id",spawner_id);
         cleanable       = TOOLS.ApplyExistingTag(data,"cleanable",cleanable);
     }
-    public override void ShowVars()
+
+    protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        GD.Print("-" + GetType().ToString() + ":" + GetUniqueModID + " name: " + display_name );
+        return " name: " + display_name;
     }
 
     // Unique data

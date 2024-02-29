@@ -12,10 +12,11 @@ public partial class AreaData : PackData
         is_space        = TOOLS.ApplyExistingTag(data,"is_space",is_space);
         always_powered  = TOOLS.ApplyExistingTag(data,"always_powered",always_powered);
     }
-    public override void ShowVars()
+
+    protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        GD.Print("-" + GetType().ToString() + ":" + GetUniqueModID + " name: " + display_name + " : "  + is_space + " : " + always_powered);
+        return " name: " + display_name + " : "  + is_space + " : " + always_powered;
     }
     
     // Unique data

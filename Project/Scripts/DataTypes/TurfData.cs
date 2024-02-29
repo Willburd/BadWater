@@ -12,10 +12,11 @@ public partial class TurfData : PackData
         density          = TOOLS.ApplyExistingTag(data,"density",density);
         opaque           = TOOLS.ApplyExistingTag(data,"opaque",opaque);
     }
-    public override void ShowVars()
+
+    protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        GD.Print("-" + GetType().ToString() + ":" + GetUniqueModID + " name: " + display_name + " density: "  + density + " opaque: " + opaque);
+        return " name: " + display_name + " density: "  + density + " opaque: " + opaque;
     }
     
     // Unique data
