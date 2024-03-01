@@ -115,11 +115,6 @@ public partial class MapController : DeligateController
             areas[entry.Value.GetUniqueModID] = area;
             area.Init();
         }
-        // Init the areas now that they are all prepared
-        foreach(KeyValuePair<string, NetworkArea> entry in areas)
-        {
-            entry.Value.Init();
-        }
     }
 
     private void InitEffects()
