@@ -10,7 +10,7 @@ public partial class AtmoController : DeligateController
 
     public override bool CanInit()
     {
-        return IsSubControllerInit(MapController.controller); // waiting on the map controller first
+        return IsSubControllerInit(MapController.controller) && IsSubControllerInit(ChemController.controller); // waiting on the map and chem controller first
     }
 
     public override bool Init()

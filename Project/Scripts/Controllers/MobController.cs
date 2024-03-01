@@ -5,7 +5,7 @@ public partial class MobController : DeligateController
 {
     public override bool CanInit()
     {
-        return IsSubControllerInit(MapController.controller); // waiting on the map controller first
+        return IsSubControllerInit(AtmoController.controller); // waiting on the Atmo controller, and by proxy: Map and Chem controllers!
     }
 
     public override bool Init()

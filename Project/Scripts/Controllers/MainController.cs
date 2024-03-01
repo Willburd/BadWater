@@ -59,14 +59,19 @@ public partial class MainController : Node
 		{
 			case ServerConfig.Standard:
 				subcontrollers.Add(new MapController());
+				subcontrollers.Add(new ChemController());
 				subcontrollers.Add(new AtmoController());
 				subcontrollers.Add(new MachineController());
 				subcontrollers.Add(new MobController());
+				subcontrollers.Add(new ChunkController());
+				subcontrollers.Add(new ChatController());
 			break;
 
 			case ServerConfig.Editor:
 				subcontrollers.Add(new MapController());
 				subcontrollers.Add(new EditorController());
+				subcontrollers.Add(new ChunkController());
+				subcontrollers.Add(new ChatController());
 			break;
 		}
 	}

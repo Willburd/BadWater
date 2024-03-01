@@ -18,7 +18,7 @@ public partial class MapController : DeligateController
 
     public override bool CanInit()
     {
-        return IsSubControllerInit(MachineController.controller);
+        return IsSubControllerInit(ChemController.controller);
     }
 
     private List<MapLoader> loading = new List<MapLoader>();

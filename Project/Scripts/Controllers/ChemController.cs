@@ -1,16 +1,16 @@
 using Godot;
 using System;
 
-public partial class MachineController : DeligateController
+public partial class ChemController : DeligateController
 {
     public override bool CanInit()
     {
-        return IsSubControllerInit(AtmoController.controller); // waiting on the Atmo controller, and by proxy: Map and Chem controllers!
+        return true;
     }
 
     public override bool Init()
     {
-        tick_rate = 10;
+        tick_rate = 5;
         controller = this;
         return true;
     }
