@@ -23,7 +23,7 @@ public partial class MapController : DeligateController
 
     private List<MapLoader> loading = new List<MapLoader>();
     private List<MapInitilizer> initing = new List<MapInitilizer>();
-    private List<MapIconUpdater> iconupdating = new List<MapIconUpdater>();
+    private List<MapLateInitilizer> iconupdating = new List<MapLateInitilizer>();
     public override bool Init()
     {
         tick_rate = 3;
@@ -79,15 +79,15 @@ public partial class MapController : DeligateController
             if(!finished) return;
             foreach(MapOperator loader in initing)
             {
-                iconupdating.Add(new MapIconUpdater(active_maps[loader.GetMapID()]));
+                iconupdating.Add(new MapLateInitilizer(active_maps[loader.GetMapID()]));
             }
             initing.Clear();
             return;
         }
-        // Time to update first time icons!
+        // Late init, and UpdateIcons();
         if(iconupdating.Count > 0)
         {
-            foreach(MapIconUpdater iconing in iconupdating)
+            foreach(MapLateInitilizer iconing in iconupdating)
             {
                 if(!iconing.Finished())
                 {
@@ -122,6 +122,12 @@ public partial class MapController : DeligateController
         for(int i = 0; i < all_effects.Count; i++) 
         {
             all_effects[i].Init();
+        }
+        // Time for their graphical update too!
+        for(int i = 0; i < all_effects.Count; i++) 
+        {
+            all_effects[i].LateInit();
+            all_effects[i].UpdateIcon();
             if(all_effects[i].spawner_id != "")
             {
                 if(!spawners.ContainsKey(all_effects[i].spawner_id))
@@ -150,6 +156,8 @@ public partial class MapController : DeligateController
         // Time for their graphical update too!
         for(int i = 0; i < all_entities.Count; i++) 
         {
+            
+            all_entities[i].LateInit();
             all_entities[i].UpdateIcon();
         }
     }
@@ -323,6 +331,7 @@ public partial class MapController : DeligateController
             else
             {
                 // Or void it
+                turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep].Kill();
                 turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep] = null;
             }
         }
@@ -511,9 +520,9 @@ public partial class MapController : DeligateController
     }
 
 
-    private class MapIconUpdater : MapOperator
+    private class MapLateInitilizer : MapOperator
     {
-        public MapIconUpdater(MapContainer input_map)
+        public MapLateInitilizer(MapContainer input_map)
         {
             map_id = input_map.MapID;
             output_map = input_map;
@@ -525,7 +534,9 @@ public partial class MapController : DeligateController
             int repeats = 100;
             while(repeats-- > 0 && !finished)
             {
-                GetTurfAtPosition(current_x, current_y, current_z).UpdateIcon();
+                AbstractTurf turf = GetTurfAtPosition(current_x, current_y, current_z);
+                turf.LateInit();
+                turf.UpdateIcon();
                 HandleLoop();
             }
         }

@@ -120,6 +120,11 @@ public partial class NetworkEntity : Node3D
     {
         
     }
+    
+    public virtual void LateInit()      // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    {
+        
+    }
 
     public virtual void Tick()          // Called every process tick on the Fire() tick of the subcontroller that owns them
     {

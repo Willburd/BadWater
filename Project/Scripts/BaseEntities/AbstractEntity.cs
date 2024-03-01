@@ -61,6 +61,11 @@ public partial class AbstractEntity
         
     }
 
+    public virtual void LateInit()      // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    {
+        
+    }
+
     public virtual void Tick()          // Called every process tick on the Fire() tick of the subcontroller that owns them
     {
         
@@ -87,7 +92,6 @@ public partial class AbstractEntity
         switch(entity_type)
         {
             case MainController.DataType.Turf:
-                MapController.areas.Remove(PackRef.modid);
                 break;
         }
     }
