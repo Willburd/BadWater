@@ -42,8 +42,7 @@ public partial class NetworkEntity : Node3D
             case MainController.DataType.Chunk:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkChunk.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
-                // Data type for these is weird!
-                //MapController.loaded_chunks.Add(newEnt);
+                // MapController's MapContainer handles chunk storage!
                 break;
             case MainController.DataType.Effect:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkEffect.tscn").Instantiate() as NetworkEntity;

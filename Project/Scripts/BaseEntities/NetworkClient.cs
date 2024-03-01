@@ -49,8 +49,14 @@ public partial class NetworkClient : Node
 
     public void Spawn()
     {
+        // Prep
         clients.Add(this);
         camera.Current = false;
+        // Check for a spawner!
+        List<NetworkEffect> spawners = MapController.spawners["PLAYER"];
+        // TEMP, pick random instead?
+        focused_map_id = spawners[0].map_id_string;
+        focused_position = spawners[0].Position;
     }
 
     public void Tick()

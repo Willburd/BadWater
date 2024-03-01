@@ -47,6 +47,19 @@ public partial class MainController : Node
 	[Export]
 	public Node client_container;
 
+	public static List<NetworkClient> ClientList
+	{
+		get 
+		{
+			List<NetworkClient> ret = new List<NetworkClient>();
+			for(int i = 0; i < controller.client_container.GetChildCount(); i++) 
+			{
+				ret.Add(controller.client_container.GetChild(i) as NetworkClient);
+			}
+			return ret;
+		}
+	} 
+
 	public void Init(ServerConfig state)
 	{
 		// self singleton for all the others.

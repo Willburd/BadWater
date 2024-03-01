@@ -10,7 +10,7 @@ public partial class ChemController : DeligateController
 
     public override bool Init()
     {
-        tick_rate = 5;
+        tick_rate = 10;
         controller = this;
         return true;
     }

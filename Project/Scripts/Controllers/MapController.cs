@@ -163,6 +163,43 @@ public partial class MapController : DeligateController
     }
 
 
+    public static bool IsMapLoaded(string mapID)
+    {
+        if(mapID == null) return false;
+        return active_maps.ContainsKey(mapID);
+    }
+
+
+    public static Dictionary<string,List<NetworkChunk>> GetAllMapChunks()
+    {
+        Dictionary<string,List<NetworkChunk>> ret = new Dictionary<string,List<NetworkChunk>>();
+        foreach(KeyValuePair<string,MapContainer> entry in active_maps)
+        {
+            ret[entry.Key] = entry.Value.GetLoadedChunks();
+        }
+        return ret;
+    }
+    public static NetworkChunk[,,] GetLoadedChunkGrid(string mapID)
+    {
+        return active_maps[mapID].GetLoadedChunkGrid();
+    }
+    public static List<NetworkChunk> GetLoadedChunks(string mapID)
+    {
+        return active_maps[mapID].GetLoadedChunks();
+    }
+    public static bool IsChunkLoaded(string mapID, ChunkPos chunk_pos)
+    {
+        return active_maps[mapID].IsChunkLoaded(chunk_pos);
+    }
+    public static NetworkChunk GetChunk(string mapID, ChunkPos chunk_pos)
+    {
+        return active_maps[mapID].GetChunk(chunk_pos);
+    }
+    public static void ChunkUnload(NetworkChunk chunk)
+    {
+        active_maps[chunk.map_id_string].UnloadChunk(chunk);
+    }
+
     public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, NetworkArea area, bool replace = true)
     {
         return active_maps[mapID].AddTurf(turfID, grid_pos, area, replace);
@@ -240,6 +277,31 @@ public partial class MapController : DeligateController
         public int dep;
     }
 
+    public struct ChunkPos
+    {
+        public ChunkPos(int set_hor, int set_ver, int set_dep)
+        {
+            hor = set_hor;
+            ver = set_ver;
+            dep = set_dep;
+        }
+        public ChunkPos(Vector3 worldPos)
+        {
+            hor = Mathf.FloorToInt((worldPos.X / MapController.TileSize) / ChunkController.chunk_size);
+            ver = Mathf.FloorToInt((worldPos.Z / MapController.TileSize) / ChunkController.chunk_size);
+            dep = Mathf.FloorToInt((worldPos.Y / MapController.TileSize));
+        }
+
+        public bool Equals(GridPos other)
+        {
+            return hor == other.hor && ver == other.ver && dep == other.dep;
+        }
+
+        public int hor;
+        public int ver;
+        public int dep;
+    }
+
     private class MapContainer
     {
         private AbstractTurf[,,] turfs;
@@ -251,13 +313,27 @@ public partial class MapController : DeligateController
         public float draw_offset_hor = 0;
         public float draw_offset_vert = 0;
 
+        private List<NetworkChunk> loaded_chunks = new List<NetworkChunk>();
+        private NetworkChunk[,,] chunk_grid;
+
+
+
+
+
+
         public MapContainer(string set_map_id,int set_width, int set_height,int set_depth)
         {
+            // Primary data for server!
             map_id = set_map_id;
             width = set_width;
             height = set_height;
             depth = set_depth;
             turfs = new AbstractTurf[width,height,depth];
+            // Chunks for clients!
+            int chunk_wid = (int)Mathf.Ceil(width / ChunkController.chunk_size);
+            int chunk_hig = (int)Mathf.Ceil(width / ChunkController.chunk_size);
+            int chunk_dep = set_depth;
+            chunk_grid = new NetworkChunk[chunk_wid,chunk_hig,chunk_dep];
         }
 
         public string MapID
@@ -362,6 +438,41 @@ public partial class MapController : DeligateController
                 turf.RandomTick();
                 turf.AtmosphericsCheck();
             }
+        }
+
+
+
+        public bool IsChunkLoaded(ChunkPos grid_pos)
+        {
+            return chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] != null;
+        }
+        public NetworkChunk GetChunk(ChunkPos grid_pos)
+        {
+            NetworkChunk chunk = GetChunk(grid_pos);
+            if(chunk != null)
+            {
+                return chunk;
+            }
+            NetworkChunk new_chunk = NetworkEntity.CreateEntity(map_id, "", MainController.DataType.Chunk) as NetworkChunk;
+            loaded_chunks.Add(new_chunk);
+            return new_chunk;
+        }
+        public void UnloadChunk(NetworkChunk chunk)
+        {
+            ChunkPos chunk_pos = new ChunkPos(chunk.Position);
+            if(chunk.Unload()) // Safer than just calling Kill() lets chunks decide some stuff if they should unload...
+            {
+                chunk_grid[chunk_pos.hor,chunk_pos.ver,chunk_pos.dep] = null;
+                loaded_chunks.Remove(chunk);
+            }
+        }
+        public List<NetworkChunk> GetLoadedChunks()
+        {
+            return loaded_chunks;
+        }
+        public NetworkChunk[,,] GetLoadedChunkGrid()
+        {
+            return chunk_grid;
         }
     }
 
