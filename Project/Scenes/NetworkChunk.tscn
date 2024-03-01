@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3 uid="uid://darn5dx2bt2p4"]
+
+[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkChunk.cs" id="1_fkcyw"]
+[ext_resource type="Script" path="res://Scenes/TurfMeshUpdater.cs" id="2_prwqa"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
+properties/0/path = NodePath(".:density")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:map_id_string")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:position")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:opaque")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:visible")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:model")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:texture")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_vyood"]
+size = Vector2(1, 1)
+center_offset = Vector3(0.5, 0, 0.5)
+
+[node name="NetworkChunk" type="Node3D" node_paths=PackedStringArray("mesh_updater")]
+script = ExtResource("1_fkcyw")
+mesh_updater = NodePath("TurfMesh")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 0.25
+replication_config = SubResource("SceneReplicationConfig_bnqg0")
+
+[node name="TurfMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_vyood")
+script = ExtResource("2_prwqa")

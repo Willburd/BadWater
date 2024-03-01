@@ -9,7 +9,7 @@ public partial class NetworkStructure : NetworkEntity
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
-        template_data = data;
+        PackRef = new PackRef(data);
         //density = template_data.density;
         //opaque = template_data.opaque;
     }

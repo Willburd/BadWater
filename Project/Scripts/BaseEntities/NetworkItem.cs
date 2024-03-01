@@ -9,8 +9,8 @@ public partial class NetworkItem : NetworkEntity
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
-        template_data = data;
-        ItemData temp = template_data as ItemData;
+        PackRef = new PackRef(data);
+        ItemData temp = AssetLoader.GetPackFromModID(PackRef) as ItemData;
         size_category = temp.size_category;
     }
     [Export]

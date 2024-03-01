@@ -9,8 +9,8 @@ public partial class NetworkEffect : NetworkEntity
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
-        template_data = data;
-        EffectData temp = template_data as EffectData;
+        PackRef = new PackRef(data);
+        EffectData temp = AssetLoader.GetPackFromModID(PackRef) as EffectData;
         spawner_id = temp.spawner_id;
         cleanable = temp.cleanable;
     } 

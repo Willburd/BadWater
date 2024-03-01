@@ -9,28 +9,22 @@ using System.Runtime.CompilerServices;
 public partial class NetworkEntity : Node3D
 {
     // Beginning of template data
-    protected PackData template_data;
+    protected PackRef PackRef;
     public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
     {
         // Update our template with newly set variables
-        template_data.SetVars(data);
+        PackData template_data = AssetLoader.GetPackFromModID(PackRef).Clone();
+        template_data.SetVars(data); // Override with custom set!
         TemplateRead(template_data);
-        
     }
     public virtual void TemplateRead(PackData data)
     {
-        template_data = data;
+        PackRef = new PackRef(data);
     }
     // End of template data
-    public override void _EnterTree()
-    {
-        SetMultiplayerAuthority(1); // Server
-    }
-
-
     public string GetUniqueID
     {
-        get { return template_data.GetUniqueModID; }
+        get { return PackRef.modid; }
     }
 
     private MainController.DataType entity_type;
@@ -45,18 +39,16 @@ public partial class NetworkEntity : Node3D
                 newEnt.entity_type = type;
                 typeData = AssetLoader.loaded_areas[type_ID];
                 break;
-            case MainController.DataType.Turf:
-                // Add to processing list is handled by the turf's creation in MapController.AddTurf()
-                newEnt = GD.Load<PackedScene>("res://Scenes/NetworkTurf.tscn").Instantiate() as NetworkEntity;
+            case MainController.DataType.Chunk:
+                newEnt = GD.Load<PackedScene>("res://Scenes/NetworkChunk.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
-                typeData = AssetLoader.loaded_turfs[type_ID];
+                // Data type for these is weird!
+                //MapController.loaded_chunks.Add(newEnt);
                 break;
             case MainController.DataType.Effect:
-                // Add to processing list is handled by the turf's creation in MapController.AddTurf()
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkEffect.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
                 typeData = AssetLoader.loaded_effects[type_ID];
-                // No template data here!
                 break;
             case MainController.DataType.Item:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkItem.tscn").Instantiate() as NetworkEntity;
@@ -83,8 +75,7 @@ public partial class NetworkEntity : Node3D
                 typeData = AssetLoader.loaded_mobs[type_ID];
                 break;
         }
-        // Entity init
-        newEnt.id = next_entity_id++;
+        // NetworkEntity init
         newEnt.map_id_string = mapID;
         newEnt.TemplateRead(typeData);
         // Finally add to entity container.
@@ -94,16 +85,30 @@ public partial class NetworkEntity : Node3D
 
     [Export]
     public string map_id_string;
-    
-    [Export]
-    public long id = 0;
-    [Export]
-    private static long next_entity_id = 0;
     [Export]
     public Vector3 velocity = Vector3.Zero;
 
 
-    NetworkEntity location = null; // Current NetworkEntity that this entity is inside of, including turf.
+    public void EnterLocation(AbstractEntity absLoc)
+    {
+        ent_location = null;
+        abs_location = absLoc;
+    }
+    public void EnterLocation(NetworkEntity entLoc)
+    {
+        ent_location = entLoc;
+        abs_location = null;
+    }
+    public void ClearLocation()
+    {
+        ent_location = null;
+        abs_location = null;
+    }
+
+    // Current NetworkEntity that this entity is inside of, including turf.
+    protected AbstractEntity abs_location = null;
+    protected NetworkEntity ent_location = null; 
+
     private List<NetworkEntity> contains_entities = new List<NetworkEntity>();
     public List<NetworkEntity> Contains
     {
@@ -141,7 +146,7 @@ public partial class NetworkEntity : Node3D
     private void ProcessVelocity()
     {
         // Containers don't update velocity, and don't move...
-        if(location != null && location is not NetworkTurf) 
+        if(ent_location != null) 
         {
             velocity *= 0;
             return;
@@ -154,18 +159,42 @@ public partial class NetworkEntity : Node3D
         }
     }
 
+    private void LeaveOldLoc(bool perform_turf_actions)
+    {
+        if(ent_location != null)
+        {
+            NetworkEntity old_ent = ent_location as NetworkEntity;
+            old_ent.EntityExited(this,perform_turf_actions);
+        }
+        if(abs_location != null)
+        {
+            // Leave old turf
+            AbstractTurf old_turf = abs_location as AbstractTurf;
+            old_turf.EntityExited(this,perform_turf_actions);
+        }
+    }
     public void Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
     {
         // If on same turf, don't bother with entrance/exit actions.
-        if(MapController.FormatWorldPosition(map_id_string,Position) == MapController.FormatWorldPosition(new_mapID,new_pos)) return;
-        // Leave old turf
-        NetworkTurf old_turf = MapController.GetTurfAtPosition(map_id_string,Position);
-        old_turf.EntityExited(this,perform_turf_actions);
+        if( ent_location == null && new MapController.GridPos(Position).Equals( new MapController.GridPos(new_pos)) && new_mapID == map_id_string) return;
+        // Leave old location, perform uncrossing events!
+        LeaveOldLoc(perform_turf_actions);
         // Enter new turf
         map_id_string = new_mapID;
         Position = new_pos;
-        NetworkTurf new_turf = MapController.GetTurfAtPosition(map_id_string,Position);
+        AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,Position);
         new_turf.EntityEntered(this,perform_turf_actions);
+    }
+
+    public void Move(NetworkEntity new_container, bool perform_turf_actions = true)
+    {
+        // If in same container, don't bother with entrance/exit actions.
+        if( ent_location == new_container) return;
+        // Leave old location, perform uncrossing events!
+        LeaveOldLoc(perform_turf_actions);
+        // Enter new location
+        map_id_string = "BAG";
+        new_container.EntityEntered(this,perform_turf_actions);
     }
 
     public void Kill()
@@ -173,10 +202,10 @@ public partial class NetworkEntity : Node3D
         switch(entity_type)
         {
             case MainController.DataType.Area:
-                MapController.areas.Remove(this.template_data.GetUniqueModID);
+                MapController.areas.Remove(this.GetUniqueID);
                 break;
-            case MainController.DataType.Turf:
-                MapController.RemoveTurf(this as NetworkTurf, false);
+            case MainController.DataType.Chunk:
+                // MapController.loaded_chunks.Remove(this); // TODO - CHUNK DELETION
                 break;
             case MainController.DataType.Effect:
                 MapController.all_effects.Remove(this as NetworkEffect);
@@ -201,7 +230,7 @@ public partial class NetworkEntity : Node3D
         QueueFree();
     }
 
-    public NetworkTurf GetTurf()
+    public AbstractTurf GetTurf()
     {
         return MapController.GetTurfAtPosition(map_id_string,Position);
     }
@@ -218,7 +247,7 @@ public partial class NetworkEntity : Node3D
         }
         
         contains_entities.Add(ent);
-        ent.location = this;
+        ent.EnterLocation(this);
     }
 
     public void EntityExited(NetworkEntity ent, bool perform_action)
@@ -231,7 +260,7 @@ public partial class NetworkEntity : Node3D
                 contains_entities[i].UnCrossed(ent);
             }
         }
-        ent.location = null;
+        ent.ClearLocation();
     }
 
     public virtual void Crossed(NetworkEntity crosser)
@@ -242,5 +271,11 @@ public partial class NetworkEntity : Node3D
     public virtual void UnCrossed(NetworkEntity crosser)
     {
         
+    }
+    
+
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(1); // Server
     }
 }

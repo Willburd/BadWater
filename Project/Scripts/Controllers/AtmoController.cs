@@ -6,7 +6,7 @@ public partial class AtmoController : DeligateController
 {
     public const double MINIMUMPRESSUMEDELTA = 0.01;    // difference in pressure where updates are triggered
     public const int MOLEDELTATRIGGER = 10;             // difference in moles where updates are triggered
-    public static List<NetworkTurf> pending_turfs = new List<NetworkTurf>();
+    public static List<AbstractTurf> pending_turfs = new List<AbstractTurf>();
 
     public override bool CanInit()
     {
@@ -17,8 +17,12 @@ public partial class AtmoController : DeligateController
     {
         tick_rate = 5;
         controller = this;
-        FinishInit();
         return true;
+    }
+
+    public override void SetupTick()
+    {
+        FinishInit();
     }
 
     public override void Fire()
@@ -26,7 +30,7 @@ public partial class AtmoController : DeligateController
         //GD.Print(Name + " Fired");
         while(pending_turfs.Count > 0)
         {
-            NetworkTurf turf = pending_turfs[0];
+            AbstractTurf turf = pending_turfs[0];
             // PROCESS ATMO - TODO, big growing flood fill that triggers other atmo updates, repeatedly ripping out until satisfied.
             pending_turfs.RemoveAt(0);
         }

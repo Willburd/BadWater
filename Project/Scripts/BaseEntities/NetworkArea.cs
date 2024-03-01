@@ -7,8 +7,8 @@ public partial class NetworkArea : NetworkEntity
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
-        template_data = data;
-        AreaData temp = template_data as AreaData;
+        PackRef = new PackRef(data);
+        AreaData temp = AssetLoader.GetPackFromModID(PackRef) as AreaData;
         base_turf_ID = temp.base_turf_ID;
         is_space = temp.is_space;
         always_powered = temp.always_powered;
@@ -27,39 +27,14 @@ public partial class NetworkArea : NetworkEntity
         SetMultiplayerAuthority(1); // Server
     }
 
-
-    public List<NetworkTurf> turfs = new List<NetworkTurf>();
-
     public override void Tick()
     {
-        RandomTurfUpdate(); // Randomly update some turfs, some types of turfs do things when random ticked, atmo also likes these.
+
     }
 
-    public void AddTurf(NetworkTurf turf)
+    public void AddTurf(AbstractTurf turf)
     {
         // Remove from other areas
-        if(turf.Area != null)
-        {
-            turf.Area.turfs.Remove(turf);
-        }
-        // Make ours!
         turf.Area = this;
-        turfs.Add(turf);
-    }
-
-    public void RandomTurfUpdate()
-    {
-        // Lower chance of random ticks heavily 
-        if(turfs.Count == 0) return;
-        if((Mathf.Abs((int)GD.Randi()) % 100) < 80) return;
-        // Perform a random number of random turf updates
-        int repeat = Mathf.Clamp(Mathf.Abs((int)GD.Randi()) % Mathf.Max((int)(turfs.Count / 50),1), 1, turfs.Count);
-        while(repeat-- > 0)
-        {
-            int check = Mathf.Abs((int)GD.Randi()) % turfs.Count;
-            NetworkTurf turf = turfs[check];
-            turf.RandomTick();
-            turf.AtmosphericsCheck();
-        }
     }
 }

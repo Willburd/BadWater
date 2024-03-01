@@ -10,8 +10,9 @@ public partial class TurfMeshUpdater : MeshInstance3D
 
     private string last_tex = "";
 
-    public void MeshUpdated(NetworkTurf turf)
+    public void MeshUpdated(NetworkChunk turf)
     {
+        /*
         bool force_update = false;
         if(MaterialOverride == null)
         {
@@ -30,5 +31,6 @@ public partial class TurfMeshUpdater : MeshInstance3D
             (MaterialOverride as ShaderMaterial).SetShaderParameter( "_MainTexture", texture_cache[path]);
             last_tex = turf.texture;
         }
+        */
     }
 }

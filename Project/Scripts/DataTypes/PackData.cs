@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+
 [GlobalClass] 
 public partial class PackData : Resource
 {
@@ -45,6 +46,11 @@ public partial class PackData : Resource
         GD.Print("-" + GetType().ToString() + ":" + GetUniqueModID + GetVarString());
     }
     
+    public PackData Clone()
+    {
+        return MemberwiseClone() as PackData;
+    }
+
 
     protected Godot.Collections.Dictionary temp_file_data;
     protected bool loaded_parent;

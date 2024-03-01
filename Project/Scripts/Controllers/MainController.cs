@@ -10,7 +10,8 @@ public partial class MainController : Node
     {
         Map,
         Area,
-        Turf,
+		Turf,
+        Chunk,
         Effect,
         Item,
         Structure,
@@ -90,6 +91,10 @@ public partial class MainController : Node
 				{
 					con.Started();
 					con.Init();
+				}
+				if(con.IsStarted && !con.IsDoneInit)
+				{
+					con.SetupTick();
 				}
 				if(!con.IsDoneInit)
 				{

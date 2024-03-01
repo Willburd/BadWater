@@ -12,8 +12,12 @@ public partial class EditorController : DeligateController
     {
         tick_rate = 1;
         controller = this;
-        FinishInit();
         return true;
+    }
+
+    public override void SetupTick()
+    {
+        FinishInit();
     }
 
     public override void Fire()

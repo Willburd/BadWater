@@ -1,8 +1,13 @@
 using Godot;
 using System;
 
-static class TOOLS
+public static class TOOLS
 {
+    static public Vector3 GridToPos(MapController.GridPos grid)
+    {
+        return new Vector3(grid.hor,grid.dep,grid.ver) * MapController.TileSize;
+    }
+
     static public Godot.Collections.Dictionary ParseJsonFile(string file_path)
     {
         // Read text from file and then call parsejson.
@@ -84,7 +89,7 @@ static class TOOLS
     {
         for(int b = 1; b <= 10; b++) 
         {
-            if(steps == Mathf.Floor(max_steps / (b * 10))) GD.Print("-" + (b * 10) + "%");
+            if(steps == Mathf.Floor(Mathf.Floor(max_steps / 10) * b)) GD.Print("-" + (b * 10) + "%");
         }
     }
 }

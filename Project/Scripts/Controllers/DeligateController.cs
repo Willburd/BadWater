@@ -7,7 +7,7 @@ public class DeligateController
     enum State
     {
         not_init,   // Not yet starting
-        started,    // Starting up (threaded could might be happening still)
+        started,    // Starting up
         ready       // All setup finished
     }
 
@@ -39,7 +39,6 @@ public class DeligateController
     public virtual bool Init()          // Called when setting up, if returns true, calls Started() to prevent multiple inits
     {
         controller = this;
-        FinishInit();
         return true;
     }
 
@@ -55,7 +54,6 @@ public class DeligateController
         GD.Print("Subsystem Finished Init: " + Name);
     }
 
-    
     public bool IsStarted               // Used by main controller during setup, to prevent double init
     {
         get { return current_state >= State.started; }
@@ -63,6 +61,11 @@ public class DeligateController
     public bool IsDoneInit              // Used by main controller to know that all controllers are ready for first game tick
     {
         get { return current_state >= State.ready; }
+    }
+
+    public virtual void SetupTick()
+    {
+        FinishInit();
     }
 
     public bool Tick()

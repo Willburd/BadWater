@@ -12,8 +12,12 @@ public partial class MachineController : DeligateController
     {
         tick_rate = 10;
         controller = this;
-        FinishInit();
         return true;
+    }
+
+    public override void SetupTick()
+    {
+        FinishInit();
     }
 
     public override void Fire()

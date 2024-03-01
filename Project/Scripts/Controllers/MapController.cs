@@ -8,17 +8,22 @@ public partial class MapController : DeligateController
 {
     public static int TileSize = 1; // size in 3D units that world tiles are
 
-    protected static List<NetworkTurf> all_turfs = new List<NetworkTurf>();
-    public static Dictionary<string,NetworkTurf> turf_at_location = new Dictionary<string,NetworkTurf>();
+
     public static Dictionary<string,NetworkArea> areas = new Dictionary<string,NetworkArea>();
     public static List<NetworkEffect> all_effects = new List<NetworkEffect>();
     public static Dictionary<string,List<NetworkEffect>> spawners = new Dictionary<string,List<NetworkEffect>>();
+
+    private static Dictionary<string,MapContainer> active_maps = new Dictionary<string,MapContainer>();
+
 
     public override bool CanInit()
     {
         return IsSubControllerInit(MachineController.controller);
     }
 
+    private List<MapLoader> loading = new List<MapLoader>();
+    private List<MapInitilizer> initing = new List<MapInitilizer>();
+    private List<MapIconUpdater> iconupdating = new List<MapIconUpdater>();
     public override bool Init()
     {
         tick_rate = 3;
@@ -32,85 +37,73 @@ public partial class MapController : DeligateController
             if(!AssetLoader.loaded_maps.ContainsKey(map_id)) continue;
             MapData map_data = AssetLoader.loaded_maps[map_id];
             GD.Print("-Loading map: " + map_data.display_name);
-            InitMap(map_id,map_data.width,map_data.height,map_data.depth);
+            loading.Add(new MapLoader(map_id,map_data.width,map_data.height,map_data.depth));
         }
-        InitTurfs();
-        InitEffects();
-        InitEntities();
-        FinishInit();
         return true;
     }
 
-    private void InitMap(string map_id,int width, int height,int depth)
+    public override void SetupTick()
     {
-        MapData map_data = AssetLoader.loaded_maps[map_id];
-        Godot.Collections.Dictionary map_list = TOOLS.ParseJsonFile(map_data.GetFilePath);
-        Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
-        Godot.Collections.Dictionary area_data = (Godot.Collections.Dictionary)map_json["area_data"];
-        Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)map_json["turf_data"];
-        int steps = 0;
-        int max_steps = depth * width * height;
-        for(int h = 0; h < depth; h++) 
+        // Process loading maps
+        bool finished = true;
+        if(loading.Count > 0)
         {
-            Godot.Collections.Dictionary area_depth = null;
-            if(area_data.ContainsKey(h.ToString())) area_depth = (Godot.Collections.Dictionary)area_data[h.ToString()];
-            Godot.Collections.Dictionary turf_depth = null;
-            if(turf_data.ContainsKey(h.ToString())) turf_depth = (Godot.Collections.Dictionary)turf_data[h.ToString()];
-
-            if(area_depth == null || turf_data == null)
+            foreach(MapOperator loader in loading)
             {
-                // Empty Z, full fill of empty tiles
-                for(int i = 0; i < height; i++) 
+                if(!loader.Finished())
                 {
-                    for(int t = 0; t < width; t++) 
-                    {
-                        NetworkTurf turf = AddTurf("_:_",map_id, new Vector3(t,h,i), areas["_:_"], false);
-                        TOOLS.PrintProgress(steps, max_steps);
-                        steps += 1;
-                    }
-                }
-                continue;
-            }
-
-            for(int i = 0; i < height; i++) 
-            {
-                // Assume data will overrun the buffer, and provide dummy lists
-                string[] area_ylist = new string[]{"_:_"};
-                if(area_depth.ContainsKey(i.ToString())) 
-                {
-                    area_ylist = area_depth[i.ToString()].AsStringArray();
-                }
-                Godot.Collections.Array<string[]> turf_ylist = new Godot.Collections.Array<string[]>{ new string[] { "_:_", "" }};
-                if(area_depth.ContainsKey(i.ToString())) 
-                {
-                    turf_ylist = (Godot.Collections.Array<string[]>)turf_depth[i.ToString()];
-                }
-                // Create turfs!
-                for(int t = 0; t < width; t++) 
-                {
-                    // Base data...
-                    string area_id = "_:_";
-                    string make_turf_id = "_:_";
-                    string embedded_json = "";
-                    // Load from current map!
-                    if(t < area_ylist.Length)
-                    {
-                        area_id = area_ylist[t];
-                    }
-                    if(t < turf_ylist.Count)
-                    {
-                        string[] construct_strings = turf_ylist[t];
-                        make_turf_id = construct_strings[0]; // Set ID
-                        embedded_json = construct_strings[1];
-                    }
-                    // It's turfin time... How awful.
-                    NetworkTurf turf = AddTurf(make_turf_id,map_id, new Vector3(t,h,i), areas[area_id], false);
-                    turf.ApplyMapCustomData(TOOLS.ParseJson(embedded_json)); // Set this object's flags using an embedded string of json!
-                    TOOLS.PrintProgress(steps, max_steps);
-                    steps += 1;
+                    finished = false;
+                    loader.Process();
                 }
             }
+            if(!finished) return;
+            foreach(MapOperator loader in loading)
+            {
+                active_maps[loader.GetMapID()] = loader.GetMap();
+                initing.Add(new MapInitilizer(active_maps[loader.GetMapID()]));
+            }
+            loading.Clear();
+            return;
         }
+        // Time to initilize!
+        if(initing.Count > 0)
+        {
+            foreach(MapInitilizer init in initing)
+            {
+                if(!init.Finished())
+                {
+                    finished = false;
+                    init.Process();
+                }
+            }
+            if(!finished) return;
+            foreach(MapOperator loader in initing)
+            {
+                iconupdating.Add(new MapIconUpdater(active_maps[loader.GetMapID()]));
+            }
+            initing.Clear();
+            return;
+        }
+        // Time to update first time icons!
+        if(iconupdating.Count > 0)
+        {
+            foreach(MapIconUpdater iconing in iconupdating)
+            {
+                if(!iconing.Finished())
+                {
+                    finished = false;
+                    iconing.Process();
+                }
+            }
+            if(!finished) return;
+            iconupdating.Clear();
+            return;
+        }
+        
+        // Finalize
+        InitEffects();
+        InitEntities();
+        FinishInit();
     }
 
     private void InitAreas()
@@ -126,21 +119,6 @@ public partial class MapController : DeligateController
         foreach(KeyValuePair<string, NetworkArea> entry in areas)
         {
             entry.Value.Init();
-        }
-    }
-
-    private void InitTurfs()
-    {
-        // Setup all turfs...
-        for(int i = 0; i < all_turfs.Count; i++) 
-        {
-            all_turfs[i].Init();
-        }
-        // And then give them all a graphics update, lets do this heavy stuff here to get it over with.
-        // Instead of making objects figure it out in the middle of their Init()... Which would get goofy because other stuff might not be init.
-        for(int i = 0; i < all_turfs.Count; i++) 
-        {
-            all_turfs[i].UpdateIcon();
         }
     }
 
@@ -170,7 +148,7 @@ public partial class MapController : DeligateController
         for(int i = 0; i < all_entities.Count; i++) 
         {
             // Directly add to turf's contents, we're still initting, no need to call Crossed() or Entered()
-            NetworkTurf turf = all_entities[i].GetTurf();
+            AbstractTurf turf = all_entities[i].GetTurf();
             turf.Init();
             turf.EntityEntered(all_entities[i],false);
         }
@@ -180,6 +158,42 @@ public partial class MapController : DeligateController
             all_entities[i].UpdateIcon();
         }
     }
+
+
+    public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, NetworkArea area, bool replace = true)
+    {
+        return active_maps[mapID].AddTurf(turfID, grid_pos, area, replace);
+    }
+    public static void RemoveTurf(AbstractTurf turf, string mapID, bool make_area_baseturf = true)
+    {
+        active_maps[mapID].RemoveTurf(turf, make_area_baseturf);
+    }
+    public static void SwapTurfs(AbstractTurf old_turf, AbstractTurf new_turf)
+    {
+        string old_map = old_turf.map_id_string;
+        GridPos old_pos = old_turf.GetGridPosition();
+        AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.GetGridPosition());
+        active_maps[old_map].SwapTurf(buffer,old_pos);
+    }
+
+
+    public static AbstractTurf GetTurfAtPosition(string mapID, GridPos grid_pos)
+    {
+        return active_maps[mapID].GetTurfAtPosition(grid_pos);
+    }
+    public static NetworkArea GetAreaAtPosition(string mapID, GridPos grid_pos)
+    {
+        return active_maps[mapID].GetAreaAtPosition(grid_pos);
+    }
+    public static AbstractTurf GetTurfAtPosition(string mapID, Vector3 pos)
+    {
+        return active_maps[mapID].GetTurfAtPosition(new GridPos(pos));
+    }
+    public static NetworkArea GetAreaAtPosition(string mapID, Vector3 pos)
+    {
+        return active_maps[mapID].GetAreaAtPosition(new GridPos(pos));
+    }
+
 
 
     public override void Fire()
@@ -198,71 +212,332 @@ public partial class MapController : DeligateController
         
     }
 
-    public static NetworkTurf AddTurf(string turfID, string mapID, Vector3 grid_pos, NetworkArea area, bool replace = true)
+    public struct GridPos
     {
-        // Replace old turf
-        if(replace)
+        public GridPos(int set_hor, int set_ver, int set_dep)
         {
-            NetworkTurf check_turf = GetTurfAtPosition(mapID,grid_pos);
+            hor = set_hor;
+            ver = set_ver;
+            dep = set_dep;
+        }
+        public GridPos(Vector3 worldPos)
+        {
+            hor = (int)(worldPos.X / MapController.TileSize);
+            ver = (int)(worldPos.Z / MapController.TileSize);
+            dep = (int)(worldPos.Y / MapController.TileSize);
+        }
+
+        public bool Equals(GridPos other)
+        {
+            return hor == other.hor && ver == other.ver && dep == other.dep;
+        }
+
+        public int hor;
+        public int ver;
+        public int dep;
+    }
+
+    private class MapContainer
+    {
+        private AbstractTurf[,,] turfs;
+        private string map_id;
+        private int width;
+        private int height;
+        private int depth;
+
+        public float draw_offset_hor = 0;
+        public float draw_offset_vert = 0;
+
+        public MapContainer(string set_map_id,int set_width, int set_height,int set_depth)
+        {
+            map_id = set_map_id;
+            width = set_width;
+            height = set_height;
+            depth = set_depth;
+            turfs = new AbstractTurf[width,height,depth];
+        }
+
+        public string MapID
+        {
+            get {return map_id;}
+        } 
+        public int Width
+        {
+            get {return width;}
+        } 
+        public int Height
+        {
+            get {return height;}
+        } 
+        public int Depth
+        {
+            get {return depth;}
+        } 
+        public AbstractTurf AddTurf(string turfID, GridPos grid_pos, NetworkArea area, bool replace = true)
+        {
+            // Replace old turf
+            if(replace)
+            {
+                AbstractTurf check_turf = GetTurfAtPosition(grid_pos);
+                if(check_turf != null)
+                {
+                    RemoveTurf(check_turf, false);
+                }
+            }
+            // Spawn new turf
+            AbstractTurf turf = AbstractEntity.CreateEntity(map_id, turfID, MainController.DataType.Turf) as AbstractTurf;
+            SetTurfPosition(turf,grid_pos);
+            area.AddTurf(turf);
+            return turf;
+        }
+        public AbstractTurf SwapTurf(AbstractTurf turf, GridPos grid_pos) // returns the turf that SWAPPED with it!
+        {
+            // Replace old turf
+            AbstractTurf check_turf = GetTurfAtPosition(grid_pos);
+            // Clear old data
             if(check_turf != null)
             {
-                RemoveTurf(check_turf, false);
+                GridPos old_pos = check_turf.GetGridPosition();
+                turfs[old_pos.hor,old_pos.ver,old_pos.dep] = null;
+            }
+            // Move new turf
+            turf.map_id_string = map_id;
+            SetTurfPosition(turf,grid_pos);
+            return check_turf;
+        }
+
+        private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos)
+        {
+            // Very dangerous function... Lets keep this internal, and only accessed by safe public calls!
+            turf.Position = TOOLS.GridToPos(grid_pos);
+            turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep] = turf;
+        }
+
+        public void RemoveTurf(AbstractTurf turf, bool make_area_baseturf = true)
+        {
+            // Remove from areas
+            NetworkArea get_area = turf.Area;
+
+            // Destroy turf in main lists
+            GridPos grid_pos = turf.GetGridPosition();
+            if(make_area_baseturf)
+            {
+                // Spawn a new turf in the same spot to replace it...
+                AddTurf(get_area.base_turf_ID, grid_pos,get_area,false);
+            }
+            else
+            {
+                // Or void it
+                turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep] = null;
             }
         }
-        // Spawn new turf
-        NetworkTurf turf = NetworkEntity.CreateEntity(mapID,turfID,MainController.DataType.Turf) as NetworkTurf;
-        turf.SetGridPosition(grid_pos);
-        area.AddTurf(turf);
-        all_turfs.Add(turf);
-        return turf;
-    }
 
-    public static void RemoveTurf(NetworkTurf turf, bool make_area_baseturf = true)
-    {
-        // Get data for later
-        string mapID = turf.map_id_string;
-        NetworkArea get_area = turf.Area;
-        Vector3 grid_pos = turf.GetGridPosition();
+        public AbstractTurf GetTurfAtPosition(GridPos grid_pos)
+        {
+            return turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep];
+        }
 
-        // Remove from area
-        get_area.turfs.Remove(turf);
+        public NetworkArea GetAreaAtPosition(GridPos grid_pos)
+        {
+            return turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep].Area;
+        }
         
-        // Destroy turf in main lists
-        all_turfs.Remove(turf);
-        if(make_area_baseturf)
+        public void RandomTurfUpdate()
         {
-            // Spawn a new turf in the same spot to replace it...
-            // TODO - area base turf definitions from mapper
-            AddTurf(get_area.base_turf_ID, mapID,grid_pos,get_area,false);
-        }
-        else
-        {
-            // Or void it
-            turf_at_location[FormatWorldPosition(mapID,grid_pos)] = null;
+            // Lower chance of random ticks heavily 
+            if((Mathf.Abs((int)GD.Randi()) % 100) < 80) return;
+
+            // Perform a random number of random turf updates
+            int repeat = 5;
+            while(repeat-- > 0)
+            {
+                int randx = Mathf.Abs((int)GD.Randi()) % width;
+                int randy = Mathf.Abs((int)GD.Randi()) % height;
+                int randz = Mathf.Abs((int)GD.Randi()) % depth;
+                AbstractTurf turf = turfs[randx,randy,randz];
+                turf.RandomTick();
+                turf.AtmosphericsCheck();
+            }
         }
     }
 
 
-    public static string FormatWorldPosition(string mapID,Vector3 pos)      // NetworkTurfs are stored in a dictionary for fast lookup, based on their map as well as XYZ. Endless submaps ahoy!
+    private class MapOperator
     {
-        return mapID + ":" + pos.X + ":" + pos.Y + ":" + pos.Z;
-    }
-
-    public static NetworkTurf GetTurfAtPosition(string mapID, Vector3 pos)
-    {
-        string loc = FormatWorldPosition(mapID,pos);
-        NetworkTurf get;
-        if(turf_at_location.TryGetValue(loc, out get))
+        protected MapContainer output_map;
+        public int max_steps
         {
-            return get;
+            get {return output_map.Depth * output_map.Width * output_map.Height;}
+        } 
+
+        protected string map_id;
+        protected int steps = 0; // for logging
+        protected int current_x = 0;
+        protected int current_y = 0;
+        protected int current_z = 0;
+
+        protected void HandleLoop()
+        {
+            // Next loop!
+            steps += 1;
+            current_x += 1;
+            if(current_x >= output_map.Width)
+            {
+                current_x = 0;
+                current_y += 1;
+            }
+            if(current_y >= output_map.Height)
+            {
+                current_y = 0;
+                current_z += 1;
+            }
+            if(current_z >= output_map.Depth)
+            {
+                finished = true;
+            }
+            TOOLS.PrintProgress(steps,max_steps);
         }
-        return null;
+
+        public virtual void Process()
+        {
+            // replace with controlled functions!
+            HandleLoop();
+        }
+
+        protected bool finished = false;
+        public bool Finished()
+        {
+            return finished;
+        }
+
+
+        public string GetMapID()
+        {
+            return map_id;
+        }
+        public MapContainer GetMap()
+        {
+            return output_map;
+        }
     }
 
-    public static NetworkArea GetAreaAtPosition(string mapID, Vector3 pos)
+    private class MapLoader : MapOperator
     {
-        NetworkTurf turf = GetTurfAtPosition(mapID, pos);
-        if(turf == null) return null;
-        return turf.Area;
+        Godot.Collections.Dictionary area_data;
+        Godot.Collections.Dictionary turf_data;
+
+        public MapLoader(string set_map_id,int set_width, int set_height,int set_depth)
+        {
+            map_id = set_map_id;
+            MapData map_data = AssetLoader.loaded_maps[set_map_id];
+            output_map = new MapContainer(set_map_id,set_width, set_height,set_depth);
+
+            Godot.Collections.Dictionary map_list = TOOLS.ParseJsonFile(map_data.GetFilePath);
+            Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
+            area_data = (Godot.Collections.Dictionary)map_json["area_data"];
+            turf_data = (Godot.Collections.Dictionary)map_json["turf_data"];
+            GD.Print("LOADING MAP" + map_id + " =========================");
+        }
+
+        public override void Process()
+        {
+            if(finished) return;
+
+            Godot.Collections.Dictionary area_depth = null;
+            if(area_data.ContainsKey(current_z.ToString())) area_depth = (Godot.Collections.Dictionary)area_data[current_z.ToString()];
+            Godot.Collections.Dictionary turf_depth = null;
+            if(turf_data.ContainsKey(current_z.ToString())) turf_depth = (Godot.Collections.Dictionary)turf_data[current_z.ToString()];
+
+            int repeats = 100;
+            while(repeats-- > 0 && !finished)
+            {
+                string make_area_id = "_:_";
+                string make_turf_id = "_:_";
+                string turf_json = "";
+                if(area_depth != null && turf_depth != null)
+                {
+                    // MUST not be an empty Z level, these should NEVER be invalid on a real map file. So it's probably an empty one... Paint a fresh map!
+                    // Assume data will overrun the buffer, and provide dummy lists
+                    string[] area_ylist = new string[]{"_:_"};
+                    if(area_depth.ContainsKey(current_x.ToString())) 
+                    {
+                        area_ylist = area_depth[current_x.ToString()].AsStringArray();
+                    }
+                    Godot.Collections.Array<string[]> turf_ylist = new Godot.Collections.Array<string[]>{ new string[] { "_:_", "" }};
+                    if(area_depth.ContainsKey(current_x.ToString())) 
+                    {
+                        turf_ylist = (Godot.Collections.Array<string[]>)turf_depth[current_x.ToString()];
+                    }
+
+                    if(current_y < area_ylist.Length)
+                    {
+                        make_area_id = area_ylist[current_y];
+                    }
+                    if(current_y < turf_ylist.Count)
+                    {
+                        string[] construct_strings = turf_ylist[current_y];
+                        make_turf_id = construct_strings[0]; // Set ID
+                        turf_json = construct_strings[1];
+                    }
+                }
+
+                // It's turfin time... How awful.
+                AbstractTurf turf = output_map.AddTurf(make_turf_id, new GridPos(current_x,current_y,current_z), areas[make_area_id], false);
+                turf.ApplyMapCustomData(TOOLS.ParseJson(turf_json)); // Set this object's flags using an embedded string of json!
+                HandleLoop();
+            }
+        }
+    }
+
+
+    private class MapInitilizer : MapOperator
+    {
+        public MapInitilizer(MapContainer input_map)
+        {
+            map_id = input_map.MapID;
+            output_map = input_map;
+            GD.Print("INITING MAP" + map_id + " =========================");
+        }
+
+        public override void Process()
+        {
+            int repeats = 100;
+            while(repeats-- > 0 && !finished)
+            {
+                GetTurfAtPosition(current_x, current_y, current_z).Init();
+                HandleLoop();
+            }
+        }
+
+        public AbstractTurf GetTurfAtPosition(int x, int y, int z)
+        {
+            return output_map.GetTurfAtPosition(new GridPos(x,y,z));
+        }
+    }
+
+
+    private class MapIconUpdater : MapOperator
+    {
+        public MapIconUpdater(MapContainer input_map)
+        {
+            map_id = input_map.MapID;
+            output_map = input_map;
+            GD.Print("UPDATING MAP" + map_id + " =========================");
+        }
+
+        public override void Process()
+        {
+            int repeats = 100;
+            while(repeats-- > 0 && !finished)
+            {
+                GetTurfAtPosition(current_x, current_y, current_z).UpdateIcon();
+                HandleLoop();
+            }
+        }
+
+        public AbstractTurf GetTurfAtPosition(int x, int y, int z)
+        {
+            return output_map.GetTurfAtPosition(new GridPos(x,y,z));
+        }
     }
 }

@@ -6,6 +6,17 @@ using System.IO;
 using System.Linq;
 
 
+public struct PackRef
+{
+    public PackRef(PackData data)
+    {
+        modid = data.GetUniqueModID;
+        data_type = data.GetType().ToString();
+    }
+    public string modid;
+    public string data_type;
+}
+
 [GlobalClass] 
 public partial class AssetLoader : Node
 {
@@ -166,6 +177,7 @@ public partial class AssetLoader : Node
             data["always_powered"] = 1.0;
             area.Init( "_", "_", "_", data);
             loaded_areas[area.GetUniqueModID] = area;
+            all_packs[area.GetType()+":"+area.GetUniqueModID] = area;
         }
         {   // Space turf
             TurfData turf = new TurfData();
@@ -175,6 +187,7 @@ public partial class AssetLoader : Node
             data["opaque"] = 0.0;
             turf.Init( "_", "_", "_", data);
             loaded_turfs[turf.GetUniqueModID] = turf;
+            all_packs[turf.GetType()+":"+turf.GetUniqueModID] = turf;
         }
         {   // Fallback player spawn
             EffectData effect = new EffectData();
@@ -184,6 +197,7 @@ public partial class AssetLoader : Node
             data["cleanable"] = 0.0;
             effect.Init( "_", "_", "PLAYER_SPAWN", data);
             loaded_effects[effect.GetUniqueModID] = effect;
+            all_packs[effect.GetType()+":"+effect.GetUniqueModID] = effect;
         }
         
         GD.Print("BUILDING INHERITANCE");
@@ -339,5 +353,12 @@ public partial class AssetLoader : Node
     private void ParseMob(string file_path)
     {
         GD.Print(file_path);
+    }
+
+
+
+    public static PackData GetPackFromModID(PackRef get_pack)
+    {
+        return all_packs[get_pack.data_type + ":" + get_pack.modid];
     }
 }

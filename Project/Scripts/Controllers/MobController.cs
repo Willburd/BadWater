@@ -12,8 +12,12 @@ public partial class MobController : DeligateController
     {
         tick_rate = 4;
         controller = this;
-        FinishInit();
         return true;
+    }
+
+    public override void SetupTick()
+    {
+        FinishInit();
     }
 
     public override void Fire()

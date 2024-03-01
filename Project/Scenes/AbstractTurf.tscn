@@ -1,7 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://csou70imp3wqb"]
+[gd_scene load_steps=5 format=3 uid="uid://b717voer1p1lq"]
 
-[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkTurf.cs" id="1_7vbmn"]
-[ext_resource type="Script" path="res://Scenes/TurfMeshUpdater.cs" id="3_m85m7"]
+[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkChunk.cs" id="1_i1wyn"]
+[ext_resource type="Script" path="res://Scenes/TurfMeshUpdater.cs" id="2_7jhb1"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:density")
@@ -31,7 +31,7 @@ size = Vector2(1, 1)
 center_offset = Vector3(0.5, 0, 0.5)
 
 [node name="NetworkTurf" type="Node3D" node_paths=PackedStringArray("mesh_updater")]
-script = ExtResource("1_7vbmn")
+script = ExtResource("1_i1wyn")
 mesh_updater = NodePath("TurfMesh")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
@@ -40,4 +40,4 @@ replication_config = SubResource("SceneReplicationConfig_bnqg0")
 
 [node name="TurfMesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_vyood")
-script = ExtResource("3_m85m7")
+script = ExtResource("2_7jhb1")
