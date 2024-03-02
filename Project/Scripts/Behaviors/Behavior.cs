@@ -6,14 +6,42 @@ using System.Net.Http;
 public partial class Behavior
 {
     // Returns subtypes of behavior object
-    public static Behavior CreateBehavior(string behavior_ID)
+    public static Behavior CreateBehavior(PackData data)
     {
-        switch(behavior_ID)
+        Behavior new_behave = null;
+        switch(data.behaviorID)
         {
+            case "TURF_RAW":
+                new_behave = new TurfBasic(0); // Bottommost turf build level! Dirt/Sand/Rock.
+            break;
+
+            case "TURF_PANEL":
+                new_behave = new TurfBasic(1); // Second level of construction, PANEL
+            break;
+            
+            case "TURF_FLOOR":
+                new_behave = new TurfBasic(2); // Flooring over top of a panel!
+            break;
+            
+            case "TURF_WALL":
+                new_behave = new TurfBasic(4); // Wall over top of a panel!
+            break;
+
+
+
             case "_BEHAVIOR_": // Debugging purposes only.
-                return new Behavior();
+                new_behave = new Behavior();
+            break;
         }
+        new_behave?.MapLoadVars(data.GetTempData());
         return null; // NO BEHAVIOR
+    }
+
+
+    // Used to read from the json and get custom data that's packed into thesame place as the rest!
+    public virtual void MapLoadVars(Godot.Collections.Dictionary data)
+    {
+
     }
 
 

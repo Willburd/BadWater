@@ -12,7 +12,7 @@ public partial class AbstractTurf : AbstractEntity
         texture = temp.texture;
         density = temp.density;
         opaque = temp.opaque;
-        SetBehavior(Behavior.CreateBehavior(temp.behaviorID));
+        SetBehavior(Behavior.CreateBehavior(temp));
     }
     [Export]
     public bool density;                // blocks movement

@@ -14,7 +14,7 @@ public partial class NetworkArea : NetworkEntity
         base_turf_ID = temp.base_turf_ID;
         is_space = temp.is_space;
         always_powered = temp.always_powered;
-        SetBehavior(Behavior.CreateBehavior(temp.behaviorID));
+        SetBehavior(Behavior.CreateBehavior(temp));
     }
     
     // Unique data
