@@ -11,25 +11,46 @@ public partial class Behavior
         Behavior new_behave = null;
         switch(data.behaviorID)
         {
+            /*****************************************************************
+             * TURF BEHAVIORS (turf that behaves in certain ways)
+             ****************************************************************/
             case "TURF_RAW":
-                new_behave = new TurfBasic(0); // Bottommost turf build level! Dirt/Sand/Rock.
+                new_behave = new BehaviorEvents.TurfBasic(0); // Bottommost turf build level! Dirt/Sand/Rock.
             break;
 
             case "TURF_PANEL":
-                new_behave = new TurfBasic(1); // Second level of construction, PANEL
+                new_behave = new BehaviorEvents.TurfBasic(1); // Second level of construction, PANEL
             break;
             
             case "TURF_FLOOR":
-                new_behave = new TurfBasic(2); // Flooring over top of a panel!
+                new_behave = new BehaviorEvents.TurfBasic(2); // Flooring over top of a panel!
             break;
             
             case "TURF_WALL":
-                new_behave = new TurfBasic(4); // Wall over top of a panel!
+                new_behave = new BehaviorEvents.TurfBasic(4); // Wall over top of a panel!
             break;
 
+            /*****************************************************************
+             * EFFECT BEHAVIORS (Stuff like reagent smears being stepped through)
+             ****************************************************************/
+            case "EFFECT_MESS": // makes nearby turfs dirty when crossed
+                //new_behave = new BehaviorEvents.OnStepped(); // Performs behaviors when crossed
+            break;
+            case "EFFECT_MESS_STEPS": // leaves a trail of steps after you walk in it
+                //new_behave = new BehaviorEvents.OnStepped(); // Performs behaviors when crossed
+            break;
 
+            /*****************************************************************
+             * MAP EVENT BEHAVIORS (stuff like onstep teleports)
+             ****************************************************************/
+            case "EVENT_ONSTEP":
+                new_behave = new BehaviorEvents.OnStepped(); // Performs behaviors when crossed
+            break;
 
-            case "_BEHAVIOR_": // Debugging purposes only.
+            /*****************************************************************
+             * Debugging purposes only.
+             ****************************************************************/
+            case "_BEHAVIOR_":
                 new_behave = new Behavior();
             break;
         }
@@ -129,13 +150,13 @@ public partial class Behavior
     }
     protected virtual void Abstract_Crossed(MainController.DataType entity_type, AbstractEntity crosser) // Use this if you don't need any unique type information from the owner to perform your actions!
     {
-        Genetic_Crossed(entity_type);
+        Generic_Crossed(entity_type);
     }
     protected virtual void Entity_Crossed(MainController.DataType entity_type, NetworkEntity crosser) // Use this if you don't need any unique type information from the owner to perform your actions!
     {
-        Genetic_Crossed(entity_type);
+        Generic_Crossed(entity_type);
     }
-    protected virtual void Genetic_Crossed(MainController.DataType entity_type) // Use this if the object doesn't need any information from the owner, OR the crosser!
+    protected virtual void Generic_Crossed(MainController.DataType entity_type) // Use this if the object doesn't need any information from the owner, OR the crosser!
     {
         GD.Print("CROSSED"); // REPLACE ME!!!
     }
@@ -161,13 +182,13 @@ public partial class Behavior
     }
     protected virtual void Abstract_UnCrossed(MainController.DataType entity_type, AbstractEntity crosser) // Use this if you don't need any unique type information from the owner to perform your actions!
     {
-        Genetic_UnCrossed(entity_type);
+        Generic_UnCrossed(entity_type);
     }
     protected virtual void Entity_UnCrossed(MainController.DataType entity_type, NetworkEntity crosser) // Use this if you don't need any unique type information from the owner to perform your actions!
     {
-        Genetic_UnCrossed(entity_type);
+        Generic_UnCrossed(entity_type);
     }
-    protected virtual void Genetic_UnCrossed(MainController.DataType entity_type) // Use this if the object doesn't need any information from the owner, OR the crosser!
+    protected virtual void Generic_UnCrossed(MainController.DataType entity_type) // Use this if the object doesn't need any information from the owner, OR the crosser!
     {
         GD.Print("UNCROSSED"); // REPLACE ME!!!
     }
