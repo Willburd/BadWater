@@ -13,7 +13,7 @@ public partial class AbstractEntity
     public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
     {
         // Update our template with newly set variables
-        PackData template_data = AssetLoader.GetPackFromModID(PackRef).Clone();
+        PackData template_data = TemplateWrite();
         template_data.SetVars(data); // Override with custom set!
         TemplateRead(template_data);
         if(data.Keys.Count > 0) template_data.ShowVars();
@@ -23,6 +23,12 @@ public partial class AbstractEntity
         PackRef = new PackRef(data);
         // SetBehavior(Behavior.CreateBehavior(behaviorID)); // Set behavior here!
     }    
+    public virtual PackData TemplateWrite()
+    {
+        return new PackData();
+    }   
+
+
     public string tag = "";
     public string model = "Plane";
     public string texture = "Error.png";

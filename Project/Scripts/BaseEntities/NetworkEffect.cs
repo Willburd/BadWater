@@ -18,6 +18,16 @@ public partial class NetworkEffect : NetworkEntity
         cleanable = temp.cleanable;
         SetBehavior(Behavior.CreateBehavior(temp));
     } 
+    public override PackData TemplateWrite()
+    {
+        EffectData data = new EffectData();
+        data.tag = tag;
+        data.model = model;
+        data.texture = texture;
+        data.is_spawner = is_spawner;
+        data.cleanable = cleanable;
+        return data;
+    }
     [Export]
     public bool is_spawner = false; // Uses tag as ID
     [Export]

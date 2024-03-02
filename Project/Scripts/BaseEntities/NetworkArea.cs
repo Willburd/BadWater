@@ -17,7 +17,15 @@ public partial class NetworkArea : NetworkEntity
         always_powered = temp.always_powered;
         SetBehavior(Behavior.CreateBehavior(temp));
     }
-    
+
+    public override PackData TemplateWrite()
+    {
+        PackData data = new AreaData();
+
+
+        return data;
+    }
+
     // Unique data
     [Export]
     public string base_turf_ID;

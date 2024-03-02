@@ -18,6 +18,13 @@ public partial class NetworkMob : NetworkEntity
         //opaque = template_data.opaque;
         //SetBehavior(Behavior.CreateBehavior(temp.behaviorID));
     }
+    public override PackData TemplateWrite()
+    {
+        ItemData data = new ItemData();
+
+
+        return data;
+    }
     [Export]
     public bool density;                // blocks movement
     [Export]

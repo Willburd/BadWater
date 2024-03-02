@@ -17,6 +17,15 @@ public partial class NetworkItem : NetworkEntity
         size_category = temp.size_category;
         SetBehavior(Behavior.CreateBehavior(temp));
     }
+    public override PackData TemplateWrite()
+    {
+        ItemData data = new ItemData();
+        data.tag = tag;
+        data.model = model;
+        data.texture = texture;
+        data.size_category = size_category;
+        return data;
+    }
     [Export]
     public bool density;                    // blocks movement
     [Export]
