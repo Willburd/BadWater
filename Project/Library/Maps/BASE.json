@@ -2,8 +2,8 @@
 	"TEST": {
 		"name": "Testing",
 		"desc": "A map where terrible things happen.",
-		"width": 100,
-		"height": 100,
+		"width": 50,
+		"height": 50,
 		"depth": 3,
 		"turf_data": {
 			"0":{
@@ -24,7 +24,7 @@
 			}
 		},
 		"items": [],
-		"effects": [["_:PLAYER_SPAWN",0.5,2.5,0,""]],
+		"effects": [["_:SPAWNER",2.5,2.5,0,"{\"tag\": \"PLAYER\"}"]],
 		"structures": [],
 		"machines": []
 	}

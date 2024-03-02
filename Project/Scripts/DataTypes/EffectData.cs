@@ -11,19 +11,20 @@ public partial class EffectData : PackData
         display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
         description     = TOOLS.ApplyExistingTag(data,"desc",description);
         behaviorID      = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
+        tag             = TOOLS.ApplyExistingTag(data,"tag",tag);
         model           = TOOLS.ApplyExistingTag(data,"model",model);
         texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
-        spawner_id      = TOOLS.ApplyExistingTag(data,"spawner_id",spawner_id);
+        is_spawner      = TOOLS.ApplyExistingTag(data,"is_spawner",is_spawner);
         cleanable       = TOOLS.ApplyExistingTag(data,"cleanable",cleanable);
     }
 
     protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        return " name: " + display_name + " description: " + description;
+        return " name: " + display_name + " description: " + description + " tag: " + tag;
     }
 
     // Unique data
-    public string spawner_id;
+    public bool is_spawner;
     public bool cleanable;
 }

@@ -189,13 +189,13 @@ public partial class AssetLoader : Node
             loaded_turfs[turf.GetUniqueModID] = turf;
             all_packs[turf.GetType()+":"+turf.GetUniqueModID] = turf;
         }
-        {   // Fallback player spawn
+        {   // Spawners for wildlife and players
             EffectData effect = new EffectData();
             Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
-            data["name"] = "Player Spawn";
-            data["spawner_id"] = "PLAYER";
+            data["name"] = "Spawner";
             data["cleanable"] = 0.0;
-            effect.Init( "_", "_", "PLAYER_SPAWN", data);
+            data["is_spawner"] = 1.0;
+            effect.Init( "_", "_", "SPAWNER", data);
             loaded_effects[effect.GetUniqueModID] = effect;
             all_packs[effect.GetType()+":"+effect.GetUniqueModID] = effect;
         }

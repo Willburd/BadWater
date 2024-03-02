@@ -11,6 +11,7 @@ public partial class AreaData : PackData
         display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
         description     = TOOLS.ApplyExistingTag(data,"desc",description);
         behaviorID      = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
+        tag             = TOOLS.ApplyExistingTag(data,"tag",tag);
         model           = TOOLS.ApplyExistingTag(data,"model",model);
         texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
         is_space        = TOOLS.ApplyExistingTag(data,"is_space",is_space);
@@ -20,7 +21,7 @@ public partial class AreaData : PackData
     protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        return " name: " + display_name + " description: " + description + " is_space: "  + is_space + " always_powered: " + always_powered;
+        return " name: " + display_name + " description: " + description + " tag: " + tag + " is_space: " + is_space + " always_powered: " + always_powered;
     }
     
     // Unique data

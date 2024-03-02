@@ -11,6 +11,7 @@ public partial class MapData : PackData
         display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
         description     = TOOLS.ApplyExistingTag(data,"desc",description);
         behaviorID      = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
+        tag             = TOOLS.ApplyExistingTag(data,"tag",tag);
         model           = TOOLS.ApplyExistingTag(data,"model",model);
         texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
         width           = TOOLS.ApplyExistingTag(data,"width",width);
@@ -21,7 +22,7 @@ public partial class MapData : PackData
     protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        return " name: " + display_name + " description: " + description + " width: "  + width + " height: " + height + " depth: " + depth;
+        return " name: " + display_name + " description: " + description + " tag: " + tag + " width: " + width + " height: " + height + " depth: " + depth;
     }
     
     // Unique data

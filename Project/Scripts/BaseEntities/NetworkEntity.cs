@@ -14,16 +14,17 @@ public partial class NetworkEntity : Node3D
     {
         // Update our template with newly set variables
         PackData template_data = AssetLoader.GetPackFromModID(PackRef).Clone();
-        model = template_data.model;
-        texture = template_data.texture;
         template_data.SetVars(data); // Override with custom set!
         TemplateRead(template_data);
+        if(data.Keys.Count > 0) template_data.ShowVars();
     }
     public virtual void TemplateRead(PackData data)
     {
         // PackRef = new PackRef(data);
         // SetBehavior(Behavior.CreateBehavior(behaviorID)); // Set behavior here!
     }
+    [Export]
+    public string tag = "";
     [Export]
     public string model = "Plane";
     [Export]
@@ -55,6 +56,7 @@ public partial class NetworkEntity : Node3D
             case MainController.DataType.Effect:
                 newEnt = GD.Load<PackedScene>("res://Scenes/NetworkEffect.tscn").Instantiate() as NetworkEntity;
                 newEnt.entity_type = type;
+                MapController.all_effects.Add(newEnt as NetworkEffect);
                 typeData = AssetLoader.loaded_effects[type_ID];
                 break;
             case MainController.DataType.Item:
@@ -240,9 +242,9 @@ public partial class NetworkEntity : Node3D
                 break;
             case MainController.DataType.Effect:
                 MapController.all_effects.Remove(this as NetworkEffect);
-                if((this as NetworkEffect).spawner_id != "")
+                if((this as NetworkEffect).is_spawner)
                 {
-                    MapController.spawners[(this as NetworkEffect).spawner_id].Remove(this as NetworkEffect);
+                    MapController.spawners[(this as NetworkEffect).GetTag()].Remove(this as NetworkEffect);
                 }
                 break;
             case MainController.DataType.Item:
@@ -258,6 +260,7 @@ public partial class NetworkEntity : Node3D
                 MobController.entities.Remove(this);
                 break;
         }
+        ClearTag(); // wipe tag
         QueueFree();
     }
 
@@ -280,7 +283,6 @@ public partial class NetworkEntity : Node3D
         contains_entities.Add(ent);
         ent.EnterLocation(this);
     }
-
     public void EntityExited(NetworkEntity ent, bool perform_action)
     {
         contains_entities.Remove(ent);
@@ -293,6 +295,22 @@ public partial class NetworkEntity : Node3D
         }
         ent.ClearLocation();
     }
+
+
+    public void SetTag(string new_tag)
+    {
+        MapController.Internal_UpdateTag(this,new_tag);
+        tag = new_tag;
+    }
+    public void ClearTag()
+    {
+        SetTag("");
+    }
+    public string GetTag()
+    {
+        return tag;
+    }
+
 
     public override void _EnterTree()
     {

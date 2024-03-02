@@ -9,6 +9,7 @@ public partial class NetworkArea : NetworkEntity
     {
         PackRef = new PackRef(data);
         AreaData temp = AssetLoader.GetPackFromModID(PackRef) as AreaData;
+        SetTag(temp.tag);
         model = temp.model;
         texture = temp.texture;
         base_turf_ID = temp.base_turf_ID;

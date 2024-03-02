@@ -11,6 +11,7 @@ public partial class NetworkItem : NetworkEntity
     {
         PackRef = new PackRef(data);
         ItemData temp = AssetLoader.GetPackFromModID(PackRef) as ItemData;
+        SetTag(temp.tag);
         model = temp.model;
         texture = temp.texture;
         size_category = temp.size_category;

@@ -11,6 +11,7 @@ public partial class TurfData : PackData
         display_name      = TOOLS.ApplyExistingTag(data,"name",display_name);
         description       = TOOLS.ApplyExistingTag(data,"desc",description);
         behaviorID        = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
+        tag               = TOOLS.ApplyExistingTag(data,"tag",tag);
         model             = TOOLS.ApplyExistingTag(data,"model",model);
         texture           = TOOLS.ApplyExistingTag(data,"texture",texture);
         density           = TOOLS.ApplyExistingTag(data,"density",density);
@@ -20,7 +21,7 @@ public partial class TurfData : PackData
     protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        return " name: " + display_name + " description: " + description + " density: "  + density + " model: "  + model + " texture: "  + texture + " opaque: " + opaque;
+        return " name: " + display_name + " description: " + description + " tag: " + tag +  " density: "  + density + " model: "  + model + " texture: "  + texture + " opaque: " + opaque;
     }
     
     // Unique data

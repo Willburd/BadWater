@@ -8,6 +8,7 @@ public partial class AbstractTurf : AbstractEntity
     {
         PackRef = new PackRef(data);
         TurfData temp = AssetLoader.GetPackFromModID(PackRef) as TurfData;
+        SetTag(temp.tag);
         model = temp.model;
         texture = temp.texture;
         density = temp.density;

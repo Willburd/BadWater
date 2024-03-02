@@ -11,6 +11,7 @@ public partial class NetworkMob : NetworkEntity
     {
         PackRef = new PackRef(data);
         //MobData temp = AssetLoader.GetPackFromModID(PackRef) as MobData;
+        //SetTag(temp.tag);
         //model = temp.model;
         //texture = temp.texture;
         //density = template_data.density;

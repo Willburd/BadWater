@@ -2,6 +2,7 @@ using Godot;
 using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.Linq;
 using System.Reflection.Metadata;
 
@@ -9,23 +10,29 @@ public partial class MapController : DeligateController
 {
     public static int TileSize = 1; // size in 3D units that world tiles are
 
+    /*****************************************************************
+     * MAP LOADING PHASES
+     ****************************************************************/
 
+    private List<MapLoader> loading = new List<MapLoader>();
+    private List<MapInitilizer> initing = new List<MapInitilizer>();
+    private List<MapLateInitilizer> iconupdating = new List<MapLateInitilizer>();
+    private List<MapEntityCreator> entitycreating = new List<MapEntityCreator>();
+
+
+    /*****************************************************************
+     * CONTROLLER SETUP
+     ****************************************************************/
     public static Dictionary<string,NetworkArea> areas = new Dictionary<string,NetworkArea>();
     public static List<NetworkEffect> all_effects = new List<NetworkEffect>();
     public static Dictionary<string,List<NetworkEffect>> spawners = new Dictionary<string,List<NetworkEffect>>();
 
     private static Dictionary<string,MapContainer> active_maps = new Dictionary<string,MapContainer>();
 
-
     public override bool CanInit()
     {
         return IsSubControllerInit(ChemController.controller);
     }
-
-    private List<MapLoader> loading = new List<MapLoader>();
-    private List<MapInitilizer> initing = new List<MapInitilizer>();
-    private List<MapLateInitilizer> iconupdating = new List<MapLateInitilizer>();
-    private List<MapEntityCreator> entitycreating = new List<MapEntityCreator>();
 
     public override bool Init()
     {
@@ -126,9 +133,9 @@ public partial class MapController : DeligateController
         InitEntities();
         FinishInit();
     }
-
     private void InitAreas()
     {
+        GD.Print("INIT AREAS " + AssetLoader.loaded_areas.Count + " ------------------------------------------------");
         // Create all areas from resources
         foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
@@ -137,9 +144,9 @@ public partial class MapController : DeligateController
             area.Init();
         }
     }
-
     private void InitEffects()
     {
+        GD.Print("INIT EFFECTS " + all_effects.Count + " ------------------------------------------------");
         for(int i = 0; i < all_effects.Count; i++) 
         {
             all_effects[i].Init();
@@ -149,17 +156,18 @@ public partial class MapController : DeligateController
         {
             all_effects[i].LateInit();
             all_effects[i].UpdateIcon();
-            if(all_effects[i].spawner_id != "")
+            if(all_effects[i].is_spawner)
             {
-                if(!spawners.ContainsKey(all_effects[i].spawner_id))
+                string spawn_tag = all_effects[i].GetTag();
+                if(!spawners.ContainsKey(spawn_tag))
                 {
-                    spawners[all_effects[i].spawner_id] = new List<NetworkEffect>();
+                    spawners[spawn_tag] = new List<NetworkEffect>();
                 }
-                spawners[all_effects[i].spawner_id].Add(all_effects[i]);
+                GD.Print("-Added spawner, tag: " + spawn_tag);
+                spawners[spawn_tag].Add(all_effects[i]);
             }
         }
     }
-
     private void InitEntities()
     {
         // Map controller handles the other controllers entity lists for this too, instead of spagetti. So those controllers can assume the Init() work has been done!
@@ -167,6 +175,7 @@ public partial class MapController : DeligateController
         all_entities.AddRange(MapController.entities);
         all_entities.AddRange(MachineController.entities);
         all_entities.AddRange(MobController.entities);
+        GD.Print("INIT ENTITIES " + all_entities.Count + " ------------------------------------------------");
         for(int i = 0; i < all_entities.Count; i++) 
         {
             // Directly add to turf's contents, we're still initting, no need to call Crossed() or Entered()
@@ -184,18 +193,23 @@ public partial class MapController : DeligateController
     }
 
 
+    /*****************************************************************
+     * MAP MANAGEMENT
+     ****************************************************************/
     public static bool IsMapLoaded(string mapID)
     {
         if(mapID == null) return false;
         return active_maps.ContainsKey(mapID);
     }
-
     public static string FallbackMap()
     {
         return active_maps.First().Key;
     }
 
 
+    /*****************************************************************
+     * CHUNK MANAGEMENT
+     ****************************************************************/
     public static Dictionary<string,List<NetworkChunk>> GetAllMapChunks()
     {
         Dictionary<string,List<NetworkChunk>> ret = new Dictionary<string,List<NetworkChunk>>();
@@ -226,6 +240,10 @@ public partial class MapController : DeligateController
         active_maps[chunk.map_id_string].UnloadChunk(chunk);
     }
 
+
+    /*****************************************************************
+     * TURF MANAGEMENT
+     ****************************************************************/
     public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, NetworkArea area, bool replace = true)
     {
         return active_maps[mapID].AddTurf(turfID, grid_pos, area, replace);
@@ -241,12 +259,15 @@ public partial class MapController : DeligateController
         AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.GetGridPosition());
         active_maps[old_map].SwapTurf(buffer,old_pos);
     }
-
-
     public static AbstractTurf GetTurfAtPosition(string mapID, GridPos grid_pos)
     {
         return active_maps[mapID].GetTurfAtPosition(grid_pos);
     }
+
+    
+    /*****************************************************************
+     * AREA MANAGEMENT
+     ****************************************************************/
     public static NetworkArea GetAreaAtPosition(string mapID, GridPos grid_pos)
     {
         return active_maps[mapID].GetAreaAtPosition(grid_pos);
@@ -261,7 +282,64 @@ public partial class MapController : DeligateController
     }
 
 
+    /*****************************************************************
+     * TAGGED OBJECT MANAGEMENT
+     ****************************************************************/
+    private static Dictionary<string,List<NetworkEntity>> tagged_entities = new Dictionary<string,List<NetworkEntity>>();
+    private static Dictionary<string,List<AbstractEntity>> tagged_abstracts = new Dictionary<string,List<AbstractEntity>>();
 
+    // DO NOT CALL THESE DIRECTLY, CALL THE ENTITIES SetTag()/GetTag()!
+    public static void Internal_UpdateTag(NetworkEntity ent, string new_tag)
+    {
+        string old_tag = ent.GetTag();
+        if(old_tag == new_tag) return;
+        if(new_tag != "") tagged_entities[new_tag].Add(ent);
+        if(old_tag != "") tagged_entities[old_tag].Remove(ent);
+    }
+    public static void Internal_UpdateTag(AbstractEntity ent, string new_tag)
+    {
+        string old_tag = ent.GetTag();
+        if(old_tag == new_tag) return;
+        if(new_tag != "") tagged_abstracts[new_tag].Add(ent);
+        if(old_tag != "") tagged_abstracts[old_tag].Remove(ent);
+    }
+
+    // NOTE: you should be calling both of these when checking for tagged objects!
+    public static List<NetworkEntity> GetTaggedEntities(string tag)
+    {
+        if(!tagged_entities.ContainsKey(tag))
+        {
+            return new List<NetworkEntity>();
+        }
+        return tagged_entities[tag];
+    }
+    public static List<AbstractEntity> GetTaggedAbstracts(string tag)
+    {
+        if(!tagged_entities.ContainsKey(tag))
+        {
+            return new List<AbstractEntity>();
+        }
+        return tagged_abstracts[tag];
+    }
+
+    // Get random entity, then pick whatever one you want to use! Be sure to use BOTH!
+    public static NetworkEntity GetRandomTaggedEntity(string tag)
+    {
+        List<NetworkEntity> ents = GetTaggedEntities(tag);
+        if(ents.Count == 0) return null;
+        return tagged_entities[tag][Mathf.Abs((int)GD.Randi() % tagged_entities[tag].Count)];
+    }
+    public static AbstractEntity GetRandomTaggedAbstract(string tag)
+    {
+        List<AbstractEntity> ents = GetTaggedAbstracts(tag);
+        if(ents.Count == 0) return null;
+        return tagged_abstracts[tag][Mathf.Abs((int)GD.Randi() % tagged_abstracts[tag].Count)];
+    }
+
+
+    /*****************************************************************
+     * GAME UPDATE
+     ****************************************************************/
     public override void Fire()
     {
         //GD.Print(Name + " Fired");
@@ -272,12 +350,15 @@ public partial class MapController : DeligateController
             entry.Value.Tick();
         }
     }
-
     public override void Shutdown()
     {
         
     }
 
+    
+    /*****************************************************************
+     * SUPPORT OBJECTS
+     ****************************************************************/
     public struct GridPos
     {
         public GridPos(int set_hor, int set_ver, int set_dep)
@@ -341,11 +422,6 @@ public partial class MapController : DeligateController
 
         private List<NetworkChunk> loaded_chunks = new List<NetworkChunk>();
         private NetworkChunk[,,] chunk_grid;
-
-
-
-
-
 
         public MapContainer(string set_map_id,int set_width, int set_height,int set_depth)
         {

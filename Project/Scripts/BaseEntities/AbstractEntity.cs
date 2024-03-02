@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 
+
 public partial class AbstractEntity
 {
     // Beginning of template data
@@ -12,17 +13,17 @@ public partial class AbstractEntity
     public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
     {
         // Update our template with newly set variables
-        PackData template_data = AssetLoader.GetPackFromModID(PackRef);
-        model = template_data.model;
-        texture = template_data.texture;
+        PackData template_data = AssetLoader.GetPackFromModID(PackRef).Clone();
         template_data.SetVars(data); // Override with custom set!
         TemplateRead(template_data);
+        if(data.Keys.Count > 0) template_data.ShowVars();
     }
     public virtual void TemplateRead(PackData data)
     {
         PackRef = new PackRef(data);
         // SetBehavior(Behavior.CreateBehavior(behaviorID)); // Set behavior here!
     }    
+    public string tag = "";
     public string model = "Plane";
     public string texture = "Error.png";
     // End of template data
@@ -37,7 +38,6 @@ public partial class AbstractEntity
     public static AbstractEntity CreateEntity(string mapID, string type_ID, MainController.DataType type)
     {
         PackData typeData = null;
-        Behavior behavior = null;
         AbstractEntity newEnt = null;
         switch(type)
         {
@@ -50,7 +50,6 @@ public partial class AbstractEntity
         // NetworkEntity init
         newEnt.map_id_string = mapID;
         newEnt.TemplateRead(typeData);
-        newEnt.SetBehavior(behavior);
         return newEnt;
     }
 
@@ -141,7 +140,6 @@ public partial class AbstractEntity
         contains_entities.Add(ent);
         ent.EnterLocation(this);
     }
-
     public void EntityExited(NetworkEntity ent, bool perform_action)
     {
         contains_entities.Remove(ent);
@@ -153,5 +151,21 @@ public partial class AbstractEntity
             }
         }
         ent.ClearLocation();
+    }
+
+
+    
+    public void SetTag(string new_tag)
+    {
+        MapController.Internal_UpdateTag(this,new_tag);
+        tag = new_tag;
+    }
+    public void ClearTag()
+    {
+        SetTag("");
+    }
+    public string GetTag()
+    {
+        return tag;
     }
 }

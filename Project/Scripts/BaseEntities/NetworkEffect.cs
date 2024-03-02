@@ -11,14 +11,15 @@ public partial class NetworkEffect : NetworkEntity
     {
         PackRef = new PackRef(data);
         EffectData temp = AssetLoader.GetPackFromModID(PackRef) as EffectData;
+        SetTag(temp.tag);
         model = temp.model;
         texture = temp.texture;
-        spawner_id = temp.spawner_id;
+        is_spawner = temp.is_spawner;
         cleanable = temp.cleanable;
         SetBehavior(Behavior.CreateBehavior(temp));
     } 
     [Export]
-    public string spawner_id = "";     // If used as a mob or item spawner by the map, gets loaded into a list of spawners as well as the list of effects!
+    public bool is_spawner = false; // Uses tag as ID
     [Export]
     public bool cleanable = false;
     // End of template data

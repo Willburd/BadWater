@@ -11,6 +11,7 @@ public partial class NetworkStructure : NetworkEntity
     {
         PackRef = new PackRef(data);
         //StructureData temp = AssetLoader.GetPackFromModID(PackRef) as StructureData;
+        //SetTag(temp.tag);
         //model = temp.model;
         //texture = temp.texture;
         //density = template_data.density;

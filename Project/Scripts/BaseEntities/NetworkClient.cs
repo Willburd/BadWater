@@ -56,10 +56,10 @@ public partial class NetworkClient : Node
         clients.Add(this);
         camera.Current = false;
         // Check for a spawner!
-        if(MapController.spawners.ContainsKey("PLAYER_SPAWN"))
+        if(MapController.spawners.ContainsKey("PLAYER"))
         {
             // TEMP, pick random instead?
-            List<NetworkEffect> spawners = MapController.spawners["PLAYER_SPAWN"];
+            List<NetworkEffect> spawners = MapController.spawners["PLAYER"];
             if(spawners.Count > 0)
             {
                 GD.Print("Client RESPAWN: " + Name);

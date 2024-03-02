@@ -23,6 +23,7 @@ public partial class ItemData : PackData
         display_name        = TOOLS.ApplyExistingTag(data,"name",display_name);
         description         = TOOLS.ApplyExistingTag(data,"desc",description);
         behaviorID          = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
+        tag                 = TOOLS.ApplyExistingTag(data,"tag",tag);
         model               = TOOLS.ApplyExistingTag(data,"model",model);
         texture             = TOOLS.ApplyExistingTag(data,"texture",texture);
         size_category       = (SizeCategory)TOOLS.ApplyExistingTag(data,"size_category",(int)size_category);
@@ -31,7 +32,7 @@ public partial class ItemData : PackData
     protected override string GetVarString()
     {
         // Print variables of loaded data for debugging
-        return " name: " + display_name + " description: " + description + " size: "  + size_category;
+        return " name: " + display_name + " description: " + description + " tag: " + tag + " size: "  + size_category;
     }
     
     public static int InventorySlots(SizeCategory size)

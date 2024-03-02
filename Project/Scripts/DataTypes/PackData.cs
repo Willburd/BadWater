@@ -45,11 +45,6 @@ public partial class PackData : Resource
         // Print variables of loaded data for debugging
         GD.Print("-" + GetType().ToString() + ":" + GetUniqueModID + GetVarString());
     }
-    
-    public PackData Clone()
-    {
-        return MemberwiseClone() as PackData;
-    }
 
 
     protected Godot.Collections.Dictionary temp_file_data;
@@ -86,6 +81,7 @@ public partial class PackData : Resource
     public string display_name = "Pack";
     public string description = "";
     public string behaviorID = "";
+    public string tag = "";
     public string model = "Plane";
     public string texture = "";
 }
