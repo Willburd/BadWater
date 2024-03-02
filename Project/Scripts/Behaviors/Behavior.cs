@@ -107,4 +107,68 @@ public partial class Behavior
     {
         GD.Print("UPDATEICON"); // REPLACE ME!!!
     }
+
+
+
+    // This is a bit of a mess, but it needs to handle all abstract and network entity types being crossed with both abstract and network entities
+    public virtual void Crossed(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity crosser)
+    {
+        Abstract_Crossed(entity_type,crosser);
+    }
+    public virtual void Crossed(AbstractEntity owner, MainController.DataType entity_type, NetworkEntity crosser)
+    {
+        Entity_Crossed(entity_type,crosser);
+    }
+    public virtual void Crossed(NetworkEntity owner, MainController.DataType entity_type, AbstractEntity crosser)
+    {
+        Abstract_Crossed(entity_type,crosser);
+    }
+    public virtual void Crossed(NetworkEntity owner, MainController.DataType entity_type, NetworkEntity crosser)
+    {
+        Entity_Crossed(entity_type,crosser);
+    }
+    protected virtual void Abstract_Crossed(MainController.DataType entity_type, AbstractEntity crosser) // Use this if you don't need any unique type information from the owner to perform your actions!
+    {
+        Genetic_Crossed(entity_type);
+    }
+    protected virtual void Entity_Crossed(MainController.DataType entity_type, NetworkEntity crosser) // Use this if you don't need any unique type information from the owner to perform your actions!
+    {
+        Genetic_Crossed(entity_type);
+    }
+    protected virtual void Genetic_Crossed(MainController.DataType entity_type) // Use this if the object doesn't need any information from the owner, OR the crosser!
+    {
+        GD.Print("CROSSED"); // REPLACE ME!!!
+    }
+
+
+
+    // This is a bit of a mess, but it needs to handle all abstract and network entity types being crossed with both abstract and network entities
+    public virtual void UnCrossed(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity crosser)
+    {
+        Abstract_UnCrossed(entity_type,crosser);
+    }
+    public virtual void UnCrossed(AbstractEntity owner, MainController.DataType entity_type, NetworkEntity crosser)
+    {
+        Entity_UnCrossed(entity_type,crosser);
+    }
+    public virtual void UnCrossed(NetworkEntity owner, MainController.DataType entity_type, AbstractEntity crosser)
+    {
+        Abstract_UnCrossed(entity_type,crosser);
+    }
+    public virtual void UnCrossed(NetworkEntity owner, MainController.DataType entity_type, NetworkEntity crosser)
+    {
+        Entity_UnCrossed(entity_type,crosser);
+    }
+    protected virtual void Abstract_UnCrossed(MainController.DataType entity_type, AbstractEntity crosser) // Use this if you don't need any unique type information from the owner to perform your actions!
+    {
+        Genetic_UnCrossed(entity_type);
+    }
+    protected virtual void Entity_UnCrossed(MainController.DataType entity_type, NetworkEntity crosser) // Use this if you don't need any unique type information from the owner to perform your actions!
+    {
+        Genetic_UnCrossed(entity_type);
+    }
+    protected virtual void Genetic_UnCrossed(MainController.DataType entity_type) // Use this if the object doesn't need any information from the owner, OR the crosser!
+    {
+        GD.Print("UNCROSSED"); // REPLACE ME!!!
+    }
 }

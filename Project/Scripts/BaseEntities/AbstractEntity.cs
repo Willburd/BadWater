@@ -88,6 +88,22 @@ public partial class AbstractEntity
         // Ask our behavior for info!
         behavior_type?.UpdateIcon(this, entity_type);
     }
+    public virtual void Crossed(NetworkEntity crosser)
+    {
+        behavior_type?.Crossed( this, entity_type, crosser);
+    }
+    public virtual void Crossed(AbstractEntity crosser)
+    {
+        behavior_type?.Crossed( this, entity_type, crosser);
+    }
+    public virtual void UnCrossed(NetworkEntity crosser)
+    {
+        behavior_type?.UnCrossed( this, entity_type, crosser);
+    }
+    public virtual void UnCrossed(AbstractEntity crosser)
+    {
+        behavior_type?.UnCrossed( this, entity_type, crosser);
+    }
 
 
 
@@ -137,15 +153,5 @@ public partial class AbstractEntity
             }
         }
         ent.ClearLocation();
-    }
-
-    public virtual void Crossed(NetworkEntity crosser)
-    {
-        
-    }
-
-    public virtual void UnCrossed(NetworkEntity crosser)
-    {
-        
     }
 }
