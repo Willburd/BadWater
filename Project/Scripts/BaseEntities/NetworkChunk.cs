@@ -22,8 +22,9 @@ public partial class NetworkChunk : NetworkEntity
     public TurfMeshUpdater mesh_updater;
 
     // AUTO UPDATED, This might be better moved to an RPC?
-    public override void Tick()
+    public new void Tick()
     {
+        // Replace behavioral calls from parent, this does it's own stuff!
         timer += 1;
     }
 

@@ -20,9 +20,12 @@ public partial class ItemData : PackData
     {
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
-        description    = TOOLS.ApplyExistingTag(data,"desc",description);
-        size_category   = (SizeCategory)TOOLS.ApplyExistingTag(data,"size_category",(int)size_category);
+        display_name        = TOOLS.ApplyExistingTag(data,"name",display_name);
+        description         = TOOLS.ApplyExistingTag(data,"desc",description);
+        behaviorID          = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
+        model               = TOOLS.ApplyExistingTag(data,"model",model);
+        texture             = TOOLS.ApplyExistingTag(data,"texture",texture);
+        size_category       = (SizeCategory)TOOLS.ApplyExistingTag(data,"size_category",(int)size_category);
     }
 
     protected override string GetVarString()

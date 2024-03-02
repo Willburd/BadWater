@@ -10,6 +10,7 @@ public partial class TurfData : PackData
         if(data_override != null) data = data_override;
         display_name      = TOOLS.ApplyExistingTag(data,"name",display_name);
         description       = TOOLS.ApplyExistingTag(data,"desc",description);
+        behaviorID        = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
         model             = TOOLS.ApplyExistingTag(data,"model",model);
         texture           = TOOLS.ApplyExistingTag(data,"texture",texture);
         density           = TOOLS.ApplyExistingTag(data,"density",density);
@@ -23,8 +24,6 @@ public partial class TurfData : PackData
     }
     
     // Unique data
-    public string model = "Plane";
-    public string texture = "";
     public bool density = false;
     public bool opaque = false;
 }

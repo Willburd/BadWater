@@ -8,6 +8,16 @@ public static class TOOLS
         return new Vector3(grid.hor,grid.dep,grid.ver) * MapController.TileSize;
     }
 
+    static public Vector3 PosOnGridWithOffset(Vector3 RawGridPos) // Uses the decimal to decide location inside of turf grid ex: 1.25 is a quarter the way into the turf at x/y 1
+    {
+        // function EXPECTS inputs in GRIDSPACE, not WORLD position!!!
+        MapController.GridPos grid = new MapController.GridPos(RawGridPos * MapController.TileSize);
+        float offsethor = RawGridPos.X % 1;
+        float offsetver = RawGridPos.Y % 1;
+        float offsetdep = RawGridPos.Z % 1;
+        return GridToPos(grid) + (new Vector3(offsethor,offsetdep,offsetver) * MapController.TileSize);
+    }
+
     static public Godot.Collections.Dictionary ParseJsonFile(string file_path)
     {
         // Read text from file and then call parsejson.
@@ -30,7 +40,7 @@ public static class TOOLS
     static public Godot.Collections.Dictionary ParseJson(string json_string)
     {
         // Nothing here...
-        if(json_string == "") return new Godot.Collections.Dictionary();
+        if(json_string == null || json_string == "") return new Godot.Collections.Dictionary();
         // cleanup 's
         json_string = json_string.Replace("'", "`");
         // Parse to dict

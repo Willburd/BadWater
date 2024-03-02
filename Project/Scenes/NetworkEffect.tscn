@@ -18,6 +18,12 @@ properties/3/replication_mode = 2
 properties/4/path = NodePath(".:visible")
 properties/4/spawn = true
 properties/4/replication_mode = 2
+properties/5/path = NodePath(".:model")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:texture")
+properties/6/spawn = true
+properties/6/replication_mode = 2
 
 [node name="NetworkEffect" type="Node3D"]
 script = ExtResource("1_xwij3")

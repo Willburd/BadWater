@@ -10,8 +10,12 @@ public partial class NetworkStructure : NetworkEntity
     public override void TemplateRead(PackData data)
     {
         PackRef = new PackRef(data);
+        //StructureData temp = AssetLoader.GetPackFromModID(PackRef) as StructureData;
+        //model = temp.model;
+        //texture = temp.texture;
         //density = template_data.density;
         //opaque = template_data.opaque;
+        //SetBehavior(Behavior.CreateBehavior(temp.behaviorID));
     }
     [Export]
     public bool density;                // blocks movement

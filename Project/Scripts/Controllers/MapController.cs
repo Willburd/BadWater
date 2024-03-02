@@ -2,6 +2,7 @@ using Godot;
 using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Metadata;
 
 public partial class MapController : DeligateController
@@ -24,6 +25,8 @@ public partial class MapController : DeligateController
     private List<MapLoader> loading = new List<MapLoader>();
     private List<MapInitilizer> initing = new List<MapInitilizer>();
     private List<MapLateInitilizer> iconupdating = new List<MapLateInitilizer>();
+    private List<MapEntityCreator> entitycreating = new List<MapEntityCreator>();
+
     public override bool Init()
     {
         tick_rate = 3;
@@ -96,10 +99,28 @@ public partial class MapController : DeligateController
                 }
             }
             if(!finished) return;
+            foreach(MapOperator loader in iconupdating)
+            {
+                entitycreating.Add(new MapEntityCreator(active_maps[loader.GetMapID()]));
+            }
             iconupdating.Clear();
             return;
         }
-        
+        // Create entities!
+        if(entitycreating.Count > 0)
+        {
+            foreach(MapEntityCreator creator in entitycreating)
+            {
+                if(!creator.Finished())
+                {
+                    finished = false;
+                    creator.Process();
+                }
+            }
+            if(!finished) return;
+            entitycreating.Clear();
+            return;
+        }
         // Finalize
         InitEffects();
         InitEntities();
@@ -167,6 +188,11 @@ public partial class MapController : DeligateController
     {
         if(mapID == null) return false;
         return active_maps.ContainsKey(mapID);
+    }
+
+    public static string FallbackMap()
+    {
+        return active_maps.First().Key;
     }
 
 
@@ -352,6 +378,7 @@ public partial class MapController : DeligateController
         {
             get {return depth;}
         } 
+
         public AbstractTurf AddTurf(string turfID, GridPos grid_pos, NetworkArea area, bool replace = true)
         {
             // Replace old turf
@@ -448,7 +475,7 @@ public partial class MapController : DeligateController
         }
         public NetworkChunk GetChunk(ChunkPos grid_pos)
         {
-            NetworkChunk chunk = GetChunk(grid_pos);
+            NetworkChunk chunk = chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep];
             if(chunk != null)
             {
                 return chunk;
@@ -491,7 +518,7 @@ public partial class MapController : DeligateController
         protected int current_y = 0;
         protected int current_z = 0;
 
-        protected void HandleLoop()
+        protected virtual void HandleLoop()
         {
             // Next loop!
             steps += 1;
@@ -581,7 +608,7 @@ public partial class MapController : DeligateController
                     Godot.Collections.Array<string[]> turf_ylist = new Godot.Collections.Array<string[]>{ new string[] { "_:_", "" }};
                     if(area_depth.ContainsKey(current_x.ToString())) 
                     {
-                        turf_ylist = (Godot.Collections.Array<string[]>)turf_depth[current_x.ToString()];
+                        turf_ylist = (Godot.Collections.Array<string[]>)turf_depth[current_x.ToString()]; // array of string[TurfID,CustomData]
                     }
 
                     if(current_y < area_ylist.Length)
@@ -616,7 +643,7 @@ public partial class MapController : DeligateController
 
         public override void Process()
         {
-            int repeats = 100;
+            int repeats = 200;
             while(repeats-- > 0 && !finished)
             {
                 GetTurfAtPosition(current_x, current_y, current_z).Init();
@@ -655,6 +682,133 @@ public partial class MapController : DeligateController
         public AbstractTurf GetTurfAtPosition(int x, int y, int z)
         {
             return output_map.GetTurfAtPosition(new GridPos(x,y,z));
+        }
+    }
+
+
+
+    private class MapEntityCreator : MapOperator
+    {
+        Godot.Collections.Array<string[]> item_data;
+        Godot.Collections.Array<string[]> effect_data;
+        Godot.Collections.Array<string[]> structure_data;
+        Godot.Collections.Array<string[]> machine_data;
+
+        public new int max_steps
+        {
+            get {return item_data.Count + effect_data.Count + structure_data.Count + machine_data.Count;}
+        } 
+
+
+        int phase = 0;
+        public MapEntityCreator(MapContainer input_map)
+        {
+            map_id = input_map.MapID;
+            output_map = input_map;
+
+            MapData map_data = AssetLoader.loaded_maps[map_id];
+            Godot.Collections.Dictionary map_list = TOOLS.ParseJsonFile(map_data.GetFilePath);
+            Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
+            item_data       = (Godot.Collections.Array<string[]>)map_json["items"]; // array of string[EntityID,X,Y,Z,CustomData]
+            effect_data     = (Godot.Collections.Array<string[]>)map_json["effects"]; // array of string[EntityID,X,Y,Z,CustomData]
+            structure_data  = (Godot.Collections.Array<string[]>)map_json["structures"]; // array of string[EntityID,X,Y,Z,CustomData]
+            machine_data    = (Godot.Collections.Array<string[]>)map_json["machines"]; // array of string[EntityID,X,Y,Z,CustomData]
+            GD.Print("CREATING ENTITIES " + map_id + " =========================");
+        }
+
+        public override void Process()
+        {
+            int repeats = 10;
+            while(repeats-- > 0 && !finished)
+            {
+                // Get entity data!
+                string[] entity_pack = null;
+                NetworkEntity ent = null;
+                switch(phase)
+                {
+                    case 0: // Item
+                        if(item_data.Count > 0)
+                        {
+                            entity_pack = item_data[current_x];
+                            ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Item);
+                            ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                        }
+                    break;
+                    case 1: // Effect
+                        if(effect_data.Count > 0)
+                        {
+                            entity_pack = effect_data[current_x];
+                            ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Effect);
+                            ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                        }
+                    break;
+                    case 2: // Structure
+                        if(structure_data.Count > 0)
+                        {
+                            entity_pack = structure_data[current_x];
+                            ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Structure);
+                            ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                        }
+                    break;
+                    case 3: // Machine
+                        if(machine_data.Count > 0)
+                        {
+                            entity_pack = machine_data[current_x];
+                            ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Machine);
+                            ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                        }
+                    break;
+                }
+                // Set location
+                if(ent != null)
+                {
+                    ent.Position = TOOLS.PosOnGridWithOffset(new Vector3(float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])));
+                }
+                // LOOP!
+                HandleLoop();
+            }
+        }
+        protected override void HandleLoop()
+        {
+            // Next loop!
+            steps += 1;
+            current_x += 1;
+            switch(phase)
+            {
+                case 0: // Item
+                    if(current_x >= item_data.Count)
+                    {
+                        current_x = 0;
+                        phase += 1;
+                    }
+                break;
+
+                case 1: // Effect
+                    if(current_x >= effect_data.Count)
+                    {
+                        current_x = 0;
+                        phase += 1;
+                    }
+                break;
+
+                case 2: // Structure
+                    if(current_x >= structure_data.Count)
+                    {
+                        current_x = 0;
+                        phase += 1;
+                    }
+                break;
+
+                case 3: // Machine
+                    if(current_x >= machine_data.Count)
+                    {
+                        current_x = 0;
+                        phase += 1;
+                        finished = true;
+                    }
+                break;
+            }
+            TOOLS.PrintProgress(steps,max_steps);
         }
     }
 }

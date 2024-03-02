@@ -3,6 +3,9 @@
 		"parent": "",
 		"name": "Thingy",
 		"desc": "It does things.",
+		"behavior": "",
+		"model": "Item",
+		"texture": "Error.png",
 		"size_category": 0
 	}
 }

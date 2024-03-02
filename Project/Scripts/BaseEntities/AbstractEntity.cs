@@ -13,13 +13,18 @@ public partial class AbstractEntity
     {
         // Update our template with newly set variables
         PackData template_data = AssetLoader.GetPackFromModID(PackRef);
+        model = template_data.model;
+        texture = template_data.texture;
         template_data.SetVars(data); // Override with custom set!
         TemplateRead(template_data);
     }
     public virtual void TemplateRead(PackData data)
     {
         PackRef = new PackRef(data);
-    }
+        // SetBehavior(Behavior.CreateBehavior(behaviorID)); // Set behavior here!
+    }    
+    public string model = "Plane";
+    public string texture = "Error.png";
     // End of template data
     public string GetUniqueID
     {
@@ -27,9 +32,12 @@ public partial class AbstractEntity
     }
 
     private MainController.DataType entity_type;
+    private Behavior behavior_type;
+
     public static AbstractEntity CreateEntity(string mapID, string type_ID, MainController.DataType type)
     {
         PackData typeData = null;
+        Behavior behavior = null;
         AbstractEntity newEnt = null;
         switch(type)
         {
@@ -42,6 +50,7 @@ public partial class AbstractEntity
         // NetworkEntity init
         newEnt.map_id_string = mapID;
         newEnt.TemplateRead(typeData);
+        newEnt.SetBehavior(behavior);
         return newEnt;
     }
 
@@ -55,31 +64,32 @@ public partial class AbstractEntity
         get {return contains_entities;}
     }
 
-
-    public virtual void Init()          // Called upon creation to set variables or state, usually detected by map information.
+    public void SetBehavior(Behavior set_behavior)
     {
-        
+        behavior_type = set_behavior;
     }
 
-    public virtual void LateInit()      // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+
+    public void Init()          // Called upon creation to set variables or state, usually detected by map information.
     {
-        
+        behavior_type?.Init(this, entity_type);
+    }
+    public void LateInit()      // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    {
+        behavior_type?.LateInit(this, entity_type);
+    }
+    public void Tick()                  // Called every process tick on the Fire() tick of the subcontroller that owns them
+    {
+        // Ask our behavior for info!
+        behavior_type?.Tick(this, entity_type);
+    }
+    public void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
+    {
+        // Ask our behavior for info!
+        behavior_type?.UpdateIcon(this, entity_type);
     }
 
-    public virtual void Tick()          // Called every process tick on the Fire() tick of the subcontroller that owns them
-    {
-        
-    }
 
-    // RPC stuff commented so I have the formatting.
-    //[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public virtual void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
-    {
-
-
-
-        //Rpc(nameof(UpdateIcon));
-    }
 
     public void Process()
     {

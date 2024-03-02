@@ -9,7 +9,10 @@ public partial class MapData : PackData
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
         display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
-        description    = TOOLS.ApplyExistingTag(data,"desc",description);
+        description     = TOOLS.ApplyExistingTag(data,"desc",description);
+        behaviorID      = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
+        model           = TOOLS.ApplyExistingTag(data,"model",model);
+        texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
         width           = TOOLS.ApplyExistingTag(data,"width",width);
         height          = TOOLS.ApplyExistingTag(data,"height",height);
         depth           = TOOLS.ApplyExistingTag(data,"depth",depth);

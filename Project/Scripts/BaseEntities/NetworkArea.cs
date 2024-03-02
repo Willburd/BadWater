@@ -9,9 +9,12 @@ public partial class NetworkArea : NetworkEntity
     {
         PackRef = new PackRef(data);
         AreaData temp = AssetLoader.GetPackFromModID(PackRef) as AreaData;
+        model = temp.model;
+        texture = temp.texture;
         base_turf_ID = temp.base_turf_ID;
         is_space = temp.is_space;
         always_powered = temp.always_powered;
+        SetBehavior(Behavior.CreateBehavior(temp.behaviorID));
     }
     
     // Unique data
@@ -25,11 +28,6 @@ public partial class NetworkArea : NetworkEntity
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(1); // Server
-    }
-
-    public override void Tick()
-    {
-
     }
 
     public void AddTurf(AbstractTurf turf)

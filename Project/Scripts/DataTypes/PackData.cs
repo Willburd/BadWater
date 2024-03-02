@@ -85,4 +85,7 @@ public partial class PackData : Resource
     }
     public string display_name = "Pack";
     public string description = "";
+    public string behaviorID = "";
+    public string model = "Plane";
+    public string texture = "";
 }

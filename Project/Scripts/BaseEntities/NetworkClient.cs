@@ -49,15 +49,51 @@ public partial class NetworkClient : Node
 
     public void Spawn()
     {
+        // Time to forceset a position!
+        string new_map;
+        Vector3 new_pos;
         // Prep
         clients.Add(this);
         camera.Current = false;
         // Check for a spawner!
-        List<NetworkEffect> spawners = MapController.spawners["PLAYER"];
-        // TEMP, pick random instead?
-        focused_map_id = spawners[0].map_id_string;
-        focused_position = spawners[0].Position;
+        if(MapController.spawners.ContainsKey("PLAYER_SPAWN"))
+        {
+            // TEMP, pick random instead?
+            List<NetworkEffect> spawners = MapController.spawners["PLAYER_SPAWN"];
+            if(spawners.Count > 0)
+            {
+                GD.Print("Client RESPAWN: " + Name);
+                int rand = (int)GD.Randi() % spawners.Count;
+                new_map = spawners[rand].map_id_string;
+                new_pos = spawners[rand].Position;
+                GD.Print("-map: " + new_map);
+                GD.Print("-pos: " + new_pos);
+                Rpc(nameof(UpdateClientFocusedPos),new_map,new_pos);
+                return;
+            }
+            else
+            {
+                GD.Print("-NO SPAWNERS!");
+            }
+        }
+        // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
+        GD.Print("Client FALLBACK RESPAWN: " + Name);
+        new_map = MapController.FallbackMap();
+        new_pos = new Vector3((float)0.5,(float)0.5,0);
+        GD.Print("-map: " + new_map);
+        GD.Print("-pos: " + new_pos);
+        Rpc(nameof(UpdateClientFocusedPos),new_map,new_pos);
     }
+
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // Tell the client we want to forcibly move this
+    public virtual void UpdateClientFocusedPos(string map_id, Vector3 new_pos)
+    {
+        GD.Print("Client " + Name + " got movement update: " + " to: " + map_id + " : " + new_pos);
+        focused_map_id = map_id;
+        focused_position = new_pos;
+    }
+
 
     public void Tick()
     {

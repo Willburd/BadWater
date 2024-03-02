@@ -12,6 +12,7 @@ public partial class NetworkItem : NetworkEntity
         PackRef = new PackRef(data);
         ItemData temp = AssetLoader.GetPackFromModID(PackRef) as ItemData;
         size_category = temp.size_category;
+        SetBehavior(Behavior.CreateBehavior(temp.behaviorID));
     }
     [Export]
     public bool density;                    // blocks movement

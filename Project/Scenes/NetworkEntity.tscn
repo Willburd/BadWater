@@ -27,6 +27,12 @@ properties/6/replication_mode = 2
 properties/7/path = NodePath(".:visible")
 properties/7/spawn = true
 properties/7/replication_mode = 2
+properties/8/path = NodePath(".:model")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath(".:texture")
+properties/9/spawn = true
+properties/9/replication_mode = 2
 
 [node name="NetworkEntity" type="Node3D"]
 script = ExtResource("1_vmmur")

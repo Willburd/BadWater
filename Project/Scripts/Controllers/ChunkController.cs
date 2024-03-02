@@ -48,24 +48,27 @@ public partial class ChunkController : DeligateController
             if(!MapController.IsMapLoaded(client.focused_map_id))
             {
                 GD.PrintErr("CLIENT " + client.Name + " ON UNLOADED MAP " + client.focused_map_id);
-                return;
+                client.Spawn(); // EMERGENCY RESPAWN
             }
 
+            // Load our chunks
             MapController.ChunkPos pos = new MapController.ChunkPos(client.focused_position);
             if(!MapController.IsChunkLoaded(client.focused_map_id,pos))
             {
                 // Init chunk!
                 NetworkChunk map_chunk = MapController.GetChunk(client.focused_map_id,pos);
                 map_chunk.Position = GetAlignedPos(client.focused_position);
+            }
 
-                List<NetworkChunk> chunks = MapController.GetLoadedChunks(client.focused_map_id);
-                foreach(NetworkChunk chunk in chunks)
+            // Unload others
+            List<NetworkChunk> chunks = MapController.GetLoadedChunks(client.focused_map_id);
+            foreach(NetworkChunk chunk in chunks)
+            {
+                // chunk loaded, handle if it should unload
+                if(chunk.timer % 10 == 0 && chunk.Position.DistanceSquaredTo(client.focused_position) > chunk_size * chunk_unload_range)
                 {
-                    // chunk loaded, handle if it should unload
-                    if(chunk.timer % 10 == 0 && chunk.Position.DistanceSquaredTo(client.focused_position) > chunk_size * chunk_unload_range)
-                    {
-                        MapController.ChunkUnload(chunk);
-                    }
+                    MapController.ChunkUnload(chunk);
+                    break; // limit unloads...
                 }
             }
 		}

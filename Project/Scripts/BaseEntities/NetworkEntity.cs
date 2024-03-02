@@ -14,13 +14,20 @@ public partial class NetworkEntity : Node3D
     {
         // Update our template with newly set variables
         PackData template_data = AssetLoader.GetPackFromModID(PackRef).Clone();
+        model = template_data.model;
+        texture = template_data.texture;
         template_data.SetVars(data); // Override with custom set!
         TemplateRead(template_data);
     }
     public virtual void TemplateRead(PackData data)
     {
-        PackRef = new PackRef(data);
+        // PackRef = new PackRef(data);
+        // SetBehavior(Behavior.CreateBehavior(behaviorID)); // Set behavior here!
     }
+    [Export]
+    public string model = "Plane";
+    [Export]
+    public string texture = "Error.png";
     // End of template data
     public string GetUniqueID
     {
@@ -28,6 +35,7 @@ public partial class NetworkEntity : Node3D
     }
 
     private MainController.DataType entity_type;
+    private Behavior behavior_type;
     public static NetworkEntity CreateEntity(string mapID, string type_ID, MainController.DataType type)
     {
         PackData typeData = null;
@@ -114,38 +122,41 @@ public partial class NetworkEntity : Node3D
         get {return contains_entities;}
     }
 
-
-    public virtual void Init()          // Called upon creation to set variables or state, usually detected by map information.
+    public void SetBehavior(Behavior set_behavior)
     {
-        
+        behavior_type = set_behavior;
+    }
+
+
+
+    public void Init()          // Called upon creation to set variables or state, usually detected by map information.
+    {
+        behavior_type?.Init(this, entity_type);
     }
     
-    public virtual void LateInit()      // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    public void LateInit()      // Same as above, but when we NEED everything else Init() before we can properly tell our state!
     {
-        
+        behavior_type?.LateInit(this, entity_type);
     }
-
-    public virtual void Tick()          // Called every process tick on the Fire() tick of the subcontroller that owns them
+    public void Tick()                  // Called every process tick on the Fire() tick of the subcontroller that owns them
     {
-        
+        // Ask our behavior for info!
+        behavior_type?.Tick(this, entity_type);
     }
-
-    // RPC stuff commented so I have the formatting.
-    //[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public virtual void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
     {
-
-
-
-        //Rpc(nameof(UpdateIcon));
+        // Ask our behavior for info!
+        behavior_type?.UpdateIcon(this, entity_type);
     }
-
     public void Process()
     {
         // Handle the tick!
         Tick();
         ProcessVelocity();
     }
+
+
+
 
     private void ProcessVelocity()
     {

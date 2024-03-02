@@ -12,15 +12,12 @@ public partial class AbstractTurf : AbstractEntity
         texture = temp.texture;
         density = temp.density;
         opaque = temp.opaque;
+        SetBehavior(Behavior.CreateBehavior(temp.behaviorID));
     }
     [Export]
     public bool density;                // blocks movement
     [Export]
     public bool opaque;               // blocks vision
-    [Export]
-    public string model = "Plane";
-    [Export]
-    public string texture = "Error.png";
     // End of template data
 
 
@@ -49,11 +46,5 @@ public partial class AbstractTurf : AbstractEntity
     {
         get {return area;}
         set {area = value;} // SET USING Area.AddTurf() DO NOT SET DIRECTLY
-    }
-
-    
-    public override void UpdateIcon()
-    {
-        
     }
 }

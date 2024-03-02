@@ -23,7 +23,9 @@
 				"4": ["_:_","_:_"		,"_:_"		,"_:_"		,"_:_"]
 			}
 		},
-		"effects": [["_:PLAYER_SPAWN",0.5,2.5,""]],
-		"entities": []
+		"items": [],
+		"effects": [["_:PLAYER_SPAWN",0.5,2.5,0,""]],
+		"structures": [],
+		"machines": []
 	}
 }
