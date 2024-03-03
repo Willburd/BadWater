@@ -69,9 +69,7 @@ public partial class NetworkEntity : Node3D
     {
         get { return PackRef.modid; }
     }
-
     protected MainController.DataType entity_type;
-    private Behavior behavior_type;
     public static NetworkEntity CreateEntity(string mapID, string type_ID, MainController.DataType type)
     {
         PackData typeData = null;
@@ -127,45 +125,14 @@ public partial class NetworkEntity : Node3D
         return newEnt;
     }
 
-    [Export]
-    public string map_id_string;
-    [Export]
-    public Vector3 velocity = Vector3.Zero;
-
-
-    public void EnterLocation(AbstractEntity absLoc)
-    {
-        ent_location = null;
-        abs_location = absLoc;
-    }
-    public void EnterLocation(NetworkEntity entLoc)
-    {
-        ent_location = entLoc;
-        abs_location = null;
-    }
-    public void ClearLocation()
-    {
-        ent_location = null;
-        abs_location = null;
-    }
-
-    // Current NetworkEntity that this entity is inside of, including turf.
-    protected AbstractEntity abs_location = null;
-    protected NetworkEntity ent_location = null; 
-
-    private List<NetworkEntity> contains_entities = new List<NetworkEntity>();
-    public List<NetworkEntity> Contains
-    {
-        get {return contains_entities;}
-    }
-
+    /*****************************************************************
+     * Behavior hooks
+     ****************************************************************/    
+    private Behavior behavior_type;
     public void SetBehavior(Behavior set_behavior)
     {
         behavior_type = set_behavior;
     }
-
-
-
     public void Init()          // Called upon creation to set variables or state, usually detected by map information.
     {
         behavior_type?.Init(this, entity_type);
@@ -202,15 +169,23 @@ public partial class NetworkEntity : Node3D
         behavior_type?.UnCrossed(this, entity_type, crosser);
     }
 
+    /*****************************************************************
+     * Processing
+     ****************************************************************/
+    [Export]
+    public Vector3 velocity = Vector3.Zero;
+    public AbstractEntity Abstractize()
+    {
+        // Spawns the NetworkEntity version of the object... DOES NOT ADD TO PROCESSING LISTS
 
-
+        return new AbstractEntity();
+    }
     public void Process()
     {
         // Handle the tick!
         Tick();
         ProcessVelocity();
     }
-
     private void ProcessVelocity()
     {
         // Containers don't update velocity, and don't move...
@@ -225,6 +200,78 @@ public partial class NetworkEntity : Node3D
         {
             Move(map_id_string, TOOLS.GridToPosWithOffset(grid_pos) + velocity);
         }
+    }
+    public void Kill()
+    {
+        switch(entity_type)
+        {
+            case MainController.DataType.Area:
+                MapController.areas.Remove(this.GetUniqueID);
+                break;
+            case MainController.DataType.Chunk:
+                // MapController.loaded_chunks.Remove(this); // TODO - CHUNK DELETION
+                break;
+            case MainController.DataType.Effect:
+                MapController.all_effects.Remove(this as NetworkEffect);
+                if((this as NetworkEffect).is_spawner)
+                {
+                    MapController.spawners[(this as NetworkEffect).GetTag()].Remove(this as NetworkEffect);
+                }
+                break;
+            case MainController.DataType.Item:
+                MapController.entities.Remove(this);
+                break;
+            case MainController.DataType.Structure:
+                MapController.entities.Remove(this);
+                break;
+            case MainController.DataType.Machine:
+                MachineController.entities.Remove(this);
+                break;
+            case MainController.DataType.Mob:
+                MobController.entities.Remove(this);
+                break;
+        }
+        ClearTag(); // wipe tag
+        QueueFree();
+    }
+
+    /*****************************************************************
+     * Movement and storage
+     ****************************************************************/
+    [Export]
+    public string map_id_string;
+    public AbstractTurf GetTurf()
+    {
+        return MapController.GetTurfAtPosition(map_id_string,grid_pos);
+    }
+    
+    protected AbstractEntity abs_location = null;
+    protected NetworkEntity ent_location = null; 
+    private List<AbstractEntity> stored_abstracts = new List<AbstractEntity>();
+    private List<NetworkEntity> stored_entities = new List<NetworkEntity>();
+    public List<AbstractEntity> StoredAbstracts
+    {
+        get {return stored_abstracts;}
+    }
+    public List<NetworkEntity> StoredEntities
+    {
+        get {return stored_entities;}
+    }
+    
+    public void EnterLocation(AbstractEntity absLoc)
+    {
+        ent_location = null;
+        abs_location = absLoc;
+    }
+    public void EnterLocation(NetworkEntity entLoc)
+    {
+        ent_location = entLoc;
+        abs_location = null;
+    }
+    public void ClearLocation()
+    {
+        ent_location = null;
+        abs_location = null;
     }
 
     private void LeaveOldLoc(bool perform_turf_actions)
@@ -270,73 +317,78 @@ public partial class NetworkEntity : Node3D
         new_container.EntityEntered(this,perform_turf_actions);
     }
 
-    public void Kill()
-    {
-        switch(entity_type)
-        {
-            case MainController.DataType.Area:
-                MapController.areas.Remove(this.GetUniqueID);
-                break;
-            case MainController.DataType.Chunk:
-                // MapController.loaded_chunks.Remove(this); // TODO - CHUNK DELETION
-                break;
-            case MainController.DataType.Effect:
-                MapController.all_effects.Remove(this as NetworkEffect);
-                if((this as NetworkEffect).is_spawner)
-                {
-                    MapController.spawners[(this as NetworkEffect).GetTag()].Remove(this as NetworkEffect);
-                }
-                break;
-            case MainController.DataType.Item:
-                MapController.entities.Remove(this);
-                break;
-            case MainController.DataType.Structure:
-                MapController.entities.Remove(this);
-                break;
-            case MainController.DataType.Machine:
-                MachineController.entities.Remove(this);
-                break;
-            case MainController.DataType.Mob:
-                MobController.entities.Remove(this);
-                break;
-        }
-        ClearTag(); // wipe tag
-        QueueFree();
-    }
-
-    public AbstractTurf GetTurf()
-    {
-        return MapController.GetTurfAtPosition(map_id_string,grid_pos);
-    }
-
-
+    // Another entity has entered us...
     public void EntityEntered(NetworkEntity ent, bool perform_action)
     {
         if(perform_action)
         {
-            for(int i = 0; i < contains_entities.Count; i++) 
+            for(int i = 0; i < stored_abstracts.Count; i++) 
             {
-                contains_entities[i].Crossed(ent);
+                stored_abstracts[i].Crossed(ent);
+            }
+            for(int i = 0; i < stored_entities.Count; i++) 
+            {
+                stored_entities[i].Crossed(ent);
             }
         }
-        
-        contains_entities.Add(ent);
+        // Network entity 
+        stored_entities.Add(ent);
         ent.EnterLocation(this);
     }
-    public void EntityExited(NetworkEntity ent, bool perform_action)
+    public void EntityEntered(AbstractEntity abs, bool perform_action)
     {
-        contains_entities.Remove(ent);
         if(perform_action)
         {
-            for(int i = 0; i < contains_entities.Count; i++) 
+            for(int i = 0; i < stored_abstracts.Count; i++) 
             {
-                contains_entities[i].UnCrossed(ent);
+                stored_abstracts[i].Crossed(abs);
+            }
+            for(int i = 0; i < stored_entities.Count; i++) 
+            {
+                stored_entities[i].Crossed(abs);
+            }
+        }
+        // Network entity 
+        stored_abstracts.Add(abs);
+        abs.EnterLocation(this);
+    }
+    // An entity stored inside us has gone somewhere else!
+    public void EntityExited(NetworkEntity ent, bool perform_action)
+    {
+        stored_entities.Remove(ent);
+        if(perform_action)
+        {
+            for(int i = 0; i < stored_abstracts.Count; i++) 
+            {
+                stored_abstracts[i].UnCrossed(ent);
+            }
+            for(int i = 0; i < stored_entities.Count; i++) 
+            {
+                stored_entities[i].UnCrossed(ent);
             }
         }
         ent.ClearLocation();
     }
+    public void EntityExited(AbstractEntity abs, bool perform_action)
+    {
+        stored_abstracts.Remove(abs);
+        if(perform_action)
+        {
+            for(int i = 0; i < stored_abstracts.Count; i++) 
+            {
+                stored_abstracts[i].UnCrossed(abs);
+            }
+            for(int i = 0; i < stored_entities.Count; i++) 
+            {
+                stored_entities[i].UnCrossed(abs);
+            }
+        }
+        abs.ClearLocation();
+    }
 
-
+    /*****************************************************************
+     * Tag control
+     ****************************************************************/
     public void SetTag(string new_tag)
     {
         MapController.Internal_UpdateTag(this,new_tag);

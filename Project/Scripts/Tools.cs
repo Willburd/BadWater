@@ -5,7 +5,11 @@ public static class TOOLS
 {
     static public Vector3 GridToPosWithOffset(MapController.GridPos grid)
     {
-        return new Vector3(grid.hor,grid.dep,grid.ver) * MapController.TileSize;
+        return new Vector3(grid.hor,grid.dep,grid.ver) * MapController.tile_size;
+    }
+    static public Vector3 ChunkGridToPos(MapController.ChunkPos grid)
+    {
+        return new Vector3(grid.hor,grid.dep,grid.ver) * (ChunkController.chunk_size * MapController.tile_size);
     }
     static public Godot.Collections.Dictionary ParseJsonFile(string file_path)
     {

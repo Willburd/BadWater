@@ -8,7 +8,7 @@ using System.Reflection.Metadata;
 
 public partial class MapController : DeligateController
 {
-    public static int TileSize = 1; // size in 3D units that world tiles are
+    public static int tile_size = 1; // size in 3D units that world tiles are
 
     /*****************************************************************
      * MAP LOADING PHASES
@@ -377,9 +377,9 @@ public partial class MapController : DeligateController
         }
         public GridPos(Vector3 worldPos)
         {
-            hor = (float)(worldPos.X / MapController.TileSize);
-            ver = (float)(worldPos.Z / MapController.TileSize);
-            dep = (float)(worldPos.Y / MapController.TileSize);
+            hor = (float)(worldPos.X / MapController.tile_size);
+            ver = (float)(worldPos.Z / MapController.tile_size);
+            dep = (float)(worldPos.Y / MapController.tile_size);
         }
 
         public bool Equals(GridPos other)
@@ -402,9 +402,9 @@ public partial class MapController : DeligateController
         }
         public ChunkPos(Vector3 worldPos)
         {
-            hor = Mathf.FloorToInt((worldPos.X / MapController.TileSize) / ChunkController.chunk_size);
-            ver = Mathf.FloorToInt((worldPos.Z / MapController.TileSize) / ChunkController.chunk_size);
-            dep = Mathf.FloorToInt((worldPos.Y / MapController.TileSize));
+            hor = Mathf.FloorToInt(worldPos.X / (ChunkController.chunk_size * MapController.tile_size));
+            ver = Mathf.FloorToInt(worldPos.Z / (ChunkController.chunk_size * MapController.tile_size));
+            dep = Mathf.FloorToInt(worldPos.Y);
         }
 
         public bool Equals(GridPos other)
@@ -441,7 +441,7 @@ public partial class MapController : DeligateController
             turfs = new AbstractTurf[width,height,depth];
             // Chunks for clients!
             int chunk_wid = (int)Mathf.Ceil(width / ChunkController.chunk_size);
-            int chunk_hig = (int)Mathf.Ceil(width / ChunkController.chunk_size);
+            int chunk_hig = (int)Mathf.Ceil(height / ChunkController.chunk_size);
             int chunk_dep = set_depth;
             chunk_grid = new NetworkChunk[chunk_wid,chunk_hig,chunk_dep];
         }
@@ -555,16 +555,24 @@ public partial class MapController : DeligateController
 
         public bool IsChunkLoaded(ChunkPos grid_pos)
         {
+            // Assuming the chunk is already loaded is faster then trying to load nothing1
+            if(grid_pos.hor < 0 || grid_pos.hor > chunk_grid.GetLength(0)) return true;
+            if(grid_pos.ver < 0 || grid_pos.ver > chunk_grid.GetLength(1)) return true;
+            if(grid_pos.dep < 0 || grid_pos.dep > chunk_grid.GetLength(2)) return true;
             return chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] != null;
         }
         public NetworkChunk GetChunk(ChunkPos grid_pos)
         {
+            // Try getting already present chunk, or out of grid null
+            if(grid_pos.hor < 0 || grid_pos.hor > chunk_grid.GetLength(0)) return null;
+            if(grid_pos.ver < 0 || grid_pos.ver > chunk_grid.GetLength(1)) return null;
+            if(grid_pos.dep < 0 || grid_pos.dep > chunk_grid.GetLength(2)) return null;
             NetworkChunk chunk = chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep];
-            if(chunk != null)
-            {
-                return chunk;
-            }
+            if(chunk != null) return chunk;
+            // Loader...
             NetworkChunk new_chunk = NetworkEntity.CreateEntity(map_id, "", MainController.DataType.Chunk) as NetworkChunk;
+            new_chunk.Position = TOOLS.ChunkGridToPos(grid_pos);
+            chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] = new_chunk;
             loaded_chunks.Add(new_chunk);
             return new_chunk;
         }
