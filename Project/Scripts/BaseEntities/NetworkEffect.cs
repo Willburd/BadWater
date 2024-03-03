@@ -9,25 +9,14 @@ public partial class NetworkEffect : NetworkEntity
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
-        PackRef = new PackRef(data);
-        EffectData temp = AssetLoader.GetPackFromModID(PackRef) as EffectData;
-        SetTag(temp.tag);
+        base.TemplateRead(data);
+        EffectData temp = data as EffectData;
         model = temp.model;
         texture = temp.texture;
         is_spawner = temp.is_spawner;
         cleanable = temp.cleanable;
-        SetBehavior(Behavior.CreateBehavior(temp));
     } 
-    public override PackData TemplateWrite()
-    {
-        EffectData data = new EffectData();
-        data.tag = tag;
-        data.model = model;
-        data.texture = texture;
-        data.is_spawner = is_spawner;
-        data.cleanable = cleanable;
-        return data;
-    }
+    
     [Export]
     public bool is_spawner = false; // Uses tag as ID
     [Export]

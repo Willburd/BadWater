@@ -20,13 +20,43 @@ public partial class NetworkEntity : Node3D
     }
     public virtual void TemplateRead(PackData data)
     {
-        // PackRef = new PackRef(data);
-        // SetBehavior(Behavior.CreateBehavior(behaviorID)); // Set behavior here!
+        PackRef = new PackRef( data, entity_type);
+        SetBehavior(Behavior.CreateBehavior(data));
+        SetTag(data.tag);
     }
-    public virtual PackData TemplateWrite()
+    public PackData TemplateWrite()
     {
-        return new PackData();
-    }   
+        PackData data = null;
+        switch(entity_type)
+        {
+            case MainController.DataType.Map:
+                data = new MapData();
+            break;
+            case MainController.DataType.Area:
+                data = new AreaData();
+            break;
+            case MainController.DataType.Turf:
+                data = new TurfData();
+            break;
+            case MainController.DataType.Effect:
+                data = new EffectData();
+            break;
+            case MainController.DataType.Item:
+                data = new ItemData();
+            break;
+            case MainController.DataType.Structure:
+                // data = new StructureData();
+            break;
+            case MainController.DataType.Machine:
+                // data = new MachineData();
+            break;
+            case MainController.DataType.Mob:
+                // data = new MobData();
+            break;
+        }
+        data.Clone(AssetLoader.GetPackFromRef(PackRef));
+        return data;
+    }
     [Export]
     public string tag = "";
     [Export]
@@ -39,7 +69,7 @@ public partial class NetworkEntity : Node3D
         get { return PackRef.modid; }
     }
 
-    private MainController.DataType entity_type;
+    protected MainController.DataType entity_type;
     private Behavior behavior_type;
     public static NetworkEntity CreateEntity(string mapID, string type_ID, MainController.DataType type)
     {

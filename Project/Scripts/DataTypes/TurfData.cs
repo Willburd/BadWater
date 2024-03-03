@@ -24,6 +24,14 @@ public partial class TurfData : PackData
         return " name: " + display_name + " description: " + description + " tag: " + tag +  " density: "  + density + " model: "  + model + " texture: "  + texture + " opaque: " + opaque;
     }
     
+    public override void Clone(PackData source)
+    {
+        TurfData temp = source as TurfData;
+        base.Clone(temp);
+        temp.density = density;
+        temp.opaque = opaque;
+    }
+
     // Unique data
     public bool density = false;
     public bool opaque = false;

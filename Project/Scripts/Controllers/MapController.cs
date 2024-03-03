@@ -293,14 +293,22 @@ public partial class MapController : DeligateController
     {
         string old_tag = ent.GetTag();
         if(old_tag == new_tag) return;
-        if(new_tag != "") tagged_entities[new_tag].Add(ent);
+        if(new_tag != "") 
+        {
+            if(!tagged_entities.ContainsKey(new_tag)) tagged_entities.Add(new_tag, new List<NetworkEntity>());
+            tagged_entities[new_tag].Add(ent);
+        }
         if(old_tag != "") tagged_entities[old_tag].Remove(ent);
     }
     public static void Internal_UpdateTag(AbstractEntity ent, string new_tag)
     {
         string old_tag = ent.GetTag();
         if(old_tag == new_tag) return;
-        if(new_tag != "") tagged_abstracts[new_tag].Add(ent);
+        if(new_tag != "") 
+        {
+            if(!tagged_abstracts.ContainsKey(new_tag)) tagged_abstracts.Add(new_tag, new List<AbstractEntity>());
+            tagged_abstracts[new_tag].Add(ent);
+        }
         if(old_tag != "") tagged_abstracts[old_tag].Remove(ent);
     }
 
@@ -701,7 +709,7 @@ public partial class MapController : DeligateController
 
                 // It's turfin time... How awful.
                 AbstractTurf turf = output_map.AddTurf(make_turf_id, new GridPos(current_x,current_y,current_z), areas[make_area_id], false);
-                turf.ApplyMapCustomData(TOOLS.ParseJson(turf_json)); // Set this object's flags using an embedded string of json!
+                if(turf_json.Length > 0) turf.ApplyMapCustomData(TOOLS.ParseJson(turf_json)); // Set this object's flags using an embedded string of json!
                 HandleLoop();
             }
         }
@@ -807,7 +815,7 @@ public partial class MapController : DeligateController
                         {
                             entity_pack = item_data[current_x];
                             ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Item);
-                            ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                     case 1: // Effect
@@ -815,7 +823,7 @@ public partial class MapController : DeligateController
                         {
                             entity_pack = effect_data[current_x];
                             ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Effect);
-                            ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                     case 2: // Structure
@@ -823,7 +831,7 @@ public partial class MapController : DeligateController
                         {
                             entity_pack = structure_data[current_x];
                             ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Structure);
-                            ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                     case 3: // Machine
@@ -831,7 +839,7 @@ public partial class MapController : DeligateController
                         {
                             entity_pack = machine_data[current_x];
                             ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Machine);
-                            ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                 }

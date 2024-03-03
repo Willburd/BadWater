@@ -8,13 +8,13 @@ using System.Linq;
 
 public struct PackRef
 {
-    public PackRef(PackData data)
+    public PackRef(PackData data,MainController.DataType set_data_type)
     {
         modid = data.GetUniqueModID;
-        data_type = data.GetType().ToString();
+        data_type = set_data_type;
     }
     public string modid;
-    public string data_type;
+    public MainController.DataType data_type;
 }
 
 [GlobalClass] 
@@ -175,9 +175,9 @@ public partial class AssetLoader : Node
             data["name"] = "Unknown";
             data["is_space"] = 1.0;
             data["always_powered"] = 1.0;
-            area.Init( "_", "_", "_", data);
+            area.Init( "_", "_", "_", MainController.DataType.Area, data);
             loaded_areas[area.GetUniqueModID] = area;
-            all_packs[area.GetType()+":"+area.GetUniqueModID] = area;
+            all_packs[AssetLoader.AllPackID(area.GetUniqueModID, MainController.DataType.Area)] = area;
         }
         {   // Space turf
             TurfData turf = new TurfData();
@@ -185,9 +185,9 @@ public partial class AssetLoader : Node
             data["name"] = "Space";
             data["density"] = 0.0;
             data["opaque"] = 0.0;
-            turf.Init( "_", "_", "_", data);
+            turf.Init( "_", "_", "_", MainController.DataType.Turf, data);
             loaded_turfs[turf.GetUniqueModID] = turf;
-            all_packs[turf.GetType()+":"+turf.GetUniqueModID] = turf;
+            all_packs[AssetLoader.AllPackID(turf.GetUniqueModID, MainController.DataType.Turf)] = turf;
         }
         {   // Spawners for wildlife and players
             EffectData effect = new EffectData();
@@ -195,9 +195,9 @@ public partial class AssetLoader : Node
             data["name"] = "Spawner";
             data["cleanable"] = 0.0;
             data["is_spawner"] = 1.0;
-            effect.Init( "_", "_", "SPAWNER", data);
+            effect.Init( "_", "_", "SPAWNER", MainController.DataType.Effect, data);
             loaded_effects[effect.GetUniqueModID] = effect;
-            all_packs[effect.GetType()+":"+effect.GetUniqueModID] = effect;
+            all_packs[AssetLoader.AllPackID(effect.GetUniqueModID, MainController.DataType.Effect)] = effect;
         }
         
         GD.Print("BUILDING INHERITANCE");
@@ -233,7 +233,7 @@ public partial class AssetLoader : Node
                     continue;
                 }
                 // IT HAS A PARENT, so time for GREAT FUN.
-                string getID = data.GetType().ToString() + ":" + data.GetDataParent;
+                string getID = AllPackID(data.GetDataParent,data.entity_type);
                 PackData parent = all_packs[getID];
                 if(!parent.ParentFlag)
                 {
@@ -243,13 +243,13 @@ public partial class AssetLoader : Node
                 }
                 // Parent's data is set, loop through parent chain, and set data repeatedly...
                 Stack<string> parent_chain = new Stack<string>();
-                string parent_search = data.GetType().ToString() + ":" + data.GetUniqueModID;
+                string parent_search = AllPackID(data.GetUniqueModID,data.entity_type);   
                 while(true)
                 {
                     PackData search_parent = all_packs[parent_search];
                     parent_chain.Push(parent_search);
                     if(search_parent.GetDataParent == "") break;
-                    parent_search = data.GetType().ToString() + ":" + search_parent.GetDataParent;
+                    parent_search = AllPackID(search_parent.GetDataParent,data.entity_type);
                 }
                 // Go through all collected parents from the lowest to ourselves, and set values!
                 while(parent_chain.Count > 0)
@@ -278,72 +278,72 @@ public partial class AssetLoader : Node
                 case MainController.DataType.Map:
                     {
                         MapData data_pack = new MapData();
-                        data_pack.Init( file_path, prefix, key,dict_data);
+                        data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_maps[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;
+                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
 
                 case MainController.DataType.Area:
                     {
                         AreaData data_pack = new AreaData();
-                        data_pack.Init( file_path, prefix, key,dict_data);
+                        data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_areas[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;
+                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
 
                 case MainController.DataType.Turf:
                     {
                         TurfData data_pack = new TurfData();
-                        data_pack.Init( file_path, prefix, key,dict_data);
+                        data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_turfs[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;
+                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
 
                 case MainController.DataType.Effect:
                     {
                         EffectData data_pack = new EffectData();
-                        data_pack.Init( file_path, prefix, key,dict_data);
+                        data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_effects[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;
+                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }       
                 break;
 
                 case MainController.DataType.Item:
                     {
                         ItemData data_pack = new ItemData();
-                        data_pack.Init( file_path, prefix, key,dict_data);
+                        data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_items[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;
+                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
                 
                 case MainController.DataType.Structure:
                     {
                         PackData data_pack = new PackData();
-                        data_pack.Init( file_path, prefix, key,dict_data);
+                        data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_structures[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;
+                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
                 
                 case MainController.DataType.Machine:
                     {
                         PackData data_pack = new PackData();
-                        data_pack.Init( file_path, prefix, key,dict_data);
+                        data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_machines[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;
+                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
                 
                 case MainController.DataType.Mob:
                     {
                         PackData data_pack = new PackData();
-                        data_pack.Init( file_path, prefix, key,dict_data);
+                        data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_mobs[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[data_pack.GetType()+":"+data_pack.GetUniqueModID] = data_pack;
+                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
             }
@@ -359,6 +359,12 @@ public partial class AssetLoader : Node
 
     public static PackData GetPackFromModID(PackRef get_pack)
     {
-        return all_packs[get_pack.data_type + ":" + get_pack.modid];
+        return all_packs[AllPackID(get_pack.modid,get_pack.data_type)];
+    }
+
+
+    public static string AllPackID( string modID, MainController.DataType type)
+    {
+        return type.ToString().ToUpper() + ":" + modID;
     }
 }

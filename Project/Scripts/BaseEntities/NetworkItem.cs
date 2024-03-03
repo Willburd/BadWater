@@ -9,22 +9,11 @@ public partial class NetworkItem : NetworkEntity
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
-        PackRef = new PackRef(data);
-        ItemData temp = AssetLoader.GetPackFromModID(PackRef) as ItemData;
-        SetTag(temp.tag);
+        base.TemplateRead(data);
+        ItemData temp = data as ItemData;
         model = temp.model;
         texture = temp.texture;
         size_category = temp.size_category;
-        SetBehavior(Behavior.CreateBehavior(temp));
-    }
-    public override PackData TemplateWrite()
-    {
-        ItemData data = new ItemData();
-        data.tag = tag;
-        data.model = model;
-        data.texture = texture;
-        data.size_category = size_category;
-        return data;
     }
     [Export]
     public bool density;                    // blocks movement

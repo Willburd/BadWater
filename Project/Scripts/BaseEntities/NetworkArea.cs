@@ -7,25 +7,14 @@ public partial class NetworkArea : NetworkEntity
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
-        PackRef = new PackRef(data);
-        AreaData temp = AssetLoader.GetPackFromModID(PackRef) as AreaData;
-        SetTag(temp.tag);
+        base.TemplateRead(data);
+        AreaData temp = data as AreaData;
         model = temp.model;
         texture = temp.texture;
         base_turf_ID = temp.base_turf_ID;
         is_space = temp.is_space;
         always_powered = temp.always_powered;
-        SetBehavior(Behavior.CreateBehavior(temp));
     }
-
-    public override PackData TemplateWrite()
-    {
-        PackData data = new AreaData();
-
-
-        return data;
-    }
-
     // Unique data
     [Export]
     public string base_turf_ID;

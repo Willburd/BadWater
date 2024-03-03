@@ -13,6 +13,11 @@ public partial class NetworkChunk : NetworkEntity
     [Export]
     public bool has_mesh_update = true;
 
+    public override void TemplateRead(PackData data)
+    {
+        // nothing here, nope!
+    }
+
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(1); // Server

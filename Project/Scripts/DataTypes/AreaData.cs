@@ -6,14 +6,9 @@ public partial class AreaData : PackData
 {
     public override void SetVars(Godot.Collections.Dictionary data_override = null)
     {
+        base.SetVars(data_override);
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
-        description     = TOOLS.ApplyExistingTag(data,"desc",description);
-        behaviorID      = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
-        tag             = TOOLS.ApplyExistingTag(data,"tag",tag);
-        model           = TOOLS.ApplyExistingTag(data,"model",model);
-        texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
         is_space        = TOOLS.ApplyExistingTag(data,"is_space",is_space);
         always_powered  = TOOLS.ApplyExistingTag(data,"always_powered",always_powered);
     }
@@ -22,6 +17,15 @@ public partial class AreaData : PackData
     {
         // Print variables of loaded data for debugging
         return " name: " + display_name + " description: " + description + " tag: " + tag + " is_space: " + is_space + " always_powered: " + always_powered;
+    }
+    
+    public override void Clone(PackData source)
+    {
+        AreaData temp = source as AreaData;
+        base.Clone(temp);
+        base_turf_ID = temp.base_turf_ID;
+        always_powered = temp.always_powered;
+        is_space = temp.is_space;
     }
     
     // Unique data

@@ -6,24 +6,32 @@ using System;
 public partial class PackData : Resource
 {
     protected string source_file_path = "";
-    protected void SetIdentity(string set_prefix, string set_ID, string set_path, string set_parent)
+    protected void SetIdentity(string set_prefix, string set_ID, MainController.DataType type, string set_path, string set_parent)
     {
         mod_prefix = set_prefix;
         unique_ID = set_ID;
         source_file_path = set_path;
+        entity_type = type;
         data_parent = set_parent;   // INHERETANCE IS FUN
     }
 
-    public void Init(string file_path, string set_prefix, string set_ID, Godot.Collections.Dictionary data)
+    public void Init(string file_path, string set_prefix, string set_ID, MainController.DataType type, Godot.Collections.Dictionary data)
     {
-        SetIdentity( set_prefix, set_ID, file_path, TOOLS.ApplyExistingTag(data,"parent",""));
+        SetIdentity( set_prefix, set_ID, type, file_path, TOOLS.ApplyExistingTag(data,"parent",""));
         temp_file_data = data;
         ParentFlag = data_parent == ""; // used by the inheretance setup code. If this is false, we aren't ready to be read... So we defer the parent data loading until we are! 
     }
 
     public virtual void SetVars(Godot.Collections.Dictionary data_override = null) // Uses temp_file_data to setup the object...
     {
-
+        Godot.Collections.Dictionary data = temp_file_data;
+        if(data_override != null) data = data_override;
+        display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
+        description     = TOOLS.ApplyExistingTag(data,"desc",description);
+        behaviorID      = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
+        tag             = TOOLS.ApplyExistingTag(data,"tag",tag);
+        model           = TOOLS.ApplyExistingTag(data,"model",model);
+        texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
     }
 
     public Godot.Collections.Dictionary GetTempData()
@@ -35,6 +43,27 @@ public partial class PackData : Resource
         temp_file_data = null;
     }
 
+
+    public virtual void Clone(PackData source)
+    {
+        // needs to CLONE ALL VARS
+        mod_prefix          = source.mod_prefix;
+        unique_ID           = source.unique_ID;
+        source_file_path    = source.source_file_path;
+        entity_type         = source.entity_type;
+        data_parent         = source.data_parent;
+        temp_file_data      = source.temp_file_data;
+        data_parent         = source.data_parent;
+        mod_prefix          = source.mod_prefix;
+        unique_ID           = source.unique_ID;
+        display_name        = source.display_name;
+        description         = source.description;
+        behaviorID          = source.behaviorID;
+        tag                 = source.tag;
+        model               = source.model;
+        texture             = source.texture;
+    }
+
     protected virtual string GetVarString()
     {
         return "";
@@ -43,7 +72,7 @@ public partial class PackData : Resource
     public void ShowVars()
     {
         // Print variables of loaded data for debugging
-        GD.Print("-" + GetType().ToString() + ":" + GetUniqueModID + GetVarString());
+        GD.Print("-" + GetUniqueModID + GetVarString());
     }
 
 
@@ -78,6 +107,7 @@ public partial class PackData : Resource
         get { return loaded_parent; }
         set { loaded_parent = value; }
     }
+    public MainController.DataType entity_type;
     public string display_name = "Pack";
     public string description = "";
     public string behaviorID = "";

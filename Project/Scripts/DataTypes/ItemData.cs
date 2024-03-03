@@ -18,14 +18,9 @@ public partial class ItemData : PackData
 
     public override void SetVars(Godot.Collections.Dictionary data_override = null)
     {
+        base.SetVars(data_override);
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        display_name        = TOOLS.ApplyExistingTag(data,"name",display_name);
-        description         = TOOLS.ApplyExistingTag(data,"desc",description);
-        behaviorID          = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
-        tag                 = TOOLS.ApplyExistingTag(data,"tag",tag);
-        model               = TOOLS.ApplyExistingTag(data,"model",model);
-        texture             = TOOLS.ApplyExistingTag(data,"texture",texture);
         size_category       = (SizeCategory)TOOLS.ApplyExistingTag(data,"size_category",(int)size_category);
     }
 
@@ -57,6 +52,13 @@ public partial class ItemData : PackData
                 return 9;
         }
         return 1;
+    }
+    
+    public override void Clone(PackData source)
+    {
+        ItemData temp = source as ItemData;
+        base.Clone(temp);
+        size_category = temp.size_category;
     }
 
     // Unique data

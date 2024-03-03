@@ -6,14 +6,12 @@ public partial class AbstractTurf : AbstractEntity
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
-        PackRef = new PackRef(data);
-        TurfData temp = AssetLoader.GetPackFromModID(PackRef) as TurfData;
-        SetTag(temp.tag);
+        base.TemplateRead(data);
+        TurfData temp = data as TurfData;
         model = temp.model;
         texture = temp.texture;
         density = temp.density;
         opaque = temp.opaque;
-        SetBehavior(Behavior.CreateBehavior(temp));
     }
     [Export]
     public bool density;                // blocks movement
@@ -24,7 +22,6 @@ public partial class AbstractTurf : AbstractEntity
 
     AtmoController.AtmoCell air_mix = null;
     private NetworkArea area = null;
-    private string grid_lookup;
 
     public virtual void RandomTick()                // Some turfs respond to random updates, every area will perform a number of them based on the area's size!
     {
