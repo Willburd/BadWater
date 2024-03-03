@@ -51,7 +51,7 @@ public partial class NetworkClient : Node
     {
         // Time to forceset a position!
         string new_map;
-        Vector3 new_pos;
+        MapController.GridPos new_pos;
         // Prep
         clients.Add(this);
         camera.Current = false;
@@ -65,10 +65,10 @@ public partial class NetworkClient : Node
                 GD.Print("Client RESPAWN: " + Name);
                 int rand = (int)GD.Randi() % spawners.Count;
                 new_map = spawners[rand].map_id_string;
-                new_pos = spawners[rand].Position;
+                new_pos = spawners[rand].grid_pos;
                 GD.Print("-map: " + new_map);
                 GD.Print("-pos: " + new_pos);
-                Rpc(nameof(UpdateClientFocusedPos),new_map,new_pos);
+                Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
                 return;
             }
             else
@@ -79,10 +79,10 @@ public partial class NetworkClient : Node
         // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
         GD.Print("Client FALLBACK RESPAWN: " + Name);
         new_map = MapController.FallbackMap();
-        new_pos = new Vector3((float)0.5,(float)0.5,0);
+        new_pos = new MapController.GridPos((float)0.5,(float)0.5,0);
         GD.Print("-map: " + new_map);
         GD.Print("-pos: " + new_pos);
-        Rpc(nameof(UpdateClientFocusedPos),new_map,new_pos);
+        Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
     }
 
 

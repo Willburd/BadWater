@@ -3,21 +3,10 @@ using System;
 
 public static class TOOLS
 {
-    static public Vector3 GridToPos(MapController.GridPos grid)
+    static public Vector3 GridToPosWithOffset(MapController.GridPos grid)
     {
         return new Vector3(grid.hor,grid.dep,grid.ver) * MapController.TileSize;
     }
-
-    static public Vector3 PosOnGridWithOffset(Vector3 RawGridPos) // Uses the decimal to decide location inside of turf grid ex: 1.25 is a quarter the way into the turf at x/y 1
-    {
-        // function EXPECTS inputs in GRIDSPACE, not WORLD position!!!
-        MapController.GridPos grid = new MapController.GridPos(RawGridPos * MapController.TileSize);
-        float offsethor = RawGridPos.X % 1;
-        float offsetver = RawGridPos.Y % 1;
-        float offsetdep = RawGridPos.Z % 1;
-        return GridToPos(grid) + (new Vector3(offsethor,offsetdep,offsetver) * MapController.TileSize);
-    }
-
     static public Godot.Collections.Dictionary ParseJsonFile(string file_path)
     {
         // Read text from file and then call parsejson.

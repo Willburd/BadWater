@@ -10,6 +10,7 @@ public partial class AbstractEntity
 {
     // Beginning of template data
     protected PackRef PackRef;
+    public MapController.GridPos grid_pos; 
     public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
     {
         // Update our template with newly set variables
@@ -87,7 +88,6 @@ public partial class AbstractEntity
     }
 
     public string map_id_string;
-    public Vector3 Position;
 
     AbstractEntity location = null; // Current NetworkEntity that this entity is inside of, including turf.
     private List<NetworkEntity> contains_entities = new List<NetworkEntity>();
@@ -156,7 +156,7 @@ public partial class AbstractEntity
 
     public AbstractTurf GetTurf()
     {
-        return MapController.GetTurfAtPosition(map_id_string,Position);
+        return MapController.GetTurfAtPosition(map_id_string,grid_pos);
     }
 
 

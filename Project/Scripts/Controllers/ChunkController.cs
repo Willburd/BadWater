@@ -65,10 +65,10 @@ public partial class ChunkController : DeligateController
             foreach(NetworkChunk chunk in chunks)
             {
                 // hor/ver distance
-                Vector2 simple_pos = new Vector2(client.focused_position.X,client.focused_position.Z);
-                Vector2 simple_chunk = new Vector2(chunk.Position.X,chunk.Position.Z);
+                Vector2 simple_pos = new Vector2(client.focused_position.X,client.focused_position.Y);
+                Vector2 simple_chunk = new Vector2(chunk.Position.X,chunk.Position.Y);
                 // dep distance
-                float dep_dist = Mathf.Abs(client.focused_position.Y - chunk.Position.Y);
+                float dep_dist = Mathf.Abs(client.focused_position.Z - chunk.Position.Z);
 
                 // chunk loaded, handle if it should unload
                 if(chunk.timer % 10 == 0 && (simple_chunk.DistanceSquaredTo(simple_pos) > chunk_size * chunk_unload_range || dep_dist > 2))

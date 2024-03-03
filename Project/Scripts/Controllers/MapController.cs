@@ -255,8 +255,8 @@ public partial class MapController : DeligateController
     public static void SwapTurfs(AbstractTurf old_turf, AbstractTurf new_turf)
     {
         string old_map = old_turf.map_id_string;
-        GridPos old_pos = old_turf.GetGridPosition();
-        AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.GetGridPosition());
+        GridPos old_pos = old_turf.grid_pos;
+        AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.grid_pos);
         active_maps[old_map].SwapTurf(buffer,old_pos);
     }
     public static AbstractTurf GetTurfAtPosition(string mapID, GridPos grid_pos)
@@ -369,7 +369,7 @@ public partial class MapController : DeligateController
      ****************************************************************/
     public struct GridPos
     {
-        public GridPos(int set_hor, int set_ver, int set_dep)
+        public GridPos(float set_hor, float set_ver, float set_dep)
         {
             hor = set_hor;
             ver = set_ver;
@@ -377,19 +377,19 @@ public partial class MapController : DeligateController
         }
         public GridPos(Vector3 worldPos)
         {
-            hor = (int)(worldPos.X / MapController.TileSize);
-            ver = (int)(worldPos.Z / MapController.TileSize);
-            dep = (int)(worldPos.Y / MapController.TileSize);
+            hor = (float)(worldPos.X / MapController.TileSize);
+            ver = (float)(worldPos.Z / MapController.TileSize);
+            dep = (float)(worldPos.Y / MapController.TileSize);
         }
 
         public bool Equals(GridPos other)
         {
-            return hor == other.hor && ver == other.ver && dep == other.dep;
+            return Mathf.FloorToInt(hor) == Mathf.FloorToInt(other.hor) && Mathf.FloorToInt(ver) == Mathf.FloorToInt(other.ver) && Mathf.FloorToInt(dep) == Mathf.FloorToInt(other.dep);
         }
 
-        public int hor;
-        public int ver;
-        public int dep;
+        public float hor;
+        public float ver;
+        public float dep;
     }
 
     public struct ChunkPos
@@ -487,8 +487,8 @@ public partial class MapController : DeligateController
             // Clear old data
             if(check_turf != null)
             {
-                GridPos old_pos = check_turf.GetGridPosition();
-                turfs[old_pos.hor,old_pos.ver,old_pos.dep] = null;
+                GridPos old_pos = check_turf.grid_pos;
+                turfs[(int)old_pos.hor,(int)old_pos.ver,(int)old_pos.dep] = null;
             }
             // Move new turf
             turf.map_id_string = map_id;
@@ -499,8 +499,8 @@ public partial class MapController : DeligateController
         private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos)
         {
             // Very dangerous function... Lets keep this internal, and only accessed by safe public calls!
-            turf.Position = TOOLS.GridToPos(grid_pos);
-            turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep] = turf;
+            turf.grid_pos = grid_pos;
+            turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = turf;
         }
 
         public void RemoveTurf(AbstractTurf turf, bool make_area_baseturf = true)
@@ -509,7 +509,7 @@ public partial class MapController : DeligateController
             NetworkArea get_area = turf.Area;
 
             // Destroy turf in main lists
-            GridPos grid_pos = turf.GetGridPosition();
+            GridPos grid_pos = turf.grid_pos;
             if(make_area_baseturf)
             {
                 // Spawn a new turf in the same spot to replace it...
@@ -518,19 +518,19 @@ public partial class MapController : DeligateController
             else
             {
                 // Or void it
-                turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep].Kill();
-                turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep] = null;
+                turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep].Kill();
+                turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = null;
             }
         }
 
         public AbstractTurf GetTurfAtPosition(GridPos grid_pos)
         {
-            return turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep];
+            return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
         }
 
         public NetworkArea GetAreaAtPosition(GridPos grid_pos)
         {
-            return turfs[grid_pos.hor,grid_pos.ver,grid_pos.dep].Area;
+            return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep].Area;
         }
         
         public void RandomTurfUpdate()
@@ -846,7 +846,8 @@ public partial class MapController : DeligateController
                 // Set location
                 if(ent != null)
                 {
-                    ent.Position = TOOLS.PosOnGridWithOffset(new Vector3(float.Parse(entity_pack[1]),float.Parse(entity_pack[3]),float.Parse(entity_pack[2])));
+                    ent.grid_pos = new GridPos(float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3]));
+                    ent.Position = TOOLS.GridToPosWithOffset(ent.grid_pos);
                 }
                 // LOOP!
                 HandleLoop();

@@ -10,6 +10,7 @@ public partial class NetworkEntity : Node3D
 {
     // Beginning of template data
     protected PackRef PackRef;
+    public MapController.GridPos grid_pos; 
     public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
     {
         // Update our template with newly set variables
@@ -222,7 +223,7 @@ public partial class NetworkEntity : Node3D
         if(velocity.Length() < 0.01) velocity *= 0;
         if(velocity != Vector3.Zero)
         {
-            Move(map_id_string, Position + velocity);
+            Move(map_id_string, TOOLS.GridToPosWithOffset(grid_pos) + velocity);
         }
     }
 
@@ -240,19 +241,24 @@ public partial class NetworkEntity : Node3D
             old_turf.EntityExited(this,perform_turf_actions);
         }
     }
+
+    public void Move(string new_mapID, MapController.GridPos new_pos, bool perform_turf_actions = true)
+    {
+        Move(new_mapID, TOOLS.GridToPosWithOffset(new_pos), perform_turf_actions);
+    }
     public void Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
     {
         // If on same turf, don't bother with entrance/exit actions.
-        if( ent_location == null && new MapController.GridPos(Position).Equals( new MapController.GridPos(new_pos)) && new_mapID == map_id_string) return;
+        if( ent_location == null && grid_pos.Equals( new MapController.GridPos(new_pos)) && new_mapID == map_id_string) return;
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
         // Enter new turf
         map_id_string = new_mapID;
-        Position = new_pos;
-        AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,Position);
+        grid_pos = new MapController.GridPos(new_pos);
+        Position = TOOLS.GridToPosWithOffset(grid_pos);
+        AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos);
         new_turf.EntityEntered(this,perform_turf_actions);
     }
-
     public void Move(NetworkEntity new_container, bool perform_turf_actions = true)
     {
         // If in same container, don't bother with entrance/exit actions.
@@ -300,7 +306,7 @@ public partial class NetworkEntity : Node3D
 
     public AbstractTurf GetTurf()
     {
-        return MapController.GetTurfAtPosition(map_id_string,Position);
+        return MapController.GetTurfAtPosition(map_id_string,grid_pos);
     }
 
 

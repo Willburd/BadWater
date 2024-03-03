@@ -33,13 +33,6 @@ public partial class AbstractTurf : AbstractEntity
         // check all four directions for any atmo diffs, if any flag for update - TODO
     }
 
-    public MapController.GridPos GetGridPosition()
-    {
-        MapController.GridPos grid = new MapController.GridPos(Position);
-        Position = TOOLS.GridToPos(grid); // ensures snapping
-        return grid;
-    }
-
     public NetworkArea Area
     {
         get {return area;}
