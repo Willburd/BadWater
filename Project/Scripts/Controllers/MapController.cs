@@ -846,7 +846,7 @@ public partial class MapController : DeligateController
                 // Set location
                 if(ent != null)
                 {
-                    ent.Position = TOOLS.PosOnGridWithOffset(new Vector3(float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])));
+                    ent.Position = TOOLS.PosOnGridWithOffset(new Vector3(float.Parse(entity_pack[1]),float.Parse(entity_pack[3]),float.Parse(entity_pack[2])));
                 }
                 // LOOP!
                 HandleLoop();
