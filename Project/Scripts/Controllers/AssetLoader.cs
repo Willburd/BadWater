@@ -357,7 +357,7 @@ public partial class AssetLoader : Node
 
 
 
-    public static PackData GetPackFromModID(PackRef get_pack)
+    public static PackData GetPackFromRef(PackRef get_pack)
     {
         return all_packs[AllPackID(get_pack.modid,get_pack.data_type)];
     }
