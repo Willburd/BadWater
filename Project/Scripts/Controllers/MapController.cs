@@ -372,7 +372,7 @@ public partial class MapController : DeligateController
 
         public readonly Vector3 WorldPos()
         {
-            return new Vector3(hor * MapController.tile_size,ver * MapController.tile_size,dep * MapController.tile_size);
+            return new Vector3(hor * MapController.tile_size,dep * MapController.tile_size,ver * MapController.tile_size);
         }
 
         public readonly bool Equals(GridPos other)
@@ -382,7 +382,7 @@ public partial class MapController : DeligateController
 
         public readonly ChunkPos ChunkPos()
         {
-            return new ChunkPos( WorldPos() );
+            return new ChunkPos(WorldPos());
         }
         public float hor;
         public float ver;

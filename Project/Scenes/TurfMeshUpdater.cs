@@ -22,7 +22,6 @@ public partial class TurfMeshUpdater : Node3D
     }
     public void MeshUpdated(string json)
     {
-        GD.Print("MESH UPDATE   " + json);
         Godot.Collections.Dictionary chunk_data = TOOLS.ParseJson(json);
         for(int i = 0; i < mesh_array.Length; i++) 
         {

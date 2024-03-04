@@ -14,7 +14,7 @@ public partial class NetworkEntity : Node3D
     [Export]
     public string model = "Plane";
     [Export]
-    public string texture = "Error.png";
+    public string texture = "";
     [Export]
     public double anim_speed = 0;
     [Export]

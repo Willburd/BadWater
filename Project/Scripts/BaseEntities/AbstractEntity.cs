@@ -63,7 +63,7 @@ public partial class AbstractEntity
     }
     public string tag = "";
     public string model = "Plane";
-    public string texture = "Error.png";
+    public string texture = "";
     public double anim_speed = 0;
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
@@ -370,7 +370,6 @@ public partial class AbstractEntity
             // If turf, update mesh...
             if((chunk_init && MapController.IsChunkValid(map_id_string,grid_pos.ChunkPos())) || MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos()))
             {
-                GD.Print("MESH A");
                 MapController.GetChunk(map_id_string,grid_pos.ChunkPos()).MeshUpdate();
             }
             return;
