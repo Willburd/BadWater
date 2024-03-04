@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://cdxb8tqj1pks"]
+[gd_scene load_steps=5 format=3 uid="uid://cdxb8tqj1pks"]
 
 [ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkEffect.cs" id="1_xwij3"]
 
@@ -25,9 +25,18 @@ properties/6/path = NodePath(".:texture")
 properties/6/spawn = true
 properties/6/replication_mode = 2
 
+[sub_resource type="SphereMesh" id="SphereMesh_2qq4r"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8f47x"]
+albedo_color = Color(1, 0.188235, 1, 1)
+
 [node name="NetworkEffect" type="Node3D"]
 script = ExtResource("1_xwij3")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25
 replication_config = SubResource("SceneReplicationConfig_bnqg0")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_2qq4r")
+surface_material_override/0 = SubResource("StandardMaterial3D_8f47x")

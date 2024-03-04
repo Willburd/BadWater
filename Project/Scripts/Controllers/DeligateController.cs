@@ -11,7 +11,7 @@ public class DeligateController
         ready       // All setup finished
     }
 
-    public static List<NetworkEntity> entities = new List<NetworkEntity>();
+    public static List<AbstractEntity> entities = new List<AbstractEntity>();
 
     public static DeligateController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
 

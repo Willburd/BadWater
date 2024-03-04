@@ -11,6 +11,7 @@ public partial class AbstractEntity
     // Beginning of template data
     protected PackRef PackRef;
     public MapController.GridPos grid_pos; 
+    private NetworkEntity loaded_entity; // Puppet this
     public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
     {
         // Update our template with newly set variables
@@ -23,6 +24,8 @@ public partial class AbstractEntity
         PackRef = new PackRef( data, entity_type);
         SetBehavior(Behavior.CreateBehavior(data));
         SetTag(data.tag);
+        model = data.model;
+        texture = data.texture;
     }
     public PackData TemplateWrite()
     {
@@ -60,6 +63,8 @@ public partial class AbstractEntity
     public string tag = "";
     public string model = "Plane";
     public string texture = "Error.png";
+    public bool density = false;              // blocks movement
+    public bool opaque = false;               // blocks vision
     // End of template data
     public string GetUniqueID
     {
@@ -72,10 +77,45 @@ public partial class AbstractEntity
         AbstractEntity newEnt = null;
         switch(type)
         {
+            case MainController.DataType.Area:
+                newEnt = new AbstractArea();
+                newEnt.entity_type = type;
+                typeData = AssetLoader.loaded_areas[type_ID];
+                break;
             case MainController.DataType.Turf:
                 newEnt = new AbstractTurf();
                 newEnt.entity_type = type;
                 typeData = AssetLoader.loaded_turfs[type_ID];
+                break;
+            case MainController.DataType.Effect:
+                newEnt = new AbstractEffect();
+                newEnt.entity_type = type;
+                MapController.effects.Add(newEnt as AbstractEffect);
+                typeData = AssetLoader.loaded_effects[type_ID];
+                break;
+            case MainController.DataType.Item:
+                newEnt = new AbstractItem();
+                newEnt.entity_type = type;
+                MapController.entities.Add(newEnt);
+                typeData = AssetLoader.loaded_items[type_ID];
+                break;
+            case MainController.DataType.Structure:
+                newEnt = new AbstractStructure();
+                newEnt.entity_type = type;
+                MapController.entities.Add(newEnt);
+                typeData = AssetLoader.loaded_structures[type_ID];
+                break;
+            case MainController.DataType.Machine:
+                newEnt = new AbstractMachine();
+                newEnt.entity_type = type;
+                MachineController.entities.Add(newEnt);
+                typeData = AssetLoader.loaded_machines[type_ID];
+                break;
+            case MainController.DataType.Mob:
+                newEnt = new AbstractMob();
+                newEnt.entity_type = type;
+                MobController.entities.Add(newEnt);
+                typeData = AssetLoader.loaded_mobs[type_ID];
                 break;
         }
         // NetworkEntity init
@@ -104,11 +144,17 @@ public partial class AbstractEntity
     {
         // Ask our behavior for info!
         behavior_type?.Tick(this, entity_type);
+        // Sync puppet
+        if(loaded_entity != null)
+        {
+            loaded_entity.Sync(this);
+        }
     }
-    public void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
+    public void UpdateIcon(bool chunk_init = false)    // It's tradition~ Pushes graphical state changes.
     {
         // Ask our behavior for info!
         behavior_type?.UpdateIcon(this, entity_type);
+        UpdateNetworkVisibility(chunk_init);
     }
     public virtual void Crossed(NetworkEntity crosser)
     {
@@ -130,22 +176,55 @@ public partial class AbstractEntity
     /*****************************************************************
      * Processing
      ****************************************************************/
-    public NetworkEntity Realize()
-    {
-        // Spawns the NetworkEntity version of the object... DOES NOT ADD TO PROCESSING LISTS
-
-        return new NetworkEntity();
-    }
+    public Vector3 velocity = Vector3.Zero;
     public void Process()
     {
         // Handle the tick!
         Tick();
+        ProcessVelocity();
+    }
+    private void ProcessVelocity()
+    {
+        // Containers don't update velocity, and don't move...
+        if(location != null) 
+        {
+            velocity *= 0;
+            return;
+        }
+        // Update position if it has velocity
+        if(velocity.Length() < 0.01) velocity *= 0;
+        if(velocity != Vector3.Zero)
+        {
+            Move(map_id_string, TOOLS.GridToPosWithOffset(grid_pos) + velocity);
+        }
     }
     public void Kill()
     {
         switch(entity_type)
         {
+            case MainController.DataType.Area:
+                MapController.areas.Remove(this.GetUniqueID);
+                break;
             case MainController.DataType.Turf:
+                break;
+            case MainController.DataType.Effect:
+                MapController.effects.Remove(this as AbstractEffect);
+                if((this as AbstractEffect).is_spawner)
+                {
+                    MapController.spawners[(this as AbstractEffect).GetTag()].Remove(this as AbstractEffect);
+                }
+                break;
+            case MainController.DataType.Item:
+                MapController.entities.Remove(this);
+                break;
+            case MainController.DataType.Structure:
+                MapController.entities.Remove(this);
+                break;
+            case MainController.DataType.Machine:
+                MachineController.entities.Remove(this);
+                break;
+            case MainController.DataType.Mob:
+                MobController.entities.Remove(this);
                 break;
         }
     }
@@ -159,46 +238,28 @@ public partial class AbstractEntity
         return MapController.GetTurfAtPosition(map_id_string,grid_pos);
     }
 
-    AbstractEntity abs_location = null; 
-    NetworkEntity ent_location = null; 
-    private List<AbstractEntity> stored_abstracts = new List<AbstractEntity>();
-    private List<NetworkEntity> stored_entities = new List<NetworkEntity>();
-    public List<AbstractEntity> StoredAbstracts
+    AbstractEntity location = null; 
+    private List<AbstractEntity> contains = new List<AbstractEntity>();
+    public List<AbstractEntity> Contents
     {
-        get {return stored_abstracts;}
-    }
-    public List<NetworkEntity> StoredEntities
-    {
-        get {return stored_entities;}
+        get {return contains;}
     }
     
-    public void EnterLocation(AbstractEntity absLoc)
+    private void EnterLocation(AbstractEntity absLoc)
     {
-        ent_location = null;
-        abs_location = absLoc;
+        location = absLoc;
     }
-    public void EnterLocation(NetworkEntity entLoc)
+    private void ClearLocation()
     {
-        ent_location = entLoc;
-        abs_location = null;
-    }
-    public void ClearLocation()
-    {
-        ent_location = null;
-        abs_location = null;
+        location = null;
     }
     
     private void LeaveOldLoc(bool perform_turf_actions)
     {
-        if(ent_location != null)
-        {
-            NetworkEntity old_ent = ent_location as NetworkEntity;
-            old_ent.EntityExited(this,perform_turf_actions);
-        }
-        if(abs_location != null)
+        if(location != null)
         {
             // Leave old turf
-            AbstractTurf old_turf = abs_location as AbstractTurf;
+            AbstractTurf old_turf = location as AbstractTurf;
             old_turf.EntityExited(this,perform_turf_actions);
         }
     }
@@ -210,7 +271,7 @@ public partial class AbstractEntity
     public void Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
     {
         // If on same turf, don't bother with entrance/exit actions.
-        if( ent_location == null && grid_pos.Equals( new MapController.GridPos(new_pos)) && new_mapID == map_id_string) return;
+        if( location == null && grid_pos.Equals( new MapController.GridPos(new_pos)) && new_mapID == map_id_string) return;
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
         // Enter new turf
@@ -219,81 +280,47 @@ public partial class AbstractEntity
         AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos);
         new_turf.EntityEntered(this,perform_turf_actions);
     }
-    public void Move(NetworkEntity new_container, bool perform_turf_actions = true)
+    public void Move(AbstractEntity new_container, bool perform_turf_actions = true)
     {
         // If in same container, don't bother with entrance/exit actions.
-        if( ent_location == new_container) return;
+        if(location == new_container) return;
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
         map_id_string = "BAG";
         new_container.EntityEntered(this,perform_turf_actions);
     }
+    public void Move(bool perform_turf_actions = true) // Move to nullspace
+    {
+        // Leave old location, perform uncrossing events!
+        LeaveOldLoc(perform_turf_actions);
+        // Enter new location
+        map_id_string = "NULL";
+    }
 
     // Another entity has entered us...
-    public void EntityEntered(NetworkEntity ent, bool perform_action)
-    {
-        if(perform_action)
-        {
-            for(int i = 0; i < stored_abstracts.Count; i++) 
-            {
-                stored_abstracts[i].Crossed(ent);
-            }
-            for(int i = 0; i < stored_entities.Count; i++) 
-            {
-                stored_entities[i].Crossed(ent);
-            }
-        }
-        // Network entity 
-        stored_entities.Add(ent);
-        ent.EnterLocation(this);
-    }
     public void EntityEntered(AbstractEntity abs, bool perform_action)
     {
         if(perform_action)
         {
-            for(int i = 0; i < stored_abstracts.Count; i++) 
+            for(int i = 0; i < contains.Count; i++) 
             {
-                stored_abstracts[i].Crossed(abs);
-            }
-            for(int i = 0; i < stored_entities.Count; i++) 
-            {
-                stored_entities[i].Crossed(abs);
+                contains[i].Crossed(abs);
             }
         }
         // Network entity 
-        stored_abstracts.Add(abs);
+        contains.Add(abs);
         abs.EnterLocation(this);
     }
     // An entity stored inside us has gone somewhere else!
-    public void EntityExited(NetworkEntity ent, bool perform_action)
-    {
-        stored_entities.Remove(ent);
-        if(perform_action)
-        {
-            for(int i = 0; i < stored_abstracts.Count; i++) 
-            {
-                stored_abstracts[i].UnCrossed(ent);
-            }
-            for(int i = 0; i < stored_entities.Count; i++) 
-            {
-                stored_entities[i].UnCrossed(ent);
-            }
-        }
-        ent.ClearLocation();
-    }
     public void EntityExited(AbstractEntity abs, bool perform_action)
     {
-        stored_abstracts.Remove(abs);
+        contains.Remove(abs);
         if(perform_action)
         {
-            for(int i = 0; i < stored_abstracts.Count; i++) 
+            for(int i = 0; i < contains.Count; i++) 
             {
-                stored_abstracts[i].UnCrossed(abs);
-            }
-            for(int i = 0; i < stored_entities.Count; i++) 
-            {
-                stored_entities[i].UnCrossed(abs);
+                contains[i].UnCrossed(abs);
             }
         }
         abs.ClearLocation();
@@ -315,4 +342,41 @@ public partial class AbstractEntity
     {
         return tag;
     }
+
+    /*****************************************************************
+     * Network entity spawning/despawning and visibility
+     ****************************************************************/
+    protected virtual bool IsNetworkVisible()
+    {
+        if(location is AbstractTurf)
+        {
+            if(behavior_type != null) return behavior_type.IsNetworkVisible();
+            return true; // By default, visible on turfs.
+        }
+        if(location is AbstractMob)
+        {
+            // Handle.... HANDS... And other slots.
+            // TODO - mob hands and other slots!
+            return false;
+        }
+        return false;
+    }
+    private void UpdateNetworkVisibility(bool chunk_init = false)
+    {
+        if(this is AbstractTurf) return; // turf has no network vis, see chunks.
+        if(location == null) return; // nullspace vanish
+        if(!chunk_init && !MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos())) return; // Not loaded. Can be forced during chunk loading for optimization.
+        // Otherwise, what does our behavior say?
+        bool is_vis = IsNetworkVisible();
+        if(is_vis && loaded_entity == null)
+        {
+            loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
+        }
+        if(!is_vis && loaded_entity != null)
+        {
+            loaded_entity.Kill();
+            loaded_entity = null;
+        }
+    }
+    
 }

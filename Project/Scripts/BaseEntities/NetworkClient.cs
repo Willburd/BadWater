@@ -59,7 +59,7 @@ public partial class NetworkClient : Node
         if(MapController.spawners.ContainsKey("PLAYER"))
         {
             // TEMP, pick random instead?
-            List<NetworkEffect> spawners = MapController.spawners["PLAYER"];
+            List<AbstractEffect> spawners = MapController.spawners["PLAYER"];
             if(spawners.Count > 0)
             {
                 GD.Print("Client RESPAWN: " + Name);

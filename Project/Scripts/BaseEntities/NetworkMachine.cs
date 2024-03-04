@@ -7,20 +7,15 @@ using System.Collections.Generic;
 public partial class NetworkMachine : NetworkEntity
 {
     // Beginning of template data
-    public override void TemplateRead(PackData data)
-    {
-        base.TemplateRead(data);
-        //MachineData temp = data as MachineData;
-        //model = temp.model;
-        //texture = temp.texture;
-        //density = template_data.density;
-        //opaque = template_data.opaque;
-    }
-    [Export]
-    public bool density;                // blocks movement
-    [Export]
-    public bool opaque;               // blocks vision
+
     // End of template data
+
+    public void Sync(AbstractItem abs)
+    {
+        // sync data
+        base.Sync(abs);
+    }
+
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(1); // Server

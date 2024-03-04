@@ -3,6 +3,7 @@
 	"port": 2279,
 	"max_clients": 64,
 	"max_entities": 65535,
+	"max_chunks": 4096,
 	"password": "",
 	"loaded_maps": ["BASE:TEST"]
 }

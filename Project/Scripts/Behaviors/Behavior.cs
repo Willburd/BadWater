@@ -192,4 +192,12 @@ public partial class Behavior
     {
         GD.Print("UNCROSSED"); // REPLACE ME!!!
     }
+
+
+
+    // visibility state of entity, only matters if on a turf and not inside anything.
+    public virtual bool IsNetworkVisible()
+    {
+        return true;
+    }
 }

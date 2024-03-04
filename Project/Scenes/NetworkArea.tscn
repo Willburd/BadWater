@@ -1,11 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://b3a85j4mnfwph"]
+[gd_scene load_steps=3 format=3 uid="uid://dsl6nyjrjydbg"]
 
-[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkArea.cs" id="1_3eo1j"]
+[ext_resource type="Script" path="res://Scripts/BaseEntities/AbstractArea.cs" id="1_tyb35"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 
 [node name="NetworkArea" type="Node3D"]
-script = ExtResource("1_3eo1j")
+script = ExtResource("1_tyb35")
+base_turf_ID = null
+always_powered = null
+is_space = null
+tag = null
+model = null
+texture = null
+map_id_string = null
+velocity = null
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25

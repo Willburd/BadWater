@@ -13,15 +13,11 @@ public partial class AbstractTurf : AbstractEntity
         density = temp.density;
         opaque = temp.opaque;
     }
-    [Export]
-    public bool density;                // blocks movement
-    [Export]
-    public bool opaque;               // blocks vision
     // End of template data
 
 
     AtmoController.AtmoCell air_mix = null;
-    private NetworkArea area = null;
+    private AbstractArea area = null;
 
     public virtual void RandomTick()                // Some turfs respond to random updates, every area will perform a number of them based on the area's size!
     {
@@ -33,7 +29,7 @@ public partial class AbstractTurf : AbstractEntity
         // check all four directions for any atmo diffs, if any flag for update - TODO
     }
 
-    public NetworkArea Area
+    public AbstractArea Area
     {
         get {return area;}
         set {area = value;} // SET USING Area.AddTurf() DO NOT SET DIRECTLY

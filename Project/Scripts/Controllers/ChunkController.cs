@@ -64,7 +64,10 @@ public partial class ChunkController : DeligateController
                     pos.ver -= Mathf.FloorToInt(loadborder_h/2);
                     pos.hor += u;
                     pos.ver += v;
-                    if(!MapController.IsChunkLoaded(client.focused_map_id,pos)) MapController.GetChunk(client.focused_map_id,pos);
+                    if(MapController.IsChunkValid(client.focused_map_id,pos) && !MapController.IsChunkLoaded(client.focused_map_id,pos)) 
+                    {
+                        NetworkChunk chunk = MapController.GetChunk(client.focused_map_id,pos);
+                    }
                 }
             }
 
@@ -92,7 +95,25 @@ public partial class ChunkController : DeligateController
 		}
     }
 
-    public Vector3 GetAlignedPos(Vector3 world_pos)
+    public static void UpdateEntityIcons(NetworkChunk chunk)
+    {
+        MapController.GridPos pos = new MapController.GridPos(GetAlignedPos(chunk.Position));
+        for(int u = 0; u < ChunkController.chunk_size; u++) 
+        {
+            for(int v = 0; v < ChunkController.chunk_size; v++) 
+            {
+                float hor = pos.hor + u;
+                float ver = pos.ver + v;
+                AbstractTurf turf = MapController.GetTurfAtPosition(chunk.map_id_string,new MapController.GridPos(hor,ver,pos.dep));
+                foreach(AbstractEntity ent in turf.Contents)
+                {
+                    ent.UpdateIcon(true);
+                }
+            }
+        }
+    }
+
+    public static Vector3 GetAlignedPos(Vector3 world_pos)
     {
         float alignsize = ChunkController.chunk_size * MapController.tile_size;
         world_pos = new Vector3(Mathf.FloorToInt(world_pos.X / alignsize) * alignsize, Mathf.FloorToInt(world_pos.Y), Mathf.FloorToInt(world_pos.Z / alignsize) * alignsize);

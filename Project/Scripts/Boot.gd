@@ -7,10 +7,12 @@ class_name BootController
 @export var client_prefab : PackedScene
 @export var client_spawner : MultiplayerSpawner
 @export var entity_spawner : MultiplayerSpawner
+@export var chunk_spawner : MultiplayerSpawner
 
 @export var join_address : String = "localhost"
 var max_players : int = -1		# Set from the ClientSpawner's data
 var max_entities : int = -1		# Set from the EntitySpawners's data
+var max_chunks : int = -1		# Set from the EntitySpawners's data
 var asset_library : AssetLoader
 
 var config : ConfigData
@@ -44,9 +46,11 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 		server_scene.Init(edit_mode);
 		client_spawner.set_spawn_limit(config.max_clients)
 		entity_spawner.set_spawn_limit(config.max_entities)
+		chunk_spawner.set_spawn_limit(config.max_chunks)
 		# Set limits
 		max_players = client_spawner.get_spawn_limit()
 		max_entities = entity_spawner.get_spawn_limit()
+		max_chunks = chunk_spawner.get_spawn_limit()
 		# Link signals
 		multiplayer.peer_connected.connect(self._PeerJoin)
 		multiplayer.peer_disconnected.connect(self._PeerLeave)

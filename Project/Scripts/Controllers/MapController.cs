@@ -23,9 +23,9 @@ public partial class MapController : DeligateController
     /*****************************************************************
      * CONTROLLER SETUP
      ****************************************************************/
-    public static Dictionary<string,NetworkArea> areas = new Dictionary<string,NetworkArea>();
-    public static List<NetworkEffect> all_effects = new List<NetworkEffect>();
-    public static Dictionary<string,List<NetworkEffect>> spawners = new Dictionary<string,List<NetworkEffect>>();
+    public static Dictionary<string,AbstractArea> areas = new Dictionary<string,AbstractArea>();
+    public static List<AbstractEffect> effects = new List<AbstractEffect>();
+    public static Dictionary<string,List<AbstractEffect>> spawners = new Dictionary<string,List<AbstractEffect>>();
 
     private static Dictionary<string,MapContainer> active_maps = new Dictionary<string,MapContainer>();
 
@@ -139,39 +139,41 @@ public partial class MapController : DeligateController
         // Create all areas from resources
         foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
-            NetworkArea area = NetworkEntity.CreateEntity("_",entry.Value.GetUniqueModID,MainController.DataType.Area) as NetworkArea;
+            AbstractArea area = AbstractEntity.CreateEntity("_",entry.Value.GetUniqueModID,MainController.DataType.Area) as AbstractArea;
             areas[entry.Value.GetUniqueModID] = area;
             area.Init();
         }
     }
     private void InitEffects()
     {
-        GD.Print("INIT EFFECTS " + all_effects.Count + " ------------------------------------------------");
-        for(int i = 0; i < all_effects.Count; i++) 
+        GD.Print("INIT EFFECTS " + effects.Count + " ------------------------------------------------");
+        for(int i = 0; i < effects.Count; i++) 
         {
-            all_effects[i].Init();
+            AbstractTurf turf = effects[i].GetTurf();
+            turf.EntityEntered(effects[i],false);
+            effects[i].Init();
         }
         // Time for their graphical update too!
-        for(int i = 0; i < all_effects.Count; i++) 
+        for(int i = 0; i < effects.Count; i++) 
         {
-            all_effects[i].LateInit();
-            all_effects[i].UpdateIcon();
-            if(all_effects[i].is_spawner)
+            effects[i].LateInit();
+            effects[i].UpdateIcon();
+            if(effects[i].is_spawner)
             {
-                string spawn_tag = all_effects[i].GetTag();
+                string spawn_tag = effects[i].GetTag();
                 if(!spawners.ContainsKey(spawn_tag))
                 {
-                    spawners[spawn_tag] = new List<NetworkEffect>();
+                    spawners[spawn_tag] = new List<AbstractEffect>();
                 }
                 GD.Print("-Added spawner, tag: " + spawn_tag);
-                spawners[spawn_tag].Add(all_effects[i]);
+                spawners[spawn_tag].Add(effects[i]);
             }
         }
     }
     private void InitEntities()
     {
         // Map controller handles the other controllers entity lists for this too, instead of spagetti. So those controllers can assume the Init() work has been done!
-        List<NetworkEntity> all_entities = new List<NetworkEntity>();
+        List<AbstractEntity> all_entities = new List<AbstractEntity>();
         all_entities.AddRange(MapController.entities);
         all_entities.AddRange(MachineController.entities);
         all_entities.AddRange(MobController.entities);
@@ -180,15 +182,14 @@ public partial class MapController : DeligateController
         {
             // Directly add to turf's contents, we're still initting, no need to call Crossed() or Entered()
             AbstractTurf turf = all_entities[i].GetTurf();
-            turf.Init();
             turf.EntityEntered(all_entities[i],false);
+            turf.Init();
         }
         // Time for their graphical update too!
         for(int i = 0; i < all_entities.Count; i++) 
         {
-            
             all_entities[i].LateInit();
-            all_entities[i].UpdateIcon();
+            all_entities[i].UpdateIcon(true);
         }
     }
 
@@ -227,6 +228,10 @@ public partial class MapController : DeligateController
     {
         return active_maps[mapID].GetLoadedChunks();
     }
+    public static bool IsChunkValid(string mapID, ChunkPos chunk_pos)
+    {
+        return active_maps[mapID].IsChunkValid(chunk_pos);
+    }
     public static bool IsChunkLoaded(string mapID, ChunkPos chunk_pos)
     {
         return active_maps[mapID].IsChunkLoaded(chunk_pos);
@@ -244,7 +249,7 @@ public partial class MapController : DeligateController
     /*****************************************************************
      * TURF MANAGEMENT
      ****************************************************************/
-    public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, NetworkArea area, bool replace = true)
+    public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, AbstractArea area, bool replace = true)
     {
         return active_maps[mapID].AddTurf(turfID, grid_pos, area, replace);
     }
@@ -268,7 +273,7 @@ public partial class MapController : DeligateController
     /*****************************************************************
      * AREA MANAGEMENT
      ****************************************************************/
-    public static NetworkArea GetAreaAtPosition(string mapID, GridPos grid_pos)
+    public static AbstractArea GetAreaAtPosition(string mapID, GridPos grid_pos)
     {
         return active_maps[mapID].GetAreaAtPosition(grid_pos);
     }
@@ -276,7 +281,7 @@ public partial class MapController : DeligateController
     {
         return active_maps[mapID].GetTurfAtPosition(new GridPos(pos));
     }
-    public static NetworkArea GetAreaAtPosition(string mapID, Vector3 pos)
+    public static AbstractArea GetAreaAtPosition(string mapID, Vector3 pos)
     {
         return active_maps[mapID].GetAreaAtPosition(new GridPos(pos));
     }
@@ -285,21 +290,9 @@ public partial class MapController : DeligateController
     /*****************************************************************
      * TAGGED OBJECT MANAGEMENT
      ****************************************************************/
-    private static Dictionary<string,List<NetworkEntity>> tagged_entities = new Dictionary<string,List<NetworkEntity>>();
     private static Dictionary<string,List<AbstractEntity>> tagged_abstracts = new Dictionary<string,List<AbstractEntity>>();
 
     // DO NOT CALL THESE DIRECTLY, CALL THE ENTITIES SetTag()/GetTag()!
-    public static void Internal_UpdateTag(NetworkEntity ent, string new_tag)
-    {
-        string old_tag = ent.GetTag();
-        if(old_tag == new_tag) return;
-        if(new_tag != "") 
-        {
-            if(!tagged_entities.ContainsKey(new_tag)) tagged_entities.Add(new_tag, new List<NetworkEntity>());
-            tagged_entities[new_tag].Add(ent);
-        }
-        if(old_tag != "") tagged_entities[old_tag].Remove(ent);
-    }
     public static void Internal_UpdateTag(AbstractEntity ent, string new_tag)
     {
         string old_tag = ent.GetTag();
@@ -313,17 +306,9 @@ public partial class MapController : DeligateController
     }
 
     // NOTE: you should be calling both of these when checking for tagged objects!
-    public static List<NetworkEntity> GetTaggedEntities(string tag)
-    {
-        if(!tagged_entities.ContainsKey(tag))
-        {
-            return new List<NetworkEntity>();
-        }
-        return tagged_entities[tag];
-    }
     public static List<AbstractEntity> GetTaggedAbstracts(string tag)
     {
-        if(!tagged_entities.ContainsKey(tag))
+        if(!tagged_abstracts.ContainsKey(tag))
         {
             return new List<AbstractEntity>();
         }
@@ -331,12 +316,6 @@ public partial class MapController : DeligateController
     }
 
     // Get random entity, then pick whatever one you want to use! Be sure to use BOTH!
-    public static NetworkEntity GetRandomTaggedEntity(string tag)
-    {
-        List<NetworkEntity> ents = GetTaggedEntities(tag);
-        if(ents.Count == 0) return null;
-        return tagged_entities[tag][Mathf.Abs((int)GD.Randi() % tagged_entities[tag].Count)];
-    }
     public static AbstractEntity GetRandomTaggedAbstract(string tag)
     {
         List<AbstractEntity> ents = GetTaggedAbstracts(tag);
@@ -352,7 +331,7 @@ public partial class MapController : DeligateController
     {
         //GD.Print(Name + " Fired");
         // All areas get their update call
-        foreach(KeyValuePair<string, NetworkArea> entry in areas)
+        foreach(KeyValuePair<string, AbstractArea> entry in areas)
         {
             // do something with entry.Value or entry.Key
             entry.Value.Tick();
@@ -382,11 +361,20 @@ public partial class MapController : DeligateController
             dep = (float)(worldPos.Y / MapController.tile_size);
         }
 
-        public bool Equals(GridPos other)
+        public readonly Vector3 WorldPos()
+        {
+            return new Vector3(hor * MapController.tile_size,ver * MapController.tile_size,dep * MapController.tile_size);
+        }
+
+        public readonly bool Equals(GridPos other)
         {
             return Mathf.FloorToInt(hor) == Mathf.FloorToInt(other.hor) && Mathf.FloorToInt(ver) == Mathf.FloorToInt(other.ver) && Mathf.FloorToInt(dep) == Mathf.FloorToInt(other.dep);
         }
 
+        public readonly ChunkPos ChunkPos()
+        {
+            return new ChunkPos( WorldPos() );
+        }
         public float hor;
         public float ver;
         public float dep;
@@ -407,7 +395,7 @@ public partial class MapController : DeligateController
             dep = Mathf.FloorToInt(worldPos.Y);
         }
 
-        public bool Equals(GridPos other)
+        public readonly bool Equals(GridPos other)
         {
             return hor == other.hor && ver == other.ver && dep == other.dep;
         }
@@ -463,7 +451,7 @@ public partial class MapController : DeligateController
             get {return depth;}
         } 
 
-        public AbstractTurf AddTurf(string turfID, GridPos grid_pos, NetworkArea area, bool replace = true)
+        public AbstractTurf AddTurf(string turfID, GridPos grid_pos, AbstractArea area, bool replace = true)
         {
             // Replace old turf
             if(replace)
@@ -506,7 +494,7 @@ public partial class MapController : DeligateController
         public void RemoveTurf(AbstractTurf turf, bool make_area_baseturf = true)
         {
             // Remove from areas
-            NetworkArea get_area = turf.Area;
+            AbstractArea get_area = turf.Area;
 
             // Destroy turf in main lists
             GridPos grid_pos = turf.grid_pos;
@@ -528,7 +516,7 @@ public partial class MapController : DeligateController
             return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
         }
 
-        public NetworkArea GetAreaAtPosition(GridPos grid_pos)
+        public AbstractArea GetAreaAtPosition(GridPos grid_pos)
         {
             return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep].Area;
         }
@@ -553,27 +541,29 @@ public partial class MapController : DeligateController
 
 
 
-        public bool IsChunkLoaded(ChunkPos grid_pos)
+        public bool IsChunkValid(ChunkPos grid_pos)
         {
             // Assuming the chunk is already loaded is faster then trying to load nothing1
-            if(grid_pos.hor < 0 || grid_pos.hor > chunk_grid.GetLength(0)) return true;
-            if(grid_pos.ver < 0 || grid_pos.ver > chunk_grid.GetLength(1)) return true;
-            if(grid_pos.dep < 0 || grid_pos.dep > chunk_grid.GetLength(2)) return true;
+            if(grid_pos.hor < 0 || grid_pos.hor > chunk_grid.GetLength(0)) return false;
+            if(grid_pos.ver < 0 || grid_pos.ver > chunk_grid.GetLength(1)) return false;
+            if(grid_pos.dep < 0 || grid_pos.dep > chunk_grid.GetLength(2)) return false;
+            return true;
+        }
+        public bool IsChunkLoaded(ChunkPos grid_pos)
+        {
+            if(!IsChunkValid(grid_pos)) return false;
             return chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] != null;
         }
         public NetworkChunk GetChunk(ChunkPos grid_pos)
         {
-            // Try getting already present chunk, or out of grid null
-            if(grid_pos.hor < 0 || grid_pos.hor > chunk_grid.GetLength(0)) return null;
-            if(grid_pos.ver < 0 || grid_pos.ver > chunk_grid.GetLength(1)) return null;
-            if(grid_pos.dep < 0 || grid_pos.dep > chunk_grid.GetLength(2)) return null;
             NetworkChunk chunk = chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep];
             if(chunk != null) return chunk;
             // Loader...
-            NetworkChunk new_chunk = NetworkEntity.CreateEntity(map_id, "", MainController.DataType.Chunk) as NetworkChunk;
+            NetworkChunk new_chunk = NetworkEntity.CreateEntity(null, map_id, MainController.DataType.Chunk) as NetworkChunk;
             new_chunk.Position = TOOLS.ChunkGridToPos(grid_pos);
             chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] = new_chunk;
             loaded_chunks.Add(new_chunk);
+            ChunkController.UpdateEntityIcons(new_chunk);
             return new_chunk;
         }
         public void UnloadChunk(NetworkChunk chunk)
@@ -583,6 +573,7 @@ public partial class MapController : DeligateController
             {
                 chunk_grid[chunk_pos.hor,chunk_pos.ver,chunk_pos.dep] = null;
                 loaded_chunks.Remove(chunk);
+                ChunkController.UpdateEntityIcons(chunk);
             }
         }
         public List<NetworkChunk> GetLoadedChunks()
@@ -815,14 +806,14 @@ public partial class MapController : DeligateController
             {
                 // Get entity data!
                 string[] entity_pack = null;
-                NetworkEntity ent = null;
+                AbstractEntity ent = null;
                 switch(phase)
                 {
                     case 0: // Item
                         if(item_data.Count > 0)
                         {
                             entity_pack = item_data[current_x];
-                            ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Item);
+                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Item);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -830,7 +821,7 @@ public partial class MapController : DeligateController
                         if(effect_data.Count > 0)
                         {
                             entity_pack = effect_data[current_x];
-                            ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Effect);
+                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Effect);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -838,7 +829,7 @@ public partial class MapController : DeligateController
                         if(structure_data.Count > 0)
                         {
                             entity_pack = structure_data[current_x];
-                            ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Structure);
+                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Structure);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -846,17 +837,13 @@ public partial class MapController : DeligateController
                         if(machine_data.Count > 0)
                         {
                             entity_pack = machine_data[current_x];
-                            ent = NetworkEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Machine);
+                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Machine);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                 }
                 // Set location
-                if(ent != null)
-                {
-                    ent.grid_pos = new GridPos(float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3]));
-                    ent.Position = TOOLS.GridToPosWithOffset(ent.grid_pos);
-                }
+                if(ent != null) ent.grid_pos = new GridPos(float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3]));
                 // LOOP!
                 HandleLoop();
             }
