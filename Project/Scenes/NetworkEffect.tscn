@@ -26,8 +26,8 @@ properties/6/spawn = true
 properties/6/replication_mode = 2
 
 [sub_resource type="SphereMesh" id="SphereMesh_2qq4r"]
-radius = 0.25
-height = 0.5
+radius = 0.1
+height = 0.2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8f47x"]
 albedo_color = Color(1, 0.188235, 1, 1)
