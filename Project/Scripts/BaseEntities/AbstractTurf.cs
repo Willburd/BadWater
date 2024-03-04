@@ -10,6 +10,7 @@ public partial class AbstractTurf : AbstractEntity
         TurfData temp = data as TurfData;
         model = temp.model;
         texture = temp.texture;
+        anim_speed = temp.anim_speed;
         density = temp.density;
         opaque = temp.opaque;
     }

@@ -32,6 +32,7 @@ public partial class PackData : Resource
         tag             = TOOLS.ApplyExistingTag(data,"tag",tag);
         model           = TOOLS.ApplyExistingTag(data,"model",model);
         texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
+        anim_speed      = TOOLS.ApplyExistingTag(data,"anim_speed",(double)0);
     }
 
     public Godot.Collections.Dictionary GetTempData()
@@ -62,6 +63,7 @@ public partial class PackData : Resource
         tag                 = source.tag;
         model               = source.model;
         texture             = source.texture;
+        anim_speed          = source.anim_speed;
     }
 
     protected virtual string GetVarString()
@@ -114,4 +116,5 @@ public partial class PackData : Resource
     public string tag = "";
     public string model = "Plane";
     public string texture = "";
+    public double anim_speed = 0;
 }

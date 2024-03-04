@@ -2,9 +2,9 @@
 	"TEST": {
 		"name": "Testing",
 		"desc": "A map where terrible things happen.",
-		"width": 50,
-		"height": 50,
-		"depth": 3,
+		"width": 10,
+		"height": 10,
+		"depth": 1,
 		"turf_data": {
 			"0":{
 				"0": [["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""],["BASE:SAND",""]],
@@ -24,7 +24,7 @@
 			}
 		},
 		"items": [],
-		"effects": [["_:SPAWNER",16.5,16.5,0,"{\"tag\": \"PLAYER\"}"]],
+		"effects": [["_:SPAWNER",2.5,2.5,0,"{\"tag\": \"PLAYER\"}"]],
 		"structures": [],
 		"machines": []
 	}

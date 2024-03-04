@@ -26,6 +26,7 @@ public partial class AbstractEntity
         SetTag(data.tag);
         model = data.model;
         texture = data.texture;
+        anim_speed = data.anim_speed;
     }
     public PackData TemplateWrite()
     {
@@ -63,6 +64,7 @@ public partial class AbstractEntity
     public string tag = "";
     public string model = "Plane";
     public string texture = "Error.png";
+    public double anim_speed = 0;
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
     // End of template data
@@ -363,19 +365,30 @@ public partial class AbstractEntity
     }
     private void UpdateNetworkVisibility(bool chunk_init = false)
     {
-        if(this is AbstractTurf) return; // turf has no network vis, see chunks.
-        if(location == null) return; // nullspace vanish
-        if(!chunk_init && !MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos())) return; // Not loaded. Can be forced during chunk loading for optimization.
-        // Otherwise, what does our behavior say?
-        bool is_vis = IsNetworkVisible();
-        if(is_vis && loaded_entity == null)
+        if(this is AbstractTurf) 
         {
-            loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
+            // If turf, update mesh...
+            if((chunk_init && MapController.IsChunkValid(map_id_string,grid_pos.ChunkPos())) || MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos()))
+            {
+                GD.Print("MESH A");
+                MapController.GetChunk(map_id_string,grid_pos.ChunkPos()).MeshUpdate();
+            }
+            return;
         }
-        if(!is_vis && loaded_entity != null)
+        else if(location == null) return; // nullspace vanish
+        // Otherwise, what does our behavior say?
+        if((chunk_init && MapController.IsChunkValid(map_id_string,grid_pos.ChunkPos())) || MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos())) 
         {
-            loaded_entity.Kill();
-            loaded_entity = null;
+            bool is_vis = IsNetworkVisible();
+            if(is_vis && loaded_entity == null)
+            {
+                loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
+            }
+            if(!is_vis && loaded_entity != null)
+            {
+                loaded_entity.Kill();
+                loaded_entity = null;
+            }
         }
     }
     

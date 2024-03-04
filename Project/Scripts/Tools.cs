@@ -69,6 +69,14 @@ public static class TOOLS
         }
         return current_val;
     }
+    public static double ApplyExistingTag(Godot.Collections.Dictionary data, string tag, double current_val)
+    {
+        if(data.ContainsKey(tag)) 
+        {
+            return data[tag].AsDouble();
+        }
+        return current_val;
+    }
 
     public static int ApplyExistingTag(Godot.Collections.Dictionary data, string tag, int current_val)
     {
@@ -79,7 +87,7 @@ public static class TOOLS
         return current_val;
     }
 
-    public static string[]  ApplyExistingTag(Godot.Collections.Dictionary data, string tag, string[] current_val)
+    public static string[] ApplyExistingTag(Godot.Collections.Dictionary data, string tag, string[] current_val)
     {
         if(data.ContainsKey(tag)) 
         {

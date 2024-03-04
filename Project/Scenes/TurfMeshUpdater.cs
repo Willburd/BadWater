@@ -8,8 +8,6 @@ public partial class TurfMeshUpdater : Node3D
 
     public static Dictionary<string,Resource> texture_cache = new Dictionary<string,Resource>();
 
-    private string last_tex = "";
-
     private MeshInstance3D[] mesh_array;
 
     public override void _Ready()
@@ -22,28 +20,27 @@ public partial class TurfMeshUpdater : Node3D
             i++;
         }
     }
-
-    public void MeshUpdated(NetworkChunk turf)
+    public void MeshUpdated(string json)
     {
-        /*
-        bool force_update = false;
-        if(MaterialOverride == null)
+        GD.Print("MESH UPDATE   " + json);
+        Godot.Collections.Dictionary chunk_data = TOOLS.ParseJson(json);
+        for(int i = 0; i < mesh_array.Length; i++) 
         {
-            MaterialOverride = GD.Load("res://Materials/Main.tres").Duplicate(true) as ShaderMaterial;
-            force_update = true;
-        }
+            Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)chunk_data["turf_" + i];
+            string model = turf_data["model"].AsString();
+            string texture = turf_data["texture"].AsString();
+            double anim_speed = turf_data["anim_speed"].AsDouble();
+            MeshInstance3D mesh = mesh_array[i];
 
-        if(force_update || last_tex != turf.texture)
-        {
-            string path = "res://Library/Textures/" + turf.texture;
+            // Assign model,tex, and animation speed to turf's model!
+            if(mesh.MaterialOverride == null) mesh.MaterialOverride = GD.Load("res://Materials/Main.tres").Duplicate(true) as ShaderMaterial;
+            string path = "res://Library/Textures/" + texture;
             if(!texture_cache.ContainsKey(path))
             {
                 if(!Godot.FileAccess.FileExists(path)) path = "res://Library/Textures/Error.png";
                 texture_cache[path] = GD.Load( path);
             }
-            (MaterialOverride as ShaderMaterial).SetShaderParameter( "_MainTexture", texture_cache[path]);
-            last_tex = turf.texture;
+            (mesh.MaterialOverride as ShaderMaterial).SetShaderParameter( "_MainTexture", texture_cache[path]);
         }
-        */
     }
 }

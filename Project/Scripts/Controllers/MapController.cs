@@ -224,7 +224,16 @@ public partial class MapController : DeligateController
     {
         return active_maps[mapID].GetLoadedChunkGrid();
     }
-    public static List<NetworkChunk> GetLoadedChunks(string mapID)
+    public static List<NetworkChunk> GetAllLoadedChunks()
+    {
+        List<NetworkChunk> all_loaded = new List<NetworkChunk>();
+        foreach(MapContainer map in active_maps.Values)
+        {
+            all_loaded.AddRange(map.GetLoadedChunks());
+        }
+        return all_loaded;
+    }
+    public static List<NetworkChunk> GetMapLoadedChunks(string mapID)
     {
         return active_maps[mapID].GetLoadedChunks();
     }
@@ -544,9 +553,9 @@ public partial class MapController : DeligateController
         public bool IsChunkValid(ChunkPos grid_pos)
         {
             // Assuming the chunk is already loaded is faster then trying to load nothing1
-            if(grid_pos.hor < 0 || grid_pos.hor > chunk_grid.GetLength(0)) return false;
-            if(grid_pos.ver < 0 || grid_pos.ver > chunk_grid.GetLength(1)) return false;
-            if(grid_pos.dep < 0 || grid_pos.dep > chunk_grid.GetLength(2)) return false;
+            if(grid_pos.hor < 0 || grid_pos.hor >= chunk_grid.GetLength(0)) return false;
+            if(grid_pos.ver < 0 || grid_pos.ver >= chunk_grid.GetLength(1)) return false;
+            if(grid_pos.dep < 0 || grid_pos.dep >= chunk_grid.GetLength(2)) return false;
             return true;
         }
         public bool IsChunkLoaded(ChunkPos grid_pos)
@@ -563,7 +572,7 @@ public partial class MapController : DeligateController
             new_chunk.Position = TOOLS.ChunkGridToPos(grid_pos);
             chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] = new_chunk;
             loaded_chunks.Add(new_chunk);
-            ChunkController.UpdateEntityIcons(new_chunk);
+            ChunkController.UpdateIcons(new_chunk);
             return new_chunk;
         }
         public void UnloadChunk(NetworkChunk chunk)
@@ -573,7 +582,7 @@ public partial class MapController : DeligateController
             {
                 chunk_grid[chunk_pos.hor,chunk_pos.ver,chunk_pos.dep] = null;
                 loaded_chunks.Remove(chunk);
-                ChunkController.UpdateEntityIcons(chunk);
+                ChunkController.UpdateIcons(chunk);
             }
         }
         public List<NetworkChunk> GetLoadedChunks()

@@ -16,6 +16,8 @@ public partial class NetworkEntity : Node3D
     [Export]
     public string texture = "Error.png";
     [Export]
+    public double anim_speed = 0;
+    [Export]
     public bool density = false;                    // blocks movement
     [Export]
     public bool opaque = false;                     // blocks vision
@@ -64,6 +66,7 @@ public partial class NetworkEntity : Node3D
         // sync data
         model = abs.model;
         texture = abs.texture;
+        anim_speed = abs.anim_speed;
         density = abs.density;
         opaque = abs.opaque;
         // sync movement

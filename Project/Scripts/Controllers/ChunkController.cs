@@ -4,9 +4,7 @@ using System.Collections.Generic;
 
 public partial class ChunkController : DeligateController
 {
-    public static int chunk_load_range = 5;
-    public static int chunk_unload_range = 7;
-
+    public static int chunk_load_range = 4;
 
     public static int chunk_size = 5; // Size in turfs that chunks are
 
@@ -41,6 +39,7 @@ public partial class ChunkController : DeligateController
             }
         }
         // Handle unloading!
+        List<NetworkChunk> in_vis_range = new List<NetworkChunk>();
         List<NetworkClient> client_list = MainController.ClientList;
         for(int i = 0; i <client_list.Count; i++) 
 		{
@@ -52,8 +51,8 @@ public partial class ChunkController : DeligateController
             }
 
             // hor/ver distance
-            float loadborder_w = chunk_load_range;
-            float loadborder_h = chunk_load_range * (float)0.8;
+            float loadborder_w = chunk_load_range * (float)1.1;
+            float loadborder_h = chunk_load_range;
             for(int u = 0; u < loadborder_w; u++) 
             {
                 for(int v = 0; v < loadborder_h; v++) 
@@ -64,38 +63,29 @@ public partial class ChunkController : DeligateController
                     pos.ver -= Mathf.FloorToInt(loadborder_h/2);
                     pos.hor += u;
                     pos.ver += v;
-                    if(MapController.IsChunkValid(client.focused_map_id,pos) && !MapController.IsChunkLoaded(client.focused_map_id,pos)) 
+                    if(MapController.IsChunkValid(client.focused_map_id,pos)) 
                     {
                         NetworkChunk chunk = MapController.GetChunk(client.focused_map_id,pos);
+                        in_vis_range.Add(chunk);
                     }
                 }
             }
-
-            // Unload others
-            List<NetworkChunk> chunks = MapController.GetLoadedChunks(client.focused_map_id);
-            foreach(NetworkChunk chunk in chunks)
-            {
-                // hor/ver distance
-                float unloadborder_w = chunk_unload_range;
-                float unloadborder_h = chunk_unload_range * (float)0.8;
-                float gridsize = ChunkController.chunk_size * MapController.tile_size;
-                Rect2 rect = new Rect2(client.focused_position.X - ((unloadborder_w/2) * gridsize),client.focused_position.Z - ((unloadborder_h/2) * gridsize),unloadborder_w * gridsize,unloadborder_h * gridsize);
-                Vector2 simple_chunk = new Vector2(chunk.Position.X,chunk.Position.Z);
-                
-                // dep distance
-                float dep_dist = Mathf.Abs(client.focused_position.Z - chunk.Position.Z);
-
-                // chunk loaded, handle if it should unload
-                if(chunk.timer % 10 == 0 && (!rect.HasPoint(simple_chunk) || dep_dist > 2))
-                {
-                    MapController.ChunkUnload(chunk);
-                    break; // limit unloads...
-                }
-            }
 		}
+
+        // Unload others
+        List<NetworkChunk> loaded_chunks = MapController.GetAllLoadedChunks();
+        foreach(NetworkChunk chunk in loaded_chunks)
+        {
+            // chunk loaded, handle if it should unload
+            if(chunk.timer % 10 == 0 && !in_vis_range.Contains(chunk))
+            {
+                MapController.ChunkUnload(chunk);
+                break; // limit unloads...
+            }
+        }
     }
 
-    public static void UpdateEntityIcons(NetworkChunk chunk)
+    public static void UpdateIcons(NetworkChunk chunk)
     {
         MapController.GridPos pos = new MapController.GridPos(GetAlignedPos(chunk.Position));
         for(int u = 0; u < ChunkController.chunk_size; u++) 
@@ -105,6 +95,7 @@ public partial class ChunkController : DeligateController
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
                 AbstractTurf turf = MapController.GetTurfAtPosition(chunk.map_id_string,new MapController.GridPos(hor,ver,pos.dep));
+                turf.UpdateIcon(true);  // Build mesh!
                 foreach(AbstractEntity ent in turf.Contents)
                 {
                     ent.UpdateIcon(true);
