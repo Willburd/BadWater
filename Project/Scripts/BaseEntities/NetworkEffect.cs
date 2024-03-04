@@ -15,9 +15,8 @@ public partial class NetworkEffect : NetworkEntity
     [Export]
     public EffectMeshUpdater mesh_updater;
 
-    public override void MeshUpdate()
+    protected override void Internal_MeshUpdate()
     {
-        GD.Print("INTERNAL MESH UPDATE");
         Godot.Collections.Dictionary entity_data = new Godot.Collections.Dictionary
         {
             { "model", abstract_owner.model },
@@ -25,12 +24,13 @@ public partial class NetworkEffect : NetworkEntity
             { "anim_speed", abstract_owner.anim_speed }
         };
         // Update json on other end.
-        Rpc(nameof(ClientMeshUpdate),Json.Stringify(entity_data));
+        Rpc(nameof(ClientMeshUpdate), Position, Json.Stringify(entity_data));
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
-    private void ClientMeshUpdate(string mesh_json)
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = debug_visual)]
+    private void ClientMeshUpdate(Vector3 pos, string mesh_json)
     {
+        Position = pos;
         mesh_updater.MeshUpdated(mesh_json);
     }
 

@@ -9,6 +9,7 @@ void vertex() {
 void fragment() {
 	// Called for every pixel the material is visible on.
 	ALBEDO = texture(_MainTexture, UV).xyz;
+	ALPHA = texture(_MainTexture, UV).a;
 }
 
 //void light() {

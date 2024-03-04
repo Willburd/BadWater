@@ -9,7 +9,6 @@ public partial class EffectMeshUpdater : MeshInstance3D
 
     public void MeshUpdated(string json)
     {
-        GD.Print("Efffect mesh print ");
         Godot.Collections.Dictionary turf_data = TOOLS.ParseJson(json);
         string model = turf_data["model"].AsString();
         string texture = turf_data["texture"].AsString();

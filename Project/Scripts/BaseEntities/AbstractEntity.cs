@@ -152,11 +152,11 @@ public partial class AbstractEntity
             loaded_entity.Sync(this);
         }
     }
-    public void UpdateIcon(bool chunk_init = false)    // It's tradition~ Pushes graphical state changes.
+    public void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
     {
         // Ask our behavior for info!
         behavior_type?.UpdateIcon(this, entity_type);
-        UpdateNetworkVisibility(chunk_init);
+        UpdateNetworkVisibility();
     }
     public virtual void Crossed(NetworkEntity crosser)
     {
@@ -202,6 +202,7 @@ public partial class AbstractEntity
     }
     public void Kill()
     {
+        UnloadNetworkEntity();
         switch(entity_type)
         {
             case MainController.DataType.Area:
@@ -229,6 +230,12 @@ public partial class AbstractEntity
                 MobController.entities.Remove(this);
                 break;
         }
+    }
+
+    public void UnloadNetworkEntity()
+    {
+        loaded_entity?.Kill();
+        loaded_entity = null;
     }
 
     /*****************************************************************
@@ -363,21 +370,18 @@ public partial class AbstractEntity
         }
         return false;
     }
-    private void UpdateNetworkVisibility(bool chunk_init = false)
+    private void UpdateNetworkVisibility()
     {
-        if(this is AbstractTurf) 
+        if(MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos())) 
         {
-            // If turf, update mesh...
-            if((chunk_init && MapController.IsChunkValid(map_id_string,grid_pos.ChunkPos())) || MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos()))
+            if(this is AbstractTurf) 
             {
+                // If turf, update mesh...
                 MapController.GetChunk(map_id_string,grid_pos.ChunkPos()).MeshUpdate();
+                return;
             }
-            return;
-        }
-        else if(location == null) return; // nullspace vanish
-        // Otherwise, what does our behavior say?
-        if((chunk_init && MapController.IsChunkValid(map_id_string,grid_pos.ChunkPos())) || MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos())) 
-        {
+            else if(location == null) return; // nullspace vanish
+            // Otherwise, what does our behavior say?
             bool is_vis = IsNetworkVisible();
             if(is_vis && loaded_entity == null)
             {
@@ -386,10 +390,8 @@ public partial class AbstractEntity
             }
             if(!is_vis && loaded_entity != null)
             {
-                loaded_entity.Kill();
-                loaded_entity = null;
+                UnloadNetworkEntity();
             }
         }
     }
-    
 }

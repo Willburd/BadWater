@@ -8,7 +8,9 @@ using System.Runtime.CompilerServices;
 [GlobalClass] 
 public partial class NetworkEntity : Node3D
 {
+
     protected AbstractEntity abstract_owner;
+    public const bool debug_visual = false; // if server gets visual updates
 
     // Beginning of template data
     [Export]
@@ -82,6 +84,11 @@ public partial class NetworkEntity : Node3D
     }
 
     public virtual void MeshUpdate()
+    {
+        // Normally just directly updated it, but some objects are multimeshes...
+        Internal_MeshUpdate();
+    }
+    protected virtual void Internal_MeshUpdate()
     {
         // Override for mesh behaviors... Then call a unique RPC to that network entity type.
     }

@@ -189,7 +189,7 @@ public partial class MapController : DeligateController
         for(int i = 0; i < all_entities.Count; i++) 
         {
             all_entities[i].LateInit();
-            all_entities[i].UpdateIcon(true);
+            all_entities[i].UpdateIcon();
         }
     }
 
@@ -522,6 +522,9 @@ public partial class MapController : DeligateController
 
         public AbstractTurf GetTurfAtPosition(GridPos grid_pos)
         {
+            if(grid_pos.hor < 0 || grid_pos.hor >= turfs.GetLength(0)) return null;
+            if(grid_pos.ver < 0 || grid_pos.ver >= turfs.GetLength(1)) return null;
+            if(grid_pos.dep < 0 || grid_pos.dep >= turfs.GetLength(2)) return null;
             return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
         }
 
@@ -572,7 +575,6 @@ public partial class MapController : DeligateController
             new_chunk.Position = TOOLS.ChunkGridToPos(grid_pos);
             chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] = new_chunk;
             loaded_chunks.Add(new_chunk);
-            ChunkController.UpdateIcons(new_chunk);
             return new_chunk;
         }
         public void UnloadChunk(NetworkChunk chunk)
@@ -580,9 +582,9 @@ public partial class MapController : DeligateController
             ChunkPos chunk_pos = new ChunkPos(chunk.Position);
             if(chunk.Unload()) // Safer than just calling Kill() lets chunks decide some stuff if they should unload...
             {
+                ChunkController.CleanChunk(chunk);
                 chunk_grid[chunk_pos.hor,chunk_pos.ver,chunk_pos.dep] = null;
                 loaded_chunks.Remove(chunk);
-                ChunkController.UpdateIcons(chunk);
             }
         }
         public List<NetworkChunk> GetLoadedChunks()
