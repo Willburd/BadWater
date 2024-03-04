@@ -382,6 +382,7 @@ public partial class AbstractEntity
             if(is_vis && loaded_entity == null)
             {
                 loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
+                loaded_entity.MeshUpdate();
             }
             if(!is_vis && loaded_entity != null)
             {

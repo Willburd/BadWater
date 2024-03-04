@@ -12,6 +12,27 @@ public partial class NetworkEffect : NetworkEntity
     [Export]
     public bool cleanable = false;
     // End of template data
+    [Export]
+    public EffectMeshUpdater mesh_updater;
+
+    public override void MeshUpdate()
+    {
+        GD.Print("INTERNAL MESH UPDATE");
+        Godot.Collections.Dictionary entity_data = new Godot.Collections.Dictionary
+        {
+            { "model", abstract_owner.model },
+            { "texture", abstract_owner.texture },
+            { "anim_speed", abstract_owner.anim_speed }
+        };
+        // Update json on other end.
+        Rpc(nameof(ClientMeshUpdate),Json.Stringify(entity_data));
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+    private void ClientMeshUpdate(string mesh_json)
+    {
+        mesh_updater.MeshUpdated(mesh_json);
+    }
 
     public override void _EnterTree()
     {

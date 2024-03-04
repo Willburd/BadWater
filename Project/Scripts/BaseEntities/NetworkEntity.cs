@@ -8,6 +8,8 @@ using System.Runtime.CompilerServices;
 [GlobalClass] 
 public partial class NetworkEntity : Node3D
 {
+    protected AbstractEntity abstract_owner;
+
     // Beginning of template data
     [Export]
     public string tag = "";
@@ -47,6 +49,7 @@ public partial class NetworkEntity : Node3D
                 break;
         }
         // NetworkEntity init
+        newEnt.abstract_owner = abs;
         newEnt.map_id_string = map_id;
         if(abs != null) newEnt.Sync(abs);
         // Add to active network entities list
@@ -76,6 +79,11 @@ public partial class NetworkEntity : Node3D
     public void Kill()
     {
         QueueFree();
+    }
+
+    public virtual void MeshUpdate()
+    {
+        // Override for mesh behaviors... Then call a unique RPC to that network entity type.
     }
 
     public override void _EnterTree()

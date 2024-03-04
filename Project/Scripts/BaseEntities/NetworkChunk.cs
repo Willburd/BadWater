@@ -17,7 +17,7 @@ public partial class NetworkChunk : NetworkEntity
         timer += 1;
     }
 
-    public void MeshUpdate()
+    public override void MeshUpdate()
     {
         Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
         int steps = 0;
