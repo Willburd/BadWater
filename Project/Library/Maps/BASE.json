@@ -24,7 +24,7 @@
 			}
 		},
 		"items": [],
-		"effects": [["_:SPAWNER",6.5,6.5,0,"{\"tag\": \"PLAYER\"}"]],
+		"effects": [["BASE:SPAWNER",6.5,6.5,0,"{\"tag\": \"PLAYER\"}"]],
 		"structures": [],
 		"machines": []
 	}

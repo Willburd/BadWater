@@ -189,16 +189,6 @@ public partial class AssetLoader : Node
             loaded_turfs[turf.GetUniqueModID] = turf;
             all_packs[AssetLoader.AllPackID(turf.GetUniqueModID, MainController.DataType.Turf)] = turf;
         }
-        {   // Spawners for wildlife and players
-            EffectData effect = new EffectData();
-            Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
-            data["name"] = "Spawner";
-            data["cleanable"] = 0.0;
-            data["is_spawner"] = 1.0;
-            effect.Init( "_", "_", "SPAWNER", MainController.DataType.Effect, data);
-            loaded_effects[effect.GetUniqueModID] = effect;
-            all_packs[AssetLoader.AllPackID(effect.GetUniqueModID, MainController.DataType.Effect)] = effect;
-        }
         
         GD.Print("BUILDING INHERITANCE");
         BuildInheritance(loaded_maps.Values.ToList<PackData>()); // Could be possible, but why would you?
