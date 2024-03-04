@@ -35,7 +35,7 @@ public partial class MainController : Node
 	[Export]
 	public static ServerConfig server_state = ServerConfig.Standard;
 
-	public const int max_zoom = 6;
+	public const int max_zoom = 8;
 	public const int tick_rate = 40;
 	
 	private static double tick_internal;	// delta_time counter for tick_rate calculation

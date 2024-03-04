@@ -51,11 +51,11 @@ public partial class ChunkController : DeligateController
             }
 
             // hor/ver distance
-            float loadborder_w = chunk_load_range * (float)1.1;
+            float loadborder_w = chunk_load_range + 1;
             float loadborder_h = chunk_load_range;
-            for(int u = 0; u < loadborder_w; u++) 
+            for(int u = 0; u < loadborder_w * 2; u++) 
             {
-                for(int v = 0; v < loadborder_h; v++) 
+                for(int v = 0; v < loadborder_h * 2; v++) 
                 {
                     // Load our chunks
                     MapController.ChunkPos pos = new MapController.ChunkPos(client.focused_position - new Vector3((loadborder_w/4) * MapController.tile_size * ChunkController.chunk_size,0,(loadborder_h/4) * MapController.tile_size * ChunkController.chunk_size));
