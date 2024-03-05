@@ -19,8 +19,7 @@ var config : ConfigData
 
 @export var join_menu : CanvasLayer # TEMP
 
-# Called when the node enters the scene tree for the first time.
-func _enter_tree():
+func _ready():
 	# Load config
 	config = ConfigData.new()
 	config.Load("res://Config/Setup.json")
@@ -32,6 +31,10 @@ func _enter_tree():
 	if args.has("-s") || args.has("-e") || args.has("--headless"):
 		StartNetwork(true,args.has("-e"))
 		join_menu.hide()
+	
+# Called when the node enters the scene tree for the first time.
+func _enter_tree():
+	pass
 
 func StartNetwork(server: bool, edit_mode: bool) -> void:
 	print("Start networking")

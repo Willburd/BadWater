@@ -5,7 +5,7 @@ public static class TOOLS
 {
     public static bool Prob(float percentile) // Rand check that is at or under value presented, float version of Byond's Prob()!
     {
-        return GD.Randf() % 100 <= percentile;
+        return Mathf.Abs(GD.Randf() % 100) <= percentile;
     }
 
     static public float VecDist(float x1, float y1, float x2, float y2)

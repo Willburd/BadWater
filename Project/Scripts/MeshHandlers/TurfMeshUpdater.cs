@@ -26,12 +26,9 @@ public partial class TurfMeshUpdater : Node
             string model = turf_data["model"].AsString();
             string texture = MeshUpdater.GetPath(turf_data["texture"].AsString());
             double anim_speed = turf_data["anim_speed"].AsDouble();
-            MeshInstance3D mesh = mesh_array[i];
 
-            // Assign model,tex, and animation speed to turf's model!
-            mesh.MaterialOverride ??= GD.Load("res://Materials/Main.tres").Duplicate(true) as ShaderMaterial;
-            MeshUpdater.PreprocessTextures(texture);
-            (mesh.MaterialOverride as ShaderMaterial).SetShaderParameter( "_MainTexture", MeshUpdater.texture_cache[texture]);
+            // Assign model,tex, and animation speed to turf!
+            MeshUpdater.TextureDataUpdate(mesh_array[i],texture);
         }
     }
 }

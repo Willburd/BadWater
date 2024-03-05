@@ -20,20 +20,25 @@ public struct PackRef
 [GlobalClass] 
 public partial class AssetLoader : Node
 {
+    public const int tex_page_size = 4096;
+
+    public static Dictionary<string,AssetLoader.LoadedTexture> loaded_textures = new Dictionary<string,AssetLoader.LoadedTexture>();
+    public static List<ShaderMaterial> material_cache = new List<ShaderMaterial>();
     public static Dictionary<string,MapData> loaded_maps = new Dictionary<string,MapData>();
     public static Dictionary<string,AreaData> loaded_areas = new Dictionary<string,AreaData>();
     public static Dictionary<string,TurfData> loaded_turfs = new Dictionary<string,TurfData>();
     public static Dictionary<string,EffectData> loaded_effects = new Dictionary<string,EffectData>();
-    public static Dictionary<string,PackData> loaded_items = new Dictionary<string,PackData>(); // TEMP
-    public static Dictionary<string,PackData> loaded_structures = new Dictionary<string,PackData>(); // TEMP
-    public static Dictionary<string,PackData> loaded_machines = new Dictionary<string,PackData>(); // TEMP
-    public static Dictionary<string,PackData> loaded_mobs = new Dictionary<string,PackData>(); // TEMP
+    public static Dictionary<string,PackData> loaded_items = new Dictionary<string,PackData>();
+    public static Dictionary<string,PackData> loaded_structures = new Dictionary<string,PackData>();
+    public static Dictionary<string,PackData> loaded_machines = new Dictionary<string,PackData>();
+    public static Dictionary<string,PackData> loaded_mobs = new Dictionary<string,PackData>();
 
     public static Dictionary<string,PackData> all_packs = new Dictionary<string,PackData>();
 
     public void Load()
     {
         GD.Print("LOADING ASSETS");
+        string texture_path = "res://Library/Textures";
         string map_path = "res://Library/Maps";
         string area_path = "res://Library/Areas";
         string turf_path = "res://Library/Turfs";
@@ -42,8 +47,37 @@ public partial class AssetLoader : Node
         string effect_path = "res://Library/Effects";
         string mob_path = "res://Library/Mobs";
 
+        GD.Print("-TEXTURES");
+        DirAccess dir;
+        Stack<string> scan_dirs = new Stack<string>();
+        scan_dirs.Push(texture_path);
+        while(scan_dirs.Count > 0)
+        {
+            string scanName = scan_dirs.Pop();
+            dir = DirAccess.Open(scanName);
+            if (dir != null)
+            {
+                dir.ListDirBegin();
+                string fileName = dir.GetNext();
+                while (fileName != "")
+                {
+                    if(!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".png")
+                    {
+                        LoadTextureAtlas(dir.GetCurrentDir() + "/" + fileName);
+                    }
+                    else if(dir.CurrentIsDir())
+                    {
+                        scan_dirs.Push(dir.GetCurrentDir() + "/" + fileName);
+                    }
+                    fileName = dir.GetNext();
+                }
+            }
+        }
+        ConstructTextureAtlas();
+
+
         GD.Print("-MAPS");
-        DirAccess dir = DirAccess.Open(map_path);
+        dir = DirAccess.Open(map_path);
         if (dir != null)
         {
             dir.ListDirBegin();
@@ -54,7 +88,7 @@ public partial class AssetLoader : Node
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
                     GD.Print("-" + fileName);
-                    ParseData(map_path + "/" + fileName, MainController.DataType.Map);
+                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Map);
                 }
                 fileName = dir.GetNext();
             }
@@ -72,7 +106,7 @@ public partial class AssetLoader : Node
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
                     GD.Print("-" + fileName);
-                    ParseData(area_path + "/" + fileName, MainController.DataType.Area);
+                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Area);
                 }
                 fileName = dir.GetNext();
             }
@@ -90,7 +124,7 @@ public partial class AssetLoader : Node
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
                     GD.Print("-" + fileName);
-                    ParseData(turf_path + "/" + fileName, MainController.DataType.Turf);
+                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Turf);
                 }
                 fileName = dir.GetNext();
             }
@@ -108,7 +142,7 @@ public partial class AssetLoader : Node
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
                     GD.Print("-" + fileName);
-                    ParseData(struct_path + "/" + fileName, MainController.DataType.Structure);
+                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Structure);
                 }
                 fileName = dir.GetNext();
             }
@@ -126,7 +160,7 @@ public partial class AssetLoader : Node
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
                     GD.Print("-" + fileName);
-                    ParseData(item_path + "/" + fileName, MainController.DataType.Item);
+                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Item);
                 }
                 fileName = dir.GetNext();
             }
@@ -144,7 +178,7 @@ public partial class AssetLoader : Node
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
                     GD.Print("-" + fileName);
-                    ParseData(effect_path + "/" + fileName, MainController.DataType.Effect);
+                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Effect);
                 }
                 fileName = dir.GetNext();
             }
@@ -162,7 +196,7 @@ public partial class AssetLoader : Node
                 if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
                 {
                     GD.Print("-" + fileName);
-                    ParseData(mob_path + "/" + fileName, MainController.DataType.Mob);
+                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Mob);
                 }
                 fileName = dir.GetNext();
             }
@@ -344,6 +378,126 @@ public partial class AssetLoader : Node
     {
         GD.Print(file_path);
     }
+
+    
+
+
+
+
+    public readonly struct LoadedTexture
+    {
+        public LoadedTexture(string set_path, int set_tex_page, int set_u, int set_v, int set_width, int set_height)
+        {
+            path = set_path;
+            tex_page = set_tex_page;
+            u = set_u;
+            v = set_v;
+            width = set_width;
+            height = set_height;
+        }
+        public readonly string path;
+        public readonly int tex_page;
+        public readonly int u;
+        public readonly int v;
+        public readonly int width;
+        public readonly int height;
+    }
+    public struct PreparingTexture
+    {
+        public PreparingTexture(string set_path, int set_width, int set_height)
+        {
+            path = set_path;
+            width = set_width;
+            height = set_height;
+        }
+        public readonly string path;
+        public int width;
+        public int height;
+    }
+
+    private List<Image> texture_pages = new List<Image>();
+    private double tex_offset_stacker = 0;
+    private SortedList<double,PreparingTexture> prepare_textures = new SortedList<double,PreparingTexture>();
+    
+    private void LoadTextureAtlas(string path)
+    {
+        Texture2D img = (Texture2D)GD.Load(path);
+        int size = img.GetWidth() * img.GetHeight();
+        prepare_textures.Add(size + tex_offset_stacker,new PreparingTexture(path,img.GetWidth(),img.GetHeight()));
+        tex_offset_stacker += 0.0000001; // TODO - figure out a better way
+    }
+    private void ConstructTextureAtlas()
+    {
+        int tex_page_ind = 0; // incriments when we max out a page!
+        int place_size = 32; // block size, powers of 2 please!
+        List<LoadedTexture> placed_on_page = new List<LoadedTexture>();
+        foreach(PreparingTexture prep_tex in prepare_textures.Values)
+        {
+            // Check each location 32x32 as a base block... Attempt to place the texture!
+            Vector2I place_pos = Vector2I.Zero;
+            bool placeable = false;
+            while(!placeable)
+            {
+                if(texture_pages.Count <= tex_page_ind) 
+                {
+                    texture_pages.Add(Image.Create(tex_page_size,tex_page_size,false,Image.Format.Rgba8));
+                }
+                placeable = true;
+                foreach(LoadedTexture check_tex in placed_on_page)
+                {
+                    Rect2I new_rect = new Rect2I(place_pos.X,place_pos.Y,prep_tex.width,prep_tex.height);
+                    Rect2I check_rect = new Rect2I(check_tex.u,check_tex.v,check_tex.width,check_tex.height);
+                    if(new_rect.Intersects(check_rect))
+                    {
+                        placeable = false;
+                        place_pos.X += place_size;
+                        if(place_pos.X + prep_tex.width >= tex_page_size)
+                        {
+                            place_pos.X = 0;
+                            place_pos.Y += place_size;
+                            if(place_pos.Y + prep_tex.height >= tex_page_size)
+                            {
+                                // Failover to next page!
+                                place_pos.X = 0;
+                                place_pos.Y = 0;
+                                tex_page_ind += 1;
+                                placed_on_page.Clear();
+                            }
+                        }
+                        break;
+                    }
+                }
+                // If the spot is clear of any other texture on the page!
+                if(placeable)
+                {
+                    Image tex_page = texture_pages[tex_page_ind];
+                    // Blit image to page
+                    LoadedTexture loaded_tex_data = new LoadedTexture(prep_tex.path,tex_page_ind,place_pos.X,place_pos.Y,prep_tex.width,prep_tex.height); 
+                    GD.Print("-" + tex_page_ind + ">" + loaded_tex_data.u + "." + loaded_tex_data.v + " - " + loaded_tex_data.path);
+                    // Handle formatting
+                    Texture2D tex = (Texture2D)GD.Load(prep_tex.path);
+                    Image img = tex.GetImage();
+                    img.Decompress(); // If format was compressed, decompress it...
+                    img.Convert(Image.Format.Rgba8);
+                    // Blit image
+                    tex_page.BlitRect(img, new Rect2I(0,0,img.GetWidth(),img.GetHeight()), new Vector2I(loaded_tex_data.u,loaded_tex_data.v));
+                    loaded_textures[prep_tex.path] = loaded_tex_data;
+                    placed_on_page.Add(loaded_tex_data);
+                    break;
+                }
+            }
+        }
+        // Create material cache for each page!
+        for(int i = 0; i <= tex_page_ind; i++) 
+        {
+            ShaderMaterial mat = GD.Load("res://Materials/Main.tres").Duplicate(true) as ShaderMaterial;
+            mat.SetShaderParameter( "_MainTexture", texture_pages[i] );
+            material_cache.Add(mat);
+        }
+    }
+
+
+
 
 
 

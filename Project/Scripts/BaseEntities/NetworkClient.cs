@@ -64,7 +64,7 @@ public partial class NetworkClient : Node
             if(spawners.Count > 0)
             {
                 GD.Print("Client RESPAWN: " + Name);
-                int rand = (int)GD.Randi() % spawners.Count;
+                int rand = Mathf.Abs((int)GD.Randi() % spawners.Count);
                 SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].grid_pos);
                 return;
             }
