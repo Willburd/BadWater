@@ -57,7 +57,7 @@ spawn_path = NodePath("../Entities")
 spawn_limit = 4096
 
 [node name="ServerCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 5, 0)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10, 0)
 
 [connection signal="pressed" from="JoinMenu/Client" to="." method="_on_client_pressed"]
 [connection signal="pressed" from="JoinMenu/Server" to="." method="_on_server_pressed"]

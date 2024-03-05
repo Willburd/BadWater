@@ -6,16 +6,6 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkMachine : NetworkEntity
 {
-    // Beginning of template data
-
-    // End of template data
-
-    public void Sync(AbstractItem abs)
-    {
-        // sync data
-        base.Sync(abs);
-    }
-
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(1); // Server

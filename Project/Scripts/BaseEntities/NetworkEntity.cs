@@ -12,20 +12,6 @@ public partial class NetworkEntity : Node3D
     protected AbstractEntity abstract_owner;
     public const bool debug_visual = false; // if server gets visual updates
 
-    // Beginning of template data
-    [Export]
-    public string tag = "";
-    [Export]
-    public string model = "Plane";
-    [Export]
-    public string texture = "";
-    [Export]
-    public double anim_speed = 0;
-    [Export]
-    public bool density = false;                    // blocks movement
-    [Export]
-    public bool opaque = false;                     // blocks vision
-    // End of template data
     public static NetworkEntity CreateEntity(AbstractEntity abs, string map_id, MainController.DataType type)
     {
         NetworkEntity newEnt = null;
@@ -53,7 +39,6 @@ public partial class NetworkEntity : Node3D
         // NetworkEntity init
         newEnt.abstract_owner = abs;
         newEnt.map_id_string = map_id;
-        if(abs != null) newEnt.Sync(abs);
         // Add to active network entities list
         MainController.controller.entity_container.AddChild(newEnt,true);
         return newEnt;
@@ -66,18 +51,7 @@ public partial class NetworkEntity : Node3D
     public string map_id_string;
     [Export]
     public Vector3 velocity = Vector3.Zero;
-    public void Sync(AbstractEntity abs)
-    {
-        // sync data
-        model = abs.model;
-        texture = abs.texture;
-        anim_speed = abs.anim_speed;
-        density = abs.density;
-        opaque = abs.opaque;
-        // sync movement
-        velocity = abs.velocity;
-        Position = TOOLS.GridToPosWithOffset(abs.grid_pos);
-    }
+
     public void Kill()
     {
         QueueFree();

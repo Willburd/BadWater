@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://b2612o53aeerg"]
+[gd_scene load_steps=5 format=3 uid="uid://b2612o53aeerg"]
 
 [ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkItem.cs" id="1_k3d4w"]
 
@@ -12,27 +12,17 @@ properties/1/replication_mode = 2
 properties/2/path = NodePath(".:velocity")
 properties/2/spawn = true
 properties/2/replication_mode = 2
-properties/3/path = NodePath(".:density")
+properties/3/path = NodePath(".:map_id_string")
 properties/3/spawn = true
 properties/3/replication_mode = 2
-properties/4/path = NodePath(".:map_id_string")
+properties/4/path = NodePath(".:position")
 properties/4/spawn = true
 properties/4/replication_mode = 2
-properties/5/path = NodePath(".:position")
-properties/5/spawn = true
-properties/5/replication_mode = 2
-properties/6/path = NodePath(".:opaque")
-properties/6/spawn = true
-properties/6/replication_mode = 2
-properties/7/path = NodePath(".:visible")
-properties/7/spawn = true
-properties/7/replication_mode = 2
-properties/8/path = NodePath(".:model")
-properties/8/spawn = true
-properties/8/replication_mode = 2
-properties/9/path = NodePath(".:texture")
-properties/9/spawn = true
-properties/9/replication_mode = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_sjwbf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_td3t8"]
+albedo_color = Color(1, 0.215686, 1, 1)
 
 [node name="NetworkItem" type="Node3D"]
 script = ExtResource("1_k3d4w")
@@ -40,3 +30,8 @@ script = ExtResource("1_k3d4w")
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25
 replication_config = SubResource("SceneReplicationConfig_bnqg0")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.31609, 0)
+mesh = SubResource("BoxMesh_sjwbf")
+surface_material_override/0 = SubResource("StandardMaterial3D_td3t8")

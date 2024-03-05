@@ -6,12 +6,6 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkEffect : NetworkEntity
 {
-    // Beginning of template data
-    [Export]
-    public bool is_spawner = false; // Uses tag as ID
-    [Export]
-    public bool cleanable = false;
-    // End of template data
     [Export]
     public EffectMeshUpdater mesh_updater;
 

@@ -20,12 +20,15 @@ public partial class NetworkClient : Node
 
     [Export]
     public string focused_map_id;
+    private string sync_map_id;
     [Export]
     public Vector3 focused_position;
-
+    private Vector3 sync_position;
     private float zoom_level = 1f;
 
-    private NetworkEntity focused_entity;
+
+    private Godot.Collections.Dictionary client_input_data = new Godot.Collections.Dictionary();
+    private AbstractEntity focused_entity;
 
     [Export]
     public Camera3D camera;
@@ -35,11 +38,12 @@ public partial class NetworkClient : Node
         SetMultiplayerAuthority(PeerID);
     }
 
-    public void SetFocusedEntity(NetworkEntity ent)
+    public void SetFocusedEntity(AbstractEntity ent)
     {
         focused_entity = ent;
         focused_map_id = focused_entity.map_id_string;
-        focused_position = focused_entity.Position;
+        focused_position = focused_entity.grid_pos.WorldPos();
+        Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
     }
 
     public void ClearFocusedEntity()
@@ -49,9 +53,6 @@ public partial class NetworkClient : Node
 
     public void Spawn()
     {
-        // Time to forceset a position!
-        string new_map;
-        MapController.GridPos new_pos;
         // Prep
         clients.Add(this);
         camera.Current = false;
@@ -64,11 +65,7 @@ public partial class NetworkClient : Node
             {
                 GD.Print("Client RESPAWN: " + Name);
                 int rand = (int)GD.Randi() % spawners.Count;
-                new_map = spawners[rand].map_id_string;
-                new_pos = spawners[rand].grid_pos;
-                GD.Print("-map: " + new_map);
-                GD.Print("-pos: " + new_pos);
-                Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
+                SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].grid_pos);
                 return;
             }
             else
@@ -78,30 +75,45 @@ public partial class NetworkClient : Node
         }
         // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
         GD.Print("Client FALLBACK RESPAWN: " + Name);
-        new_map = MapController.FallbackMap();
-        new_pos = new MapController.GridPos((float)0.5,(float)0.5,0);
-        GD.Print("-map: " + new_map);
-        GD.Print("-pos: " + new_pos);
-        Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
+        SpawnHostEntity(MapController.FallbackMap(),new MapController.GridPos((float)0.5,(float)0.5,0));
     }
 
+    private void SpawnHostEntity(string new_map, MapController.GridPos new_pos)
+    {
+        // SPAWN HOST OBJECT
+        if(focused_entity == null) focused_entity = AbstractEffect.CreateEntity(new_map,"BASE:THINGY",MainController.DataType.Item);
+        focused_entity.Move(new_map,new_pos,false);
+        // Inform client of movment from server
+        Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
+    }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // Tell the client we want to forcibly move this
     public virtual void UpdateClientFocusedPos(string map_id, Vector3 new_pos)
     {
-        GD.Print("Client " + Name + " got movement update: " + " to: " + map_id + " : " + new_pos);
         focused_map_id = map_id;
         focused_position = new_pos;
+        sync_map_id = focused_map_id;
+        sync_position = focused_position;
     }
-
 
     public void Tick()
     {
+        UpdateClientControl();
         if(focused_entity != null)
         {
             focused_map_id = focused_entity.map_id_string;
-            focused_position = focused_entity.Position;
+            focused_position = focused_entity.grid_pos.WorldPos();
+            if(sync_map_id != focused_map_id || sync_position != focused_position)
+            {
+                Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
+            }
         }
+    }
+
+    private void UpdateClientControl()
+    {
+        focused_entity?.ControlUpdate(client_input_data);
+        client_input_data = new Godot.Collections.Dictionary();
     }
 
     public override void _Process(double delta)
@@ -111,6 +123,21 @@ public partial class NetworkClient : Node
         camera.Current = true;
         camera.Position = focused_position + new Vector3(0f,zoom_level * MainController.max_zoom,0.3f);
         camera.LookAt(focused_position);
+        // Get client inputs!
+        Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
+        new_inputs["x"] = Input.GetAxis("ui_left","ui_right") / 10;
+        new_inputs["y"] = Input.GetAxis("ui_up","ui_down") / 10;
+        // Limit to only sending if we have useful input
+        if(new_inputs["x"].AsDouble() != 0 || new_inputs["y"].AsDouble() != 0)
+        {
+            Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    private void SetClientControl(string control_data)
+    {
+        client_input_data = (Godot.Collections.Dictionary)Json.ParseString(control_data);
     }
 
     public void Kill()

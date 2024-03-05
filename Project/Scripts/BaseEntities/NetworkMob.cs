@@ -6,21 +6,8 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkMob : NetworkEntity
 {
-    // Beginning of template data
-
-    // End of template data
-
-    public void Sync(AbstractItem abs)
-    {
-        // sync data
-        base.Sync(abs);
-    }
-    
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(1); // Server
     }
-
-    int health = 100;
-    int hunger = 0;
 }

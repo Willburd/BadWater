@@ -146,11 +146,12 @@ public partial class AbstractEntity
     {
         // Ask our behavior for info!
         behavior_type?.Tick(this, entity_type);
-        // Sync puppet
-        if(loaded_entity != null)
-        {
-            loaded_entity.Sync(this);
-        }
+        SyncNetwork();
+    }
+    public virtual void SyncNetwork()
+    {
+        if(loaded_entity == null) return;
+        loaded_entity.Position = grid_pos.WorldPos();
     }
     public void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
     {
@@ -239,6 +240,21 @@ public partial class AbstractEntity
     }
 
     /*****************************************************************
+     * Client input and control
+     ****************************************************************/
+    public void ControlUpdate(Godot.Collections.Dictionary client_input_data)
+    {
+        if(client_input_data.Keys.Count == 0) return;
+        // Got an actual control update!
+        MapController.GridPos new_pos = grid_pos;
+        double dat_x = client_input_data["x"].AsDouble();
+        double dat_y = client_input_data["y"].AsDouble();
+        new_pos.hor += (float)dat_x;
+        new_pos.ver += (float)dat_y;
+        Move(map_id_string, new_pos);
+    }
+
+    /*****************************************************************
      * Movement and storage
      ****************************************************************/
     public string map_id_string;
@@ -287,7 +303,7 @@ public partial class AbstractEntity
         map_id_string = new_mapID;
         grid_pos = new MapController.GridPos(new_pos);
         AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos);
-        new_turf.EntityEntered(this,perform_turf_actions);
+        new_turf?.EntityEntered(this,perform_turf_actions);
     }
     public void Move(AbstractEntity new_container, bool perform_turf_actions = true)
     {
