@@ -146,7 +146,6 @@ public partial class AbstractEntity
     {
         // Ask our behavior for info!
         behavior_type?.Tick(this, entity_type);
-        SyncNetwork();
     }
     public virtual void SyncNetwork()
     {
@@ -304,6 +303,7 @@ public partial class AbstractEntity
         grid_pos = new MapController.GridPos(new_pos);
         AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos);
         new_turf?.EntityEntered(this,perform_turf_actions);
+        SyncNetwork();
     }
     public void Move(AbstractEntity new_container, bool perform_turf_actions = true)
     {
@@ -314,6 +314,7 @@ public partial class AbstractEntity
         // Enter new location
         map_id_string = "BAG";
         new_container.EntityEntered(this,perform_turf_actions);
+        SyncNetwork();
     }
     public void Move(bool perform_turf_actions = true) // Move to nullspace
     {
@@ -321,6 +322,7 @@ public partial class AbstractEntity
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
         map_id_string = "NULL";
+        SyncNetwork();
     }
 
     // Another entity has entered us...
@@ -402,6 +404,7 @@ public partial class AbstractEntity
             if(is_vis && loaded_entity == null)
             {
                 loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
+                SyncNetwork();
                 loaded_entity.MeshUpdate();
             }
             if(!is_vis && loaded_entity != null)
