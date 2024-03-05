@@ -34,9 +34,9 @@ public partial class NetworkChunk : NetworkEntity
         Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
         int steps = 0;
         MapController.GridPos pos = new MapController.GridPos(ChunkController.GetAlignedPos(Position));
-        for(int u = 0; u < ChunkController.chunk_size; u++) 
+        for(int v = 0; v < ChunkController.chunk_size; v++) 
         {
-            for(int v = 0; v < ChunkController.chunk_size; v++) 
+            for(int u = 0; u < ChunkController.chunk_size; u++) 
             {
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;

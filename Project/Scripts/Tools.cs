@@ -3,6 +3,36 @@ using System;
 
 public static class TOOLS
 {
+    public static bool Prob(float percentile) // Rand check that is at or under value presented, float version of Byond's Prob()!
+    {
+        return GD.Randf() % 100 <= percentile;
+    }
+
+    static public float VecDist(float x1, float y1, float x2, float y2)
+    {
+        return VecDist(new Vector2(x1,y1) , new Vector2(x2,y2) );
+    }
+    static public float VecDist(Vector2 start, Vector2 goal)
+    {
+        return (goal-start).Length();
+    }
+    static public float VecDist(Vector3 start, Vector3 goal)
+    {
+        return (goal-start).Length();
+    }
+
+    static public Vector2 DirVec(float x1, float y1, float x2, float y2)
+    {
+        return DirVec(new Vector2(x1,y1) , new Vector2(x2,y2) );
+    }
+    static public Vector2 DirVec(Vector2 start, Vector2 goal)
+    {
+        return (goal-start).Normalized();
+    }
+    static public Vector3 DirVec(Vector3 start, Vector3 goal)
+    {
+        return (goal-start).Normalized();
+    }
     static public Vector3 GridToPosWithOffset(MapController.GridPos grid)
     {
         return new Vector3(grid.hor,grid.dep,grid.ver) * MapController.tile_size;

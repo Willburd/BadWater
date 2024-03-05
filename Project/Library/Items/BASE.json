@@ -6,6 +6,7 @@
 		"behavior": "",
 		"model": "Item",
 		"texture": "Error.png",
+		"intangible": 0,
 		"size_category": 0
 	}
 }

@@ -13,6 +13,7 @@ public partial class AbstractTurf : AbstractEntity
         anim_speed = temp.anim_speed;
         density = temp.density;
         opaque = temp.opaque;
+        intangible = temp.intangible;
     }
     // End of template data
 

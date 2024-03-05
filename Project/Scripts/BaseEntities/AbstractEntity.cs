@@ -67,6 +67,7 @@ public partial class AbstractEntity
     public double anim_speed = 0;
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
+    public bool intangible = false;           // can move through solids
     // End of template data
     public string GetUniqueID
     {
@@ -158,22 +159,22 @@ public partial class AbstractEntity
         behavior_type?.UpdateIcon(this, entity_type);
         UpdateNetworkVisibility();
     }
-    public virtual void Crossed(NetworkEntity crosser)
-    {
-        behavior_type?.Crossed( this, entity_type, crosser);
-    }
+
     public virtual void Crossed(AbstractEntity crosser)
     {
         behavior_type?.Crossed( this, entity_type, crosser);
     }
-    public virtual void UnCrossed(NetworkEntity crosser)
-    {
-        behavior_type?.UnCrossed( this, entity_type, crosser);
-    }
+
     public virtual void UnCrossed(AbstractEntity crosser)
     {
         behavior_type?.UnCrossed( this, entity_type, crosser);
     }
+    
+    public void Bump(AbstractEntity hitby) // When we are bumped by an incoming entity
+    {
+        behavior_type?.Bump( this, entity_type, hitby);
+    }
+
 
     /*****************************************************************
      * Processing
@@ -294,13 +295,139 @@ public partial class AbstractEntity
     }
     public void Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
     {
-        // If on same turf, don't bother with entrance/exit actions.
-        if( location == null && grid_pos.Equals( new MapController.GridPos(new_pos)) && new_mapID == map_id_string) return;
-        // Leave old location, perform uncrossing events!
+        // Is new location valid?
+        MapController.GridPos new_grid = new MapController.GridPos(new_pos);
+        Vector2 dir_vec = TOOLS.DirVec( grid_pos.hor, grid_pos.ver, new_grid.hor, new_grid.ver);
+        
+        if(map_id_string == new_mapID)
+        {
+            // EDGE LOCK
+            float threshold = (float)0.01;
+            if(!MapController.IsTurfValid(new_mapID,new MapController.GridPos(new_grid.hor,grid_pos.ver,grid_pos.dep)))
+            {
+                if(dir_vec.X < 0)
+                {   
+                    new_grid.hor = Mathf.Floor(grid_pos.hor) + threshold;
+                }
+                else if(dir_vec.X > 0)
+                {
+                    new_grid.hor = Mathf.Floor(grid_pos.hor) + 1 - threshold;
+                }
+            }
+            if(!MapController.IsTurfValid(new_mapID,new MapController.GridPos(grid_pos.hor,new_grid.ver,grid_pos.dep)))
+            {
+                if(dir_vec.Y < 0)
+                {
+                    new_grid.ver = Mathf.Floor(grid_pos.ver) + threshold;
+                }
+                else if(dir_vec.Y > 0)
+                {
+                    new_grid.ver = Mathf.Floor(grid_pos.ver) + 1 - threshold;
+                }
+            }
+            
+            if(!intangible)
+            {
+                // Check to see on each axis if we bump... This allows sliding!
+                bool bump_h = false;
+                AbstractTurf hor_turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(new_grid.hor,grid_pos.ver,grid_pos.dep));
+                if(hor_turf != null && hor_turf != GetTurf() && hor_turf.density)
+                {
+                    bump_h = true;
+                    if(dir_vec.X < 0)
+                    {   
+                        new_grid.hor = Mathf.Floor(grid_pos.hor) + threshold;
+                    }
+                    else if(dir_vec.X > 0)
+                    {
+                        new_grid.hor = Mathf.Floor(grid_pos.hor) + 1 - threshold;
+                    }
+                }
+                bool bump_v = false;
+                AbstractTurf ver_turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(grid_pos.hor,new_grid.ver,grid_pos.dep));
+                if(ver_turf != null && ver_turf != GetTurf() && ver_turf.density)
+                {
+                    bump_v = true;
+                    if(dir_vec.Y < 0)
+                    {
+                        new_grid.ver = Mathf.Floor(grid_pos.ver) + threshold;
+                    }
+                    else if(dir_vec.Y > 0)
+                    {
+                        new_grid.ver = Mathf.Floor(grid_pos.ver) + 1 - threshold;
+                    }
+                }
+                // Bump solids!
+                AbstractTurf corner_turf = MapController.GetTurfAtPosition(map_id_string,new_grid);
+                if(corner_turf != null && corner_turf.density)
+                {
+                    // Corner bonking is silly... Needs a unique case when you run into a corner exactly head on!
+                    MapController.GridPos original_new = new_grid;
+                    if(dir_vec.X < 0)
+                    {   
+                        new_grid.hor = Mathf.Floor(grid_pos.hor) + threshold;
+                    }
+                    else if(dir_vec.X > 0)
+                    {
+                        new_grid.hor = Mathf.Floor(grid_pos.hor) + 1 - threshold;
+                    }
+                    if(dir_vec.Y < 0)
+                    {
+                        new_grid.ver = Mathf.Floor(grid_pos.ver) + threshold;
+                    }
+                    else if(dir_vec.Y > 0)
+                    {
+                        new_grid.ver = Mathf.Floor(grid_pos.ver) + 1 - threshold;
+                    }
+                    Vector3 distVec = new_grid.WorldPos() - grid_pos.WorldPos();
+                    if(distVec.Length() > 0.01)
+                    {
+                        Bump(corner_turf);
+                        corner_turf.Bump(this);
+                    }
+                    // Randomly break out of direct headon perfect corner intersections...
+                    if(TOOLS.Prob(50)) 
+                    {
+                        new_grid.hor = original_new.hor;
+                    }
+                    else 
+                    {
+                        new_grid.ver = original_new.ver;
+                    }
+                }
+                else
+                {
+                    // check if the bonk is significant enough!
+                    Vector3 distVec = new_grid.WorldPos() - grid_pos.WorldPos();
+                    if(bump_h && distVec.X > 0.01) // bonk horizontal.
+                    {
+                        Bump(hor_turf);
+                        hor_turf.Bump(this);
+                    }
+                    if(bump_v && distVec.Z > 0.01) // bonk verticle.
+                    {
+                        Bump(ver_turf);
+                        ver_turf.Bump(this);
+                    }
+                }
+            }  
+        } 
+        
+        // At same location still, don't bother with much else...
+        if(location is AbstractTurf && grid_pos.Equals(new_grid) && new_mapID == map_id_string) 
+        {
+            // Move around in current turf
+            map_id_string = new_mapID;
+            grid_pos = new_grid;
+            SyncNetwork();
+            return;
+        }
+
+        // Leave old location, perform uncrossing events! Enter new turf...
         LeaveOldLoc(perform_turf_actions);
-        // Enter new turf
         map_id_string = new_mapID;
-        grid_pos = new MapController.GridPos(new_pos);
+        grid_pos = new_grid;
+        // Enter new location!
         AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos);
         new_turf?.EntityEntered(this,perform_turf_actions);
         SyncNetwork();

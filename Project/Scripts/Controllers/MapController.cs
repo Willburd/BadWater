@@ -258,6 +258,10 @@ public partial class MapController : DeligateController
     /*****************************************************************
      * TURF MANAGEMENT
      ****************************************************************/
+    public static bool IsTurfValid(string mapID, GridPos chunk_pos)
+    {
+        return active_maps[mapID].IsTurfValid(chunk_pos);
+    }
     public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, AbstractArea area, bool replace = true)
     {
         return active_maps[mapID].AddTurf(turfID, grid_pos, area, replace);
@@ -522,14 +526,13 @@ public partial class MapController : DeligateController
 
         public AbstractTurf GetTurfAtPosition(GridPos grid_pos)
         {
-            if(grid_pos.hor < 0 || grid_pos.hor >= turfs.GetLength(0)) return null;
-            if(grid_pos.ver < 0 || grid_pos.ver >= turfs.GetLength(1)) return null;
-            if(grid_pos.dep < 0 || grid_pos.dep >= turfs.GetLength(2)) return null;
+            if(!IsTurfValid( grid_pos)) return null;
             return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
         }
 
         public AbstractArea GetAreaAtPosition(GridPos grid_pos)
         {
+            if(!IsTurfValid( grid_pos)) return null;
             return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep].Area;
         }
         
@@ -550,8 +553,15 @@ public partial class MapController : DeligateController
                 turf.AtmosphericsCheck();
             }
         }
-
-
+        
+        public bool IsTurfValid(GridPos grid_pos)
+        {
+            // Assuming the chunk is already loaded is faster then trying to load nothing1
+            if(grid_pos.hor < 0 || grid_pos.hor >= turfs.GetLength(0)) return false;
+            if(grid_pos.ver < 0 || grid_pos.ver >= turfs.GetLength(1)) return false;
+            if(grid_pos.dep < 0 || grid_pos.dep >= turfs.GetLength(2)) return false;
+            return true;
+        }
 
         public bool IsChunkValid(ChunkPos grid_pos)
         {
