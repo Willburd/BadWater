@@ -11,6 +11,7 @@ client_prefab = ExtResource("2_cssdj")
 client_spawner = NodePath("ClientSpawner")
 entity_spawner = NodePath("EntitySpawner")
 chunk_spawner = NodePath("ChunkSpawner")
+debug_textures = true
 join_menu = NodePath("JoinMenu")
 
 [node name="Entities" type="Node" parent="."]

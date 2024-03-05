@@ -28,8 +28,10 @@ public partial class MeshUpdater : MeshInstance3D
     {
         if(!AssetLoader.loaded_textures.ContainsKey(texture_path)) texture_path = "res://Library/Textures/Error.png";
         AssetLoader.LoadedTexture tex_data = AssetLoader.loaded_textures[texture_path];
-        mesh.Mesh.SurfaceSetMaterial(0,AssetLoader.material_cache[tex_data.tex_page]);
-        (mesh.Mesh.SurfaceGetMaterial(0) as ShaderMaterial).SetShaderParameter( "_XY", new Vector2((float)tex_data.u / AssetLoader.tex_page_size,(float)tex_data.v / AssetLoader.tex_page_size) );
-        (mesh.Mesh.SurfaceGetMaterial(0) as ShaderMaterial).SetShaderParameter( "_WH", new Vector2((float)tex_data.width / AssetLoader.tex_page_size,(float)tex_data.height / AssetLoader.tex_page_size) );
+        
+        // Assign material cache, and reapply texture.
+        mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[tex_data.tex_page]);
+        mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)tex_data.u / AssetLoader.tex_page_size,(float)tex_data.v / AssetLoader.tex_page_size) );
+        mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)tex_data.width / AssetLoader.tex_page_size,(float)tex_data.height / AssetLoader.tex_page_size) );
     }
 }

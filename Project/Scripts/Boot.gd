@@ -15,19 +15,22 @@ var max_entities : int = -1		# Set from the EntitySpawners's data
 var max_chunks : int = -1		# Set from the EntitySpawners's data
 var asset_library : AssetLoader
 
+@export var debug_textures : bool
+
 var config : ConfigData
 
 @export var join_menu : CanvasLayer # TEMP
 
 func _ready():
+	var args = Array(OS.get_cmdline_args())
 	# Load config
 	config = ConfigData.new()
 	config.Load("res://Config/Setup.json")
 	# Load asset library
 	asset_library = AssetLoader.new()
+	asset_library.export_pages = args.has("-p") || debug_textures;
 	asset_library.Load()
 	# Spawn server from launch options
-	var args = Array(OS.get_cmdline_args())
 	if args.has("-s") || args.has("-e") || args.has("--headless"):
 		StartNetwork(true,args.has("-e"))
 		join_menu.hide()

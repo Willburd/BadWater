@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 
@@ -20,10 +21,13 @@ public struct PackRef
 [GlobalClass] 
 public partial class AssetLoader : Node
 {
-    public const int tex_page_size = 4096;
+    public const int tex_page_size = 512;
+
+    [Export]
+    public bool export_pages;
 
     public static Dictionary<string,AssetLoader.LoadedTexture> loaded_textures = new Dictionary<string,AssetLoader.LoadedTexture>();
-    public static List<ShaderMaterial> material_cache = new List<ShaderMaterial>();
+    public static ShaderMaterial[] material_cache;
     public static Dictionary<string,MapData> loaded_maps = new Dictionary<string,MapData>();
     public static Dictionary<string,AreaData> loaded_areas = new Dictionary<string,AreaData>();
     public static Dictionary<string,TurfData> loaded_turfs = new Dictionary<string,TurfData>();
@@ -415,7 +419,7 @@ public partial class AssetLoader : Node
         public int height;
     }
 
-    private List<Image> texture_pages = new List<Image>();
+    public static List<Image> texture_pages = new List<Image>();
     private double tex_offset_stacker = 0;
     private SortedList<double,PreparingTexture> prepare_textures = new SortedList<double,PreparingTexture>();
     
@@ -440,7 +444,8 @@ public partial class AssetLoader : Node
             {
                 if(texture_pages.Count <= tex_page_ind) 
                 {
-                    texture_pages.Add(Image.Create(tex_page_size,tex_page_size,false,Image.Format.Rgba8));
+                    Image new_page = Image.Create(tex_page_size,tex_page_size,false,Image.Format.Rgba8);
+                    texture_pages.Add(new_page);
                 }
                 placeable = true;
                 foreach(LoadedTexture check_tex in placed_on_page)
@@ -451,11 +456,11 @@ public partial class AssetLoader : Node
                     {
                         placeable = false;
                         place_pos.X += place_size;
-                        if(place_pos.X + prep_tex.width >= tex_page_size)
+                        if(place_pos.X + prep_tex.width > tex_page_size)
                         {
                             place_pos.X = 0;
                             place_pos.Y += place_size;
-                            if(place_pos.Y + prep_tex.height >= tex_page_size)
+                            if(place_pos.Y + prep_tex.height > tex_page_size)
                             {
                                 // Failover to next page!
                                 place_pos.X = 0;
@@ -473,26 +478,27 @@ public partial class AssetLoader : Node
                     Image tex_page = texture_pages[tex_page_ind];
                     // Blit image to page
                     LoadedTexture loaded_tex_data = new LoadedTexture(prep_tex.path,tex_page_ind,place_pos.X,place_pos.Y,prep_tex.width,prep_tex.height); 
-                    GD.Print("-" + tex_page_ind + ">" + loaded_tex_data.u + "." + loaded_tex_data.v + " - " + loaded_tex_data.path);
+                    GD.Print("-" + tex_page_ind + ">" + loaded_tex_data.u + "-" + loaded_tex_data.v + "(" + loaded_tex_data.width + "-" + loaded_tex_data.height + "): " + loaded_tex_data.path);
                     // Handle formatting
-                    Texture2D tex = (Texture2D)GD.Load(prep_tex.path);
-                    Image img = tex.GetImage();
-                    img.Decompress(); // If format was compressed, decompress it...
-                    img.Convert(Image.Format.Rgba8);
+                    Image blit_img = ((Texture2D)GD.Load(prep_tex.path)).GetImage();
+                    blit_img.Decompress(); // If format was compressed, decompress it...
+                    blit_img.Convert(Image.Format.Rgba8);
                     // Blit image
-                    tex_page.BlitRect(img, new Rect2I(0,0,img.GetWidth(),img.GetHeight()), new Vector2I(loaded_tex_data.u,loaded_tex_data.v));
+                    tex_page.BlitRect(blit_img, new Rect2I(0,0,loaded_tex_data.width,loaded_tex_data.height), new Vector2I(loaded_tex_data.u,loaded_tex_data.v));
                     loaded_textures[prep_tex.path] = loaded_tex_data;
                     placed_on_page.Add(loaded_tex_data);
+                    texture_pages[tex_page_ind] = tex_page;
                     break;
                 }
             }
         }
         // Create material cache for each page!
-        for(int i = 0; i <= tex_page_ind; i++) 
+        material_cache = new ShaderMaterial[tex_page_ind+1];
+        for(int i = 0; i < tex_page_ind+1; i++) 
         {
-            ShaderMaterial mat = GD.Load("res://Materials/Main.tres").Duplicate(true) as ShaderMaterial;
-            mat.SetShaderParameter( "_MainTexture", texture_pages[i] );
-            material_cache.Add(mat);
+            texture_pages[i].SavePng("res://Export/Page_" + i + ".png");
+            material_cache[i] = (ShaderMaterial)GD.Load("res://Materials/Main.tres").Duplicate(true);
+            material_cache[i].SetShaderParameter( "_MainTexture", ImageTexture.CreateFromImage(AssetLoader.texture_pages[i]));
         }
     }
 
