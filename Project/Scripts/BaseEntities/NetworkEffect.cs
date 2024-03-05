@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public partial class NetworkEffect : NetworkEntity
 {
     [Export]
-    public EffectMeshUpdater mesh_updater;
+    public MeshUpdater mesh_updater;
 
     protected override void Internal_MeshUpdate()
     {
