@@ -101,6 +101,7 @@ public partial class ChunkController : DeligateController
                 foreach(AbstractEntity ent in turf.Contents)
                 {
                     ent.UpdateIcon();
+                    ent.SyncNetwork(true);
                 }
             }
         }
@@ -137,5 +138,14 @@ public partial class ChunkController : DeligateController
     public override void Shutdown()
     {
         
+    }
+
+    public static void NewClient(NetworkClient client)
+    {
+        List<NetworkChunk> loaded_chunks = MapController.GetAllLoadedChunks();
+        foreach(NetworkChunk chunk in loaded_chunks)
+        {
+            SetupChunk(chunk);
+        }
     }
 }

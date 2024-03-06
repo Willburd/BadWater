@@ -66,6 +66,7 @@ public partial class NetworkClient : Node
                 GD.Print("Client RESPAWN: " + Name);
                 int rand = Mathf.Abs((int)GD.Randi() % spawners.Count);
                 SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].grid_pos);
+                ChunkController.NewClient(this);
                 return;
             }
             else
@@ -76,6 +77,7 @@ public partial class NetworkClient : Node
         // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
         GD.Print("Client FALLBACK RESPAWN: " + Name);
         SpawnHostEntity(MapController.FallbackMap(),new MapController.GridPos((float)0.5,(float)0.5,0));
+        ChunkController.NewClient(this);
     }
 
     private void SpawnHostEntity(string new_map, MapController.GridPos new_pos)

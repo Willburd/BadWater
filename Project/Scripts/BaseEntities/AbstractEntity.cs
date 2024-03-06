@@ -148,10 +148,11 @@ public partial class AbstractEntity
         // Ask our behavior for info!
         behavior_type?.Tick(this, entity_type);
     }
-    public virtual void SyncNetwork()
+    public virtual void SyncNetwork(bool include_mesh)
     {
         if(loaded_entity == null) return;
         loaded_entity.Position = grid_pos.WorldPos();
+        if(include_mesh) loaded_entity.MeshUpdate();
     }
     public void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
     {
@@ -419,7 +420,7 @@ public partial class AbstractEntity
             // Move around in current turf
             map_id_string = new_mapID;
             grid_pos = new_grid;
-            SyncNetwork();
+            SyncNetwork(false);
             return;
         }
 
@@ -430,7 +431,7 @@ public partial class AbstractEntity
         // Enter new location!
         AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos);
         new_turf?.EntityEntered(this,perform_turf_actions);
-        SyncNetwork();
+        SyncNetwork(false);
     }
     public void Move(AbstractEntity new_container, bool perform_turf_actions = true)
     {
@@ -441,7 +442,7 @@ public partial class AbstractEntity
         // Enter new location
         map_id_string = "BAG";
         new_container.EntityEntered(this,perform_turf_actions);
-        SyncNetwork();
+        SyncNetwork(false);
     }
     public void Move(bool perform_turf_actions = true) // Move to nullspace
     {
@@ -449,7 +450,7 @@ public partial class AbstractEntity
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
         map_id_string = "NULL";
-        SyncNetwork();
+        SyncNetwork(false);
     }
 
     // Another entity has entered us...
@@ -531,8 +532,7 @@ public partial class AbstractEntity
             if(is_vis && loaded_entity == null)
             {
                 loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
-                SyncNetwork();
-                loaded_entity.MeshUpdate();
+                SyncNetwork(true);
             }
             if(!is_vis && loaded_entity != null)
             {
