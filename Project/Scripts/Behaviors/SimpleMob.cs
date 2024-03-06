@@ -33,12 +33,21 @@ namespace BehaviorEvents
         public override void HandleInput(AbstractEntity owner, MainController.DataType entity_type, Godot.Collections.Dictionary input)
         {
             // Got an actual control update!
-            MapController.GridPos new_pos = owner.GridPos;
             double dat_x = input["x"].AsDouble();
             double dat_y = input["y"].AsDouble();
-            new_pos.hor += (float)dat_x;
-            new_pos.ver += (float)dat_y;
-            owner.Move(owner.map_id_string, new_pos);
+
+            if(stat != LifeState.Dead)
+            {
+                // Move based on mob speed
+                MapController.GridPos new_pos = owner.GridPos;
+                new_pos.hor += (float)dat_x;
+                new_pos.ver += (float)dat_y;
+                owner.Move(owner.map_id_string, new_pos);
+            }
+            else
+            {
+                // dead or knocked out...
+            }
         }
 
         public override void Tick(AbstractEntity owner, MainController.DataType entity_type)

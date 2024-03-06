@@ -19,6 +19,16 @@ public partial class MainController : Node
         Mob
     }
 
+	public enum RPCTransferChannels
+    {
+        Main,
+		Movement,
+		VisualUpdate,
+		MachineUpdate,
+		ClientData,
+		Chat
+    }
+
 	public static MainController controller;
 
 	[Export]

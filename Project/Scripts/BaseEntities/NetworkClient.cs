@@ -27,7 +27,8 @@ public partial class NetworkClient : Node
     private float zoom_level = 1f;
 
 
-    private Godot.Collections.Dictionary client_input_data = new Godot.Collections.Dictionary();
+    private Godot.Collections.Dictionary client_input_data = new Godot.Collections.Dictionary();    // current inputs from client
+    private Godot.Collections.Dictionary visual_state = new Godot.Collections.Dictionary();         // The visual effects from status conditions
     private AbstractEntity focused_entity;
 
     [Export]
@@ -43,7 +44,7 @@ public partial class NetworkClient : Node
         focused_entity = ent;
         focused_map_id = focused_entity.map_id_string;
         focused_position = focused_entity.GridPos.WorldPos();
-        Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
     }
 
     public void ClearFocusedEntity()
@@ -86,10 +87,10 @@ public partial class NetworkClient : Node
         if(focused_entity == null) focused_entity = AbstractEffect.CreateEntity(new_map,"BASE:TEST",MainController.DataType.Mob);
         focused_entity.Move(new_map,new_pos,false);
         // Inform client of movment from server
-        Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // Tell the client we want to forcibly move this
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferChannel = (int)MainController.RPCTransferChannels.Movement)] // Tell the client we want to forcibly move this
     public virtual void UpdateClientFocusedPos(string map_id, Vector3 new_pos)
     {
         focused_map_id = map_id;
@@ -101,15 +102,21 @@ public partial class NetworkClient : Node
     public void Tick()
     {
         UpdateClientControl();
+        Godot.Collections.Dictionary new_visual_state = new Godot.Collections.Dictionary();
         if(focused_entity != null)
         {
+            // handle camera movement
             focused_map_id = focused_entity.map_id_string;
             focused_position = focused_entity.GridPos.WorldPos();
             if(sync_map_id != focused_map_id || sync_position != focused_position)
             {
-                Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
+                if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
             }
+            // Update visual state from mob
+
         }
+        // One of the few things we actually update rather regularly...
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientMobVisuals), Json.Stringify(new_visual_state));
     }
 
     private void UpdateClientControl()
@@ -141,7 +148,7 @@ public partial class NetworkClient : Node
         camera.LookAt(new Vector3(camera.Position.X,focused_position.Y,camera.Position.Z-(float)0.1));
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
     private void SetClientControl(string control_data)
     {
         client_input_data = (Godot.Collections.Dictionary)Json.ParseString(control_data);
@@ -150,5 +157,15 @@ public partial class NetworkClient : Node
     public void Kill()
     {
         clients.Remove(this);
+    }
+
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    private void UpdateClientMobVisuals(string control_data)
+    {
+        visual_state = (Godot.Collections.Dictionary)Json.ParseString(control_data);
+        bool blind = TOOLS.ApplyExistingTag(visual_state,"blind",false);
+        float white_fade = TOOLS.ApplyExistingTag(visual_state,"white_fade",0);
+        float black_fade = TOOLS.ApplyExistingTag(visual_state,"black_fade",0);
     }
 }

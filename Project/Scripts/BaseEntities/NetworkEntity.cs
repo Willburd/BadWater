@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 [GlobalClass] 
 public partial class NetworkEntity : Node3D
 {
-
     protected AbstractEntity abstract_owner;
     public const bool debug_visual = false; // if server gets visual updates
 

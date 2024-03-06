@@ -3,6 +3,19 @@ using System;
 
 public static class TOOLS
 {
+    public static bool PeerDisconnected(Node node)
+    {
+        return node.Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Disconnected;
+    }
+    public static bool PeerConnecting(Node node)
+    {
+        return node.Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connecting;
+    }
+    public static bool PeerConnected(Node node)
+    {
+        return node.Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connected;
+    }
+
     public static bool Prob(float percentile) // Rand check that is at or under value presented, float version of Byond's Prob()!
     {
         return Mathf.Abs(GD.Randf() % 100) <= percentile;
