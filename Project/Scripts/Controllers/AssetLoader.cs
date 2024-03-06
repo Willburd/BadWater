@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 
 
@@ -59,17 +60,24 @@ public partial class AssetLoader : Node
             {
                 dir.ListDirBegin();
                 string fileName = dir.GetNext();
-                GD.Print("scandir :" + fileName);
+                GD.Print(dir.GetCurrentDir());
                 while (fileName != "")
                 {
-                    if(!dir.CurrentIsDir() && fileName.GetExtension() == "png")
+                    GD.Print(fileName);
+                    if(!dir.CurrentIsDir())
                     {
-                        GD.Print("addfile :" + fileName);
-                        LoadTextureAtlas(dir.GetCurrentDir() + "/" + fileName);
+                        if(fileName.EndsWith("png.import"))
+                        {
+                            LoadTextureAtlas(dir.GetCurrentDir() + "/" + fileName.Replace("png.import", "png"));
+                        }
+                        else if(fileName.EndsWith("png"))
+                        {
+                            LoadTextureAtlas(dir.GetCurrentDir() + "/" + fileName);
+                        }
                     }
-                    else if(dir.CurrentIsDir())
+                    
+                    else
                     {
-                        GD.Print("adddir :" + fileName);
                         scan_dirs.Push(dir.GetCurrentDir() + "/" + fileName);
                     }
                     fileName = dir.GetNext();
@@ -78,19 +86,17 @@ public partial class AssetLoader : Node
         }
         ConstructTextureAtlas();
 
-
         GD.Print("-MAPS");
         dir = DirAccess.Open(map_path);
         if (dir != null)
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            while (fileName != "")
+            GD.Print(dir.GetCurrentDir());
+            while (fileName != "" && fileName.GetExtension() == "json")
             {
-                
-                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
+                if (!dir.CurrentIsDir())
                 {
-                    GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Map);
                 }
                 fileName = dir.GetNext();
@@ -103,12 +109,11 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            while (fileName != "")
+            GD.Print(dir.GetCurrentDir());
+            while (fileName != "" && fileName.GetExtension() == "json")
             {
-                
-                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
+                if (!dir.CurrentIsDir())
                 {
-                    GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Area);
                 }
                 fileName = dir.GetNext();
@@ -121,12 +126,11 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            while (fileName != "")
+            GD.Print(dir.GetCurrentDir());
+            while (fileName != "" && fileName.GetExtension() == "json")
             {
-                
-                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
+                if (!dir.CurrentIsDir())
                 {
-                    GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Turf);
                 }
                 fileName = dir.GetNext();
@@ -139,12 +143,11 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            while (fileName != "")
+            GD.Print(dir.GetCurrentDir());
+            while (fileName != "" && fileName.GetExtension() == "json")
             {
-                
-                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
+                if (!dir.CurrentIsDir())
                 {
-                    GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Structure);
                 }
                 fileName = dir.GetNext();
@@ -157,12 +160,11 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            while (fileName != "")
+            GD.Print(dir.GetCurrentDir());
+            while (fileName != "" && fileName.GetExtension() == "json")
             {
-                
-                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
+                if (!dir.CurrentIsDir())
                 {
-                    GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Item);
                 }
                 fileName = dir.GetNext();
@@ -175,12 +177,11 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            while (fileName != "")
+            GD.Print(dir.GetCurrentDir());
+            while (fileName != "" && fileName.GetExtension() == "json")
             {
-                
-                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
+                if (!dir.CurrentIsDir())
                 {
-                    GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Effect);
                 }
                 fileName = dir.GetNext();
@@ -193,12 +194,11 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            while (fileName != "")
+            GD.Print(dir.GetCurrentDir());
+            while (fileName != "" && fileName.GetExtension() == "json")
             {
-                
-                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
+                if (!dir.CurrentIsDir())
                 {
-                    GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Mob);
                 }
                 fileName = dir.GetNext();
@@ -296,7 +296,8 @@ public partial class AssetLoader : Node
     private void ParseData(string file_path, MainController.DataType type)
     {
         Godot.Collections.Dictionary data = TOOLS.ParseJsonFile(file_path);
-        string prefix = file_path.Substring(0, file_path.Length - (file_path.GetExtension().Length+1));
+        string prefix = Path.GetFileNameWithoutExtension(file_path);
+        GD.Print("--PARSING: " + file_path + " " + prefix);
         foreach( string key in data.Keys )
         {
             Godot.Collections.Dictionary dict_data = (Godot.Collections.Dictionary)data[key];
@@ -424,9 +425,10 @@ public partial class AssetLoader : Node
     
     private void LoadTextureAtlas(string path)
     {
-        Texture2D img = (Texture2D)GD.Load(path);
-        int size = img.GetWidth() * img.GetHeight();
-        prepare_textures.Add(size + tex_offset_stacker,new PreparingTexture(path,img.GetWidth(),img.GetHeight()));
+        GD.Print("--TEXTURE: " + path);
+        Texture2D tex = (Texture2D)ResourceLoader.Load(path);
+        int size = tex.GetWidth() * tex.GetHeight();
+        prepare_textures.Add(size + tex_offset_stacker,new PreparingTexture(path,tex.GetWidth(),tex.GetHeight()));
         tex_offset_stacker += 0.0000001; // TODO - figure out a better way
     }
     private void ConstructTextureAtlas()
@@ -479,7 +481,7 @@ public partial class AssetLoader : Node
                     LoadedTexture loaded_tex_data = new LoadedTexture(prep_tex.path,tex_page_ind,place_pos.X,place_pos.Y,prep_tex.width,prep_tex.height); 
                     GD.Print("-" + tex_page_ind + ">" + loaded_tex_data.u + "-" + loaded_tex_data.v + "(" + loaded_tex_data.width + "-" + loaded_tex_data.height + "): " + loaded_tex_data.path);
                     // Handle formatting
-                    Image blit_img = ((Texture2D)GD.Load(prep_tex.path)).GetImage();
+                    Image blit_img = ((Texture2D)ResourceLoader.Load(loaded_tex_data.path)).GetImage();
                     blit_img.Decompress(); // If format was compressed, decompress it...
                     blit_img.Convert(Image.Format.Rgba8);
                     // Blit image
@@ -491,13 +493,21 @@ public partial class AssetLoader : Node
                 }
             }
         }
-        // Create material cache for each page!
-        material_cache = new ShaderMaterial[tex_page_ind+1];
-        for(int i = 0; i < tex_page_ind+1; i++) 
+        if(texture_pages.Count > 0)
         {
-            texture_pages[i].SavePng("res://Export/Page_" + i + ".png");
-            material_cache[i] = (ShaderMaterial)GD.Load("res://Materials/Main.tres").Duplicate(true);
-            material_cache[i].SetShaderParameter( "_MainTexture", ImageTexture.CreateFromImage(AssetLoader.texture_pages[i]));
+            GD.Print("-Creating texture pages. Count: " + texture_pages.Count);
+            // Create material cache for each page!
+            material_cache = new ShaderMaterial[tex_page_ind+1];
+            for(int i = 0; i < texture_pages.Count; i++) 
+            {
+                // texture_pages[i].SavePng("res://Export/Page_" + i + ".png");
+                material_cache[i] = (ShaderMaterial)ResourceLoader.Load("res://Materials/Main.tres").Duplicate(true);
+                material_cache[i].SetShaderParameter( "_MainTexture", ImageTexture.CreateFromImage(AssetLoader.texture_pages[i]));
+            }
+        }
+        else
+        {
+            GD.Print("============TEXTURE PAGE ERROR, NO PAGES============");
         }
     }
 
