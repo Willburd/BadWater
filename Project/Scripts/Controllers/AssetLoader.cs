@@ -347,10 +347,10 @@ public partial class AssetLoader : Node
                         all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
-                
+                /*
                 case MainController.DataType.Structure:
                     {
-                        PackData data_pack = new PackData();
+                        PackData data_pack = new StructureData();
                         data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_structures[data_pack.GetUniqueModID] = data_pack;
                         all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
@@ -359,16 +359,16 @@ public partial class AssetLoader : Node
                 
                 case MainController.DataType.Machine:
                     {
-                        PackData data_pack = new PackData();
+                        PackData data_pack = new MachineData();
                         data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_machines[data_pack.GetUniqueModID] = data_pack;
                         all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
                     }
                 break;
-                
+                */
                 case MainController.DataType.Mob:
                     {
-                        PackData data_pack = new PackData();
+                        MobData data_pack = new MobData();
                         data_pack.Init( file_path, prefix, key, type, dict_data);
                         loaded_mobs[data_pack.GetUniqueModID] = data_pack;
                         all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;

@@ -13,7 +13,6 @@ public partial class AbstractItem : AbstractEntity
         ItemData temp = data as ItemData;
         size_category = temp.size_category;
     }
-    [Export]
     public ItemData.SizeCategory size_category = ItemData.SizeCategory.Tiny;   // Size of item in world and bags
     // End of template data
 }

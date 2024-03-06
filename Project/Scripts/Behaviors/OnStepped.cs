@@ -6,11 +6,12 @@ namespace BehaviorEvents
     // Handles construction clicks
     public partial class OnStepped : Behavior
     {
-        private string teleport_tag = "";
-
         public OnStepped()
         {
+
         }
+        
+        private string teleport_tag = "";
 
         public override void MapLoadVars(Godot.Collections.Dictionary data)
         {

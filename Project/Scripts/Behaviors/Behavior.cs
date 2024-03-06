@@ -48,6 +48,24 @@ public partial class Behavior
             break;
 
             /*****************************************************************
+             * MOB BEHAVIORS (Living creatures and players)
+             ****************************************************************/
+            case "MOB_SIMPLE": // Life, death, status effects, breathing, eating, reagent processing.
+                new_behave = new BehaviorEvents.SimpleMob();
+            break;
+
+            case "MOB_COMPLEX": // Has species, unique markings, Has organs and limbs, DNA, traits, mutations, on top of all the stuff MOB has.
+                new_behave = new BehaviorEvents.SimpleMob();
+            break;
+
+            /*****************************************************************
+             * UNIQUE MOB BEHAVIORS (Hyper specialized mobs that need entirely unique features)
+             ****************************************************************/
+            case "MOB_BORER":
+                new_behave = new BehaviorEvents.SimpleMob();
+            break;
+
+            /*****************************************************************
              * Debugging purposes only.
              ****************************************************************/
             case "_BEHAVIOR_":
@@ -81,6 +99,11 @@ public partial class Behavior
     public virtual void Tick(AbstractEntity owner, MainController.DataType entity_type)
     {
         GD.Print("TICK"); // REPLACE ME!!!
+    }
+
+    public virtual void HandleInput(AbstractEntity owner, MainController.DataType entity_type, Godot.Collections.Dictionary input)
+    {
+        GD.Print("INPUTS"); // REPLACE ME!!!
     }
 
     // Update graphical state of host entity/abstract! Different for abstract and networked entities...

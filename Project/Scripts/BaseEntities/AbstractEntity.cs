@@ -10,8 +10,7 @@ public partial class AbstractEntity
 {
     // Beginning of template data
     protected PackRef PackRef;
-    public MapController.GridPos grid_pos; 
-    private NetworkEntity loaded_entity; // Puppet this
+    public MapController.GridPos grid_pos;
     public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
     {
         // Update our template with newly set variables
@@ -24,6 +23,7 @@ public partial class AbstractEntity
         PackRef = new PackRef( data, entity_type);
         SetBehavior(Behavior.CreateBehavior(data));
         SetTag(data.tag);
+        intangible = data.intangible;
         model = data.model;
         texture = data.texture;
         anim_speed = data.anim_speed;
@@ -55,7 +55,7 @@ public partial class AbstractEntity
                 // data = new MachineData();
             break;
             case MainController.DataType.Mob:
-                // data = new MobData();
+                data = new MobData();
             break;
         }
         data.Clone(AssetLoader.GetPackFromRef(PackRef));
@@ -130,7 +130,8 @@ public partial class AbstractEntity
     /*****************************************************************
      * Behavior hooks
      ****************************************************************/
-    private Behavior behavior_type;
+    private NetworkEntity loaded_entity;    // Puppet this
+    protected Behavior behavior_type;         // Behavior processing object
     public void SetBehavior(Behavior set_behavior)
     {
         behavior_type = set_behavior;

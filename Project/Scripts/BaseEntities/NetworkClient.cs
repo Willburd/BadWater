@@ -83,7 +83,7 @@ public partial class NetworkClient : Node
     private void SpawnHostEntity(string new_map, MapController.GridPos new_pos)
     {
         // SPAWN HOST OBJECT
-        if(focused_entity == null) focused_entity = AbstractEffect.CreateEntity(new_map,"BASE:THINGY",MainController.DataType.Item);
+        if(focused_entity == null) focused_entity = AbstractEffect.CreateEntity(new_map,"BASE:TEST",MainController.DataType.Mob);
         focused_entity.Move(new_map,new_pos,false);
         // Inform client of movment from server
         Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));

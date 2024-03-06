@@ -1,0 +1,11 @@
+{
+	"TEST": {
+		"parent": "",
+		"name": "Tester",
+		"desc": "Someone testing something.",
+		"behavior": "MOB_SIMPLE",
+		"model": "CUBE",
+		"texture": "Error.png",
+		"intangible": 0
+	}
+}
