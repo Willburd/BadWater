@@ -23,9 +23,6 @@ public partial class AssetLoader : Node
 {
     public const int tex_page_size = 512;
 
-    [Export]
-    public bool export_pages;
-
     public static Dictionary<string,AssetLoader.LoadedTexture> loaded_textures = new Dictionary<string,AssetLoader.LoadedTexture>();
     public static ShaderMaterial[] material_cache;
     public static Dictionary<string,MapData> loaded_maps = new Dictionary<string,MapData>();

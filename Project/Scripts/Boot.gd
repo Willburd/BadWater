@@ -9,13 +9,12 @@ class_name BootController
 @export var entity_spawner : MultiplayerSpawner
 @export var chunk_spawner : MultiplayerSpawner
 
-@export var join_address : String = "localhost"
+@export var ip_entry : TextEdit
+
 var max_players : int = -1		# Set from the ClientSpawner's data
 var max_entities : int = -1		# Set from the EntitySpawners's data
 var max_chunks : int = -1		# Set from the EntitySpawners's data
 var asset_library : AssetLoader
-
-@export var debug_textures : bool
 
 var config : ConfigData
 
@@ -28,7 +27,6 @@ func _ready():
 	config.Load("res://Config/Setup.json")
 	# Load asset library
 	asset_library = AssetLoader.new()
-	asset_library.export_pages = args.has("-p") || debug_textures;
 	asset_library.Load()
 	# Spawn server from launch options
 	if args.has("-s") || args.has("-e") || args.has("--headless"):
@@ -64,7 +62,7 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 		peer.create_server(config.port,max_players)
 	else:
 		# Create godot client connection to server
-		peer.create_client(join_address,config.port)
+		peer.create_client(ip_entry.text,config.port)
 	multiplayer.set_multiplayer_peer(peer)
 	
 func _PeerJoin(id: int):

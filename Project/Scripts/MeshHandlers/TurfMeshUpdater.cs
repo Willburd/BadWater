@@ -14,6 +14,7 @@ public partial class TurfMeshUpdater : Node
         foreach(MeshInstance3D mesh in GetChildren())
         {
             mesh_array[i] = mesh;
+            mesh.Visible = false;
             i++;
         }
     }
@@ -28,6 +29,7 @@ public partial class TurfMeshUpdater : Node
             double anim_speed = turf_data["anim_speed"].AsDouble();
 
             // Assign model,tex, and animation speed to turf!
+            mesh_array[i].Visible = true;
             MeshUpdater.TextureDataUpdate(mesh_array[i],texture);
         }
     }

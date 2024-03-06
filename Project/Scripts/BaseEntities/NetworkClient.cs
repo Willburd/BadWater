@@ -121,10 +121,6 @@ public partial class NetworkClient : Node
     public override void _Process(double delta)
     {
         if(!IsMultiplayerAuthority()) return;
-        // Client only!
-        camera.Current = true;
-        camera.Position = focused_position + new Vector3(0f,zoom_level * MainController.max_zoom,0.3f);
-        camera.LookAt(focused_position);
         // Get client inputs!
         Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
         new_inputs["x"] = Input.GetAxis("ui_left","ui_right") / 10;
@@ -134,6 +130,15 @@ public partial class NetworkClient : Node
         {
             Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
         }
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        if(!IsMultiplayerAuthority()) return;
+        // Client only camera update
+        camera.Current = true;
+        camera.Position = camera.Position.MoveToward(focused_position + new Vector3(0f,zoom_level * MainController.max_zoom,0.3f), (float)delta * 10f);
+        camera.LookAt(new Vector3(camera.Position.X,focused_position.Y,camera.Position.Z-(float)0.1));
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
