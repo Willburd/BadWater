@@ -273,8 +273,8 @@ public partial class MapController : DeligateController
     public static void SwapTurfs(AbstractTurf old_turf, AbstractTurf new_turf)
     {
         string old_map = old_turf.map_id_string;
-        GridPos old_pos = old_turf.grid_pos;
-        AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.grid_pos);
+        GridPos old_pos = old_turf.GridPos;
+        AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.GridPos);
         active_maps[old_map].SwapTurf(buffer,old_pos);
     }
     public static AbstractTurf GetTurfAtPosition(string mapID, GridPos grid_pos)
@@ -488,7 +488,7 @@ public partial class MapController : DeligateController
             // Clear old data
             if(check_turf != null)
             {
-                GridPos old_pos = check_turf.grid_pos;
+                GridPos old_pos = check_turf.GridPos;
                 turfs[(int)old_pos.hor,(int)old_pos.ver,(int)old_pos.dep] = null;
             }
             // Move new turf
@@ -500,7 +500,7 @@ public partial class MapController : DeligateController
         private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos)
         {
             // Very dangerous function... Lets keep this internal, and only accessed by safe public calls!
-            turf.grid_pos = grid_pos;
+            turf.Move( turf.map_id_string, grid_pos, false);
             turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = turf;
         }
 
@@ -510,7 +510,7 @@ public partial class MapController : DeligateController
             AbstractArea get_area = turf.Area;
 
             // Destroy turf in main lists
-            GridPos grid_pos = turf.grid_pos;
+            GridPos grid_pos = turf.GridPos;
             if(make_area_baseturf)
             {
                 // Spawn a new turf in the same spot to replace it...
@@ -864,7 +864,10 @@ public partial class MapController : DeligateController
                     break;
                 }
                 // Set location
-                if(ent != null) ent.grid_pos = new GridPos(float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3]));
+                if(ent != null) 
+                {
+                    ent.Move( ent.map_id_string, new GridPos(float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), false);
+                }
                 // LOOP!
                 HandleLoop();
             }

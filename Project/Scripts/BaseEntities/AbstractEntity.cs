@@ -10,7 +10,11 @@ public partial class AbstractEntity
 {
     // Beginning of template data
     protected PackRef PackRef;
-    public MapController.GridPos grid_pos;
+    protected MapController.GridPos grid_pos;
+    public MapController.GridPos GridPos
+    {
+        get {return grid_pos;}
+    }
     public virtual void ApplyMapCustomData(Godot.Collections.Dictionary data)
     {
         // Update our template with newly set variables

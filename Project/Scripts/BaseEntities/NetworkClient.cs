@@ -42,7 +42,7 @@ public partial class NetworkClient : Node
     {
         focused_entity = ent;
         focused_map_id = focused_entity.map_id_string;
-        focused_position = focused_entity.grid_pos.WorldPos();
+        focused_position = focused_entity.GridPos.WorldPos();
         Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
     }
 
@@ -65,7 +65,7 @@ public partial class NetworkClient : Node
             {
                 GD.Print("Client RESPAWN: " + Name);
                 int rand = Mathf.Abs((int)GD.Randi() % spawners.Count);
-                SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].grid_pos);
+                SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].GridPos);
                 ChunkController.NewClient(this);
                 return;
             }
@@ -104,7 +104,7 @@ public partial class NetworkClient : Node
         if(focused_entity != null)
         {
             focused_map_id = focused_entity.map_id_string;
-            focused_position = focused_entity.grid_pos.WorldPos();
+            focused_position = focused_entity.GridPos.WorldPos();
             if(sync_map_id != focused_map_id || sync_position != focused_position)
             {
                 Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);

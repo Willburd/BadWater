@@ -33,7 +33,7 @@ namespace BehaviorEvents
         public override void HandleInput(AbstractEntity owner, MainController.DataType entity_type, Godot.Collections.Dictionary input)
         {
             // Got an actual control update!
-            MapController.GridPos new_pos = owner.grid_pos;
+            MapController.GridPos new_pos = owner.GridPos;
             double dat_x = input["x"].AsDouble();
             double dat_y = input["y"].AsDouble();
             new_pos.hor += (float)dat_x;
