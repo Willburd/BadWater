@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 
 
@@ -60,14 +59,17 @@ public partial class AssetLoader : Node
             {
                 dir.ListDirBegin();
                 string fileName = dir.GetNext();
+                GD.Print("scandir :" + fileName);
                 while (fileName != "")
                 {
-                    if(!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".png")
+                    if(!dir.CurrentIsDir() && fileName.GetExtension() == "png")
                     {
+                        GD.Print("addfile :" + fileName);
                         LoadTextureAtlas(dir.GetCurrentDir() + "/" + fileName);
                     }
                     else if(dir.CurrentIsDir())
                     {
+                        GD.Print("adddir :" + fileName);
                         scan_dirs.Push(dir.GetCurrentDir() + "/" + fileName);
                     }
                     fileName = dir.GetNext();
@@ -86,7 +88,7 @@ public partial class AssetLoader : Node
             while (fileName != "")
             {
                 
-                if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
+                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
                 {
                     GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Map);
@@ -104,7 +106,7 @@ public partial class AssetLoader : Node
             while (fileName != "")
             {
                 
-                if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
+                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
                 {
                     GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Area);
@@ -122,7 +124,7 @@ public partial class AssetLoader : Node
             while (fileName != "")
             {
                 
-                if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
+                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
                 {
                     GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Turf);
@@ -140,7 +142,7 @@ public partial class AssetLoader : Node
             while (fileName != "")
             {
                 
-                if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
+                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
                 {
                     GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Structure);
@@ -158,7 +160,7 @@ public partial class AssetLoader : Node
             while (fileName != "")
             {
                 
-                if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
+                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
                 {
                     GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Item);
@@ -176,7 +178,7 @@ public partial class AssetLoader : Node
             while (fileName != "")
             {
                 
-                if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
+                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
                 {
                     GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Effect);
@@ -194,7 +196,7 @@ public partial class AssetLoader : Node
             while (fileName != "")
             {
                 
-                if (!dir.CurrentIsDir() && Path.HasExtension(fileName) && Path.GetExtension(fileName) == ".json")
+                if (!dir.CurrentIsDir() && fileName.GetExtension() == "json")
                 {
                     GD.Print("-" + fileName);
                     ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Mob);
@@ -294,7 +296,7 @@ public partial class AssetLoader : Node
     private void ParseData(string file_path, MainController.DataType type)
     {
         Godot.Collections.Dictionary data = TOOLS.ParseJsonFile(file_path);
-        string prefix = Path.GetFileNameWithoutExtension(file_path);
+        string prefix = file_path.Substring(0, file_path.Length - (file_path.GetExtension().Length+1));
         foreach( string key in data.Keys )
         {
             Godot.Collections.Dictionary dict_data = (Godot.Collections.Dictionary)data[key];
