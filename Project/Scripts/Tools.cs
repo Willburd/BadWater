@@ -5,14 +5,20 @@ public static class TOOLS
 {
     public static bool PeerDisconnected(Node node)
     {
+        if(node == null) return true;
+        if(node.Multiplayer.MultiplayerPeer == null) return true;
         return node.Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Disconnected;
     }
     public static bool PeerConnecting(Node node)
     {
+        if(node == null) return false;
+        if(node.Multiplayer.MultiplayerPeer == null) return false;
         return node.Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connecting;
     }
     public static bool PeerConnected(Node node)
     {
+        if(node == null) return false;
+        if(node.Multiplayer.MultiplayerPeer == null) return false;
         return node.Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connected;
     }
 

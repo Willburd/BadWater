@@ -14,6 +14,7 @@ public partial class ConfigData : Resource
         max_chunks    = TOOLS.ApplyExistingTag(data,"max_chunks",max_chunks);
         password        = TOOLS.ApplyExistingTag(data,"password",password);
         loaded_maps     = TOOLS.ApplyExistingTag(data,"loaded_maps",loaded_maps);
+        allow_new_accounts=TOOLS.ApplyExistingTag(data,"allow_new_accounts",allow_new_accounts);
     }
 
     [Export]
@@ -30,4 +31,6 @@ public partial class ConfigData : Resource
     public string password = "";
     [Export]
     public string[] loaded_maps;
+    [Export]
+    public bool allow_new_accounts;
 }

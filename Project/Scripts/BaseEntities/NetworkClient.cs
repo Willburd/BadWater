@@ -45,17 +45,44 @@ public partial class NetworkClient : Node
         focused_map_id = focused_entity.map_id_string;
         focused_position = focused_entity.GridPos.WorldPos();
         if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
+        AccountController.UpdateAccount(this);
+    }
+    public AbstractEntity GetFocusedEntity()
+    {
+        return focused_entity;
     }
 
     public void ClearFocusedEntity()
     {
         focused_entity = null;
+        AccountController.UpdateAccount(this);
+    }
+
+    public void Init(string assign_name, string pass_hash)
+    {
+        // Check if valid, we can't login if this account is already online!
+        clients.Add(this);
+        if(!AccountController.CanJoin(assign_name,pass_hash)) 
+        {
+            // Can we join the game?
+            GD.Print(Name + " Could not join as " + assign_name + " already active client");
+            Kill();
+            return;
+        }
+        // Prep
+        if(!AccountController.JoinGame(this, assign_name, pass_hash))
+        {
+            // Failed to join the game still..
+            GD.Print(Name + " Could not join as " + assign_name + " failed to join");
+            Kill();
+            return;
+        }
+        // Add to active network clients list
+        MainController.controller.client_container.AddChild(this,true);
     }
 
     public void Spawn()
     {
-        // Prep
-        clients.Add(this);
         camera.Current = false;
         // Check for a spawner!
         if(MapController.spawners.ContainsKey("PLAYER"))
@@ -84,8 +111,12 @@ public partial class NetworkClient : Node
     private void SpawnHostEntity(string new_map, MapController.GridPos new_pos)
     {
         // SPAWN HOST OBJECT
-        if(focused_entity == null) focused_entity = AbstractEffect.CreateEntity(new_map,"BASE:TEST",MainController.DataType.Mob);
-        focused_entity.Move(new_map,new_pos,false);
+        if(focused_entity == null) 
+        {
+            AbstractEntity new_ent = AbstractEffect.CreateEntity(new_map,"BASE:TEST",MainController.DataType.Mob);
+            new_ent.SetClientOwner(this);
+            new_ent.Move(new_map,new_pos,false);
+        }
         // Inform client of movment from server
         if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
     }
@@ -101,6 +132,9 @@ public partial class NetworkClient : Node
 
     public void Tick()
     {
+        if(TOOLS.PeerConnecting(this)) return;
+
+        // Process client inputs
         UpdateClientControl();
         Godot.Collections.Dictionary new_visual_state = new Godot.Collections.Dictionary();
         if(focused_entity != null)
@@ -112,10 +146,9 @@ public partial class NetworkClient : Node
             {
                 if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
             }
-            // Update visual state from mob
-
         }
-        // One of the few things we actually update rather regularly...
+
+        // One of the few things we actually update rather regularly... Visual hud update stuff
         if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientMobVisuals), Json.Stringify(new_visual_state));
     }
 
@@ -156,7 +189,13 @@ public partial class NetworkClient : Node
 
     public void Kill()
     {
+        if(!IsMultiplayerAuthority())
+        {
+            // Server handling client DC
+            AccountController.ClientLeave(this);
+        }
         clients.Remove(this);
+        QueueFree();
     }
 
     

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Diagnostics;
 
 public partial class Behavior
 {
@@ -121,9 +121,18 @@ public partial class Behavior
         GD.Print("UNCROSSED"); // REPLACE ME!!!
     }
 
-    public virtual void Bump(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity hitby) // When we are bumped by an incoming entity
+    public virtual void Bump(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity hitby)
     {
         GD.Print("BUMPED"); // REPLACE ME!!!
+    }
+
+    public virtual void Dropped(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity user)
+    {
+        GD.Print("DROPPED"); // REPLACE ME!!!
+    }
+    public virtual void ContainerMoved(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity user)
+    {
+        GD.Print("PLACEDINCONTAINER"); // REPLACE ME!!!
     }
 
     // visibility state of entity, only matters if on a turf and not inside anything.

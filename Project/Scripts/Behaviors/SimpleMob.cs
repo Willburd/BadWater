@@ -6,6 +6,8 @@ namespace BehaviorEvents
     // Handles construction clicks
     public partial class SimpleMob : Behavior
     {
+        public MobAI mob_ai;
+
         public enum LifeState
         {
             Alive,
@@ -55,10 +57,12 @@ namespace BehaviorEvents
             if(stat != LifeState.Dead)
             {
                 LifeUpdate(owner, entity_type);
+                mob_ai?.Alive();
             }
             else
             {
                 DeathUpdate(owner, entity_type);
+                mob_ai?.Dead();
             }
         }
 

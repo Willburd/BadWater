@@ -10,6 +10,11 @@ class_name BootController
 @export var chunk_spawner : MultiplayerSpawner
 
 @export var ip_entry : TextEdit
+@export var port_entry : TextEdit
+@export var pass_entry : TextEdit
+
+@export var account_entry : TextEdit
+@export var accpass_entry : TextEdit
 
 var max_players : int = -1		# Set from the ClientSpawner's data
 var max_entities : int = -1		# Set from the EntitySpawners's data
@@ -62,20 +67,31 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 		peer.create_server(config.port,max_players)
 	else:
 		# Create godot client connection to server
-		peer.create_client(ip_entry.text,config.port)
+		peer.create_client(ip_entry.text,port_entry.text.to_int())
 	multiplayer.set_multiplayer_peer(peer)
 	
 func _PeerJoin(id: int):
 	print(str("Peer join: ",id))
 	var c : NetworkClient = client_prefab.instantiate()
 	c.name = str(id)
-	client_container.add_child(c,true)
+	c.Init(account_entry.text,accpass_entry.text)
 	
 func _PeerLeave(id: int):
 	print(str("Peer Leave: ",id))
 	var c : NetworkClient = client_container.get_node(str(id))
+	c.ClearFocusedEntity();
 	c.Kill()
-	c.queue_free()
+	# Removal of the client is done in the NetworkClient it self!
+	if is_multiplayer_authority(): # Only run on DC client
+		return
+	# Reset the client...
+	while(entity_container.get_child_count() > 0):
+		entity_container.get_child(0).queue_free();
+	while(client_container.get_child_count() > 0):
+		client_container.get_child(0).queue_free();
+	print("LEFT GAME")
+	join_menu.show();
+	
 
 # TEMPS
 func _on_client_pressed():

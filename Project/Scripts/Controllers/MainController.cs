@@ -81,6 +81,7 @@ public partial class MainController : Node
 		switch(server_state)
 		{
 			case ServerConfig.Standard:
+				subcontrollers.Add(new AccountController());
 				subcontrollers.Add(new MapController());
 				subcontrollers.Add(new ChemController());
 				subcontrollers.Add(new AtmoController());
@@ -91,6 +92,7 @@ public partial class MainController : Node
 			break;
 
 			case ServerConfig.Editor:
+				subcontrollers.Add(new AccountController());
 				subcontrollers.Add(new MapController());
 				subcontrollers.Add(new EditorController());
 				subcontrollers.Add(new ChunkController());

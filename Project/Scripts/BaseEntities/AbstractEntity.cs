@@ -2,6 +2,7 @@ using Godot;
 using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 
@@ -11,6 +12,7 @@ public partial class AbstractEntity
     // Beginning of template data
     protected PackRef PackRef;
     protected MapController.GridPos grid_pos;
+    protected NetworkClient owner_client;
     public MapController.GridPos GridPos
     {
         get {return grid_pos;}
@@ -248,6 +250,17 @@ public partial class AbstractEntity
     /*****************************************************************
      * Client input and control
      ****************************************************************/
+    public void SetClientOwner(NetworkClient client)
+    {
+        Debug.Assert(client != null);
+        owner_client = client;
+        owner_client.SetFocusedEntity(this);
+    }
+    public void ClearClientOwner()
+    {
+        owner_client?.ClearFocusedEntity();
+        owner_client = null;
+    }
     public void ControlUpdate(Godot.Collections.Dictionary client_input_data)
     {
         if(client_input_data.Keys.Count == 0) return;
@@ -268,6 +281,11 @@ public partial class AbstractEntity
     {
         return MapController.GetTurfAtPosition(map_id_string,grid_pos);
     }
+    public AbstractEntity GetLocation()
+    {
+        if(location == null) return GetTurf();
+        return location;
+    }
 
     AbstractEntity location = null; 
     private List<AbstractEntity> contains = new List<AbstractEntity>();
@@ -278,6 +296,7 @@ public partial class AbstractEntity
     
     private void EnterLocation(AbstractEntity absLoc)
     {
+        Debug.Assert(absLoc != null);
         location = absLoc;
     }
     private void ClearLocation()
@@ -438,15 +457,21 @@ public partial class AbstractEntity
         new_turf?.EntityEntered(this,perform_turf_actions);
         SyncNetwork(false);
     }
-    public void Move(AbstractEntity new_container, bool perform_turf_actions = true)
+    public void Move(AbstractEntity new_destination, bool perform_turf_actions = true)
     {
         // If in same container, don't bother with entrance/exit actions.
-        if(location == new_container) return;
+        if(location == new_destination) return;
+        if(new_destination is AbstractTurf)
+        {
+            // It's a turf! move normally!
+            Move(new_destination.map_id_string, new_destination.GridPos, perform_turf_actions);
+            return;
+        }
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
         map_id_string = "BAG";
-        new_container.EntityEntered(this,perform_turf_actions);
+        new_destination.EntityEntered(this,perform_turf_actions);
         SyncNetwork(false);
     }
     public void Move(bool perform_turf_actions = true) // Move to nullspace
@@ -457,10 +482,21 @@ public partial class AbstractEntity
         map_id_string = "NULL";
         SyncNetwork(false);
     }
+    public void Drop(AbstractEntity new_destination, AbstractEntity user)
+    {
+        Move(new_destination,true);
+        behavior_type?.Dropped(this,entity_type,user);
+    }
+    public void PickedUp(AbstractEntity new_destination, AbstractEntity user)
+    {
+        Move(new_destination,true);
+        behavior_type?.ContainerMoved(this,entity_type,user);
+    }
 
     // Another entity has entered us...
     public void EntityEntered(AbstractEntity abs, bool perform_action)
     {
+        Debug.Assert(abs != null);
         if(perform_action)
         {
             for(int i = 0; i < contains.Count; i++) 
@@ -475,6 +511,7 @@ public partial class AbstractEntity
     // An entity stored inside us has gone somewhere else!
     public void EntityExited(AbstractEntity abs, bool perform_action)
     {
+        Debug.Assert(abs != null);
         contains.Remove(abs);
         if(perform_action)
         {

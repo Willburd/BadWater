@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/Boot.gd" id="1_ypo6r"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Scenes/NetworkClient.tscn" id="2_cssdj"]
 
-[node name="Main" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner", "ip_entry", "join_menu")]
+[node name="Main" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry", "join_menu")]
 script = ExtResource("1_ypo6r")
 entity_container = NodePath("Entities")
 client_container = NodePath("Clients")
@@ -12,6 +12,10 @@ client_spawner = NodePath("ClientSpawner")
 entity_spawner = NodePath("EntitySpawner")
 chunk_spawner = NodePath("ChunkSpawner")
 ip_entry = NodePath("JoinMenu/IPEntry")
+port_entry = NodePath("JoinMenu/PortEntry")
+pass_entry = NodePath("JoinMenu/PasswordEntry")
+account_entry = NodePath("JoinMenu/AccountEntry")
+accpass_entry = NodePath("JoinMenu/AccountPass")
 join_menu = NodePath("JoinMenu")
 
 [node name="Entities" type="Node" parent="."]
@@ -21,9 +25,9 @@ join_menu = NodePath("JoinMenu")
 [node name="JoinMenu" type="CanvasLayer" parent="."]
 
 [node name="Client" type="Button" parent="JoinMenu"]
-offset_left = 4.0
+offset_left = 5.0
 offset_top = 5.0
-offset_right = 179.0
+offset_right = 180.0
 offset_bottom = 47.0
 text = "CLIENT"
 
@@ -35,22 +39,63 @@ offset_bottom = 95.0
 text = "SERVER"
 
 [node name="Editor" type="Button" parent="JoinMenu"]
-offset_left = 7.0
+offset_left = 5.0
 offset_top = 100.0
-offset_right = 181.0
+offset_right = 179.0
 offset_bottom = 143.0
 text = "EDIT SERVER
 "
 
 [node name="IPEntry" type="TextEdit" parent="JoinMenu"]
-offset_left = 186.0
-offset_top = 10.0
-offset_right = 673.0
-offset_bottom = 40.0
+offset_left = 193.0
+offset_top = 12.0
+offset_right = 424.0
+offset_bottom = 47.0
 auto_translate = false
 localize_numeral_system = false
 text = "127.0.0.1"
 placeholder_text = "IP Address"
+scroll_fit_content_height = true
+
+[node name="PortEntry" type="TextEdit" parent="JoinMenu"]
+offset_left = 434.0
+offset_top = 12.0
+offset_right = 665.0
+offset_bottom = 47.0
+auto_translate = false
+localize_numeral_system = false
+text = "2279"
+placeholder_text = "Port"
+scroll_fit_content_height = true
+
+[node name="PasswordEntry" type="TextEdit" parent="JoinMenu"]
+offset_left = 674.0
+offset_top = 13.0
+offset_right = 958.0
+offset_bottom = 48.0
+auto_translate = false
+localize_numeral_system = false
+placeholder_text = "Server Password"
+scroll_fit_content_height = true
+
+[node name="AccountEntry" type="TextEdit" parent="JoinMenu"]
+offset_left = 193.0
+offset_top = 60.0
+offset_right = 666.0
+offset_bottom = 95.0
+auto_translate = false
+localize_numeral_system = false
+placeholder_text = "Account Name"
+scroll_fit_content_height = true
+
+[node name="AccountPass" type="TextEdit" parent="JoinMenu"]
+offset_left = 193.0
+offset_top = 103.0
+offset_right = 666.0
+offset_bottom = 138.0
+auto_translate = false
+localize_numeral_system = false
+placeholder_text = "Account Password"
 scroll_fit_content_height = true
 
 [node name="ClientSpawner" type="MultiplayerSpawner" parent="."]
