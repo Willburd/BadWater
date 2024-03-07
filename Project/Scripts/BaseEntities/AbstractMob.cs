@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 // Mob entities are objects on a map perform regular life updates, have special inventory slots to wear things, and recieve inputs from clients that they decide how to interpret.
 public partial class AbstractMob : AbstractEntity
@@ -75,7 +76,7 @@ public partial class AbstractMob : AbstractEntity
         Rpocket
     }
     private int active_hand = 0; // L or R
-    private AbstractEntity[] inventory_slots = new AbstractEntity[1];
+    private AbstractEntity[] inventory_slots;
     public AbstractEntity ActiveHand    { get {return inventory_slots[active_hand];} set {inventory_slots[active_hand] = value;}}
     public AbstractEntity R_hand        { get {return inventory_slots[(int)InventorySlot.Rhand];}   set {inventory_slots[(int)InventorySlot.Rhand] = value;}}
     public AbstractEntity L_hand        { get {return inventory_slots[(int)InventorySlot.Lhand];}   set {inventory_slots[(int)InventorySlot.Lhand] = value;}}
@@ -96,6 +97,11 @@ public partial class AbstractMob : AbstractEntity
     public AbstractEntity SlotBag       { get {return inventory_slots[(int)InventorySlot.Bag];}     set {inventory_slots[(int)InventorySlot.Bag] = value;}}
     public AbstractEntity SlotLPocket   { get {return inventory_slots[(int)InventorySlot.Lpocket];} set {inventory_slots[(int)InventorySlot.Lpocket] = value;}}
     public AbstractEntity SlotRPocket   { get {return inventory_slots[(int)InventorySlot.Rpocket];} set {inventory_slots[(int)InventorySlot.Rpocket] = value;}}
+
+    public AbstractMob()
+    {
+        inventory_slots = new AbstractEntity[ Enum.GetNames(typeof(InventorySlot)).Length ];
+    }
 
     /*****************************************************************
      * INVENTORY MANAGEMENT

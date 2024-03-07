@@ -10,7 +10,7 @@
 
 		"max_health": 100,
 		"move_speed": 0.5,
-		"run_speed": 10,
+		"run_speed": 2,
 		
 		"has_hands": 1,
 		"extra_hands": 0,

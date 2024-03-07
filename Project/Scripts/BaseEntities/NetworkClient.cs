@@ -192,7 +192,8 @@ public partial class NetworkClient : Node
         if(!IsMultiplayerAuthority()) return;
         // Client only camera update
         camera.Current = true;
-        camera.Position = camera.Position.MoveToward(focused_position + new Vector3(0f,zoom_level * MainController.max_zoom,0.3f), (float)delta * 10f);
+        float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
+        camera.Position = camera.Position.MoveToward(focused_position + new Vector3(0f,zoom_level * MainController.max_zoom,0.3f), (float)delta * lerp_speed);
         camera.LookAt(new Vector3(camera.Position.X,focused_position.Y,camera.Position.Z-(float)0.1));
     }
 
