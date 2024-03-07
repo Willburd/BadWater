@@ -41,11 +41,12 @@ public partial class NetworkClient : Node
 
     public void SetFocusedEntity(AbstractEntity ent)
     {
+        GD.Print(Name + " Client focused entity updated " + ent);
         focused_entity = ent;
         focused_map_id = focused_entity.map_id_string;
         focused_position = focused_entity.GridPos.WorldPos();
+        AccountController.UpdateAccount(this,ent);
         if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
-        AccountController.UpdateAccount(this);
     }
     public AbstractEntity GetFocusedEntity()
     {
@@ -54,8 +55,9 @@ public partial class NetworkClient : Node
 
     public void ClearFocusedEntity()
     {
+        GD.Print(Name + " Client focused entity cleared");
         focused_entity = null;
-        AccountController.UpdateAccount(this);
+        AccountController.UpdateAccount(this,null);
     }
 
     public void Init(string assign_name, string pass_hash)
@@ -65,7 +67,6 @@ public partial class NetworkClient : Node
         if(!AccountController.CanJoin(assign_name,pass_hash)) 
         {
             // Can we join the game?
-            GD.Print(Name + " Could not join as " + assign_name + " already active client");
             Kill();
             return;
         }
@@ -73,12 +74,28 @@ public partial class NetworkClient : Node
         if(!AccountController.JoinGame(this, assign_name, pass_hash))
         {
             // Failed to join the game still..
-            GD.Print(Name + " Could not join as " + assign_name + " failed to join");
             Kill();
             return;
         }
         // Add to active network clients list
         MainController.controller.client_container.AddChild(this,true);
+        // Assign tracking mob from account
+        AbstractEntity foc = AccountController.GetClientEntity(this);
+        if(foc == null) 
+        {
+            // TODO - properly handle first spawn!
+            GD.Print("-No entity stored.");
+            Spawn();
+        }
+        else
+        {
+            // logging back in from DC
+            GD.Print("-Syncing to entity: " + foc);
+            foc.SetClientOwner(this);
+            SetFocusedEntity(foc);
+        }
+        // Client joins chunk controller
+        ChunkController.NewClient(this);
     }
 
     public void Spawn()
@@ -94,7 +111,6 @@ public partial class NetworkClient : Node
                 GD.Print("Client RESPAWN: " + Name);
                 int rand = Mathf.Abs((int)GD.Randi() % spawners.Count);
                 SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].GridPos);
-                ChunkController.NewClient(this);
                 return;
             }
             else
@@ -105,7 +121,6 @@ public partial class NetworkClient : Node
         // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
         GD.Print("Client FALLBACK RESPAWN: " + Name);
         SpawnHostEntity(MapController.FallbackMap(),new MapController.GridPos((float)0.5,(float)0.5,0));
-        ChunkController.NewClient(this);
     }
 
     private void SpawnHostEntity(string new_map, MapController.GridPos new_pos)
@@ -115,6 +130,7 @@ public partial class NetworkClient : Node
         {
             AbstractEntity new_ent = AbstractEffect.CreateEntity(new_map,"BASE:TEST",MainController.DataType.Mob);
             new_ent.SetClientOwner(this);
+            SetFocusedEntity(new_ent);
             new_ent.Move(new_map,new_pos,false);
         }
         // Inform client of movment from server
@@ -194,6 +210,7 @@ public partial class NetworkClient : Node
             // Server handling client DC
             AccountController.ClientLeave(this);
         }
+        focused_entity?.ClearClientOwner();
         clients.Remove(this);
         QueueFree();
     }

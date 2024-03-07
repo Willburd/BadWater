@@ -239,6 +239,8 @@ public partial class AbstractEntity
                 MobController.entities.Remove(this);
                 break;
         }
+        owner_client?.ClearFocusedEntity();
+        ClearClientOwner();
     }
 
     public void UnloadNetworkEntity()
@@ -254,11 +256,9 @@ public partial class AbstractEntity
     {
         Debug.Assert(client != null);
         owner_client = client;
-        owner_client.SetFocusedEntity(this);
     }
     public void ClearClientOwner()
     {
-        owner_client?.ClearFocusedEntity();
         owner_client = null;
     }
     public void ControlUpdate(Godot.Collections.Dictionary client_input_data)

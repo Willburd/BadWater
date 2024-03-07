@@ -79,7 +79,6 @@ func _PeerJoin(id: int):
 func _PeerLeave(id: int):
 	print(str("Peer Leave: ",id))
 	var c : NetworkClient = client_container.get_node(str(id))
-	c.ClearFocusedEntity();
 	c.Kill()
 	# Removal of the client is done in the NetworkClient it self!
 	if is_multiplayer_authority(): # Only run on DC client
@@ -95,6 +94,8 @@ func _PeerLeave(id: int):
 
 # TEMPS
 func _on_client_pressed():
+	if account_entry.text.length() <= 0:
+		return
 	join_menu.hide()
 	StartNetwork(false,false)
 

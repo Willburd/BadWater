@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public partial class AccountController : DeligateController
 {
-    public struct Account
+    public class Account
     {
         public string id_name;
         public NetworkClient active_client;
@@ -28,13 +28,13 @@ public partial class AccountController : DeligateController
                 {
                     if(acc.password_hash == pass_hash) 
                     {
-                        GD.Print(assign_name + " was allowed to join");
+                        GD.Print("-" + assign_name + " was allowed to join");
                         return true;
                     }
-                    GD.Print(" Could not join as " + assign_name + " password mismatch");
+                    GD.Print("-Could not join as " + assign_name + " password mismatch");
                     return false;
                 } 
-                GD.Print(" Could not join as " + assign_name + " already active client");
+                GD.Print("-Could not join as " + assign_name + " already active client");
                 return false;
             }
         }
@@ -55,14 +55,16 @@ public partial class AccountController : DeligateController
             {
                 if(acc_check.password_hash == pass_hash)
                 {
-                    GD.Print("-Account: " + acc_check.id_name + " client set to " + client.Name);
+                    GD.Print("-Account: " + acc_check.id_name + " correct password, client set to " + client.Name);
                     acc_check.active_client = client;
                     return true;
                 }
+                GD.Print("-Account: " + acc_check.id_name + " failed to validate, password mismatch");
                 return false; // Somehow not the same password as before.
             }
         }
         // Fresh account joining
+        GD.Print("-Fresh account " + assign_name + " initializing...");
         Account acc = new Account
         {
             id_name = assign_name,
@@ -74,7 +76,7 @@ public partial class AccountController : DeligateController
     }
 
 
-    public static void UpdateAccount(NetworkClient client)
+    public static void UpdateAccount(NetworkClient client, AbstractEntity focusedEnt)
     {
         // Update our account with client's current status, so we can rejoin properly if we get DCed
         for(int i = 0; i < loaded_accounts.Count; i++) 
@@ -82,19 +84,20 @@ public partial class AccountController : DeligateController
             Account acc = loaded_accounts[i];
             if(acc.active_client == client)
             {
-                acc.registered_entity = client.GetFocusedEntity();
+                GD.Print("Client " + client.Name + " focused entity updated to " + focusedEnt);
+                acc.registered_entity = focusedEnt;
                 return;
             }
         }
         // How did you get on the server without an account?
-        GD.Print("Client had no account to update...");
+        GD.Print("Client had no account to update... Disconnecting " + client.Name);
         client.Kill();
     }
 
 
     public static void ClientLeave(NetworkClient client)
     {
-        GD.Print("Client DC, updating account");
+        GD.Print("Client DC");
         for(int i = 0; i < loaded_accounts.Count; i++) 
         {
             Account acc = loaded_accounts[i];
@@ -105,6 +108,23 @@ public partial class AccountController : DeligateController
                 return;
             }
         }
+        GD.Print("-Account failed to locate DCing client...");
+    }
+
+
+    public static AbstractEntity GetClientEntity(NetworkClient client)
+    {
+        GD.Print("Client requesting saved entitiy");
+        for(int i = 0; i < loaded_accounts.Count; i++) 
+        {
+            Account acc = loaded_accounts[i];
+            if(acc.active_client == client)
+            {
+                GD.Print("-Account: " + acc.id_name + " entity reloaded: " + loaded_accounts[i].registered_entity);
+                return loaded_accounts[i].registered_entity;
+            }
+        }
+        return null;
     }
 
 

@@ -85,6 +85,7 @@ offset_right = 666.0
 offset_bottom = 95.0
 auto_translate = false
 localize_numeral_system = false
+text = "Tester"
 placeholder_text = "Account Name"
 scroll_fit_content_height = true
 
