@@ -177,12 +177,24 @@ public partial class NetworkClient : Node
         if(!IsMultiplayerAuthority()) return;
         // Get client inputs!
         Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
-        new_inputs["x"] = Input.GetAxis("ui_left","ui_right") / 10;
-        new_inputs["y"] = Input.GetAxis("ui_up","ui_down") / 10;
+        new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
+        new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
+        new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
+        // Shifting input only triggers on taps, otherwise normal inputs
+        new_inputs["x"] = 0;
+        new_inputs["y"] = 0;
+        if(!new_inputs["mod_control"].AsBool() || Input.IsActionJustPressed("game_left") || Input.IsActionJustPressed("game_right") || Input.IsActionJustPressed("game_up") || Input.IsActionJustPressed("game_down") )
+        {
+            new_inputs["x"] = Input.GetAxis("game_left","game_right");
+            new_inputs["y"] = Input.GetAxis("game_up","game_down");
+        }
+        
         // Limit to only sending if we have useful input
         if(new_inputs["x"].AsDouble() != 0 || new_inputs["y"].AsDouble() != 0)
         {
-            new_inputs["walk"] = false; // TODO - walking input
+            new_inputs["x"] = new_inputs["x"].AsDouble();
+            new_inputs["y"] = new_inputs["y"].AsDouble();
+            new_inputs["walk"] = new_inputs["mod_shift"];
             Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
         }
     }

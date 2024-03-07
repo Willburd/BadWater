@@ -37,21 +37,34 @@ namespace BehaviorEvents
             AbstractMob mob = owner as AbstractMob;
 
             // Got an actual control update!
-            double dat_x = input["x"].AsDouble();
-            double dat_y = input["y"].AsDouble();
+            double dat_x = Mathf.Clamp(input["x"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
+            double dat_y = Mathf.Clamp(input["y"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
             bool walking = input["walk"].AsBool();
 
             if(stat != LifeState.Dead)
             {
                 // Move based on mob speed
                 MapController.GridPos new_pos = owner.GridPos;
-                if(walking)
+                if(input["mod_alt"].AsBool())
                 {
+                    // Only face the direction pressed!
+                    // Not moving!
+                }
+                else if(input["mod_control"].AsBool())
+                {
+                    // Inching along with taps at a fixed rate
+                    new_pos.hor += (float)dat_x * 0.5f;
+                    new_pos.ver += (float)dat_y * 0.5f;
+                }
+                else if(walking)
+                {
+                    // slower safer movement
                     new_pos.hor += (float)dat_x * mob.walk_speed;
                     new_pos.ver += (float)dat_y * mob.walk_speed;
                 }
                 else
                 {
+                    // zoomies as normal
                     new_pos.hor += (float)dat_x * mob.run_speed;
                     new_pos.ver += (float)dat_y * mob.run_speed;
                 }
