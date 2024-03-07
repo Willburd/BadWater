@@ -180,6 +180,15 @@ public partial class NetworkClient : Node
         new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
         new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
         new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
+        // Hotkeys
+        new_inputs["walk"]     = new_inputs["mod_shift"];
+        new_inputs["swap"]     = Input.IsActionPressed("game_swap");
+        new_inputs["resist"]   = Input.IsActionPressed("game_resist");
+        new_inputs["rest"]     = Input.IsActionPressed("game_rest");
+        new_inputs["throw"]    = Input.IsActionPressed("game_throw");
+        new_inputs["equip"]    = Input.IsActionPressed("game_equip");
+        new_inputs["drop"]     = Input.IsActionPressed("game_drop");
+        new_inputs["use"]      = Input.IsActionPressed("game_use");
         // Shifting input only triggers on taps, otherwise normal inputs
         new_inputs["x"] = 0;
         new_inputs["y"] = 0;
@@ -188,13 +197,17 @@ public partial class NetworkClient : Node
             new_inputs["x"] = Input.GetAxis("game_left","game_right");
             new_inputs["y"] = Input.GetAxis("game_up","game_down");
         }
-        
         // Limit to only sending if we have useful input
-        if(new_inputs["x"].AsDouble() != 0 || new_inputs["y"].AsDouble() != 0)
+        if(new_inputs["x"].AsDouble() != 0 
+        || new_inputs["y"].AsDouble() != 0 
+        || new_inputs["swap"].AsBool()
+        || new_inputs["resist"].AsBool()
+        || new_inputs["rest"].AsBool()
+        || new_inputs["throw"].AsBool()
+        || new_inputs["equip"].AsBool()
+        || new_inputs["drop"].AsBool()
+        || new_inputs["use"].AsBool())
         {
-            new_inputs["x"] = new_inputs["x"].AsDouble();
-            new_inputs["y"] = new_inputs["y"].AsDouble();
-            new_inputs["walk"] = new_inputs["mod_shift"];
             Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
         }
     }

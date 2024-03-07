@@ -43,6 +43,24 @@ namespace BehaviorEvents
 
             if(stat != LifeState.Dead)
             {
+                // Trigger mob actions
+                if(input["resist"].AsBool())
+                {
+
+                }
+                if(input["rest"].AsBool())
+                {
+                    
+                }
+                if(input["equip"].AsBool())
+                {
+                    
+                }
+                if(input["use"].AsBool())
+                {
+                    //mob.UseActiveHand();
+                }
+
                 // Move based on mob speed
                 MapController.GridPos new_pos = owner.GridPos;
                 if(input["mod_alt"].AsBool())
@@ -73,6 +91,20 @@ namespace BehaviorEvents
             else
             {
                 // dead or knocked out...
+            }
+
+            // Respond in any state, as they are mostly just input states for actions!
+            if(input["swap"].AsBool())
+            {
+                mob.SwapHands();
+            }
+            if(input["throw"].AsBool())
+            {
+                
+            }
+            if(input["drop"].AsBool())
+            {
+                mob.DropActiveHand();
             }
         }
 
