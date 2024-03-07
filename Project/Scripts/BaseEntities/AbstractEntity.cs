@@ -261,7 +261,7 @@ public partial class AbstractEntity
     {
         owner_client = null;
     }
-    public void ControlUpdate(Godot.Collections.Dictionary client_input_data)
+    public virtual void ControlUpdate(Godot.Collections.Dictionary client_input_data)
     {
         if(client_input_data.Keys.Count == 0) return;
         // Got an actual control update!

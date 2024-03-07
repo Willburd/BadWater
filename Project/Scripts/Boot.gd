@@ -26,6 +26,7 @@ var config : ConfigData
 @export var join_menu : CanvasLayer # TEMP
 
 func _ready():
+	join_menu.show()
 	var args = Array(OS.get_cmdline_args())
 	# Load config
 	config = ConfigData.new()

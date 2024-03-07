@@ -10,11 +10,43 @@ public partial class AbstractMob : AbstractEntity
     {
         base.TemplateRead(data);
         MobData temp = data as MobData;
-        max_health = temp.max_health;
-        health = temp.max_health;
+        max_health      = temp.max_health;
+        health          = temp.max_health;
+        walk_speed      = temp.walk_speed;
+        run_speed       = temp.run_speed;
+
+        has_hands       = temp.has_hands;
+        extra_hands     = temp.extra_hands;
+        complex_tools   = temp.complex_tools;
+
+        wears_hats      = temp.wears_hats;
+        wears_mask      = temp.wears_mask;
+        wears_eyes      = temp.wears_eyes;
+        wears_uniform   = temp.wears_uniform;
+        wears_suit      = temp.wears_suit;
+        wears_shoe      = temp.wears_shoe;
+        wears_ears      = temp.wears_ears;
+        wears_glove     = temp.wears_glove;
+        wears_belt      = temp.wears_belt;
     }
+    // Gameplay interaction
     public float max_health = 0;   // Size of item in world and bags
-    public float health = 0;   // Size of item in world and bags
+    public float health = 0;    // Size of item in world and bags
+    public float walk_speed = (float)0.25;
+    public float run_speed = 1;
+    public bool has_hands;      // Can pick up objects
+    public bool extra_hands;    // Has extra hand slots(basically just pockets without needing uniform)
+    public bool complex_tools;  // If mob can use complex tools 
+    // Inventory slots
+    public bool wears_hats;
+    public bool wears_mask;
+    public bool wears_eyes;
+    public bool wears_uniform; // Controls more than uniform slot, allows pockets, id, back, etc
+    public bool wears_suit;
+    public bool wears_shoe;
+    public bool wears_ears;
+    public bool wears_glove;
+    public bool wears_belt;
     // End of template data
 
     /*****************************************************************
@@ -24,6 +56,8 @@ public partial class AbstractMob : AbstractEntity
     {
         Rhand,
         Lhand,
+        RhandLower,
+        LhandLower,
         Head,
         Mask,
         Eyes,
@@ -45,6 +79,8 @@ public partial class AbstractMob : AbstractEntity
     public AbstractEntity ActiveHand    { get {return inventory_slots[active_hand];} set {inventory_slots[active_hand] = value;}}
     public AbstractEntity R_hand        { get {return inventory_slots[(int)InventorySlot.Rhand];}   set {inventory_slots[(int)InventorySlot.Rhand] = value;}}
     public AbstractEntity L_hand        { get {return inventory_slots[(int)InventorySlot.Lhand];}   set {inventory_slots[(int)InventorySlot.Lhand] = value;}}
+    public AbstractEntity R_handlower   { get {return inventory_slots[(int)InventorySlot.Rhand];}   set {inventory_slots[(int)InventorySlot.Rhand] = value;}}
+    public AbstractEntity L_handlower   { get {return inventory_slots[(int)InventorySlot.LhandLower];}   set {inventory_slots[(int)InventorySlot.LhandLower] = value;}}
     public AbstractEntity SlotHead      { get {return inventory_slots[(int)InventorySlot.Head];}    set {inventory_slots[(int)InventorySlot.Head] = value;}}
     public AbstractEntity SlotMask      { get {return inventory_slots[(int)InventorySlot.Mask];}    set {inventory_slots[(int)InventorySlot.Mask] = value;}}
     public AbstractEntity SlotEyes      { get {return inventory_slots[(int)InventorySlot.Eyes];}    set {inventory_slots[(int)InventorySlot.Eyes] = value;}}
@@ -74,17 +110,27 @@ public partial class AbstractMob : AbstractEntity
     }
     public void DropActiveHand()
     {
+        if(ActiveHand != null) return;
         ActiveHand?.Drop(GetTurf(),this);
     }
     public void DropSlot(InventorySlot slot)
     {
+        if(inventory_slots[(int)slot] != null) return;
         inventory_slots[(int)slot]?.Drop(GetTurf(),this);
+    }
+    public bool SlotInUse(InventorySlot slot)
+    {
+        return inventory_slots[(int)slot] != null;
+    }
+    public AbstractEntity GetSlotEntity(InventorySlot slot)
+    {
+        return inventory_slots[(int)slot];
     }
 
     /*****************************************************************
      * Input and AI control
      ****************************************************************/
-    public new void ControlUpdate(Godot.Collections.Dictionary client_input_data)
+    public override void ControlUpdate(Godot.Collections.Dictionary client_input_data)
     {
         if(client_input_data.Keys.Count == 0) return;
         behavior_type?.HandleInput(this,entity_type,client_input_data);

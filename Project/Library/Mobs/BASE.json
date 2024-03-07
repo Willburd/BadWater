@@ -1,11 +1,28 @@
 {
 	"TEST": {
 		"parent": "",
-		"name": "Tester",
+		"name": "Jil",
 		"desc": "Someone testing something.",
 		"behavior": "MOB_SIMPLE",
 		"model": "CUBE",
 		"texture": "Error.png",
-		"intangible": 0
+		"intangible": 0,
+
+		"max_health": 100,
+		"move_speed": 0.5,
+		"run_speed": 10,
+		
+		"has_hands": 1,
+		"extra_hands": 0,
+		"complex_tools": 0,
+		"wears_hats": 0,
+		"wears_mask": 0,
+		"wears_eyes": 0,
+		"wears_uniform": 0,
+		"wears_suit": 0,
+		"wears_shoe": 0,
+		"wears_ears": 0,
+		"wears_glove": 0,
+		"wears_belt": 0
 	}
 }

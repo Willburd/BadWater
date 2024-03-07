@@ -182,6 +182,7 @@ public partial class NetworkClient : Node
         // Limit to only sending if we have useful input
         if(new_inputs["x"].AsDouble() != 0 || new_inputs["y"].AsDouble() != 0)
         {
+            new_inputs["walk"] = false; // TODO - walking input
             Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
         }
     }
