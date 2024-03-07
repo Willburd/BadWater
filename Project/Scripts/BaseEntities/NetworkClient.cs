@@ -6,7 +6,6 @@ using System.Diagnostics;
 [GlobalClass]
 public partial class NetworkClient : Node
 {
-    public static List<NetworkClient> clients = new List<NetworkClient>();
     
     public int PeerID              // Used by main controller to know that all controllers are ready for first game tick
     {
@@ -41,7 +40,7 @@ public partial class NetworkClient : Node
 
     public void SetFocusedEntity(AbstractEntity ent)
     {
-        GD.Print(Name + " Client focused entity updated " + ent);
+        GD.Print("Client " + Name + " focused entity updated to " + ent);
         focused_entity = ent;
         focused_map_id = focused_entity.map_id_string;
         focused_position = focused_entity.GridPos.WorldPos();
@@ -63,18 +62,17 @@ public partial class NetworkClient : Node
     public void Init(string assign_name, string pass_hash)
     {
         // Check if valid, we can't login if this account is already online!
-        clients.Add(this);
         if(!AccountController.CanJoin(assign_name,pass_hash)) 
         {
             // Can we join the game?
-            Kill();
+            DisconnectClient();
             return;
         }
         // Prep
         if(!AccountController.JoinGame(this, assign_name, pass_hash))
         {
             // Failed to join the game still..
-            Kill();
+            DisconnectClient();
             return;
         }
         // Add to active network clients list
@@ -203,18 +201,14 @@ public partial class NetworkClient : Node
         client_input_data = (Godot.Collections.Dictionary)Json.ParseString(control_data);
     }
 
-    public void Kill()
-    {
-        if(!IsMultiplayerAuthority())
-        {
-            // Server handling client DC
-            AccountController.ClientLeave(this);
-        }
-        focused_entity?.ClearClientOwner();
-        clients.Remove(this);
-        QueueFree();
-    }
 
+    public void DisconnectClient()
+    {
+        // Server handling client DC
+        AccountController.ClientLeave(this);
+        focused_entity?.ClearClientOwner();
+        MainController.controller.Multiplayer.MultiplayerPeer.DisconnectPeer(int.Parse(Name)); // Calls Kill() remotely
+    }
     
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
     private void UpdateClientMobVisuals(string control_data)

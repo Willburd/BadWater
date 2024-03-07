@@ -84,14 +84,14 @@ public partial class AccountController : DeligateController
             Account acc = loaded_accounts[i];
             if(acc.active_client == client)
             {
-                GD.Print("Client " + client.Name + " focused entity updated to " + focusedEnt);
+                GD.Print("Account " + acc.id_name + " reserved entity updated to " + focusedEnt);
                 acc.registered_entity = focusedEnt;
                 return;
             }
         }
         // How did you get on the server without an account?
         GD.Print("Client had no account to update... Disconnecting " + client.Name);
-        client.Kill();
+        client.DisconnectClient();
     }
 
 
@@ -108,7 +108,6 @@ public partial class AccountController : DeligateController
                 return;
             }
         }
-        GD.Print("-Account failed to locate DCing client...");
     }
 
 
@@ -120,7 +119,7 @@ public partial class AccountController : DeligateController
             Account acc = loaded_accounts[i];
             if(acc.active_client == client)
             {
-                GD.Print("-Account: " + acc.id_name + " entity reloaded: " + loaded_accounts[i].registered_entity);
+                GD.Print("-Account: " + acc.id_name + " reserved entity reloaded: " + loaded_accounts[i].registered_entity);
                 return loaded_accounts[i].registered_entity;
             }
         }

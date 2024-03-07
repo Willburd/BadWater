@@ -74,12 +74,16 @@ func _PeerJoin(id: int):
 	print(str("Peer join: ",id))
 	var c : NetworkClient = client_prefab.instantiate()
 	c.name = str(id)
+	if !is_multiplayer_authority():
+		return
+	# Only run on server
 	c.Init(account_entry.text,accpass_entry.text)
 	
 func _PeerLeave(id: int):
 	print(str("Peer Leave: ",id))
 	var c : NetworkClient = client_container.get_node(str(id))
-	c.Kill()
+	if c != null && c.multiplayer.multiplayer_peer && is_multiplayer_authority():
+		c.DisconnectClient()
 	# Removal of the client is done in the NetworkClient it self!
 	if is_multiplayer_authority(): # Only run on DC client
 		return
