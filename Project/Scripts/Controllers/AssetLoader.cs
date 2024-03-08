@@ -62,7 +62,8 @@ public partial class AssetLoader : Node
             {
                 // Add directory for random sound selection
                 loaded_sounds.Add(dir.GetCurrentDir(),new List<string>()); // Each of these lists stores all audio files inside the folder we are currently scanning. For random picking!
-
+                
+                int found_sounds = 0;
                 dir.ListDirBegin();
                 string fileName = dir.GetNext();
                 while (fileName != "")
@@ -71,12 +72,11 @@ public partial class AssetLoader : Node
                     {
                         if(fileName.EndsWith("ogg.import"))
                         {
-                            GD.Print("--OGG: " + dir.GetCurrentDir() + "/" + fileName);
                             loaded_sounds[dir.GetCurrentDir()].Add(fileName.Replace("ogg.import", "ogg"));
                         }
                         else if(fileName.EndsWith("ogg"))
                         {
-                            GD.Print("--OGG: " + dir.GetCurrentDir() + "/" + fileName);
+                            found_sounds += 1;
                             loaded_sounds[dir.GetCurrentDir()].Add(fileName);
                         }
                     }
@@ -87,6 +87,8 @@ public partial class AssetLoader : Node
                     }
                     fileName = dir.GetNext();
                 }
+
+                GD.Print("--AUDIOPACK: " + dir.GetCurrentDir() + " : " + found_sounds);
             }
         }
         scan_dirs.Clear();

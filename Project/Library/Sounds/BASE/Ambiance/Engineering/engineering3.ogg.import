@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://cvi6ic6tqi6sg"
-path="res://.godot/imported/engineering3.ogg-e790945f1759fa3a48bda899e42b5a17.oggvorbisstr"
+path="res://.godot/imported/engineering3.ogg-4d7c643479d5ae53c5490990635579db.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/Sounds/BASE/Ambiance/engineering/engineering3.ogg"
-dest_files=["res://.godot/imported/engineering3.ogg-e790945f1759fa3a48bda899e42b5a17.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Ambiance/Engineering/engineering3.ogg"
+dest_files=["res://.godot/imported/engineering3.ogg-4d7c643479d5ae53c5490990635579db.oggvorbisstr"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://lyqwiurenmul"
-path="res://.godot/imported/foreboding6.ogg-16bc64a5cd678df04aea7947b99c4424.oggvorbisstr"
+path="res://.godot/imported/foreboding6.ogg-a4894ffef1e0c23cfca15a65525b23a3.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/Sounds/BASE/Ambiance/foreboding/foreboding6.ogg"
-dest_files=["res://.godot/imported/foreboding6.ogg-16bc64a5cd678df04aea7947b99c4424.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Ambiance/Foreboding/foreboding6.ogg"
+dest_files=["res://.godot/imported/foreboding6.ogg-a4894ffef1e0c23cfca15a65525b23a3.oggvorbisstr"]
 
 [params]
 

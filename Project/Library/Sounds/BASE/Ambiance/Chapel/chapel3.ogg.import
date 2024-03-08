@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://dpmwq7dq1mi7j"
-path="res://.godot/imported/chapel3.ogg-41d36d1742fdc2a29cb9809c683bd088.oggvorbisstr"
+path="res://.godot/imported/chapel3.ogg-55abe80883af44b412cf190ceeab9618.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/Sounds/BASE/Ambiance/chapel/chapel3.ogg"
-dest_files=["res://.godot/imported/chapel3.ogg-41d36d1742fdc2a29cb9809c683bd088.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Ambiance/Chapel/chapel3.ogg"
+dest_files=["res://.godot/imported/chapel3.ogg-55abe80883af44b412cf190ceeab9618.oggvorbisstr"]
 
 [params]
 

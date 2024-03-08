@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://de1yyl7i5ary5"
-path="res://.godot/imported/ghostly1.ogg-bf1c1dd5786cdc29157711cb1781a72b.oggvorbisstr"
+path="res://.godot/imported/ghostly1.ogg-02278db35b9058b490606aa45fef3d56.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/Sounds/BASE/Ambiance/ghostly/ghostly1.ogg"
-dest_files=["res://.godot/imported/ghostly1.ogg-bf1c1dd5786cdc29157711cb1781a72b.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Ambiance/Ghostly/ghostly1.ogg"
+dest_files=["res://.godot/imported/ghostly1.ogg-02278db35b9058b490606aa45fef3d56.oggvorbisstr"]
 
 [params]
 
