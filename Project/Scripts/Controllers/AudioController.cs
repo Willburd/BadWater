@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public partial class AudioController : DeligateController
 {
-    public const float screen_range = 8;
+    public const float screen_range = 6;
 
     public override bool CanInit()
     {
