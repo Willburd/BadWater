@@ -56,7 +56,7 @@ namespace BehaviorEvents
                 {
                     
                 }
-                if(input["use"].AsBool())
+                if(input["useheld"].AsBool())
                 {
                     //mob.UseActiveHand();
                 }
