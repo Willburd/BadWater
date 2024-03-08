@@ -134,7 +134,7 @@ public partial class AccountController : DeligateController
 
     public override bool Init()
     {
-        tick_rate = 10;
+        tick_rate = -1; // NO TICK
         controller = this;
         return true;
     }

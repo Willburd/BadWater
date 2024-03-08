@@ -68,6 +68,11 @@ public class DeligateController
         FinishInit();
     }
 
+    public bool NoTick
+    {
+        get {return tick_rate <= 0;}
+    }
+
     public bool Tick()
     {
         // Controller is paused

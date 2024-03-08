@@ -25,6 +25,7 @@ public partial class AssetLoader : Node
 
     public static Dictionary<string,AssetLoader.LoadedTexture> loaded_textures = new Dictionary<string,AssetLoader.LoadedTexture>();
     public static ShaderMaterial[] material_cache;
+    public static Dictionary<string,List<string>> loaded_sounds = new Dictionary<string,List<string>>();
     public static Dictionary<string,MapData> loaded_maps = new Dictionary<string,MapData>();
     public static Dictionary<string,AreaData> loaded_areas = new Dictionary<string,AreaData>();
     public static Dictionary<string,TurfData> loaded_turfs = new Dictionary<string,TurfData>();
@@ -39,6 +40,7 @@ public partial class AssetLoader : Node
     public void Load()
     {
         GD.Print("LOADING ASSETS");
+        string sound_path = "res://Library/Sounds";
         string texture_path = "res://Library/Textures";
         string map_path = "res://Library/Maps";
         string area_path = "res://Library/Areas";
@@ -48,9 +50,49 @@ public partial class AssetLoader : Node
         string effect_path = "res://Library/Effects";
         string mob_path = "res://Library/Mobs";
 
-        GD.Print("-TEXTURES");
+        GD.Print("-SOUND");
         DirAccess dir;
         Stack<string> scan_dirs = new Stack<string>();
+        scan_dirs.Push(sound_path);
+        while(scan_dirs.Count > 0)
+        {
+            string scanName = scan_dirs.Pop();
+            dir = DirAccess.Open(scanName);
+            if (dir != null)
+            {
+                // Add directory for random sound selection
+                loaded_sounds.Add(dir.GetCurrentDir(),new List<string>()); // Each of these lists stores all audio files inside the folder we are currently scanning. For random picking!
+
+                dir.ListDirBegin();
+                string fileName = dir.GetNext();
+                while (fileName != "")
+                {
+                    if(!dir.CurrentIsDir())
+                    {
+                        if(fileName.EndsWith("ogg.import"))
+                        {
+                            GD.Print("--OGG: " + dir.GetCurrentDir() + "/" + fileName);
+                            loaded_sounds[dir.GetCurrentDir()].Add(fileName.Replace("ogg.import", "ogg"));
+                        }
+                        else if(fileName.EndsWith("ogg"))
+                        {
+                            GD.Print("--OGG: " + dir.GetCurrentDir() + "/" + fileName);
+                            loaded_sounds[dir.GetCurrentDir()].Add(fileName);
+                        }
+                    }
+                    
+                    else
+                    {
+                        scan_dirs.Push(dir.GetCurrentDir() + "/" + fileName);
+                    }
+                    fileName = dir.GetNext();
+                }
+            }
+        }
+        scan_dirs.Clear();
+
+        GD.Print("-TEXTURES");
+        scan_dirs = new Stack<string>();
         scan_dirs.Push(texture_path);
         while(scan_dirs.Count > 0)
         {
@@ -60,10 +102,8 @@ public partial class AssetLoader : Node
             {
                 dir.ListDirBegin();
                 string fileName = dir.GetNext();
-                GD.Print(dir.GetCurrentDir());
                 while (fileName != "")
                 {
-                    GD.Print(fileName);
                     if(!dir.CurrentIsDir())
                     {
                         if(fileName.EndsWith("png.import"))
@@ -85,6 +125,7 @@ public partial class AssetLoader : Node
             }
         }
         ConstructTextureAtlas();
+        scan_dirs.Clear();
 
         GD.Print("-MAPS");
         dir = DirAccess.Open(map_path);
@@ -92,7 +133,6 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            GD.Print(dir.GetCurrentDir());
             while (fileName != "" && fileName.GetExtension() == "json")
             {
                 if (!dir.CurrentIsDir())
@@ -109,7 +149,6 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            GD.Print(dir.GetCurrentDir());
             while (fileName != "" && fileName.GetExtension() == "json")
             {
                 if (!dir.CurrentIsDir())
@@ -126,7 +165,6 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            GD.Print(dir.GetCurrentDir());
             while (fileName != "" && fileName.GetExtension() == "json")
             {
                 if (!dir.CurrentIsDir())
@@ -143,7 +181,6 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            GD.Print(dir.GetCurrentDir());
             while (fileName != "" && fileName.GetExtension() == "json")
             {
                 if (!dir.CurrentIsDir())
@@ -160,7 +197,6 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            GD.Print(dir.GetCurrentDir());
             while (fileName != "" && fileName.GetExtension() == "json")
             {
                 if (!dir.CurrentIsDir())
@@ -177,7 +213,6 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            GD.Print(dir.GetCurrentDir());
             while (fileName != "" && fileName.GetExtension() == "json")
             {
                 if (!dir.CurrentIsDir())
@@ -194,7 +229,6 @@ public partial class AssetLoader : Node
         {
             dir.ListDirBegin();
             string fileName = dir.GetNext();
-            GD.Print(dir.GetCurrentDir());
             while (fileName != "" && fileName.GetExtension() == "json")
             {
                 if (!dir.CurrentIsDir())

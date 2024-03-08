@@ -137,6 +137,15 @@ public partial class MainController : Node
 				GD.Print("Setup Finished");
 				GD.Print("Tick rate: " + tick_rate);
 				GD.Print("Delta Threshold " + delta_rate);
+				// Remove notickers
+				for(int i = 0; i < subcontrollers.Count; i++) 
+				{
+					if(subcontrollers[i].NoTick)
+					{
+						subcontrollers.RemoveAt(i);
+					}
+				}
+				// Done
 				setup_phase = false;
 			}
 			return;
