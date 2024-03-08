@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public partial class AudioController : DeligateController
 {
+    public const float screen_range = 8;
+
     public override bool CanInit()
     {
         return true;
@@ -32,7 +34,7 @@ public partial class AudioController : DeligateController
     }
 
 
-    public static void PlayAt(string soundpack_id, string map_id, Vector3 pos)
+    public static void PlayAt(string soundpack_id, string map_id, Vector3 pos, float range)
     {
         if(soundpack_id == "") return;
         string soundpack = "res://Library/Sounds/" + soundpack_id;
@@ -45,9 +47,9 @@ public partial class AudioController : DeligateController
             for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
             {
                 NetworkClient client = (NetworkClient)MainController.controller.client_container.GetChild(i);
-                if(client.focused_map_id == map_id)
+                if(client.focused_map_id == map_id && TOOLS.VecDist(pos, client.focused_position) < range)
                 {
-                    client.PlaySoundAt(soundpack + "/" + path,pos);
+                    client.PlaySoundAt(soundpack + "/" + path,pos,range);
                 }
             }
         }

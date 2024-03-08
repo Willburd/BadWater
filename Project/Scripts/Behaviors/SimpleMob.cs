@@ -65,6 +65,7 @@ namespace BehaviorEvents
 
                 // Move based on mob speed
                 MapController.GridPos new_pos = owner.GridPos;
+                float speed = 0f;
                 if(input["mod_alt"].AsBool())
                 {
                     // Only face the direction pressed!
@@ -81,15 +82,17 @@ namespace BehaviorEvents
                     // slower safer movement
                     new_pos.hor += (float)dat_x * mob.walk_speed;
                     new_pos.ver += (float)dat_y * mob.walk_speed;
-                    footstep_timer += 0.05f;
+                    speed = mob.walk_speed;
                 }
                 else
                 {
                     // zoomies as normal
                     new_pos.hor += (float)dat_x * mob.run_speed;
                     new_pos.ver += (float)dat_y * mob.run_speed;
-                    footstep_timer += 0.08f;
+                    speed = mob.run_speed;
                 }
+                // math for feet speed
+                footstep_timer += Mathf.Lerp(0.05f,0.08f, Mathf.Clamp(speed,0,1.5f));
                 AbstractEntity newloc = owner.Move(owner.map_id_string, new_pos);
                 if(footstep_timer > 1)
                 {

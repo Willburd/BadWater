@@ -54,6 +54,6 @@ public partial class AbstractTurf : AbstractEntity
 
     public void PlayStepSound()
     {
-        AudioController.PlayAt(step_sound, map_id_string ,grid_pos.WorldPos() + new Vector3(MapController.tile_size/2,0,MapController.tile_size/2));
+        AudioController.PlayAt(step_sound, map_id_string ,grid_pos.WorldPos() + new Vector3(MapController.tile_size/2,0,MapController.tile_size/2), AudioController.screen_range);
     }
 }
