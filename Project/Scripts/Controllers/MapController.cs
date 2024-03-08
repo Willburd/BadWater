@@ -333,7 +333,7 @@ public partial class MapController : DeligateController
     {
         List<AbstractEntity> ents = GetTaggedAbstracts(tag);
         if(ents.Count == 0) return null;
-        return tagged_abstracts[tag][Mathf.Abs((int)GD.Randi() % tagged_abstracts[tag].Count)];
+        return tagged_abstracts[tag][TOOLS.RandI(tagged_abstracts[tag].Count)];
     }
 
 
@@ -539,15 +539,15 @@ public partial class MapController : DeligateController
         public void RandomTurfUpdate()
         {
             // Lower chance of random ticks heavily 
-            if((Mathf.Abs((int)GD.Randi()) % 100) < 80) return;
+            if(TOOLS.Prob(80)) return;
 
             // Perform a random number of random turf updates
             int repeat = 5;
             while(repeat-- > 0)
             {
-                int randx = Mathf.Abs((int)GD.Randi()) % width;
-                int randy = Mathf.Abs((int)GD.Randi()) % height;
-                int randz = Mathf.Abs((int)GD.Randi()) % depth;
+                int randx = TOOLS.RandI(width);
+                int randy = TOOLS.RandI(height);
+                int randz = TOOLS.RandI(depth);
                 AbstractTurf turf = turfs[randx,randy,randz];
                 turf.RandomTick();
                 turf.AtmosphericsCheck();

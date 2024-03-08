@@ -74,6 +74,7 @@ public partial class AbstractEntity
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
     public bool intangible = false;           // can move through solids
+    public string step_sound = "";              // Sound pack ID for steps
     // End of template data
     public string GetUniqueID
     {
@@ -314,11 +315,11 @@ public partial class AbstractEntity
         }
     }
 
-    public void Move(string new_mapID, MapController.GridPos new_pos, bool perform_turf_actions = true)
+    public AbstractEntity Move(string new_mapID, MapController.GridPos new_pos, bool perform_turf_actions = true)
     {
-        Move(new_mapID, TOOLS.GridToPosWithOffset(new_pos), perform_turf_actions);
+        return Move(new_mapID, TOOLS.GridToPosWithOffset(new_pos), perform_turf_actions);
     }
-    public void Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
+    public AbstractEntity Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
     {
         // Is new location valid?
         MapController.GridPos new_grid = new MapController.GridPos(new_pos);
@@ -445,7 +446,7 @@ public partial class AbstractEntity
             map_id_string = new_mapID;
             grid_pos = new_grid;
             SyncNetwork(false);
-            return;
+            return location;
         }
 
         // Leave old location, perform uncrossing events! Enter new turf...
@@ -456,16 +457,16 @@ public partial class AbstractEntity
         AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos);
         new_turf?.EntityEntered(this,perform_turf_actions);
         SyncNetwork(false);
+        return location;
     }
-    public void Move(AbstractEntity new_destination, bool perform_turf_actions = true)
+    public AbstractEntity Move(AbstractEntity new_destination, bool perform_turf_actions = true)
     {
         // If in same container, don't bother with entrance/exit actions.
-        if(location == new_destination) return;
+        if(location == new_destination) return location;
         if(new_destination is AbstractTurf)
         {
             // It's a turf! move normally!
-            Move(new_destination.map_id_string, new_destination.GridPos, perform_turf_actions);
-            return;
+            return Move(new_destination.map_id_string, new_destination.GridPos, perform_turf_actions);
         }
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
@@ -473,14 +474,16 @@ public partial class AbstractEntity
         map_id_string = "BAG";
         new_destination.EntityEntered(this,perform_turf_actions);
         SyncNetwork(false);
+        return location;
     }
-    public void Move(bool perform_turf_actions = true) // Move to nullspace
+    public AbstractEntity Move(bool perform_turf_actions = true) // Move to nullspace
     {
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
         map_id_string = "NULL";
         SyncNetwork(false);
+        return location;
     }
     public void Drop(AbstractEntity new_destination, AbstractEntity user)
     {

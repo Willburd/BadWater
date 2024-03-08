@@ -107,7 +107,7 @@ public partial class NetworkClient : Node
             if(spawners.Count > 0)
             {
                 GD.Print("Client RESPAWN: " + Name);
-                int rand = Mathf.Abs((int)GD.Randi() % spawners.Count);
+                int rand = TOOLS.RandI(spawners.Count);
                 SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].GridPos);
                 return;
             }
@@ -244,5 +244,22 @@ public partial class NetworkClient : Node
         bool blind = TOOLS.ApplyExistingTag(visual_state,"blind",false);
         float white_fade = TOOLS.ApplyExistingTag(visual_state,"white_fade",0);
         float black_fade = TOOLS.ApplyExistingTag(visual_state,"black_fade",0);
+    }
+
+
+
+
+    public void PlaySoundAt(string path, Vector3 pos)
+    {
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientPlayAudio),path, pos);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    public void ClientPlayAudio(string path, Vector3 pos)
+    {
+        SoundPlayer newsound = GD.Load<PackedScene>("res://Scenes/SoundPlayer.tscn").Instantiate() as SoundPlayer;
+        newsound.path = path;
+        newsound.Position = pos;
+        GetTree().Root.AddChild(newsound);
     }
 }

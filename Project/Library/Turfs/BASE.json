@@ -6,6 +6,7 @@
 		"behavior": "TURF_RAW",
 		"model": "Plane",
 		"texture": "BASE/Turf/Floor/Sand.png",
+		"step_sound": "BASE/Footsteps/Sand",
 		"density": 0,
 		"opaque": 0
 	},
@@ -16,6 +17,7 @@
 		"behavior": "TURF_PANEL",
 		"model": "Plane",
 		"texture": "BASE/Turf/Floor/Plate.png",
+		"step_sound": "BASE/Footsteps/Plating",
 		"density": 0,
 		"opaque": 0
 	},
@@ -26,6 +28,7 @@
 		"behavior": "TURF_FLOOR",
 		"model": "Plane",
 		"texture": "BASE/Turf/Floor/Floor.png",
+		"step_sound": "BASE/Footsteps/Generic",
 		"density": 0,
 		"opaque": 0
 	},
@@ -36,6 +39,7 @@
 		"behavior": "TURF_WALL",
 		"model": "Plane",
 		"texture": "BASE/Turf/Wall/Wall.png",
+		"step_sound": "BASE/Footsteps/Generic",
 		"density": 1,
 		"opaque": 1
 	},
@@ -46,6 +50,7 @@
 		"behavior": "TURF_MINEABLE",
 		"model": "Plane",
 		"texture": "BASE/Turf/Wall/Rock.png",
+		"step_sound": "BASE/Footsteps/Stone",
 		"density": 1,
 		"opaque": 1
 	}

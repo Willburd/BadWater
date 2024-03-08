@@ -17,6 +17,8 @@ namespace BehaviorEvents
         
         public LifeState stat = LifeState.Alive;
 
+        public float footstep_timer = 0;
+
         public SimpleMob()
         {
 
@@ -79,14 +81,24 @@ namespace BehaviorEvents
                     // slower safer movement
                     new_pos.hor += (float)dat_x * mob.walk_speed;
                     new_pos.ver += (float)dat_y * mob.walk_speed;
+                    footstep_timer += 0.05f;
                 }
                 else
                 {
                     // zoomies as normal
                     new_pos.hor += (float)dat_x * mob.run_speed;
                     new_pos.ver += (float)dat_y * mob.run_speed;
+                    footstep_timer += 0.08f;
                 }
-                owner.Move(owner.map_id_string, new_pos);
+                AbstractEntity newloc = owner.Move(owner.map_id_string, new_pos);
+                if(footstep_timer > 1)
+                {
+                    footstep_timer = 0;
+                    if(newloc is AbstractTurf)
+                    {
+                        (newloc as AbstractTurf).PlayStepSound();
+                    }
+                }
             }
             else
             {

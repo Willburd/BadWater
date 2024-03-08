@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://buq20ubgjb8hv"]
+
+[ext_resource type="Script" path="res://Scripts/SoundPlayer.cs" id="1_7ckxd"]
+
+[node name="SoundPlayer" type="Node3D" node_paths=PackedStringArray("player")]
+script = ExtResource("1_7ckxd")
+player = NodePath("AudioStreamPlayer3D")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]

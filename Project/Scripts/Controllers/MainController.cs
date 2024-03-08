@@ -26,7 +26,8 @@ public partial class MainController : Node
 		VisualUpdate,
 		MachineUpdate,
 		ClientData,
-		Chat
+		Chat,
+		Sound
     }
 
 	public static MainController controller;

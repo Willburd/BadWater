@@ -11,6 +11,7 @@ public partial class TurfData : PackData
         if(data_override != null) data = data_override;
         density           = TOOLS.ApplyExistingTag(data,"density",density);
         opaque            = TOOLS.ApplyExistingTag(data,"opaque",opaque);
+        step_sound        = TOOLS.ApplyExistingTag(data,"step_sound",step_sound);
     }
 
     protected override string GetVarString()
@@ -30,4 +31,5 @@ public partial class TurfData : PackData
     // Unique data
     public bool density = false;
     public bool opaque = false;
+    public string step_sound = "";
 }

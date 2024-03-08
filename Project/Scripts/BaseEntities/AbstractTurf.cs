@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class AbstractTurf : AbstractEntity
 {
@@ -13,6 +14,7 @@ public partial class AbstractTurf : AbstractEntity
         anim_speed = temp.anim_speed;
         density = temp.density;
         opaque = temp.opaque;
+        step_sound = temp.step_sound;
     }
     // End of template data
 
@@ -48,5 +50,10 @@ public partial class AbstractTurf : AbstractEntity
     {
         get {return area;}
         set {area = value;} // SET USING Area.AddTurf() DO NOT SET DIRECTLY
+    }
+
+    public void PlayStepSound()
+    {
+        AudioController.PlayAt(step_sound, map_id_string ,grid_pos.WorldPos() + new Vector3(MapController.tile_size/2,0,MapController.tile_size/2));
     }
 }

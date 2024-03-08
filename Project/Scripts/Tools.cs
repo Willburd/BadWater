@@ -27,6 +27,16 @@ public static class TOOLS
         return Mathf.Abs(GD.Randf() % 100) <= percentile;
     }
 
+    public static float RandF(float max)
+    {
+        return GD.Randf() * max;
+    }
+
+    public static int RandI(int max)
+    {
+        return Mathf.Abs((int)GD.Randi()) % max;
+    }
+
     static public float VecDist(float x1, float y1, float x2, float y2)
     {
         return VecDist(new Vector2(x1,y1) , new Vector2(x2,y2) );
