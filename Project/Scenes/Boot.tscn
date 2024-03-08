@@ -23,7 +23,6 @@ join_menu = NodePath("JoinMenu")
 [node name="Clients" type="Node" parent="."]
 
 [node name="JoinMenu" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="Client" type="Button" parent="JoinMenu"]
 offset_left = 5.0

@@ -89,9 +89,21 @@ public partial class AccountController : DeligateController
                 return;
             }
         }
-        // How did you get on the server without an account?
-        GD.Print("Client had no account to update... Disconnecting " + client.Name);
-        client.DisconnectClient();
+        if(!client.has_logged_in)
+        {
+            // Not yet logged, try and log them!
+            if(client.login_name == null) 
+            {
+                // Request client info
+                client.RequestCredentials();
+            }
+        }
+        else
+        {
+            // How did you get on the server without an account?
+            GD.Print("Client had no account to update... Disconnecting " + client.Name);
+            client.DisconnectClient();
+        }
     }
 
 

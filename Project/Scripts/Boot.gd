@@ -68,17 +68,14 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 		peer.create_server(config.port,max_players)
 	else:
 		# Create godot client connection to server
-		peer.create_client(ip_entry.text,port_entry.text.to_int())
+		peer.create_client(ip_entry.get_text(),port_entry.get_text().to_int())
 	multiplayer.set_multiplayer_peer(peer)
 	
 func _PeerJoin(id: int):
 	print(str("Peer join: ",id))
 	var c : NetworkClient = client_prefab.instantiate()
 	c.name = str(id)
-	if !is_multiplayer_authority():
-		return
-	# Only run on server
-	c.Init(account_entry.text,accpass_entry.text)
+	client_container.add_child(c,true);
 	
 func _PeerLeave(id: int):
 	print(str("Peer Leave: ",id))

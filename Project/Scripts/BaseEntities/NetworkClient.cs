@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 
 [GlobalClass]
@@ -59,24 +60,57 @@ public partial class NetworkClient : Node
         AccountController.UpdateAccount(this,null);
     }
 
-    public void Init(string assign_name, string pass_hash)
+
+    public bool has_logged_in = false;
+    public string login_name = null;
+    public string login_hash = null;
+
+    public void RequestCredentials()
+    {
+        GD.Print("Request credentials");
+        Rpc(nameof(RespondCredentials));
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)] // Tell the client we want to forcibly move this
+    public void RespondCredentials()
+    {
+        if(!IsMultiplayerAuthority()) return;
+        // DUMP TEMPORARY STUFF
+        // TODO - Actual login
+        string assign_name = ((TextEdit)GetTree().Root.GetChild(0).GetChild<CanvasLayer>(2).GetChild(6)).Text;
+        string pass_hash = ((TextEdit)GetTree().Root.GetChild(0).GetChild<CanvasLayer>(2).GetChild(7)).Text;
+        Rpc(nameof(AcknowledgeCredentials), Name, assign_name, pass_hash);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)] // Tell the client we want to forcibly move this
+    public void AcknowledgeCredentials(string name_id, string assign_name, string pass_hash)
+    {
+        if(!Multiplayer.IsServer()) return; // Server only
+        if(Name == name_id && !has_logged_in)
+        {
+            GD.Print("Received credentials " + assign_name);
+            login_name = assign_name;
+            login_hash = pass_hash;
+            Init();
+        }
+    }
+
+    public void Init()
     {
         // Check if valid, we can't login if this account is already online!
-        if(!AccountController.CanJoin(assign_name,pass_hash)) 
+        if(!AccountController.CanJoin( login_name, login_hash)) 
         {
             // Can we join the game?
             DisconnectClient();
             return;
         }
         // Prep
-        if(!AccountController.JoinGame(this, assign_name, pass_hash))
+        if(!AccountController.JoinGame(this, login_name, login_hash))
         {
             // Failed to join the game still..
             DisconnectClient();
             return;
         }
-        // Add to active network clients list
-        MainController.controller.client_container.AddChild(this,true);
         // Assign tracking mob from account
         AbstractEntity foc = AccountController.GetClientEntity(this);
         if(foc == null) 
@@ -94,6 +128,7 @@ public partial class NetworkClient : Node
         }
         // Client joins chunk controller
         ChunkController.NewClient(this);
+        has_logged_in = true;
     }
 
     public void Spawn()
@@ -147,6 +182,7 @@ public partial class NetworkClient : Node
     public void Tick()
     {
         if(TOOLS.PeerConnecting(this)) return;
+        if(!has_logged_in) return;
 
         // Process client inputs
         UpdateClientControl();
@@ -251,6 +287,7 @@ public partial class NetworkClient : Node
 
     public void PlaySoundAt(string path, Vector3 pos, float range)
     {
+        if(!has_logged_in) return;
         if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientPlayAudio),path, pos, range);
     }
 
