@@ -72,12 +72,8 @@ public partial class AssetLoader : Node
                     {
                         if(fileName.EndsWith("ogg.import"))
                         {
-                            loaded_sounds[dir.GetCurrentDir()].Add(fileName.Replace("ogg.import", "ogg"));
-                        }
-                        else if(fileName.EndsWith("ogg"))
-                        {
                             found_sounds += 1;
-                            loaded_sounds[dir.GetCurrentDir()].Add(fileName);
+                            loaded_sounds[dir.GetCurrentDir()].Add(fileName.Replace("ogg.import", "ogg"));
                         }
                     }
                     
@@ -111,10 +107,6 @@ public partial class AssetLoader : Node
                         if(fileName.EndsWith("png.import"))
                         {
                             LoadTextureAtlas(dir.GetCurrentDir() + "/" + fileName.Replace("png.import", "png"));
-                        }
-                        else if(fileName.EndsWith("png"))
-                        {
-                            LoadTextureAtlas(dir.GetCurrentDir() + "/" + fileName);
                         }
                     }
                     
