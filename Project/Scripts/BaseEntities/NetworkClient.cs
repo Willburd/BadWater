@@ -308,7 +308,7 @@ public partial class NetworkClient : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
     public void ClientPlayAudio(string path, Vector3 pos, float range, float volume_mod)
     {
-        SoundPlayer newsound = GD.Load<PackedScene>("res://Scenes/SoundPlayer.tscn").Instantiate() as SoundPlayer;
+        SoundPlayer newsound = GD.Load<PackedScene>("res://Prefabs/SoundPlayer.tscn").Instantiate() as SoundPlayer;
         if(range <= -1)
         {
             newsound.player_global = new AudioStreamPlayer();

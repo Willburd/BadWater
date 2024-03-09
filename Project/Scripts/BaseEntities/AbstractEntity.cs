@@ -76,6 +76,8 @@ public partial class AbstractEntity
     public bool intangible = false;           // can move through solids
     public string step_sound = "";              // Sound pack ID for steps
     // End of template data
+    private float bump_cooldown = 0;
+    private const float bump_reset_time = 30; // Ticks
     public string GetUniqueID
     {
         get { return PackRef.modid; }
@@ -154,6 +156,7 @@ public partial class AbstractEntity
     public void Tick()                  // Called every process tick on the Fire() tick of the subcontroller that owns them
     {
         // Ask our behavior for info!
+        bump_cooldown -= 1;
         behavior_type?.Tick(this, entity_type);
     }
     public virtual void SyncNetwork(bool include_mesh)
@@ -181,6 +184,8 @@ public partial class AbstractEntity
     
     public void Bump(AbstractEntity hitby) // When we are bumped by an incoming entity
     {
+        if(bump_cooldown > 0) return;
+        bump_cooldown = bump_reset_time;
         behavior_type?.Bump( this, entity_type, hitby);
     }
 
@@ -405,12 +410,9 @@ public partial class AbstractEntity
                     {
                         new_grid.ver = Mathf.Floor(grid_pos.ver) + 1 - threshold;
                     }
-                    Vector3 distVec = new_grid.WorldPos() - grid_pos.WorldPos();
-                    if(distVec.Length() > 0.01)
-                    {
-                        Bump(corner_turf);
-                        corner_turf.Bump(this);
-                    }
+                    Bump(corner_turf);
+                    corner_turf.Bump(this);
+                    
                     // Randomly break out of direct headon perfect corner intersections...
                     if(TOOLS.Prob(50)) 
                     {
@@ -425,12 +427,12 @@ public partial class AbstractEntity
                 {
                     // check if the bonk is significant enough!
                     Vector3 distVec = new_grid.WorldPos() - grid_pos.WorldPos();
-                    if(bump_h && distVec.X > 0.01) // bonk horizontal.
+                    if(bump_h) // bonk horizontal.
                     {
                         Bump(hor_turf);
                         hor_turf.Bump(this);
                     }
-                    if(bump_v && distVec.Z > 0.01) // bonk verticle.
+                    if(bump_v) // bonk verticle.
                     {
                         Bump(ver_turf);
                         ver_turf.Bump(this);

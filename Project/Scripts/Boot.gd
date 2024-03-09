@@ -48,7 +48,7 @@ func StartNetwork(server: bool, edit_mode: bool) -> void:
 	var peer = ENetMultiplayerPeer.new()
 	if(server):
 		# Start controller
-		var server_scene: MainController = preload("res://Scenes/Server.tscn").instantiate()
+		var server_scene: MainController = preload("res://Prefabs/Server.tscn").instantiate()
 		add_child.call_deferred(server_scene)
 		server_scene.client_container = client_container
 		server_scene.entity_container = entity_container
