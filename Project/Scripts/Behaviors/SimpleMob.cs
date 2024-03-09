@@ -56,11 +56,11 @@ namespace BehaviorEvents
                 }
                 if(input["equip"].AsBool())
                 {
-                    
+                    mob.EquipActiveHand(null);
                 }
                 if(input["useheld"].AsBool())
                 {
-                    //mob.UseActiveHand();
+                    mob.UseActiveHand(null);
                 }
 
                 // Move based on mob speed

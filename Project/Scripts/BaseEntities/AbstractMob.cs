@@ -133,6 +133,18 @@ public partial class AbstractMob : AbstractEntity
         return inventory_slots[(int)slot];
     }
 
+    public void UseActiveHand(AbstractEntity target)
+    {
+        if(ActiveHand != null) return;
+        ActiveHand?.Interact(this,true,target);
+    }
+
+    public void EquipActiveHand(AbstractEntity target)
+    {
+        if(ActiveHand != null) return;
+        ActiveHand?.Equip(this);
+    }
+
     /*****************************************************************
      * Input and AI control
      ****************************************************************/

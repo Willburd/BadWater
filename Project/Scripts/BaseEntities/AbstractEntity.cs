@@ -488,12 +488,22 @@ public partial class AbstractEntity
     public void Drop(AbstractEntity new_destination, AbstractEntity user)
     {
         Move(new_destination,true);
-        behavior_type?.Dropped(this,entity_type,user);
+        behavior_type?.Dropped(this,entity_type,user,new_destination);
     }
     public void PickedUp(AbstractEntity new_destination, AbstractEntity user)
     {
         Move(new_destination,true);
-        behavior_type?.ContainerMoved(this,entity_type,user);
+        behavior_type?.ContainerMoved(this,entity_type,user,user);
+    }
+
+    public void Interact(AbstractEntity user, bool in_inventory, AbstractEntity target)
+    {
+        behavior_type?.Interact(this,entity_type,user,in_inventory,target);
+    }
+
+    public void Equip(AbstractEntity user)
+    {
+        behavior_type?.Equip(this,entity_type,user);
     }
 
     // Another entity has entered us...

@@ -84,55 +84,65 @@ public partial class Behavior
     }
 
     // Called upon creation to set variables or state, usually detected by map information.
-    public virtual void Init(AbstractEntity owner, MainController.DataType entity_type)
+    public virtual void Init(AbstractEntity self, MainController.DataType entity_type)
     {
         //GD.Print("INIT"); // REPLACE ME!!!
     }
     
     // Same as above, but when we NEED everything else Init() before we can properly tell our state!
-    public virtual void LateInit(AbstractEntity owner, MainController.DataType entity_type)
+    public virtual void LateInit(AbstractEntity self, MainController.DataType entity_type)
     {
         //GD.Print("LATE INIT"); // REPLACE ME!!!
     }
 
     // Tick every game tick from the object it's inside of! Different for abstract and networked entities...
-    public virtual void Tick(AbstractEntity owner, MainController.DataType entity_type)
+    public virtual void Tick(AbstractEntity self, MainController.DataType entity_type)
     {
         //GD.Print("TICK"); // REPLACE ME!!!
     }
 
-    public virtual void HandleInput(AbstractEntity owner, MainController.DataType entity_type, Godot.Collections.Dictionary input)
+    public virtual void Interact(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, bool in_inventory, AbstractEntity target)
+    {
+        GD.Print("USED"); // REPLACE ME!!!
+    }
+
+    public virtual void Equip(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user)
+    {
+        GD.Print("EQUIP"); // REPLACE ME!!!
+    }
+
+    public virtual void HandleInput(AbstractEntity self, MainController.DataType entity_type, Godot.Collections.Dictionary input)
     {
         //GD.Print("INPUTS"); // REPLACE ME!!!
     }
 
     // Update graphical state of host entity/abstract! Different for abstract and networked entities...
-    public virtual void UpdateIcon(AbstractEntity owner, MainController.DataType entity_type)
+    public virtual void UpdateIcon(AbstractEntity self, MainController.DataType entity_type)
     {
         //GD.Print("UPDATEICON"); // REPLACE ME!!!
     }
 
-    public virtual void Crossed(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity crosser)
+    public virtual void Crossed(AbstractEntity self, MainController.DataType entity_type, AbstractEntity crosser)
     {
         //GD.Print("CROSSED"); // REPLACE ME!!!
     }
-    public virtual void UnCrossed(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity crosser)
+    public virtual void UnCrossed(AbstractEntity self, MainController.DataType entity_type, AbstractEntity crosser)
     {
         //GD.Print("UNCROSSED"); // REPLACE ME!!!
     }
 
-    public virtual void Bump(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity hitby)
+    public virtual void Bump(AbstractEntity self, MainController.DataType entity_type, AbstractEntity hitby)
     {
-        //GD.Print("BUMPED"); // REPLACE ME!!!
+        GD.Print("BUMPED"); // REPLACE ME!!!
     }
 
-    public virtual void Dropped(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity user)
+    public virtual void Dropped(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity target)
     {
-        //GD.Print("DROPPED"); // REPLACE ME!!!
+        GD.Print("DROPPED"); // REPLACE ME!!!
     }
-    public virtual void ContainerMoved(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity user)
+    public virtual void ContainerMoved(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity target)
     {
-        //GD.Print("PLACEDINCONTAINER"); // REPLACE ME!!!
+        GD.Print("PLACEDINCONTAINER"); // REPLACE ME!!!
     }
 
     // visibility state of entity, only matters if on a turf and not inside anything.
