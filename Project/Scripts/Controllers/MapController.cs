@@ -590,7 +590,7 @@ public partial class MapController : DeligateController
                 int randx = TOOLS.RandI(width);
                 int randy = TOOLS.RandI(height);
                 int randz = TOOLS.RandI(depth);
-                AbstractTurf turf = GetTurfAtPosition(new GridPos(randx,randy,randz),true);
+                AbstractTurf turf = GetTurfAtPosition(new GridPos(randx,randy,randz),false);
                 turf.RandomTick();
                 turf.AtmosphericsCheck();
             }
