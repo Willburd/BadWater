@@ -159,6 +159,7 @@ namespace BehaviorEvents
                 mob.DropSlot(AbstractMob.InventorySlot.Rpocket);
                 mob.DropSlot(AbstractMob.InventorySlot.Back);
                 mob.DropSlot(AbstractMob.InventorySlot.ID);
+                mob.DropSlot(AbstractMob.InventorySlot.Belt);
             }
         }
 
