@@ -489,7 +489,7 @@ public partial class MapController : DeligateController
             if(check_turf != null)
             {
                 GridPos old_pos = check_turf.GridPos;
-                turfs[(int)old_pos.hor,(int)old_pos.ver,(int)old_pos.dep] = null;
+                Internal_SetTurf(old_pos, null, true);
             }
             // Move new turf
             turf.map_id_string = map_id;
@@ -501,7 +501,7 @@ public partial class MapController : DeligateController
         {
             // Very dangerous function... Lets keep this internal, and only accessed by safe public calls!
             turf.Move( turf.map_id_string, grid_pos, false);
-            turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = turf;
+            Internal_SetTurf(grid_pos, turf, true);
         }
 
         public void RemoveTurf(AbstractTurf turf, bool make_area_baseturf = true)
@@ -519,22 +519,42 @@ public partial class MapController : DeligateController
             else
             {
                 // Or void it
-                turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep].Kill();
-                turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = null;
+                Internal_GetTurf(grid_pos, true).Kill();
+                Internal_SetTurf(grid_pos, null, true);
             }
         }
 
         public AbstractTurf GetTurfAtPosition(GridPos grid_pos)
         {
-            if(!IsTurfValid( grid_pos)) return null;
-            return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
+            return Internal_GetTurf(grid_pos, true);
         }
 
         public AbstractArea GetAreaAtPosition(GridPos grid_pos)
         {
-            if(!IsTurfValid( grid_pos)) return null;
-            return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep].Area;
+            return GetTurfAtPosition(grid_pos)?.Area;
         }
+
+
+
+        // MAJOR TODO - handle submaps in maps,
+        // Use a list of submaps injected into a map
+        // Compare their rectangle to the current XY lookup
+        // Return their tiles instead if on submaps mode!
+
+        private AbstractTurf Internal_GetTurf(GridPos grid_pos, bool submaps)
+        {
+            if(!IsTurfValid(grid_pos)) return null; // handle submap's internal X and Y too... eventually
+            return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
+        }
+
+        private void Internal_SetTurf(GridPos grid_pos, AbstractTurf set, bool submaps)
+        {
+            turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = set;
+        }
+
+        // END major TODO!
+
+
         
         public void RandomTurfUpdate()
         {
@@ -548,7 +568,7 @@ public partial class MapController : DeligateController
                 int randx = TOOLS.RandI(width);
                 int randy = TOOLS.RandI(height);
                 int randz = TOOLS.RandI(depth);
-                AbstractTurf turf = turfs[randx,randy,randz];
+                AbstractTurf turf = GetTurfAtPosition(new GridPos(randx,randy,randz));
                 turf.RandomTick();
                 turf.AtmosphericsCheck();
             }
