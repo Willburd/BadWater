@@ -68,6 +68,8 @@ public partial class NetworkClient : Node
     public void RequestCredentials()
     {
         GD.Print("Request credentials");
+        login_name = "";
+        login_hash = "";
         Rpc(nameof(RespondCredentials));
     }
 
@@ -97,6 +99,7 @@ public partial class NetworkClient : Node
 
     public void Init()
     {
+        GD.Print("Client init " + Name);
         // Check if valid, we can't login if this account is already online!
         if(!AccountController.CanJoin( login_name, login_hash)) 
         {
@@ -112,6 +115,8 @@ public partial class NetworkClient : Node
             return;
         }
         // Assign tracking mob from account
+        GD.Print("Successful account login " + login_name);
+        has_logged_in = true;
         AbstractEntity foc = AccountController.GetClientEntity(this);
         if(foc == null) 
         {
@@ -128,7 +133,6 @@ public partial class NetworkClient : Node
         }
         // Client joins chunk controller
         ChunkController.NewClient(this);
-        has_logged_in = true;
     }
 
     public void Spawn()
@@ -182,7 +186,16 @@ public partial class NetworkClient : Node
     public void Tick()
     {
         if(TOOLS.PeerConnecting(this)) return;
-        if(!has_logged_in) return;
+        if(!has_logged_in) 
+        {
+            // Attempt login!
+            if(login_name == null) // set in RequestCreds to "" then gets data from actual client!
+            {
+                // Request client info
+                RequestCredentials(); 
+            }
+            return;
+        }
 
         // Process client inputs
         UpdateClientControl();

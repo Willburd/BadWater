@@ -44,6 +44,7 @@ public partial class ChunkController : DeligateController
         for(int i = 0; i <client_list.Count; i++) 
 		{
 			NetworkClient client = client_list[i];
+            if(!client.has_logged_in) continue; // Skip!
             if(!MapController.IsMapLoaded(client.focused_map_id))
             {
                 GD.PrintErr("CLIENT " + client.Name + " ON UNLOADED MAP " + client.focused_map_id);
