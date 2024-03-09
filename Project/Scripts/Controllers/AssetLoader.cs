@@ -26,6 +26,7 @@ public partial class AssetLoader : Node
     public static Dictionary<string,AssetLoader.LoadedTexture> loaded_textures = new Dictionary<string,AssetLoader.LoadedTexture>();
     public static ShaderMaterial[] material_cache;
     public static Dictionary<string,List<string>> loaded_sounds = new Dictionary<string,List<string>>();
+    public static Dictionary<string,PackedScene> loaded_models = new Dictionary<string,PackedScene>();
     public static Dictionary<string,MapData> loaded_maps = new Dictionary<string,MapData>();
     public static Dictionary<string,AreaData> loaded_areas = new Dictionary<string,AreaData>();
     public static Dictionary<string,TurfData> loaded_turfs = new Dictionary<string,TurfData>();
@@ -34,13 +35,13 @@ public partial class AssetLoader : Node
     public static Dictionary<string,PackData> loaded_structures = new Dictionary<string,PackData>();
     public static Dictionary<string,PackData> loaded_machines = new Dictionary<string,PackData>();
     public static Dictionary<string,PackData> loaded_mobs = new Dictionary<string,PackData>();
-
     public static Dictionary<string,PackData> all_packs = new Dictionary<string,PackData>();
 
     public void Load()
     {
         GD.Print("LOADING ASSETS");
         string sound_path = "res://Library/Sounds";
+        string model_path = "res://Library/Models";
         string texture_path = "res://Library/Textures";
         string map_path = "res://Library/Maps";
         string area_path = "res://Library/Areas";
@@ -88,6 +89,44 @@ public partial class AssetLoader : Node
             }
         }
         scan_dirs.Clear();
+
+
+
+        GD.Print("-MODELS");
+        scan_dirs = new Stack<string>();
+        scan_dirs.Push(model_path);
+        while(scan_dirs.Count > 0)
+        {
+            string scanName = scan_dirs.Pop();
+            dir = DirAccess.Open(scanName);
+            if (dir != null)
+            {
+                // Add directory for random sound selection
+                dir.ListDirBegin();
+                string fileName = dir.GetNext();
+                while (fileName != "")
+                {
+                    if(!dir.CurrentIsDir())
+                    {
+                        if(fileName.EndsWith("tscn"))
+                        {   
+                            string path = dir.GetCurrentDir() + "/" + fileName;
+                            GD.Print("--MODEL: " + path);
+                            loaded_models.Add(path, (PackedScene)GD.Load(path));
+                        }
+                    }
+                    
+                    else
+                    {
+                        scan_dirs.Push(dir.GetCurrentDir() + "/" + fileName);
+                    }
+                    fileName = dir.GetNext();
+                }
+            }
+        }
+        scan_dirs.Clear();
+
+
 
         GD.Print("-TEXTURES");
         scan_dirs = new Stack<string>();

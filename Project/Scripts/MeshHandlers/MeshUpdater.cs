@@ -17,7 +17,7 @@ public partial class MeshUpdater : MeshInstance3D
     public static MeshUpdater GetModelScene(Godot.Collections.Dictionary turf_data)
     {
         string path = "res://Library/Models/" + turf_data["model"].AsString();
-        return (MeshUpdater)((PackedScene)GD.Load(path)).Instantiate();
+        return (MeshUpdater)AssetLoader.loaded_models[path].Instantiate();
     }
     
     public void TextureUpdated(Godot.Collections.Dictionary turf_data)
