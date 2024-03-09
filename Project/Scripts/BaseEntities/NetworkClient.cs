@@ -223,6 +223,7 @@ public partial class NetworkClient : Node
 
     public override void _Process(double delta)
     {
+        if(!TOOLS.PeerConnected(this)) return;
         if(!IsMultiplayerAuthority()) return;
         // Get client inputs!
         Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
