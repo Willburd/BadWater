@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://darn5dx2bt2p4"]
+[gd_scene load_steps=3 format=3 uid="uid://darn5dx2bt2p4"]
 
 [ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkChunk.cs" id="1_fkcyw"]
-[ext_resource type="Script" path="res://Scripts/MeshHandlers/TurfMeshUpdater.cs" id="2_prwqa"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:map_id_string")
@@ -11,141 +10,9 @@ properties/1/path = NodePath(".:position")
 properties/1/spawn = true
 properties/1/replication_mode = 2
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_vyood"]
-size = Vector2(1, 1)
-center_offset = Vector3(0.5, 0, 0.5)
-
-[node name="NetworkChunk" type="Node3D" node_paths=PackedStringArray("mesh_updater")]
+[node name="NetworkChunk" type="Node3D"]
 script = ExtResource("1_fkcyw")
-mesh_updater = NodePath("Meshes")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25
 replication_config = SubResource("SceneReplicationConfig_bnqg0")
-
-[node name="Meshes" type="Node3D" parent="."]
-script = ExtResource("2_prwqa")
-
-[node name="A1" type="MeshInstance3D" parent="Meshes"]
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="A2" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="A3" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="A4" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="A5" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="B1" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="B2" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="B3" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="B4" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="B5" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="C1" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="C2" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 2)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="C3" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="C4" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="C5" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="D1" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="D2" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 3)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="D3" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="D4" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="D5" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 3)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="E1" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="E2" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 4)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="E3" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 4)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="E4" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 4)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")
-
-[node name="E5" type="MeshInstance3D" parent="Meshes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
-mesh = SubResource("PlaneMesh_vyood")
-skeleton = NodePath("../..")

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bnitdqigev7yh"]
 
-[ext_resource type="Script" path="res://Scripts/Controllers/MainController.cs" id="1_son8j"]
+[ext_resource type="Script" path="res://Scripts/Controllers/MainController.cs" id="1_mycrp"]
 
 [node name="Server" type="Node"]
-script = ExtResource("1_son8j")
+script = ExtResource("1_mycrp")

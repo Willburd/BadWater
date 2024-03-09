@@ -1,7 +1,4 @@
 using Godot;
-using System.Collections.Generic;
-using System;
-using System.ComponentModel;
 
 [GlobalClass]
 public partial class MeshUpdater : MeshInstance3D
@@ -12,10 +9,19 @@ public partial class MeshUpdater : MeshInstance3D
         return "res://Library/Textures/" + texture_path;
     }
 
-    public void MeshUpdated(string json)
+    public void TextureUpdated(string json)
     {
-        Godot.Collections.Dictionary turf_data = TOOLS.ParseJson(json);
-        string model = turf_data["model"].AsString();
+        TextureUpdated(TOOLS.ParseJson(json));
+    }
+
+    public static MeshUpdater GetModelScene(Godot.Collections.Dictionary turf_data)
+    {
+        string path = "res://Library/Models/" + turf_data["model"].AsString();
+        return (MeshUpdater)((PackedScene)GD.Load(path)).Instantiate();
+    }
+    
+    public void TextureUpdated(Godot.Collections.Dictionary turf_data)
+    {
         string texture = GetPath(turf_data["texture"].AsString());
         double anim_speed = turf_data["anim_speed"].AsDouble();
         // Assign model,tex, and animation speed to the entity!

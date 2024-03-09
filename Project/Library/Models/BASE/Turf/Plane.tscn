@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://x1uieshxpknx"]
+
+[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_pq2v7"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1rs77"]
+size = Vector2(1, 1)
+center_offset = Vector3(0.5, 0, 0.5)
+
+[node name="Plane" type="MeshInstance3D"]
+mesh = SubResource("PlaneMesh_1rs77")
+script = ExtResource("1_pq2v7")

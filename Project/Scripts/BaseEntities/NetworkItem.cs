@@ -25,7 +25,7 @@ public partial class NetworkItem : NetworkEntity
     private void ClientMeshUpdate(Vector3 pos, string mesh_json)
     {
         Position = pos;
-        mesh_updater.MeshUpdated(mesh_json);
+        mesh_updater.TextureUpdated(mesh_json);
     }
     
     public override void _EnterTree()

@@ -9,8 +9,7 @@ public partial class NetworkChunk : NetworkEntity
 {
     public int timer = 0;
     public bool do_not_unload = false;
-    [Export]
-    public TurfMeshUpdater mesh_updater;
+    private MeshUpdater[] mesh_array = new MeshUpdater[ChunkController.chunk_size * ChunkController.chunk_size];
 
     private bool mesh_dirty;
     
@@ -74,7 +73,21 @@ public partial class NetworkChunk : NetworkEntity
     private void ClientMeshUpdate(Vector3 pos, string mesh_json)
     {
         Position = pos;
-        mesh_updater.MeshUpdated(mesh_json);
+        Godot.Collections.Dictionary chunk_data = TOOLS.ParseJson(mesh_json);
+        for(int i = 0; i < mesh_array.Length; i++) 
+        {
+            Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)chunk_data["turf_" + i];
+            // Get new model
+            if(mesh_array[i] != null) mesh_array[i].QueueFree();
+            mesh_array[i] = MeshUpdater.GetModelScene(turf_data);
+            // Init model textures
+            if(mesh_array[i] == null) GD.Print("No model for " + turf_data["model"]);
+            mesh_array[i].Position = new Vector3(Mathf.Floor(i % ChunkController.chunk_size) * MapController.tile_size,0,Mathf.Floor(i / ChunkController.chunk_size) * MapController.tile_size);
+            mesh_array[i].TextureUpdated(turf_data);
+            // APPEAR!
+            AddChild(mesh_array[i]);
+            mesh_array[i].Visible = true;
+        }
     }
 
     public bool Unload()

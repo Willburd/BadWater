@@ -68,7 +68,7 @@ public partial class AbstractEntity
         return data;
     }
     public string tag = "";
-    public string model = "Plane";
+    public string model = "BASE/Turf/Plane.tscn";
     public string texture = "";
     public double anim_speed = 0;
     public bool density = false;              // blocks movement
