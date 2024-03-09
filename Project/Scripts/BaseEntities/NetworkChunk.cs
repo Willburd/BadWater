@@ -41,7 +41,7 @@ public partial class NetworkChunk : NetworkEntity
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
                 Godot.Collections.Dictionary turf_data;
-                AbstractTurf turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(hor,ver,pos.dep));
+                AbstractTurf turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(hor,ver,pos.dep),true);
                 if(turf == null) 
                 {
                     turf_data = new Godot.Collections.Dictionary 

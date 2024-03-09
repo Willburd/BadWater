@@ -93,13 +93,13 @@ namespace BehaviorEvents
                 }
                 // math for feet speed
                 footstep_timer += Mathf.Lerp(0.05f,0.08f, Mathf.Clamp(speed,0,1.5f));
-                AbstractEntity newloc = owner.Move(owner.map_id_string, new_pos);
+                AbstractEntity newloc = owner.Move(owner.map_id_string,new_pos,true);
                 if(footstep_timer > 1)
                 {
                     footstep_timer = 0;
                     if(newloc is AbstractTurf)
                     {
-                        (newloc as AbstractTurf).PlayStepSound();
+                        (newloc as AbstractTurf).PlayStepSound(walking);
                     }
                 }
             }
