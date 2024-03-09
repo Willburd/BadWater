@@ -136,11 +136,11 @@ public partial class Behavior
         GD.Print("BUMPED"); // REPLACE ME!!!
     }
 
-    public virtual void Dropped(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity target)
+    public virtual void Dropped(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity new_location)
     {
         GD.Print("DROPPED"); // REPLACE ME!!!
     }
-    public virtual void ContainerMoved(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity target)
+    public virtual void ContainerMoved(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity new_location)
     {
         GD.Print("PLACEDINCONTAINER"); // REPLACE ME!!!
     }
