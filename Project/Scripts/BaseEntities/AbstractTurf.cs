@@ -52,8 +52,8 @@ public partial class AbstractTurf : AbstractEntity
         set {area = value;} // SET USING Area.AddTurf() DO NOT SET DIRECTLY
     }
 
-    public void PlayStepSound(bool quiet)
+    public void PlayStepSound()
     {
-        AudioController.PlayAt(step_sound, map_id_string ,grid_pos.WorldPos() + new Vector3(MapController.tile_size/2,0,MapController.tile_size/2), AudioController.screen_range,quiet ? -5 : 0);
+        AudioController.PlayAt(step_sound, map_id_string ,grid_pos.WorldPos() + new Vector3(MapController.tile_size/2,0,MapController.tile_size/2), AudioController.screen_range);
     }
 }

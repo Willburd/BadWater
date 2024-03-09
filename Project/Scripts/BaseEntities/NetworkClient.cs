@@ -299,28 +299,26 @@ public partial class NetworkClient : Node
 
 
 
-    public void PlaySoundAt(string path, Vector3 pos, float range, float volume_mod)
+    public void PlaySoundAt(string path, Vector3 pos, float range)
     {
         if(!has_logged_in) return;
-        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientPlayAudio),path, pos, range, volume_mod);
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientPlayAudio),path, pos, range);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
-    public void ClientPlayAudio(string path, Vector3 pos, float range, float volume_mod)
+    public void ClientPlayAudio(string path, Vector3 pos, float range)
     {
         SoundPlayer newsound = GD.Load<PackedScene>("res://Scenes/SoundPlayer.tscn").Instantiate() as SoundPlayer;
         if(range <= -1)
         {
             newsound.player_global = new AudioStreamPlayer();
-            newsound.player_global.VolumeDb = volume_mod;
             newsound.AddChild(newsound.player_global);
         }
         else
         {
             newsound.player_pos = new AudioStreamPlayer3D();
-            newsound.player_pos.UnitSize = range * 0.60f; // Gestimate for byond like sound range
-            newsound.player_pos.VolumeDb = volume_mod;
             newsound.AddChild(newsound.player_pos);
+            newsound.player_pos.UnitSize = range * 0.60f; // Gestimate for byond like sound range
         }
         newsound.path = path;
         newsound.Position = pos;

@@ -262,41 +262,41 @@ public partial class MapController : DeligateController
     {
         return active_maps[mapID].IsTurfValid(chunk_pos);
     }
-    public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, AbstractArea area, bool submaps, bool replace = true)
+    public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, AbstractArea area, bool replace = true)
     {
-        return active_maps[mapID].AddTurf(turfID, grid_pos, area, submaps, replace);
+        return active_maps[mapID].AddTurf(turfID, grid_pos, area, replace);
     }
-    public static void RemoveTurf(AbstractTurf turf, string mapID, bool submaps, bool make_area_baseturf)
+    public static void RemoveTurf(AbstractTurf turf, string mapID, bool make_area_baseturf = true)
     {
-        active_maps[mapID].RemoveTurf(turf, make_area_baseturf, submaps);
+        active_maps[mapID].RemoveTurf(turf, make_area_baseturf);
     }
-    public static void SwapTurfs(AbstractTurf old_turf, AbstractTurf new_turf, bool submaps)
+    public static void SwapTurfs(AbstractTurf old_turf, AbstractTurf new_turf)
     {
         string old_map = old_turf.map_id_string;
         GridPos old_pos = old_turf.GridPos;
-        AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.GridPos,submaps);
-        active_maps[old_map].SwapTurf(buffer,old_pos,submaps);
+        AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.GridPos);
+        active_maps[old_map].SwapTurf(buffer,old_pos);
     }
-    public static AbstractTurf GetTurfAtPosition(string mapID, GridPos grid_pos, bool submaps)
+    public static AbstractTurf GetTurfAtPosition(string mapID, GridPos grid_pos)
     {
-        return active_maps[mapID].GetTurfAtPosition(grid_pos,submaps);
+        return active_maps[mapID].GetTurfAtPosition(grid_pos);
     }
 
     
     /*****************************************************************
      * AREA MANAGEMENT
      ****************************************************************/
-    public static AbstractArea GetAreaAtPosition(string mapID, GridPos grid_pos, bool submaps)
+    public static AbstractArea GetAreaAtPosition(string mapID, GridPos grid_pos)
     {
-        return active_maps[mapID].GetAreaAtPosition(grid_pos,submaps);
+        return active_maps[mapID].GetAreaAtPosition(grid_pos);
     }
-    public static AbstractTurf GetTurfAtPosition(string mapID, Vector3 pos, bool submaps)
+    public static AbstractTurf GetTurfAtPosition(string mapID, Vector3 pos)
     {
-        return active_maps[mapID].GetTurfAtPosition(new GridPos(pos),submaps);
+        return active_maps[mapID].GetTurfAtPosition(new GridPos(pos));
     }
-    public static AbstractArea GetAreaAtPosition(string mapID, Vector3 pos, bool submaps)
+    public static AbstractArea GetAreaAtPosition(string mapID, Vector3 pos)
     {
-        return active_maps[mapID].GetAreaAtPosition(new GridPos(pos),submaps);
+        return active_maps[mapID].GetAreaAtPosition(new GridPos(pos));
     }
 
 
@@ -464,27 +464,27 @@ public partial class MapController : DeligateController
             get {return depth;}
         } 
 
-        public AbstractTurf AddTurf(string turfID, GridPos grid_pos, AbstractArea area, bool submaps, bool replace = true)
+        public AbstractTurf AddTurf(string turfID, GridPos grid_pos, AbstractArea area, bool replace = true)
         {
             // Replace old turf
             if(replace)
             {
-                AbstractTurf check_turf = GetTurfAtPosition(grid_pos,submaps);
+                AbstractTurf check_turf = GetTurfAtPosition(grid_pos);
                 if(check_turf != null)
                 {
-                    RemoveTurf(check_turf, false, true);
+                    RemoveTurf(check_turf, false);
                 }
             }
             // Spawn new turf
             AbstractTurf turf = AbstractEntity.CreateEntity(map_id, turfID, MainController.DataType.Turf) as AbstractTurf;
-            SetTurfPosition(turf,grid_pos,submaps);
+            SetTurfPosition(turf,grid_pos);
             area.AddTurf(turf);
             return turf;
         }
-        public AbstractTurf SwapTurf(AbstractTurf turf, GridPos grid_pos, bool submaps) // returns the turf that SWAPPED with it!
+        public AbstractTurf SwapTurf(AbstractTurf turf, GridPos grid_pos) // returns the turf that SWAPPED with it!
         {
             // Replace old turf
-            AbstractTurf check_turf = GetTurfAtPosition(grid_pos,submaps);
+            AbstractTurf check_turf = GetTurfAtPosition(grid_pos);
             // Clear old data
             if(check_turf != null)
             {
@@ -493,18 +493,18 @@ public partial class MapController : DeligateController
             }
             // Move new turf
             turf.map_id_string = map_id;
-            SetTurfPosition(turf,grid_pos,submaps);
+            SetTurfPosition(turf,grid_pos);
             return check_turf;
         }
 
-        private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos, bool submaps)
+        private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos)
         {
             // Very dangerous function... Lets keep this internal, and only accessed by safe public calls!
-            turf.Move( turf.map_id_string, grid_pos, submaps, false);
-            InternalSetTurf(grid_pos, submaps, turf);
+            turf.Move( turf.map_id_string, grid_pos, false);
+            turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = turf;
         }
 
-        public void RemoveTurf(AbstractTurf turf, bool submaps, bool make_area_baseturf)
+        public void RemoveTurf(AbstractTurf turf, bool make_area_baseturf = true)
         {
             // Remove from areas
             AbstractArea get_area = turf.Area;
@@ -514,53 +514,26 @@ public partial class MapController : DeligateController
             if(make_area_baseturf)
             {
                 // Spawn a new turf in the same spot to replace it...
-                AddTurf(get_area.base_turf_ID, grid_pos,get_area, submaps,false);
+                AddTurf(get_area.base_turf_ID, grid_pos,get_area,false);
             }
             else
             {
                 // Or void it
-                InternalGetTurf(grid_pos, submaps).Kill();
-                InternalSetTurf(grid_pos, submaps, null);
+                turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep].Kill();
+                turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = null;
             }
         }
 
-        public AbstractTurf GetTurfAtPosition(GridPos grid_pos, bool submaps)
+        public AbstractTurf GetTurfAtPosition(GridPos grid_pos)
         {
             if(!IsTurfValid( grid_pos)) return null;
-            return InternalGetTurf(grid_pos, submaps);
-        }
-
-        private AbstractTurf InternalGetTurf(GridPos grid_pos, bool submaps)
-        {
-            // TODO - read from list of shuttles/maps currently subloaded into this map
-            // Compared their rectangle to our position, and if we are in it.
-            // Get THAT turf instead of this one! This is how we inject submaps
-            // Things under shuttles remain under them for example... Do this to get area too!
-            if(submaps)
-            {
-
-            }
             return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
         }
 
-        private void InternalSetTurf(GridPos grid_pos, bool submaps, AbstractTurf new_turf)
+        public AbstractArea GetAreaAtPosition(GridPos grid_pos)
         {
-            // TODO - read from list of shuttles/maps currently subloaded into this map
-            // Compared their rectangle to our position, and if we are in it.
-            // Get THAT turf instead of this one! This is how we inject submaps
-            // Things under shuttles remain under them for example... Do this to get area too!
-            if(submaps)
-            {
-
-            }
-            turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = new_turf;
-        }
-
-
-
-        public AbstractArea GetAreaAtPosition(GridPos grid_pos, bool submaps)
-        {
-            return GetTurfAtPosition(grid_pos,submaps)?.Area;
+            if(!IsTurfValid( grid_pos)) return null;
+            return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep].Area;
         }
         
         public void RandomTurfUpdate()
@@ -784,7 +757,7 @@ public partial class MapController : DeligateController
 
         public AbstractTurf GetTurfAtPosition(int x, int y, int z)
         {
-            return output_map.GetTurfAtPosition(new GridPos(x,y,z), false);
+            return output_map.GetTurfAtPosition(new GridPos(x,y,z));
         }
     }
 
@@ -812,7 +785,7 @@ public partial class MapController : DeligateController
 
         public AbstractTurf GetTurfAtPosition(int x, int y, int z)
         {
-            return output_map.GetTurfAtPosition(new GridPos(x,y,z),false);
+            return output_map.GetTurfAtPosition(new GridPos(x,y,z));
         }
     }
 
