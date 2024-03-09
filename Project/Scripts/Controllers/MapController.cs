@@ -472,7 +472,7 @@ public partial class MapController : DeligateController
                 AbstractTurf check_turf = GetTurfAtPosition(grid_pos,true);
                 if(check_turf != null)
                 {
-                    RemoveTurf(check_turf, submaps, false);
+                    RemoveTurf(check_turf, false, submaps);
                 }
             }
             // Spawn new turf
