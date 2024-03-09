@@ -97,7 +97,7 @@ public partial class ChunkController : DeligateController
             {
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
-                AbstractTurf turf = MapController.GetTurfAtPosition(chunk.map_id_string,new MapController.GridPos(hor,ver,pos.dep));
+                AbstractTurf turf = MapController.GetTurfAtPosition(chunk.map_id_string,new MapController.GridPos(hor,ver,pos.dep),true);
                 turf.UpdateIcon();  // Build mesh!
                 foreach(AbstractEntity ent in turf.Contents)
                 {
@@ -120,7 +120,7 @@ public partial class ChunkController : DeligateController
             {
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
-                AbstractTurf turf = MapController.GetTurfAtPosition(chunk.map_id_string,new MapController.GridPos(hor,ver,pos.dep));
+                AbstractTurf turf = MapController.GetTurfAtPosition(chunk.map_id_string,new MapController.GridPos(hor,ver,pos.dep),true);
                 foreach(AbstractEntity ent in turf.Contents)
                 {
                     ent.UnloadNetworkEntity();

@@ -280,7 +280,7 @@ public partial class AbstractEntity
     public string map_id_string;
     public AbstractTurf GetTurf()
     {
-        return MapController.GetTurfAtPosition(map_id_string,grid_pos);
+        return MapController.GetTurfAtPosition(map_id_string,grid_pos,true);
     }
     public AbstractEntity GetLocation()
     {
@@ -356,7 +356,7 @@ public partial class AbstractEntity
             {
                 // Check to see on each axis if we bump... This allows sliding!
                 bool bump_h = false;
-                AbstractTurf hor_turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(new_grid.hor,grid_pos.ver,grid_pos.dep));
+                AbstractTurf hor_turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(new_grid.hor,grid_pos.ver,grid_pos.dep),true);
                 if(hor_turf != null && hor_turf != GetTurf() && hor_turf.density)
                 {
                     bump_h = true;
@@ -370,7 +370,7 @@ public partial class AbstractEntity
                     }
                 }
                 bool bump_v = false;
-                AbstractTurf ver_turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(grid_pos.hor,new_grid.ver,grid_pos.dep));
+                AbstractTurf ver_turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(grid_pos.hor,new_grid.ver,grid_pos.dep),true);
                 if(ver_turf != null && ver_turf != GetTurf() && ver_turf.density)
                 {
                     bump_v = true;
@@ -384,7 +384,7 @@ public partial class AbstractEntity
                     }
                 }
                 // Bump solids!
-                AbstractTurf corner_turf = MapController.GetTurfAtPosition(map_id_string,new_grid);
+                AbstractTurf corner_turf = MapController.GetTurfAtPosition(map_id_string,new_grid,true);
                 if(corner_turf != null && corner_turf.density)
                 {
                     // Corner bonking is silly... Needs a unique case when you run into a corner exactly head on!
@@ -454,7 +454,7 @@ public partial class AbstractEntity
         map_id_string = new_mapID;
         grid_pos = new_grid;
         // Enter new location!
-        AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos);
+        AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos,true);
         new_turf?.EntityEntered(this,perform_turf_actions);
         SyncNetwork(false);
         return location;
