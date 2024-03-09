@@ -99,7 +99,7 @@ namespace BehaviorEvents
                     footstep_timer = 0;
                     if(newloc is AbstractTurf)
                     {
-                        (newloc as AbstractTurf).PlayStepSound();
+                        (newloc as AbstractTurf).PlayStepSound(walking);
                     }
                 }
             }

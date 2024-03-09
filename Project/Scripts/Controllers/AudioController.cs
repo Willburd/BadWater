@@ -34,7 +34,7 @@ public partial class AudioController : DeligateController
     }
 
 
-    public static void PlayAt(string soundpack_id, string map_id, Vector3 pos, float range)
+    public static void PlayAt(string soundpack_id, string map_id, Vector3 pos, float range, float volume_mod)
     {
         if(soundpack_id == "") return;
         string soundpack = "res://Library/Sounds/" + soundpack_id;
@@ -49,7 +49,8 @@ public partial class AudioController : DeligateController
                 NetworkClient client = (NetworkClient)MainController.controller.client_container.GetChild(i);
                 if(client.focused_map_id == map_id && TOOLS.VecDist(pos, client.focused_position) < range)
                 {
-                    client.PlaySoundAt(soundpack + "/" + path,pos,range);
+                    float zlevel_dist = Mathf.Abs(pos.Z - client.focused_position.Z) * -5; // -5 per Z level!
+                    client.PlaySoundAt(soundpack + "/" + path,pos,range,volume_mod + zlevel_dist);
                 }
             }
         }
