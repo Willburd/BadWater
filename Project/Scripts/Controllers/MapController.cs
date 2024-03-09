@@ -426,8 +426,9 @@ public partial class MapController : DeligateController
         private int height;
         private int depth;
 
-        public float draw_offset_hor = 0;
-        public float draw_offset_vert = 0;
+        // XY location map is at, when submapped into another map!
+        private List<string> loaded_submaps = new List<string>();
+        public GridPos submap_pos = new GridPos(0,0,0);
 
         private List<NetworkChunk> loaded_chunks = new List<NetworkChunk>();
         private NetworkChunk[,,] chunk_grid;
@@ -477,7 +478,7 @@ public partial class MapController : DeligateController
             }
             // Spawn new turf
             AbstractTurf turf = AbstractEntity.CreateEntity(map_id, turfID, MainController.DataType.Turf) as AbstractTurf;
-            SetTurfPosition(turf,grid_pos);
+            SetTurfPosition(turf,grid_pos,submaps);
             area.AddTurf(turf);
             return turf;
         }
@@ -493,15 +494,15 @@ public partial class MapController : DeligateController
             }
             // Move new turf
             turf.map_id_string = map_id;
-            SetTurfPosition(turf,grid_pos);
+            SetTurfPosition(turf,grid_pos,submaps);
             return check_turf;
         }
 
-        private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos)
+        private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos, bool submaps)
         {
             // Very dangerous function... Lets keep this internal, and only accessed by safe public calls!
             turf.Move( turf.map_id_string, grid_pos, false);
-            Internal_SetTurf(grid_pos, turf, true);
+            Internal_SetTurf(grid_pos, turf, submaps);
         }
 
         public void RemoveTurf(AbstractTurf turf, bool make_area_baseturf, bool submaps)
@@ -536,23 +537,44 @@ public partial class MapController : DeligateController
 
 
 
-        // MAJOR TODO - handle submaps in maps,
-        // Use a list of submaps injected into a map
-        // Compare their rectangle to the current XY lookup
-        // Return their tiles instead if on submaps mode!
-
         private AbstractTurf Internal_GetTurf(GridPos grid_pos, bool submaps)
         {
-            if(!IsTurfValid(grid_pos)) return null; // handle submap's internal X and Y too... eventually
+            if(!IsTurfValid(grid_pos)) return null;
+            if(submaps)
+            {
+                foreach(string map_id in loaded_submaps)
+                {
+                    MapContainer map = active_maps[map_id];
+                    if(grid_pos.hor >= map.submap_pos.hor && grid_pos.hor < map.submap_pos.hor + map.Width 
+                    && grid_pos.ver >= map.submap_pos.ver && grid_pos.ver < map.submap_pos.ver + map.Height
+                    && grid_pos.dep >= map.submap_pos.dep && grid_pos.dep < map.submap_pos.dep + map.Depth)
+                    {
+                        return map.Internal_GetTurf(new GridPos(grid_pos.hor-map.submap_pos.hor,grid_pos.ver-map.submap_pos.ver,grid_pos.dep-map.submap_pos.dep),true);
+                    }
+                }
+            }
             return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
         }
 
         private void Internal_SetTurf(GridPos grid_pos, AbstractTurf set, bool submaps)
         {
+            if(!IsTurfValid(grid_pos)) return;
+            if(submaps)
+            {
+                foreach(string map_id in loaded_submaps)
+                {
+                    MapContainer map = active_maps[map_id];
+                    if(grid_pos.hor >= map.submap_pos.hor && grid_pos.hor < map.submap_pos.hor + map.Width 
+                    && grid_pos.ver >= map.submap_pos.ver && grid_pos.ver < map.submap_pos.ver + map.Height
+                    && grid_pos.dep >= map.submap_pos.dep && grid_pos.dep < map.submap_pos.dep + map.Depth)
+                    {
+                        map.Internal_SetTurf(new GridPos(grid_pos.hor-map.submap_pos.hor,grid_pos.ver-map.submap_pos.ver,grid_pos.dep-map.submap_pos.dep),set,true);
+                        return;
+                    }
+                }
+            }
             turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = set;
         }
-
-        // END major TODO!
 
 
         
