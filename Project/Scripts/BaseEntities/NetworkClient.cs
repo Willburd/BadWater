@@ -25,6 +25,7 @@ public partial class NetworkClient : Node
     public Vector3 focused_position;
     private Vector3 sync_position;
     private float zoom_level = 1f;
+    private float view_rotation = 0f;
 
 
     private Godot.Collections.Dictionary client_input_data = new Godot.Collections.Dictionary();    // current inputs from client
@@ -247,8 +248,13 @@ public partial class NetworkClient : Node
         new_inputs["y"] = 0;
         if(!new_inputs["mod_control"].AsBool() || Input.IsActionJustPressed("game_left") || Input.IsActionJustPressed("game_right") || Input.IsActionJustPressed("game_up") || Input.IsActionJustPressed("game_down") )
         {
-            new_inputs["x"] = Input.GetAxis("game_left","game_right");
-            new_inputs["y"] = Input.GetAxis("game_up","game_down");
+            // perform camera transform 
+            Vector2 tf_vec = new Vector2(Input.GetAxis("game_left","game_right"),Input.GetAxis("game_up","game_down"));
+            tf_vec = tf_vec.Rotated(CamRotationVector2().Angle() - 1.5708f); // -90 degrees, but in radians
+            tf_vec.Normalized();
+            // assign actual values
+            new_inputs["x"] = tf_vec.X;
+            new_inputs["y"] = tf_vec.Y;
         }
         // Limit to only sending if we have useful input
         if(new_inputs["x"].AsDouble() != 0 
@@ -285,10 +291,22 @@ public partial class NetworkClient : Node
             camera.Current = true;
             listener.MakeCurrent();
         }
+        view_rotation += (float)delta;
         float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
-        camera.Position = camera.Position.MoveToward(focused_position + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0.3f), (float)delta * lerp_speed);
-        camera.LookAt(new Vector3(camera.Position.X,focused_position.Y,camera.Position.Z-(float)0.1));
+        camera.Position = camera.Position.MoveToward(focused_position + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0), (float)delta * lerp_speed);
+        camera.LookAt(focused_position + new Vector3(0,0.1f,0));
         listener.Position = focused_position + Vector3.Up;
+    }
+
+    public Vector3 CamRotationVector3()
+    {
+        Vector2 vec = CamRotationVector2();
+        return new Vector3(vec.X,0,vec.Y).Normalized();
+    }
+
+    public Vector2 CamRotationVector2()
+    {
+        return new Vector2(Mathf.Sin(view_rotation),Mathf.Cos(view_rotation)).Normalized();
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]

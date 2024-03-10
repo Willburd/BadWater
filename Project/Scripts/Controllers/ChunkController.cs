@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public partial class ChunkController : DeligateController
 {
-    public static int chunk_load_range = 3;
+    public static int chunk_load_range = 5;
 
     public static int chunk_size = 5; // Size in turfs that chunks are
 
@@ -52,7 +52,7 @@ public partial class ChunkController : DeligateController
             }
 
             // hor/ver distance
-            float loadborder_w = chunk_load_range + 1;
+            float loadborder_w = chunk_load_range;
             float loadborder_h = chunk_load_range;
             for(int u = 0; u < loadborder_w * 2; u++) 
             {
