@@ -24,8 +24,20 @@ public partial class NetworkEffect : NetworkEntity
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = debug_visual, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
     private void ClientMeshUpdate(Vector3 pos, string mesh_json)
     {
-        Position = pos;
+        Godot.Collections.Dictionary turf_data = TOOLS.ParseJson(mesh_json);
+        // Get new model
+        if(mesh_updater != null) mesh_updater.QueueFree();
+        mesh_updater = MeshUpdater.GetModelScene(turf_data);
+        // Init model textures
+        if(mesh_updater == null) 
+        {
+            GD.Print("No model for " + turf_data["model"]);
+            return;
+        }
         mesh_updater.TextureUpdated(mesh_json);
+        // APPEAR!
+        AddChild(mesh_updater);
+        mesh_updater.Visible = true;
     }
 
     public override void _EnterTree()

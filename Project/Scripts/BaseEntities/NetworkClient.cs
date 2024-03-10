@@ -33,6 +33,8 @@ public partial class NetworkClient : Node
 
     [Export]
     public Camera3D camera;
+    [Export]
+    public AudioListener3D listener;
 
     public override void _EnterTree()
     {
@@ -138,6 +140,7 @@ public partial class NetworkClient : Node
     public void Spawn()
     {
         camera.Current = false;
+        listener.ClearCurrent();
         // Check for a spawner!
         if(MapController.spawners.ContainsKey("PLAYER"))
         {
@@ -277,10 +280,15 @@ public partial class NetworkClient : Node
     {
         if(!IsMultiplayerAuthority()) return;
         // Client only camera update
-        camera.Current = true;
+        if(camera.Current == false)
+        {
+            camera.Current = true;
+            listener.MakeCurrent();
+        }
         float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
         camera.Position = camera.Position.MoveToward(focused_position + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0.3f), (float)delta * lerp_speed);
         camera.LookAt(new Vector3(camera.Position.X,focused_position.Y,camera.Position.Z-(float)0.1));
+        listener.Position = focused_position + Vector3.Up;
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]

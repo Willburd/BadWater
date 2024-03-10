@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://b2612o53aeerg"]
+[gd_scene load_steps=3 format=3 uid="uid://b2612o53aeerg"]
 
 [ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkItem.cs" id="1_k3d4w"]
-[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="2_xbav3"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:rotation")
@@ -20,17 +19,10 @@ properties/4/path = NodePath(".:position")
 properties/4/spawn = true
 properties/4/replication_mode = 2
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_brx83"]
-
 [node name="NetworkItem" type="Node3D" node_paths=PackedStringArray("mesh_updater")]
 script = ExtResource("1_k3d4w")
-mesh_updater = NodePath("Mesh")
+mesh_updater = NodePath("")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25
 replication_config = SubResource("SceneReplicationConfig_bnqg0")
-
-[node name="Mesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.01, 0)
-mesh = SubResource("PlaneMesh_brx83")
-script = ExtResource("2_xbav3")

@@ -115,7 +115,6 @@ public partial class AssetLoader : Node
                             loaded_models.Add(path, (PackedScene)GD.Load(path));
                         }
                     }
-                    
                     else
                     {
                         scan_dirs.Push(dir.GetCurrentDir() + "/" + fileName);

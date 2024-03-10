@@ -10,9 +10,10 @@ properties/1/path = NodePath(".:focused_position")
 properties/1/spawn = true
 properties/1/replication_mode = 1
 
-[node name="NetworkClient" type="Node" node_paths=PackedStringArray("camera")]
+[node name="NetworkClient" type="Node" node_paths=PackedStringArray("camera", "listener")]
 script = ExtResource("1_3ymcw")
 camera = NodePath("ClientCamera")
+listener = NodePath("AudioListener3D")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.12
@@ -20,3 +21,7 @@ replication_config = SubResource("SceneReplicationConfig_ulbxs")
 
 [node name="ClientCamera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+
+[node name="AudioListener3D" type="AudioListener3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+current = true

@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://cdxb8tqj1pks"]
+[gd_scene load_steps=3 format=3 uid="uid://cdxb8tqj1pks"]
 
 [ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkEffect.cs" id="1_xwij3"]
-[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="2_eiwan"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:rotation")
@@ -20,17 +19,10 @@ properties/4/path = NodePath(".:velocity")
 properties/4/spawn = true
 properties/4/replication_mode = 2
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_67i0o"]
-
 [node name="NetworkEffect" type="Node3D" node_paths=PackedStringArray("mesh_updater")]
 script = ExtResource("1_xwij3")
-mesh_updater = NodePath("Mesh")
+mesh_updater = NodePath("")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25
 replication_config = SubResource("SceneReplicationConfig_bnqg0")
-
-[node name="Mesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.01, 0)
-mesh = SubResource("PlaneMesh_67i0o")
-script = ExtResource("2_eiwan")
