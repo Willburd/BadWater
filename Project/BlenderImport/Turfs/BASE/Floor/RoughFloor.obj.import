@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cn0jgac6inih2"
+path="res://.godot/imported/RoughFloor.obj-0688424a5a9d6a80617b01ab03d95273.mesh"
+
+[deps]
+
+files=["res://.godot/imported/RoughFloor.obj-0688424a5a9d6a80617b01ab03d95273.mesh"]
+
+source_file="res://BlenderImport/Turfs/BASE/Floor/RoughFloor.obj"
+dest_files=["res://.godot/imported/RoughFloor.obj-0688424a5a9d6a80617b01ab03d95273.mesh", "res://.godot/imported/RoughFloor.obj-0688424a5a9d6a80617b01ab03d95273.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

@@ -32,3 +32,7 @@ replication_config = SubResource("SceneReplicationConfig_bnqg0")
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.31609, 0)
 mesh = SubResource("BoxMesh_rp15w")
 surface_material_override/0 = SubResource("StandardMaterial3D_kntja")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.661174, 0)
+shadow_enabled = true

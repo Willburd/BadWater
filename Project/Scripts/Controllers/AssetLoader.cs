@@ -108,9 +108,9 @@ public partial class AssetLoader : Node
                 {
                     if(!dir.CurrentIsDir())
                     {
-                        if(fileName.EndsWith("tscn"))
+                        if(fileName.EndsWith("tscn") || fileName.EndsWith("tscn.remap"))
                         {   
-                            string path = dir.GetCurrentDir() + "/" + fileName;
+                            string path = dir.GetCurrentDir() + "/" + fileName.Replace("tscn.remap", "tscn");
                             GD.Print("--MODEL: " + path);
                             loaded_models.Add(path, (PackedScene)GD.Load(path));
                         }

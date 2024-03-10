@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bwxjqtjo6f6ce"]
+
+[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_i6dtl"]
+[ext_resource type="ArrayMesh" uid="uid://cn0jgac6inih2" path="res://BlenderImport/Turfs/BASE/Floor/RoughFloor.obj" id="1_qq3ix"]
+
+[node name="Rough" type="MeshInstance3D"]
+cast_shadow = 2
+mesh = ExtResource("1_qq3ix")
+script = ExtResource("1_i6dtl")

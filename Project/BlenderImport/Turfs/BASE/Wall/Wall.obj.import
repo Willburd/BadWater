@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://hpev8gul7k3x"
+path="res://.godot/imported/Wall.obj-9e134d02f4f3e80dd647480d1366479e.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Wall.obj-9e134d02f4f3e80dd647480d1366479e.mesh"]
+
+source_file="res://BlenderImport/Turfs/BASE/Wall/Wall.obj"
+dest_files=["res://.godot/imported/Wall.obj-9e134d02f4f3e80dd647480d1366479e.mesh", "res://.godot/imported/Wall.obj-9e134d02f4f3e80dd647480d1366479e.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

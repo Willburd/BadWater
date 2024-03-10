@@ -260,6 +260,17 @@ public partial class NetworkClient : Node
         {
             Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
         }
+        // Unzoom and zoom
+        if(Input.IsActionJustPressed("game_zoom"))
+        {
+            zoom_level -= 0.05f;
+            if(zoom_level < 0) zoom_level = 0f;
+        }
+        else if(Input.IsActionJustPressed("game_unzoom"))
+        {
+            zoom_level += 0.05f;
+            if(zoom_level > 1) zoom_level = 1f;
+        }
     }
 
     public override void _PhysicsProcess(double delta)
@@ -268,7 +279,7 @@ public partial class NetworkClient : Node
         // Client only camera update
         camera.Current = true;
         float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
-        camera.Position = camera.Position.MoveToward(focused_position + new Vector3(0f,zoom_level * MainController.max_zoom,0.3f), (float)delta * lerp_speed);
+        camera.Position = camera.Position.MoveToward(focused_position + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0.3f), (float)delta * lerp_speed);
         camera.LookAt(new Vector3(camera.Position.X,focused_position.Y,camera.Position.Z-(float)0.1));
     }
 

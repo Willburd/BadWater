@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://csksdy5uca2mx"]
+
+[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_s8dra"]
+[ext_resource type="ArrayMesh" uid="uid://hpev8gul7k3x" path="res://BlenderImport/Turfs/BASE/Wall/Wall.obj" id="1_vf3xy"]
+
+[node name="Wall" type="MeshInstance3D"]
+cast_shadow = 2
+mesh = ExtResource("1_vf3xy")
+script = ExtResource("1_s8dra")
