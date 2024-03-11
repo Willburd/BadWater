@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cn3kt7i64lhin"
-path.s3tc="res://.godot/imported/Plate.png-d051d56a2247add09ce3af8770381af0.s3tc.ctex"
+uid="uid://brmajpgut88y3"
+path.s3tc="res://.godot/imported/Wall.png-900e24222af27bfcba7222325ad29520.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Library/Textures/BASE/Turf/Floor/Plate.png"
-dest_files=["res://.godot/imported/Plate.png-d051d56a2247add09ce3af8770381af0.s3tc.ctex"]
+source_file="res://Library/Textures/BASE/Turfs/Wall/Wall.png"
+dest_files=["res://.godot/imported/Wall.png-900e24222af27bfcba7222325ad29520.s3tc.ctex"]
 
 [params]
 

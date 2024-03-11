@@ -1,0 +1,1 @@
+Effect definitions go here, base values and names are defined in json files. Each file is the MODID of the data, to avoid conflicts with future stations. Parenting is assembled at startup. So json definitions may cross reference other MODIDs, or be children of definitions from other mods. 

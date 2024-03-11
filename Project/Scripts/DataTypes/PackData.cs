@@ -116,7 +116,7 @@ public partial class PackData : Resource
     public string description = "";
     public string behaviorID = "";
     public string tag = "";
-    public string model = "BASE/Turf/Plane.tscn";
+    public string model = "BASE/Turfs/Plane.tscn";
     public string texture = "";
     public double anim_speed = 0;
     public bool intangible;
