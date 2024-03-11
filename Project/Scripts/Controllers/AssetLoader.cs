@@ -566,13 +566,7 @@ public partial class AssetLoader : Node
             material_cache = new ShaderMaterial[tex_page_ind+1];
             for(int i = 0; i < texture_pages.Count; i++) 
             {
-                try {
-                    texture_pages[i].SavePng("user://Export/Page_" + i + ".png");
-                }
-                catch
-                {
-                    GD.Print("Could not export texture page...");
-                }
+                // texture_pages[i].SavePng("user://Export/Page_" + i + ".png");
                 material_cache[i] = (ShaderMaterial)ResourceLoader.Load("res://Materials/Main.tres").Duplicate(true);
                 material_cache[i].SetShaderParameter( "_MainTexture", ImageTexture.CreateFromImage(AssetLoader.texture_pages[i]));
             }
