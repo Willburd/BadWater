@@ -141,7 +141,6 @@ public partial class NetworkClient : Node
     public void Spawn()
     {
         camera.Current = false;
-        listener.ClearCurrent();
         // Check for a spawner!
         if(MapController.spawners.ContainsKey("PLAYER"))
         {
