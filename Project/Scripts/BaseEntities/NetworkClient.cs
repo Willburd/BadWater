@@ -280,6 +280,17 @@ public partial class NetworkClient : Node
             zoom_level += 0.05f;
             if(zoom_level > 1) zoom_level = 1f;
         }
+
+        if(Input.IsActionJustPressed("game_camstepright"))
+        {
+            view_rotation = Mathf.Round(view_rotation / (Mathf.Pi / 4)) * (Mathf.Pi / 4);
+            view_rotation += Mathf.Pi / 4;
+        }
+        if(Input.IsActionJustPressed("game_camstepleft"))
+        {
+            view_rotation = Mathf.Round(view_rotation / (Mathf.Pi / 4)) * (Mathf.Pi / 4);
+            view_rotation -= Mathf.Pi / 4;
+        }
     }
 
     public override void _PhysicsProcess(double delta)
@@ -291,11 +302,28 @@ public partial class NetworkClient : Node
             camera.Current = true;
             listener.MakeCurrent();
         }
-        view_rotation += (float)delta;
         float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
         camera.Position = camera.Position.MoveToward(focused_position + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0), (float)delta * lerp_speed);
         camera.LookAt(focused_position + new Vector3(0,0.1f,0));
         listener.Position = focused_position + Vector3.Up;
+    }
+
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if(!IsMultiplayerAuthority()) return;
+        // Client only input handling
+        if(@event is InputEventMouseMotion mouse_move)
+        {
+            if(mouse_move.Velocity.Length() > 0)
+            {
+                if(Input.IsActionPressed("game_camcontrol"))
+                {
+                    float velocity = mouse_move.Velocity.X / 15000f;
+                    view_rotation -= velocity;
+                    view_rotation %= Mathf.Pi * 2;
+                }
+            }
+        }
     }
 
     public Vector3 CamRotationVector3()
