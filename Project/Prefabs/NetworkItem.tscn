@@ -19,9 +19,8 @@ properties/4/path = NodePath(".:position")
 properties/4/spawn = true
 properties/4/replication_mode = 2
 
-[node name="NetworkItem" type="Node3D" node_paths=PackedStringArray("mesh_updater")]
+[node name="NetworkItem" type="Node3D"]
 script = ExtResource("1_k3d4w")
-mesh_updater = NodePath("")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25

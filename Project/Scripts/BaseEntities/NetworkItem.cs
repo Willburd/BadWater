@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public partial class NetworkItem : NetworkEntity
 {
     [Export]
-    public MeshUpdater mesh_updater;
+    public SpriteUpdater mesh_updater;
 
     protected override void Internal_MeshUpdate()
     {
@@ -27,7 +27,7 @@ public partial class NetworkItem : NetworkEntity
         Godot.Collections.Dictionary turf_data = TOOLS.ParseJson(mesh_json);
         // Get new model
         if(mesh_updater != null) mesh_updater.QueueFree();
-        mesh_updater = MeshUpdater.GetModelScene(turf_data);
+        mesh_updater = SpriteUpdater.GetModelScene(turf_data);
         // Init model textures
         if(mesh_updater == null)
         {

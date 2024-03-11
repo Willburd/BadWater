@@ -4,7 +4,7 @@
 		"name": "Thingy",
 		"desc": "It does things.",
 		"behavior": "",
-		"model": "Item",
+		"model": "BASE/Entities/Small.tscn",
 		"texture": "Error.png",
 		"intangible": 0,
 		"size_category": 0
