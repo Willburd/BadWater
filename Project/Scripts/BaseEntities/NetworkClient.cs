@@ -280,15 +280,16 @@ public partial class NetworkClient : Node
             if(zoom_level > 1) zoom_level = 1f;
         }
         // camera stepped movements
+        float cam_steps = (Mathf.Pi / 4);
         if(Input.IsActionJustPressed("game_camstepright"))
         {
-            view_rotation = Mathf.Round(view_rotation / (Mathf.Pi / 4)) * (Mathf.Pi / 4);
-            view_rotation += Mathf.Pi / 4;
+            view_rotation = Mathf.Round(view_rotation / cam_steps) * cam_steps;
+            view_rotation += cam_steps;
         }
         if(Input.IsActionJustPressed("game_camstepleft"))
         {
-            view_rotation = Mathf.Round(view_rotation / (Mathf.Pi / 4)) * (Mathf.Pi / 4);
-            view_rotation -= Mathf.Pi / 4;
+            view_rotation = Mathf.Round(view_rotation / cam_steps) * cam_steps;
+            view_rotation -= cam_steps;
         }
     }
 
