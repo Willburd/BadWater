@@ -280,7 +280,7 @@ public partial class NetworkClient : Node
             zoom_level += 0.05f;
             if(zoom_level > 1) zoom_level = 1f;
         }
-
+        // camera stepped movements
         if(Input.IsActionJustPressed("game_camstepright"))
         {
             view_rotation = Mathf.Round(view_rotation / (Mathf.Pi / 4)) * (Mathf.Pi / 4);
