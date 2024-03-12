@@ -16,8 +16,7 @@ public partial class NetworkItem : NetworkEntity
             { "model", abstract_owner.model },
             { "texture", abstract_owner.texture },
             { "anim_speed", abstract_owner.anim_speed },
-            { "state", abstract_owner.icon_state },
-            { "direction", (int)abstract_owner.direction }
+            { "state", abstract_owner.icon_state }
         };
         // Update json on other end.
         Rpc(nameof(ClientMeshUpdate), Position, Json.Stringify(entity_data));
@@ -30,6 +29,8 @@ public partial class NetworkItem : NetworkEntity
         // Get new model
         if(mesh_updater != null) mesh_updater.QueueFree();
         mesh_updater = MeshUpdater.GetModelScene(turf_data);
+        mesh_updater.Visible = false;
+        AddChild(mesh_updater);
         // Init model textures
         if(mesh_updater == null)
         {
@@ -37,8 +38,6 @@ public partial class NetworkItem : NetworkEntity
             return;
         }
         mesh_updater.TextureUpdated(mesh_json);
-        // APPEAR!
-        AddChild(mesh_updater);
         mesh_updater.Visible = true;
     }
     

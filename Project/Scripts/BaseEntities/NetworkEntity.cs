@@ -50,6 +50,8 @@ public partial class NetworkEntity : Node3D
     public string map_id_string;
     [Export]
     public Vector3 velocity = Vector3.Zero;
+    [Export]
+    public DAT.Dir direction = DAT.Dir.South;
 
     public void Kill()
     {

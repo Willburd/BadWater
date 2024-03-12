@@ -28,6 +28,8 @@ public partial class NetworkMachine : NetworkEntity
         // Get new model
         if(mesh_updater != null) mesh_updater.QueueFree();
         mesh_updater = MeshUpdater.GetModelScene(turf_data);
+        mesh_updater.Visible = false;
+        AddChild(mesh_updater);
         // Init model textures
         if(mesh_updater == null)
         {
@@ -35,8 +37,6 @@ public partial class NetworkMachine : NetworkEntity
             return;
         }
         mesh_updater.TextureUpdated(mesh_json);
-        // APPEAR!
-        AddChild(mesh_updater);
         mesh_updater.Visible = true;
     }
 

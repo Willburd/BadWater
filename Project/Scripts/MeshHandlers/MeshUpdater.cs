@@ -20,6 +20,11 @@ public partial class MeshUpdater : Node3D
     {
         TextureUpdated(TOOLS.ParseJson(json));
     }
+    
+    public NetworkEntity Entity
+    {
+        get {return GetParent() as NetworkEntity;}
+    }
 
     public static MeshUpdater GetModelScene(Godot.Collections.Dictionary turf_data)
     {
@@ -33,17 +38,15 @@ public partial class MeshUpdater : Node3D
         string texture      = turf_data["texture"].AsString();
         double anim_speed   = turf_data["anim_speed"].AsDouble();
         string state        = "Idle";
-        DAT.Dir direction   = DAT.Dir.None;
         if(is_directional)
         {
             state        = turf_data["state"].AsString();
-            direction    = (DAT.Dir)turf_data["direction"].AsInt32();
         }
         // Assign model,tex, and animation speed to the entity!
-        TextureDataUpdate(texture,state,direction,anim_speed > 0,0);
+        TextureDataUpdate(texture,state,anim_speed > 0,0);
     }
 
-    public void TextureDataUpdate(string texture_path, string icon_state, DAT.Dir direction, bool animating, float animation_index)
+    public void TextureDataUpdate(string texture_path, string icon_state, bool animating, float animation_index)
     {
         if(!is_directional)
         {
@@ -76,7 +79,6 @@ public partial class MeshUpdater : Node3D
             cached_texpath = texture_path;
             cached_icon_state = icon_state;
             cached_animation_suffix = animation_suffix;
-            cached_direction = direction;
             RotateDirectionInRelationToCamera();
         }
     }
@@ -85,13 +87,12 @@ public partial class MeshUpdater : Node3D
     // These are used for internal rotations, has to be done regularly...
     private string cached_texpath;
     private string cached_icon_state;
-    private DAT.Dir cached_direction;
     private string cached_animation_suffix;
     public void RotateDirectionInRelationToCamera()
     {
         // Solve rotation steps from camera rotation
         int dir_steps = Mathf.RoundToInt(Mathf.RadToDeg(new Vector2(camera_relational_vector.X,camera_relational_vector.Z).Angle() + 360) / 90) % 4;
-        string direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/" + DAT.RotateCardinal(cached_direction, dir_steps) + cached_animation_suffix + ".png";
+        string direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/" + DAT.RotateCardinal(Entity.direction, dir_steps) + cached_animation_suffix + ".png";
         // Check if asset exists as directional, and fallback otherwise
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + cached_animation_suffix + "/Base.png";
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/Base.png";

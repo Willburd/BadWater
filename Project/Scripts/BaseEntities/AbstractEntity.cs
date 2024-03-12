@@ -160,14 +160,13 @@ public partial class AbstractEntity
     {
         // Ask our behavior for info!
         bump_cooldown -= 1;
-        DAT.Dir previous_dir = direction;
         behavior_type?.Tick(this, entity_type);
-        if(previous_dir != direction) SyncNetwork(true);
     }
     public virtual void SyncNetwork(bool include_mesh)
     {
         if(loaded_entity == null) return;
         loaded_entity.Position = grid_pos.WorldPos();
+        loaded_entity.direction = direction;
         if(include_mesh) loaded_entity.MeshUpdate();
     }
     public void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
@@ -202,8 +201,10 @@ public partial class AbstractEntity
     public void Process()
     {
         // Handle the tick!
+        DAT.Dir old_dir = direction;
         Tick();
         ProcessVelocity();
+        if(old_dir != direction) SyncNetwork(false);
     }
     private void ProcessVelocity()
     {
@@ -274,6 +275,7 @@ public partial class AbstractEntity
     }
     public virtual void ControlUpdate(Godot.Collections.Dictionary client_input_data)
     {
+        DAT.Dir old_dir = direction;
         if(client_input_data.Keys.Count == 0) return;
         // Got an actual control update!
         MapController.GridPos new_pos = grid_pos;
@@ -282,6 +284,7 @@ public partial class AbstractEntity
         new_pos.hor += (float)dat_x;
         new_pos.ver += (float)dat_y;
         Move(map_id_string, new_pos);
+        if(old_dir != direction) SyncNetwork(false);
     }
 
     /*****************************************************************

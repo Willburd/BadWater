@@ -80,12 +80,12 @@ public partial class NetworkChunk : NetworkEntity
             // Get new model
             if(mesh_array[i] != null) mesh_array[i].QueueFree();
             mesh_array[i] = MeshUpdater.GetModelScene(turf_data);
+            mesh_array[i].Visible = false;
+            AddChild(mesh_array[i]);
             // Init model textures
             if(mesh_array[i] == null) GD.Print("No model for " + turf_data["model"]);
             mesh_array[i].Position = new Vector3(Mathf.Floor(i % ChunkController.chunk_size) * MapController.tile_size,0,Mathf.Floor(i / ChunkController.chunk_size) * MapController.tile_size);
             mesh_array[i].TextureUpdated(turf_data);
-            // APPEAR!
-            AddChild(mesh_array[i]);
             mesh_array[i].Visible = true;
         }
     }

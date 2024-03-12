@@ -150,9 +150,9 @@ public partial class AbstractMob : AbstractEntity
      ****************************************************************/
     public override void ControlUpdate(Godot.Collections.Dictionary client_input_data)
     {
+        DAT.Dir old_dir = direction;
         if(client_input_data.Keys.Count == 0) return;
-        DAT.Dir previous_dir = direction;
         behavior_type?.HandleInput(this,entity_type,client_input_data);
-        if(previous_dir != direction) SyncNetwork(true);
+        if(old_dir != direction) SyncNetwork(false);
     }
 }
