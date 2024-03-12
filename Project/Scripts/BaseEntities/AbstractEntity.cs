@@ -160,7 +160,9 @@ public partial class AbstractEntity
     {
         // Ask our behavior for info!
         bump_cooldown -= 1;
+        DAT.Dir previous_dir = direction;
         behavior_type?.Tick(this, entity_type);
+        if(previous_dir != direction) SyncNetwork(true);
     }
     public virtual void SyncNetwork(bool include_mesh)
     {

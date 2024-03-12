@@ -17,7 +17,7 @@ public partial class NetworkItem : NetworkEntity
             { "texture", abstract_owner.texture },
             { "anim_speed", abstract_owner.anim_speed },
             { "state", abstract_owner.icon_state },
-            { "direction", (uint)DAT.Dir.South }
+            { "direction", (int)abstract_owner.direction }
         };
         // Update json on other end.
         Rpc(nameof(ClientMeshUpdate), Position, Json.Stringify(entity_data));

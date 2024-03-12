@@ -16,8 +16,8 @@ public partial class NetworkMob : NetworkEntity
             { "model", abstract_owner.model },
             { "texture", abstract_owner.texture },
             { "anim_speed", abstract_owner.anim_speed },
-            { "direction", (uint)abstract_owner.direction },
-            { "state", abstract_owner.icon_state }
+            { "state", abstract_owner.icon_state },
+            { "direction", (int)abstract_owner.direction }
         };
         // Update json on other end.
         Rpc(nameof(ClientMeshUpdate), Position, Json.Stringify(entity_data));

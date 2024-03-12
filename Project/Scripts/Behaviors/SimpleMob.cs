@@ -64,14 +64,9 @@ namespace BehaviorEvents
                 }
 
                 // Move based on mob speed
-                MapController.GridPos new_pos = owner.GridPos;
+                MapController.GridPos new_pos = mob.GridPos;
                 float speed = 0f;
-                if(input["mod_alt"].AsBool())
-                {
-                    // Only face the direction pressed!
-                    // Not moving!
-                }
-                else if(input["mod_control"].AsBool())
+                if(input["mod_control"].AsBool())
                 {
                     // Inching along with taps at a fixed rate
                     new_pos.hor += (float)dat_x * 0.5f;
@@ -82,6 +77,7 @@ namespace BehaviorEvents
                     // slower safer movement
                     new_pos.hor += (float)dat_x * mob.walk_speed;
                     new_pos.ver += (float)dat_y * mob.walk_speed;
+                    if(!input["mod_alt"].AsBool()) mob.direction = DAT.InputToCardinalDir((float)dat_x,(float)dat_y);
                     speed = mob.walk_speed;
                 }
                 else
@@ -89,6 +85,7 @@ namespace BehaviorEvents
                     // zoomies as normal
                     new_pos.hor += (float)dat_x * mob.run_speed;
                     new_pos.ver += (float)dat_y * mob.run_speed;
+                    if(!input["mod_alt"].AsBool()) mob.direction = DAT.InputToCardinalDir((float)dat_x,(float)dat_y);
                     speed = mob.run_speed;
                 }
                 // math for feet speed

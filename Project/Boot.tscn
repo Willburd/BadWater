@@ -1,13 +1,13 @@
 [gd_scene load_steps=3 format=3 uid="uid://it0x18qe03km"]
 
-[ext_resource type="Script" path="res://Scripts/Boot.gd" id="1_ypo6r"]
-[ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_cssdj"]
+[ext_resource type="Script" path="res://Scripts/Boot.gd" id="1_vcouu"]
+[ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
 
 [node name="Main" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry", "join_menu")]
-script = ExtResource("1_ypo6r")
+script = ExtResource("1_vcouu")
 entity_container = NodePath("Entities")
 client_container = NodePath("Clients")
-client_prefab = ExtResource("2_cssdj")
+client_prefab = ExtResource("2_doepm")
 client_spawner = NodePath("ClientSpawner")
 entity_spawner = NodePath("EntitySpawner")
 chunk_spawner = NodePath("ChunkSpawner")
