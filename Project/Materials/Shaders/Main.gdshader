@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode depth_draw_always;
+render_mode depth_prepass_alpha;
 
 uniform sampler2D _MainTexture : filter_nearest; 
 instance uniform vec2 _XY;

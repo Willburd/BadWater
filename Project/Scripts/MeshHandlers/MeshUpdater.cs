@@ -93,18 +93,9 @@ public partial class MeshUpdater : Node3D
         // Solve rotation steps from camera rotation
         float solve_step = Mathf.Round(new Vector2(camera_relational_vector.X,camera_relational_vector.Z).Angle() / (Mathf.Pi * 2) * 100);
         int dir_steps;
-        if(Mathf.Abs(solve_step) < 4.5)
-        {
-            dir_steps = 0;
-        }
-        else if(Mathf.Abs(solve_step) < 48.5)
-        {
-            dir_steps = 1;
-        }
-        else
-        {
-            dir_steps = 2;
-        }
+        if(Mathf.Abs(solve_step) < 4.5) dir_steps = 0;
+        else if(Mathf.Abs(solve_step) < 48.5) dir_steps = 1;
+        else dir_steps = 2;
         dir_steps *= Mathf.Sign(solve_step);
         string direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/" + DAT.RotateCardinal(Entity.direction, Mathf.RoundToInt(dir_steps)) + cached_animation_suffix + ".png";
         // Check if asset exists as directional, and fallback otherwise
