@@ -93,7 +93,6 @@ public partial class MeshUpdater : Node3D
         // Solve rotation steps from camera rotation
         float solve_step = Mathf.Round(new Vector2(camera_relational_vector.X,camera_relational_vector.Z).Angle() / (Mathf.Pi * 2) * 100);
         int dir_steps;
-        GD.Print(solve_step);
         if(Mathf.Abs(solve_step) < 4.5)
         {
             dir_steps = 0;
@@ -107,7 +106,6 @@ public partial class MeshUpdater : Node3D
             dir_steps = 2;
         }
         dir_steps *= Mathf.Sign(solve_step);
-        GD.Print(dir_steps);
         string direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/" + DAT.RotateCardinal(Entity.direction, Mathf.RoundToInt(dir_steps)) + cached_animation_suffix + ".png";
         // Check if asset exists as directional, and fallback otherwise
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + cached_animation_suffix + "/Base.png";
