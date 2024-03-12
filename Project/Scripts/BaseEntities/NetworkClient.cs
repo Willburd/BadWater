@@ -17,6 +17,8 @@ public partial class NetworkClient : Node
             return 1;
         }
     }
+    [Export]
+    CanvasLayer my_hud;
 
     [Export]
     public string focused_map_id;
@@ -141,6 +143,7 @@ public partial class NetworkClient : Node
     public void Spawn()
     {
         camera.Current = false;
+        my_hud.Hide();
         // Check for a spawner!
         if(MapController.spawners.ContainsKey("PLAYER"))
         {
@@ -301,6 +304,7 @@ public partial class NetworkClient : Node
         {
             camera.Current = true;
             listener.MakeCurrent();
+            my_hud.Show();
         }
         float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
         camera.Position = camera.Position.MoveToward(focused_position + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0), (float)delta * lerp_speed);

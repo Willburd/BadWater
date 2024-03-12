@@ -77,7 +77,7 @@ namespace BehaviorEvents
                     // slower safer movement
                     new_pos.hor += (float)dat_x * mob.walk_speed;
                     new_pos.ver += (float)dat_y * mob.walk_speed;
-                    if(!input["mod_alt"].AsBool()) mob.direction = DAT.InputToCardinalDir((float)dat_x,(float)dat_y);
+                    if(!input["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) mob.direction = DAT.InputToCardinalDir((float)dat_x,(float)dat_y);
                     speed = mob.walk_speed;
                 }
                 else
@@ -85,11 +85,11 @@ namespace BehaviorEvents
                     // zoomies as normal
                     new_pos.hor += (float)dat_x * mob.run_speed;
                     new_pos.ver += (float)dat_y * mob.run_speed;
-                    if(!input["mod_alt"].AsBool()) mob.direction = DAT.InputToCardinalDir((float)dat_x,(float)dat_y);
+                    if(!input["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) mob.direction = DAT.InputToCardinalDir((float)dat_x,(float)dat_y);
                     speed = mob.run_speed;
                 }
                 // math for feet speed
-                footstep_timer += Mathf.Lerp(0.05f,0.08f, Mathf.Clamp(speed,0,1.5f));
+                if(dat_x != 0 || dat_y != 0) footstep_timer += Mathf.Lerp(0.05f,0.08f, Mathf.Clamp(speed,0,1.5f));
                 AbstractEntity newloc = owner.Move(owner.map_id_string, new_pos);
                 if(footstep_timer > 1)
                 {
