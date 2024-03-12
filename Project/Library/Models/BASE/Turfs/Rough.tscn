@@ -1,9 +1,12 @@
 [gd_scene load_steps=3 format=3 uid="uid://bwxjqtjo6f6ce"]
 
-[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_i6dtl"]
-[ext_resource type="ArrayMesh" uid="uid://cn0jgac6inih2" path="res://BlenderImport/Turfs/BASE/Floor/RoughFloor.obj" id="1_qq3ix"]
+[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_k5ffj"]
+[ext_resource type="ArrayMesh" uid="uid://cn0jgac6inih2" path="res://BlenderImport/Turfs/BASE/Floor/RoughFloor.obj" id="2_saohn"]
 
-[node name="Rough" type="MeshInstance3D"]
+[node name="Constraint" type="Node3D" node_paths=PackedStringArray("mesh")]
+script = ExtResource("1_k5ffj")
+mesh = NodePath("Rough")
+
+[node name="Rough" type="MeshInstance3D" parent="."]
 cast_shadow = 2
-mesh = ExtResource("1_qq3ix")
-script = ExtResource("1_i6dtl")
+mesh = ExtResource("2_saohn")

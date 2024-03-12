@@ -3,7 +3,10 @@
 [ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_s8dra"]
 [ext_resource type="ArrayMesh" uid="uid://hpev8gul7k3x" path="res://BlenderImport/Turfs/BASE/Wall/Wall.obj" id="1_vf3xy"]
 
-[node name="Wall" type="MeshInstance3D"]
+[node name="Node3D" type="Node3D" node_paths=PackedStringArray("mesh")]
+script = ExtResource("1_s8dra")
+mesh = NodePath("Wall")
+
+[node name="Wall" type="MeshInstance3D" parent="."]
 cast_shadow = 2
 mesh = ExtResource("1_vf3xy")
-script = ExtResource("1_s8dra")

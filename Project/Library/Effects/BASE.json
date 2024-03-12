@@ -4,7 +4,7 @@
 		"name": "Spawner",
 		"desc": "Spawns things on the map... You shouldn't see this.",
 		"behavior": "",
-		"model": "Item",
+		"model": "BASE/Entities/Effect.tscn",
 		"texture": "BASE/Effects/XGreen.png",
 		"is_spawner": 1,
 		"cleanable": 0

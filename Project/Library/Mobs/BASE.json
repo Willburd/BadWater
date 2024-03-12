@@ -5,7 +5,7 @@
 		"desc": "Someone testing something.",
 		"behavior": "MOB_SIMPLE",
 		"model": "BASE/Entities/Small.tscn",
-		"texture": "Error.png",
+		"texture": "BASE/Mobs/Jil",
 		"intangible": 0,
 
 		"max_health": 100,
@@ -15,7 +15,7 @@
 		"has_hands": 1,
 		"extra_hands": 0,
 		"complex_tools": 0,
-		"wears_hats": 0,
+		"wears_hats": 1,
 		"wears_mask": 0,
 		"wears_eyes": 0,
 		"wears_uniform": 0,

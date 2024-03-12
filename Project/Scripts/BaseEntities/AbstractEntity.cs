@@ -71,6 +71,9 @@ public partial class AbstractEntity
     public string model = "BASE/Turf/Plane.tscn";
     public string texture = "";
     public double anim_speed = 0;
+    public string icon_state = "Idle";
+    
+    public DAT.Dir direction = DAT.Dir.South;
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
     public bool intangible = false;           // can move through solids

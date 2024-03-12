@@ -6,8 +6,8 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkMob : NetworkEntity
 {
-    [Export]
-    public SpriteUpdater mesh_updater;
+    public MeshUpdater mesh_updater;
+    public SpriteUpdater sprite_updater;
 
     protected override void Internal_MeshUpdate()
     {
@@ -15,7 +15,9 @@ public partial class NetworkMob : NetworkEntity
         {
             { "model", abstract_owner.model },
             { "texture", abstract_owner.texture },
-            { "anim_speed", abstract_owner.anim_speed }
+            { "anim_speed", abstract_owner.anim_speed },
+            { "direction", (uint)abstract_owner.direction },
+            { "state", abstract_owner.icon_state }
         };
         // Update json on other end.
         Rpc(nameof(ClientMeshUpdate), Position, Json.Stringify(entity_data));
@@ -27,11 +29,11 @@ public partial class NetworkMob : NetworkEntity
         Godot.Collections.Dictionary turf_data = TOOLS.ParseJson(mesh_json);
         // Get new model
         if(mesh_updater != null) mesh_updater.QueueFree();
-        mesh_updater = SpriteUpdater.GetModelScene(turf_data);
+        mesh_updater = MeshUpdater.GetModelScene(turf_data);
         // Init model textures
         if(mesh_updater == null)
         {
-            GD.Print("No model for " + turf_data["model"]);
+            GD.Print("No updater for " + turf_data["model"]);
             return;
         }
         mesh_updater.TextureUpdated(mesh_json);

@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://c2j1ac4uflg23"]
+
+[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_gj3hx"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wnhxs"]
+size = Vector2(1, 1)
+
+[node name="Constraint" type="Node3D" node_paths=PackedStringArray("mesh")]
+script = ExtResource("1_gj3hx")
+mesh = NodePath("Effect")
+
+[node name="Effect" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+mesh = SubResource("PlaneMesh_wnhxs")

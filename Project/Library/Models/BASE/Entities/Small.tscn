@@ -1,14 +1,15 @@
 [gd_scene load_steps=3 format=3 uid="uid://vytqv2y40k7a"]
 
-[ext_resource type="Texture2D" uid="uid://xndwnahegcqs" path="res://Library/Textures/Error.png" id="1_0f0vk"]
-[ext_resource type="Script" path="res://Scripts/MeshHandlers/SpriteUpdater.cs" id="2_d3ya8"]
+[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_xtx3w"]
 
-[node name="Small" type="Sprite3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-offset = Vector2(0, 12)
-pixel_size = 0.03
-billboard = 1
-double_sided = false
-texture_filter = 0
-texture = ExtResource("1_0f0vk")
-script = ExtResource("2_d3ya8")
+[sub_resource type="PlaneMesh" id="PlaneMesh_4wiiq"]
+
+[node name="Constraint" type="Node3D" node_paths=PackedStringArray("mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+script = ExtResource("1_xtx3w")
+mesh = NodePath("Small")
+is_directional = true
+
+[node name="Small" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, -2.18557e-08, -0.5, 0, 0.5, -2.18557e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_4wiiq")
