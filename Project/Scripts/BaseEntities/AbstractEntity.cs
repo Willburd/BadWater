@@ -2,6 +2,7 @@ using Godot;
 using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
@@ -29,6 +30,8 @@ public partial class AbstractEntity
         PackRef = new PackRef( data, entity_type);
         SetBehavior(Behavior.CreateBehavior(data));
         SetTag(data.tag);
+        display_name = data.display_name;
+        description = data.description;
         intangible = data.intangible;
         model = data.model;
         texture = data.texture;
@@ -74,12 +77,14 @@ public partial class AbstractEntity
     public string icon_state = "Idle";
     
     public DAT.Dir direction = DAT.Dir.South;
+    public string display_name;
+    public string description;
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
     public bool intangible = false;           // can move through solids
     public string step_sound = "";              // Sound pack ID for steps
     // End of template data
-    private float bump_cooldown = 0;
+    private float last_bump_time = 0;
     private const float bump_reset_time = 30; // Ticks
     public string GetUniqueID
     {
@@ -159,7 +164,6 @@ public partial class AbstractEntity
     public void Tick()                  // Called every process tick on the Fire() tick of the subcontroller that owns them
     {
         // Ask our behavior for info!
-        bump_cooldown -= 1;
         behavior_type?.Tick(this, entity_type);
     }
     public virtual void SyncNetwork(bool include_mesh)
@@ -188,8 +192,8 @@ public partial class AbstractEntity
     
     public void Bump(AbstractEntity hitby) // When we are bumped by an incoming entity
     {
-        if(bump_cooldown > 0) return;
-        bump_cooldown = bump_reset_time;
+        if(MainController.WorldTicks <= last_bump_time + bump_reset_time) return;
+        last_bump_time = MainController.WorldTicks;
         behavior_type?.Bump( this, entity_type, hitby);
     }
 
@@ -285,6 +289,16 @@ public partial class AbstractEntity
         new_pos.ver += (float)dat_y;
         Move(map_id_string, new_pos);
         if(old_dir != direction) SyncNetwork(false);
+    }
+
+    public void Click(AbstractEntity user,Godot.Collections.Dictionary click_params)
+    {
+        behavior_type?.Click(this,entity_type,user,click_params);
+    }
+
+    public void Drag(AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params)
+    {
+        behavior_type?.Drag(this,entity_type,user,new_destination,click_params);
     }
 
     /*****************************************************************

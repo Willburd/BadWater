@@ -372,12 +372,13 @@ public partial class NetworkClient : Node
             if(client_click_data["state"].AsBool())
             {
                 AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
-                StartLeftClickInteraction(turf, new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble())); // BEGIN a contextual interaction...
+                StartLeftClickInteraction(turf, new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble()),client_click_data); // BEGIN a contextual interaction...
                 return;
             }
             else
             {
-                EndLeftClickInteraction(new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble())); // Handling drags, we confirm our contextual interaction!
+                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                EndLeftClickInteraction(turf, new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble()),client_click_data); // Handling drags, we confirm our contextual interaction!
             }
         }
         if(client_click_data["button"].AsInt32() == (int)MouseButton.Right)
@@ -385,45 +386,59 @@ public partial class NetworkClient : Node
             if(client_click_data["state"].AsBool())
             {
                 AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
-                RightClickInteraction(turf); // Right click contents menu
+                RightClickInteraction(turf,client_click_data); // Right click contents menu
             }
         }
     }
 
 
+    private const float item_radius = 0.3f;
     private Vector3 current_context_pos;
     private AbstractEntity current_context_entity;
-    private void StartLeftClickInteraction(AbstractTurf turf,Vector3 pos)
+    private void StartLeftClickInteraction(AbstractTurf turf,Vector3 pos,Godot.Collections.Dictionary click_params)
     {
         // Store last position of the click
         current_context_pos = pos;
         // Get all entities on turf, attempt to click them from top to bottom
-
+        foreach(AbstractEntity ent in turf.Contents)
+        {
+            if(TOOLS.VecDist(ent.GridPos.WorldPos(),pos) < item_radius)
+            {
+                current_context_entity = ent;
+                return;
+            }
+        }
         // If no entities, click the turf itself!
-
+        current_context_entity = turf;
     }
-    private void EndLeftClickInteraction(Vector3 pos)
+    private void EndLeftClickInteraction(AbstractTurf turf,Vector3 pos,Godot.Collections.Dictionary click_params)
     {
         if(current_context_entity == null) return;
         // Perform interaction with contextual entity! If it's at nearly the same place we did a normal click!
-        if(TOOLS.VecDist(current_context_pos,pos) < 0.1)
+        if(TOOLS.VecDist(current_context_pos,pos) < item_radius)
         {
             // CLICK INTERACTION
-
+            current_context_entity.Click( focused_entity, click_params);
         }
         else
         {
             // DRAG INTERACTION
-
+            current_context_entity.Drag( focused_entity, turf,click_params);
         }
         // Cleanup
         current_context_entity = null;
         current_context_pos = Vector3.Zero;
     }
-    private void RightClickInteraction(AbstractTurf turf)
+    private void RightClickInteraction(AbstractTurf turf,Godot.Collections.Dictionary click_params)
     {
         // Create a list of entities on the tile that we can click, including the turf!
-
+        foreach(AbstractEntity ent in turf.Contents)
+        {
+            if(TOOLS.VecDist(ent.GridPos.WorldPos(),current_context_pos) < item_radius)
+            {
+                GD.Print(ent.display_name);
+            }
+        }
         // Cleanup
         current_context_entity = null;
         current_context_pos = Vector3.Zero;

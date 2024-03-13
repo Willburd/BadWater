@@ -182,4 +182,9 @@ public partial class MainController : Node
 		// TODO - editor mode!
 		ticks += 1;
 	}
+
+	public static int WorldTicks
+	{
+		get {return ticks;}
+	}
 }
