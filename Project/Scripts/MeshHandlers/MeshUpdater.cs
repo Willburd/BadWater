@@ -115,8 +115,10 @@ public partial class MeshUpdater : Node3D
         // Use constraint to look at camera.
         if(GetViewport().GetCamera3D() != null)
         {
-            LookAt(GetViewport().GetCamera3D().Position,Vector3.Up,true);
-            camera_relational_vector = Vector3.Right * 50f * GetViewport().GetCamera3D().Quaternion;
+            Quaternion quat = GetViewport().GetCamera3D().Quaternion;
+            Vector3 solve_vec = quat * Vector3.Forward;
+            LookAt(GlobalPosition + solve_vec);
+            camera_relational_vector = Vector3.Right * 50f * quat;
             camera_relational_vector.Y = 0;
             camera_relational_vector = camera_relational_vector.Normalized();
             RotateDirectionInRelationToCamera();

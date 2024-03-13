@@ -845,10 +845,11 @@ public partial class MapController : DeligateController
         Godot.Collections.Array<string[]> effect_data;
         Godot.Collections.Array<string[]> structure_data;
         Godot.Collections.Array<string[]> machine_data;
+        Godot.Collections.Array<string[]> mob_data;
 
         public new int max_steps
         {
-            get {return item_data.Count + effect_data.Count + structure_data.Count + machine_data.Count;}
+            get {return item_data.Count + effect_data.Count + structure_data.Count + machine_data.Count + mob_data.Count;}
         } 
 
 
@@ -861,10 +862,11 @@ public partial class MapController : DeligateController
             MapData map_data = AssetLoader.loaded_maps[map_id];
             Godot.Collections.Dictionary map_list = TOOLS.ParseJsonFile(map_data.GetFilePath);
             Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
-            item_data       = (Godot.Collections.Array<string[]>)map_json["items"]; // array of string[EntityID,X,Y,Z,CustomData]
-            effect_data     = (Godot.Collections.Array<string[]>)map_json["effects"]; // array of string[EntityID,X,Y,Z,CustomData]
-            structure_data  = (Godot.Collections.Array<string[]>)map_json["structures"]; // array of string[EntityID,X,Y,Z,CustomData]
-            machine_data    = (Godot.Collections.Array<string[]>)map_json["machines"]; // array of string[EntityID,X,Y,Z,CustomData]
+            item_data       = (Godot.Collections.Array<string[]>)map_json["items"];     // array of string[EntityID,X,Y,Z,CustomData]
+            effect_data     = (Godot.Collections.Array<string[]>)map_json["effects"];   // array of string[EntityID,X,Y,Z,CustomData]
+            structure_data  = (Godot.Collections.Array<string[]>)map_json["structures"];// array of string[EntityID,X,Y,Z,CustomData]
+            machine_data    = (Godot.Collections.Array<string[]>)map_json["machines"];  // array of string[EntityID,X,Y,Z,CustomData]
+            mob_data        = (Godot.Collections.Array<string[]>)map_json["mobs"];      // array of string[EntityID,X,Y,Z,CustomData]
             GD.Print("CREATING ENTITIES " + map_id + " =========================");
         }
 
@@ -907,6 +909,14 @@ public partial class MapController : DeligateController
                         {
                             entity_pack = machine_data[current_x];
                             ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Machine);
+                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                        }
+                    break;
+                    case 4: // Mobs
+                        if(mob_data.Count > 0)
+                        {
+                            entity_pack = mob_data[current_x];
+                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Mob);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -953,6 +963,14 @@ public partial class MapController : DeligateController
 
                 case 3: // Machine
                     if(current_x >= machine_data.Count)
+                    {
+                        current_x = 0;
+                        phase += 1;
+                    }
+                break;
+
+                case 4: // Mobs
+                    if(current_x >= mob_data.Count)
                     {
                         current_x = 0;
                         phase += 1;
