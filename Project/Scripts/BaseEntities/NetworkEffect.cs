@@ -6,9 +6,6 @@ using System.Collections.Generic;
 [GlobalClass] 
 public partial class NetworkEffect : NetworkEntity
 {
-    [Export]
-    public MeshUpdater mesh_updater;
-
     protected override void Internal_MeshUpdate()
     {
         Godot.Collections.Dictionary entity_data = new Godot.Collections.Dictionary

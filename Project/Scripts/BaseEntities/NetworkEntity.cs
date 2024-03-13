@@ -57,6 +57,9 @@ public partial class NetworkEntity : Node3D
     {
         QueueFree();
     }
+    
+    [Export]
+    public MeshUpdater mesh_updater;
 
     public virtual void MeshUpdate()
     {

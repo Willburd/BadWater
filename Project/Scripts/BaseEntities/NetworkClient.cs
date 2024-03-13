@@ -339,6 +339,13 @@ public partial class NetworkClient : Node
             Vector3 origin = camera.ProjectRayOrigin(mouse_button.Position);
             Vector3 direction = camera.ProjectRayNormal(mouse_button.Position);
             if (direction.Z == 0) return;
+            // Log ray for pixel checks later
+            new_inputs["raystart_x"]    = origin.X;
+            new_inputs["raystart_y"]    = origin.Y;
+            new_inputs["raystart_z"]    = origin.Z;
+            new_inputs["raynormal_x"]   = direction.X;
+            new_inputs["raynormal_y"]   = direction.Y;
+            new_inputs["raynormal_z"]   = direction.Z;
             Plane plane = new Plane(new Vector3(0, 1, 0), focused_position.Y);
             Vector3? position = plane.IntersectsRay(origin, direction);
             if(position == null) return;
@@ -392,7 +399,6 @@ public partial class NetworkClient : Node
     }
 
 
-    private const float item_radius = 0.3f;
     private Vector3 current_context_pos;
     private AbstractEntity current_context_entity;
     private void StartLeftClickInteraction(AbstractTurf turf,Vector3 pos,Godot.Collections.Dictionary click_params)
@@ -402,7 +408,23 @@ public partial class NetworkClient : Node
         // Get all entities on turf, attempt to click them from top to bottom
         foreach(AbstractEntity ent in turf.Contents)
         {
-            if(TOOLS.VecDist(ent.GridPos.WorldPos(),pos) < item_radius)
+            if(ent.LoadedNetworkEntity == null) continue;
+            MeshUpdater mesh_updater = ent.LoadedNetworkEntity.mesh_updater;
+            if(mesh_updater == null) continue;
+            AssetLoader.LoadedTexture tex_data = AssetLoader.loaded_textures[mesh_updater.CachedTexturePath];
+
+            Plane plane = new Plane(new Vector3(0, 1, 0), focused_position.Y);
+            Vector3? position = mesh_updater.mesh.Mesh.IntersectsRay(origin, direction);
+
+            click_params["raystart_x"]    = origin.X;
+            click_params["raystart_y"]    = origin.Y;
+            click_params["raystart_z"]    = origin.Z;
+            click_params["raynormal_x"]   = direction.X;
+            click_params["raynormal_y"]   = direction.Y;
+            click_params["raynormal_z"]   = direction.Z;
+
+
+            if(AssetLoader.texture_pages[tex_data.tex_page].GetPixel().A > 0.01)
             {
                 current_context_entity = ent;
                 return;

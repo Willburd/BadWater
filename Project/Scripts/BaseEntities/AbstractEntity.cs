@@ -148,6 +148,10 @@ public partial class AbstractEntity
      * Behavior hooks
      ****************************************************************/
     private NetworkEntity loaded_entity;    // Puppet this
+    public NetworkEntity LoadedNetworkEntity
+    {
+        get {return loaded_entity;}
+    }
     protected Behavior behavior_type;         // Behavior processing object
     public void SetBehavior(Behavior set_behavior)
     {

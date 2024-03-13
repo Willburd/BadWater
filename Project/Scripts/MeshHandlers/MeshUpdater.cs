@@ -64,7 +64,8 @@ public partial class MeshUpdater : Node3D
                 texture_path = "res://Library/Textures/" + texture_path;
             }
             if(!AssetLoader.loaded_textures.ContainsKey(texture_path)) texture_path = "res://Library/Textures/Error.png";
-            AssetLoader.LoadedTexture tex_data = AssetLoader.loaded_textures[texture_path];
+            cached_texpath = texture_path;
+            AssetLoader.LoadedTexture tex_data = AssetLoader.loaded_textures[cached_texpath];
             // Load from assetloader's material cache. Get the page the texture is on, and set it's offset from the atlas we built on launch!
             mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[tex_data.tex_page]);
             mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)tex_data.u / AssetLoader.tex_page_size,(float)tex_data.v / AssetLoader.tex_page_size) );
@@ -86,6 +87,10 @@ public partial class MeshUpdater : Node3D
     
     // These are used for internal rotations, has to be done regularly...
     private string cached_texpath;
+    public string CachedTexturePath
+    {
+        get {return cached_texpath;}
+    }
     private string cached_icon_state;
     private string cached_animation_suffix;
     public void RotateDirectionInRelationToCamera()
