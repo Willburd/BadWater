@@ -367,16 +367,66 @@ public partial class NetworkClient : Node
         if(!Multiplayer.IsServer()) return; // Server only
         Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
         if(client_click_data.Keys.Count == 0) return;
-        if(client_click_data["state"].AsBool())
+        if(client_click_data["button"].AsInt32() == (int)MouseButton.Left)
         {
-            GD.Print("Click " + client_click_data["button"] + " at " + client_click_data["x"] + "-" + client_click_data["y"] + "-" + client_click_data["z"]);
-            AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
-            GD.Print(turf);
+            if(client_click_data["state"].AsBool())
+            {
+                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                StartLeftClickInteraction(turf, new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble())); // BEGIN a contextual interaction...
+                return;
+            }
+            else
+            {
+                EndLeftClickInteraction(new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble())); // Handling drags, we confirm our contextual interaction!
+            }
+        }
+        if(client_click_data["button"].AsInt32() == (int)MouseButton.Right)
+        {
+            if(client_click_data["state"].AsBool())
+            {
+                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                RightClickInteraction(turf); // Right click contents menu
+            }
+        }
+    }
+
+
+    private Vector3 current_context_pos;
+    private AbstractEntity current_context_entity;
+    private void StartLeftClickInteraction(AbstractTurf turf,Vector3 pos)
+    {
+        // Store last position of the click
+        current_context_pos = pos;
+        // Get all entities on turf, attempt to click them from top to bottom
+
+        // If no entities, click the turf itself!
+
+    }
+    private void EndLeftClickInteraction(Vector3 pos)
+    {
+        if(current_context_entity == null) return;
+        // Perform interaction with contextual entity! If it's at nearly the same place we did a normal click!
+        if(TOOLS.VecDist(current_context_pos,pos) < 0.1)
+        {
+            // CLICK INTERACTION
+
         }
         else
         {
-            //GD.Print("Release " + client_click_data["button"] + " at " + client_click_data["x"] + "-" + client_click_data["y"] + "-" + client_click_data["z"]);
+            // DRAG INTERACTION
+
         }
+        // Cleanup
+        current_context_entity = null;
+        current_context_pos = Vector3.Zero;
+    }
+    private void RightClickInteraction(AbstractTurf turf)
+    {
+        // Create a list of entities on the tile that we can click, including the turf!
+
+        // Cleanup
+        current_context_entity = null;
+        current_context_pos = Vector3.Zero;
     }
 
     public Vector3 CamRotationVector3()
