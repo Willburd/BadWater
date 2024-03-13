@@ -328,6 +328,21 @@ public partial class NetworkClient : Node
                 }
             }
         }
+        if(@event is InputEventMouseButton mouse_button)
+        {
+            if(mouse_button.ButtonIndex == MouseButton.Left)
+            {
+                GD.Print("handle left");
+            }
+            if(mouse_button.ButtonIndex == MouseButton.Right)
+            {
+                GD.Print("handle right");
+            }
+            if(mouse_button.ButtonIndex == MouseButton.Middle)
+            {
+                GD.Print("handle right");
+            }
+        }
     }
 
     public Vector3 CamRotationVector3()
