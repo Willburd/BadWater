@@ -553,7 +553,10 @@ public partial class MapController : DeligateController
                     }
                 }
             }
-            return turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep];
+            int hor = Mathf.FloorToInt(grid_pos.hor);
+            int ver = Mathf.FloorToInt(grid_pos.ver);
+            int dep = Mathf.FloorToInt(grid_pos.dep);
+            return turfs[hor,ver,dep];
         }
 
         private void Internal_SetTurf(GridPos grid_pos, AbstractTurf set, bool submaps)
@@ -573,7 +576,10 @@ public partial class MapController : DeligateController
                     }
                 }
             }
-            turfs[(int)grid_pos.hor,(int)grid_pos.ver,(int)grid_pos.dep] = set;
+            int hor = Mathf.FloorToInt(grid_pos.hor);
+            int ver = Mathf.FloorToInt(grid_pos.ver);
+            int dep = Mathf.FloorToInt(grid_pos.dep);
+            turfs[hor,ver,dep] = set;
         }
 
 

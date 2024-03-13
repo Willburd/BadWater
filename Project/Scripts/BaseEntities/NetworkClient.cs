@@ -330,18 +330,52 @@ public partial class NetworkClient : Node
         }
         if(@event is InputEventMouseButton mouse_button)
         {
+            bool click = false;
+            Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
+            new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
+            new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
+            new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
+            // Cast into world on current focused Z level!
+            Vector3 origin = camera.ProjectRayOrigin(mouse_button.Position);
+            Vector3 direction = camera.ProjectRayNormal(mouse_button.Position);
+            if (direction.Z == 0) return;
+            Plane plane = new Plane(new Vector3(0, 1, 0), focused_position.Y);
+            Vector3? position = plane.IntersectsRay(origin, direction);
+            if(position == null) return;
+            new_inputs["x"]             = position.Value.X;
+            new_inputs["y"]             = position.Value.Y;
+            new_inputs["z"]             = position.Value.Z;
             if(mouse_button.ButtonIndex == MouseButton.Left)
             {
-                GD.Print("handle left");
+                new_inputs["button"] = (int)MouseButton.Left;
+                new_inputs["state"] = mouse_button.Pressed;
+                click = true;
             }
             if(mouse_button.ButtonIndex == MouseButton.Right)
             {
-                GD.Print("handle right");
+                new_inputs["button"] = (int)MouseButton.Right;
+                new_inputs["state"] = mouse_button.Pressed;
+                click = true;
             }
-            if(mouse_button.ButtonIndex == MouseButton.Middle)
-            {
-                GD.Print("handle right");
-            }
+            if(click) Rpc(nameof(ClientClick), Json.Stringify(new_inputs));
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    private void ClientClick(string parameters_json)
+    {
+        if(!Multiplayer.IsServer()) return; // Server only
+        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        if(client_click_data.Keys.Count == 0) return;
+        if(client_click_data["state"].AsBool())
+        {
+            GD.Print("Click " + client_click_data["button"] + " at " + client_click_data["x"] + "-" + client_click_data["y"] + "-" + client_click_data["z"]);
+            AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+            GD.Print(turf);
+        }
+        else
+        {
+            //GD.Print("Release " + client_click_data["button"] + " at " + client_click_data["x"] + "-" + client_click_data["y"] + "-" + client_click_data["z"]);
         }
     }
 
