@@ -293,12 +293,24 @@ public partial class AbstractEntity
 
     public void Click(AbstractEntity user,Godot.Collections.Dictionary click_params)
     {
-        behavior_type?.Click(this,entity_type,user,click_params);
+        if(user == this)
+        {
+            behavior_type?.ClickSelf(this,entity_type,click_params);
+        }
+        else
+        {
+            behavior_type?.Click(this,entity_type,user,click_params);
+        }
     }
 
     public void Drag(AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params)
     {
         behavior_type?.Drag(this,entity_type,user,new_destination,click_params);
+    }
+
+    public static bool Adjacent(AbstractEntity A,AbstractEntity B)
+    {
+        return TOOLS.VecDist(A.grid_pos.WorldPos(),B.grid_pos.WorldPos()) < 1f;
     }
 
     /*****************************************************************

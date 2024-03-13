@@ -18,4 +18,17 @@ namespace BehaviorEvents
             
         }
     }
+
+    // Minable turfs
+    public partial class TurfMineable : Behavior
+    {
+        public TurfMineable()
+        {
+        }
+
+        public override void MapLoadVars(Godot.Collections.Dictionary data)
+        {
+            
+        }
+    }
 }

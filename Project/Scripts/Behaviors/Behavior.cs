@@ -30,6 +30,10 @@ public partial class Behavior
                 new_behave = new BehaviorEvents.TurfBasic(4); // Wall over top of a panel!
             break;
 
+            case "TURF_MINEABLE":
+                new_behave = new BehaviorEvents.TurfMineable(); // Wall over top of a panel!
+            break;
+
             /*****************************************************************
              * EFFECT BEHAVIORS (Stuff like reagent smears being stepped through)
              ****************************************************************/
@@ -155,6 +159,11 @@ public partial class Behavior
     public void Click(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, Godot.Collections.Dictionary click_params)
     {
         GD.Print("CLICKED " + self.display_name); // REPLACE ME!!!
+    }
+
+    public void ClickSelf(AbstractEntity self, MainController.DataType entity_type, Godot.Collections.Dictionary click_params)
+    {
+        GD.Print("CLICKSELF " + self.display_name); // REPLACE ME!!!
     }
 
     public void Drag(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params)
