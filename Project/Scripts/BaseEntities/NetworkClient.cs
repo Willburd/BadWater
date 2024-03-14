@@ -314,8 +314,22 @@ public partial class NetworkClient : Node3D
     private AbstractEntity current_click_held_entity;
     private Vector3 current_click_start_pos;
 
-    public override void _Input(InputEvent @event)
+    public override void _UnhandledInput(InputEvent @event)
     {
+        if(!IsMultiplayerAuthority()) return;
+        // Client only input handling
+        if(@event is InputEventMouseMotion mouse_move)
+        {
+            if(mouse_move.Velocity.Length() > 0)
+            {
+                if(Input.IsActionPressed("game_camcontrol"))
+                {
+                    float velocity = mouse_move.Velocity.X / 15000f;
+                    view_rotation -= velocity;
+                    view_rotation %= Mathf.Pi * 2;
+                }
+            }
+        }
         if(@event is InputEventMouseButton mouse_button)
         {
             // Only handle LR presses
@@ -443,23 +457,6 @@ public partial class NetworkClient : Node3D
     private float view_rotation = 0f;
     [Export]
     public AudioListener3D listener;
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        if(!IsMultiplayerAuthority()) return;
-        // Client only input handling
-        if(@event is InputEventMouseMotion mouse_move)
-        {
-            if(mouse_move.Velocity.Length() > 0)
-            {
-                if(Input.IsActionPressed("game_camcontrol"))
-                {
-                    float velocity = mouse_move.Velocity.X / 15000f;
-                    view_rotation -= velocity;
-                    view_rotation %= Mathf.Pi * 2;
-                }
-            }
-        }
-    }
     public Vector3 CamRotationVector3()
     {
         Vector2 vec = CamRotationVector2();
