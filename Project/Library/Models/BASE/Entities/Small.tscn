@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://vytqv2y40k7a"]
+[gd_scene load_steps=4 format=3 uid="uid://vytqv2y40k7a"]
 
 [ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_xtx3w"]
-[ext_resource type="Script" path="res://Library/Models/BASE/Entities/ClickReciever.gd" id="2_co34h"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_4wiiq"]
 
@@ -18,10 +17,8 @@ is_directional = true
 transform = Transform3D(0.5, 0, 0, 0, -2.18557e-08, -0.5, 0, 0.5, -2.18557e-08, 0, 0, 0)
 mesh = SubResource("PlaneMesh_4wiiq")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Small" node_paths=PackedStringArray("mesh_updater")]
+[node name="StaticBody3D" type="StaticBody3D" parent="Small"]
 collision_mask = 0
-script = ExtResource("2_co34h")
-mesh_updater = NodePath("../..")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Small/StaticBody3D"]
 shape = SubResource("ConvexPolygonShape3D_rsnbt")

@@ -10,7 +10,7 @@ properties/1/path = NodePath(".:focused_position")
 properties/1/spawn = true
 properties/1/replication_mode = 1
 
-[node name="NetworkClient" type="Node" node_paths=PackedStringArray("my_hud", "camera", "listener")]
+[node name="NetworkClient" type="Node3D" node_paths=PackedStringArray("my_hud", "camera", "listener")]
 script = ExtResource("1_3ymcw")
 my_hud = NodePath("PlayerHud")
 camera = NodePath("ClientCamera")

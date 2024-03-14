@@ -132,7 +132,7 @@ public partial class MeshUpdater : Node3D
     }
 
 
-    public void ClickInput(Camera3D camera, InputEvent evnt, Vector3 position, Vector3 normal, StaticBody3D collider, int shape_idx)
+    public bool ClickInput(Camera3D camera, InputEvent evnt, Vector3 position, StaticBody3D collider)
     {
         if(evnt is InputEventMouseButton button)
         {
@@ -149,9 +149,11 @@ public partial class MeshUpdater : Node3D
                     {
                         (GetParent() as NetworkEntity).ClickReleased(position);
                     }
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     public Vector2 ColliderUVSpace(Vector3 position,StaticBody3D collider)

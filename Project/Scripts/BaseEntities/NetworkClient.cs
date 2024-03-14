@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Diagnostics;
 
 [GlobalClass]
-public partial class NetworkClient : Node
+public partial class NetworkClient : Node3D
 {
     public static NetworkClient peer_active_client;
     public int PeerID              // Used by main controller to know that all controllers are ready for first game tick
@@ -313,6 +313,136 @@ public partial class NetworkClient : Node
      ****************************************************************/
     private AbstractEntity current_click_held_entity;
     private Vector3 current_click_start_pos;
+
+    public override void _Input(InputEvent @event)
+    {
+        if(@event is InputEventMouseButton mouse_button)
+        {
+            // Only handle LR presses
+            if(mouse_button.ButtonIndex != MouseButton.Left && mouse_button.ButtonIndex != MouseButton.Right) return;
+
+            // Raycasting time! We want to handle a raycast all on our own, because godot has some brain damage in its input system, and this is too hard for it.
+            Camera3D current_camera = GetViewport().GetCamera3D();
+            Vector3 from = current_camera.ProjectRayOrigin(mouse_button.Position);
+            float dist = 100f;
+            Vector3 raynormal = current_camera.ProjectRayNormal(mouse_button.Position);
+            Vector3 to = from + (raynormal * dist);
+            // Scan all colliding bodies on a raycast!
+            SortedList<float,StaticBody3D> dist_list = new SortedList<float, StaticBody3D>();
+            Godot.Collections.Array<Rid> already_processed = new Godot.Collections.Array<Rid>();
+            Godot.Collections.Dictionary raycast_hit = GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create(from, to));
+            while(raycast_hit.Count > 0)
+            {
+                if(raycast_hit["collider"].AsGodotObject() is StaticBody3D static_body)
+                {
+                    dist_list.Add(TOOLS.VecDist(from,raycast_hit["position"].AsVector3()), static_body);
+                }
+                already_processed.Add(raycast_hit["rid"].AsRid()); // Prevent endless loops
+                raycast_hit = GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create( from, to, exclude:already_processed));
+            }
+            // Now that they're sorted by distance, attempt from nearest to furthest to interact!
+            foreach(var dat in dist_list)
+            {
+                if(mouse_button.ButtonIndex == MouseButton.Left)
+                {
+                    if(dat.Value.GetParent().GetParent() is MeshUpdater mesh_handler)
+                    {
+                        if(mesh_handler.ClickInput(current_camera, @event,from + (raynormal * dat.Key),dat.Value)) break;
+                    }
+                }
+                // Make rightclicking always get the TURF's content list!
+                if(dat.Value.GetParent() is TurfClickHandler turf_handler)
+                {
+                    if(turf_handler.ClickInput(current_camera, @event,from + (raynormal * dat.Key),dat.Value)) break;
+                }
+            }
+        }
+    }
+
+    // Clientside catch for turfplane click!
+    public void ClientTurfClick(string parameters_json)
+    {
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClickTurf), parameters_json);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    private void ClickTurf(string parameters_json)
+    {
+        if(!Multiplayer.IsServer()) return; // Server only
+        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        if(client_click_data.Keys.Count == 0) return;
+
+        if(client_click_data["button"].AsInt32() == (int)MouseButton.Left)
+        {
+            if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
+            {
+                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                if(current_click_held_entity != null)
+                {
+                    current_click_held_entity.Drag( focused_entity, turf, client_click_data);
+                    current_click_held_entity = null;
+                    current_click_start_pos = Vector3.Zero;
+                }
+                else
+                {
+                    turf?.Click( focused_entity, client_click_data);
+                }
+            }
+        }
+
+        if(client_click_data["button"].AsInt32() == (int)MouseButton.Right)
+        {
+            if(client_click_data["state"].AsBool()) // Creates a menu, so do this instantly!
+            {
+                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                // Create a list of entities on the tile that we can click, including the turf!
+                if(turf == null) return;
+                foreach(AbstractEntity ent in turf.Contents)
+                {
+                    GD.Print(ent.display_name);
+                }
+                GD.Print(turf.display_name);
+            }
+        }
+    }
+    public void ClickEntityStart(AbstractEntity ent,string parameters_json)
+    {
+        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        current_click_held_entity = ent;
+        current_click_start_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
+    }
+    public void ClickEntityEnd(AbstractEntity ent,string parameters_json)
+    {
+        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        Vector3 release_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
+        if(current_click_held_entity != null && ent != null) // Catching entity drags!
+        {
+            if(TOOLS.VecDist(release_pos, current_click_start_pos) > 0.1f || current_click_held_entity != ent)
+            {
+                // Dragged onto another entity!
+                current_click_held_entity.Drag(focused_entity,ent,TOOLS.ParseJson(parameters_json));
+            }
+            else
+            {
+                // Click on same entity!
+                current_click_held_entity.Click(focused_entity,TOOLS.ParseJson(parameters_json));
+            }
+            // Cleanup
+            current_click_start_pos = Vector3.Zero;
+            current_click_held_entity = null;
+        }
+    }
+
+
+    /*****************************************************************
+     * Client camera handling
+     ****************************************************************/
+    [Export]
+    public Camera3D camera;
+    private float zoom_level = 1f;
+    private float view_rotation = 0f;
+    [Export]
+    public AudioListener3D listener;
     public override void _UnhandledInput(InputEvent @event)
     {
         if(!IsMultiplayerAuthority()) return;
@@ -329,105 +459,7 @@ public partial class NetworkClient : Node
                 }
             }
         }
-        if(@event is InputEventMouseButton mouse_button)
-        {
-            bool click = false;
-            Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
-            new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
-            new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
-            new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
-            // Cast into world on current focused Z level!
-            Vector3 origin = camera.ProjectRayOrigin(mouse_button.Position);
-            Vector3 direction = camera.ProjectRayNormal(mouse_button.Position);
-            if (direction.Z == 0) return;
-            Plane plane = new Plane(new Vector3(0, 1, 0), focused_position.Y);
-            Vector3? position = plane.IntersectsRay(origin, direction);
-            if(position == null) return;
-            new_inputs["x"]             = position.Value.X;
-            new_inputs["y"]             = position.Value.Y;
-            new_inputs["z"]             = position.Value.Z;
-            if(mouse_button.ButtonIndex == MouseButton.Left)
-            {
-                new_inputs["button"] = (int)MouseButton.Left;
-                new_inputs["state"] = mouse_button.Pressed;
-                click = true;
-            }
-            if(mouse_button.ButtonIndex == MouseButton.Right)
-            {
-                new_inputs["button"] = (int)MouseButton.Right;
-                new_inputs["state"] = mouse_button.Pressed;
-                click = true;
-            }
-            if(click) Rpc(nameof(ClickTurf), Json.Stringify(new_inputs));
-        }
     }
-
-    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
-    private void ClickTurf(string parameters_json)
-    {
-        if(!Multiplayer.IsServer()) return; // Server only
-        if(current_click_held_entity != null) return; // holding or clicking an entity!
-        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
-        if(client_click_data.Keys.Count == 0) return;
-        if(client_click_data["button"].AsInt32() == (int)MouseButton.Left)
-        {
-            if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
-            {
-                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
-                turf?.Click( focused_entity, client_click_data);
-            }
-        }
-        if(client_click_data["button"].AsInt32() == (int)MouseButton.Right)
-        {
-            if(client_click_data["state"].AsBool()) // Creates a menu, so do this instantly!
-            {
-                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
-                // Create a list of entities on the tile that we can click, including the turf!
-                if(turf != null)
-                {
-                    foreach(AbstractEntity ent in turf.Contents)
-                    {
-                        GD.Print(ent.display_name);
-                    }
-                }
-            }
-        }
-    }
-    public void ClickEntityStart(AbstractEntity ent,string parameters_json)
-    {
-        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
-        current_click_held_entity = ent;
-        current_click_start_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
-    }
-    public void ClickEntityEnd(AbstractEntity ent,string parameters_json)
-    {
-        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
-        Vector3 release_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
-        if(TOOLS.VecDist(release_pos, current_click_start_pos) > 0.05f)
-        {
-            // drag to turf if no entity is at mouse location!
-            ent ??= MapController.GetTurfAtPosition(focused_map_id, new MapController.GridPos(release_pos.X, release_pos.Z, release_pos.Y), true); 
-            current_click_held_entity.Drag(focused_entity,ent,TOOLS.ParseJson(parameters_json));
-        }
-        else
-        {
-            current_click_held_entity.Click(focused_entity,TOOLS.ParseJson(parameters_json));
-        }
-        // Cleanup
-        current_click_start_pos = Vector3.Zero;
-        current_click_held_entity = null;
-    }
-
-
-    /*****************************************************************
-     * Client camera handling
-     ****************************************************************/
-    [Export]
-    public Camera3D camera;
-    private float zoom_level = 1f;
-    private float view_rotation = 0f;
-    [Export]
-    public AudioListener3D listener;
     public Vector3 CamRotationVector3()
     {
         Vector2 vec = CamRotationVector2();
