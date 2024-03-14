@@ -8,9 +8,6 @@ using System.Diagnostics;
 public partial class NetworkClient : Node
 {
     public static NetworkClient peer_active_client;
-    public NetworkEntity holding_entity;
-    public Vector3 drag_start_location;
-
     public int PeerID              // Used by main controller to know that all controllers are ready for first game tick
     {
         get 
@@ -20,55 +17,15 @@ public partial class NetworkClient : Node
             return 1;
         }
     }
-    [Export]
-    CanvasLayer my_hud;
-
-    [Export]
-    public string focused_map_id;
-    private string sync_map_id;
-    [Export]
-    public Vector3 focused_position;
-    private Vector3 sync_position;
-    private float zoom_level = 1f;
-    private float view_rotation = 0f;
-
-
-    private Godot.Collections.Dictionary client_input_data = new Godot.Collections.Dictionary();    // current inputs from client
-    private Godot.Collections.Dictionary visual_state = new Godot.Collections.Dictionary();         // The visual effects from status conditions
-    private AbstractEntity focused_entity;
-
-    [Export]
-    public Camera3D camera;
-    [Export]
-    public AudioListener3D listener;
-
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(PeerID);
     }
 
-    public void SetFocusedEntity(AbstractEntity ent)
-    {
-        GD.Print("Client " + Name + " focused entity updated to " + ent);
-        focused_entity = ent;
-        focused_map_id = focused_entity.map_id_string;
-        focused_position = focused_entity.GridPos.WorldPos();
-        AccountController.UpdateAccount(this,ent);
-        if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
-    }
-    public AbstractEntity GetFocusedEntity()
-    {
-        return focused_entity;
-    }
 
-    public void ClearFocusedEntity()
-    {
-        GD.Print(Name + " Client focused entity cleared");
-        focused_entity = null;
-        AccountController.UpdateAccount(this,null);
-    }
-
-
+    /*****************************************************************
+     * Login and credential requests
+     ****************************************************************/
     public bool has_logged_in = false;
     public string login_name = null;
     public string login_hash = null;
@@ -106,7 +63,6 @@ public partial class NetworkClient : Node
             Init();
         }
     }
-
     public void Init()
     {
         GD.Print("Client init " + Name);
@@ -144,7 +100,6 @@ public partial class NetworkClient : Node
         // Client joins chunk controller
         ChunkController.NewClient(this);
     }
-
     public void Spawn()
     {
         camera.Current = false;
@@ -170,7 +125,6 @@ public partial class NetworkClient : Node
         GD.Print("Client FALLBACK RESPAWN: " + Name);
         SpawnHostEntity(MapController.FallbackMap(),new MapController.GridPos((float)0.5,(float)0.5,0));
     }
-
     private void SpawnHostEntity(string new_map, MapController.GridPos new_pos)
     {
         // SPAWN HOST OBJECT
@@ -185,6 +139,38 @@ public partial class NetworkClient : Node
         if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
     }
 
+
+    /*****************************************************************
+     * Currently focused entity of the client... It will follow this around.
+     ****************************************************************/
+    private AbstractEntity focused_entity;
+    public Vector3 focused_position;
+    public string focused_map_id;
+    private Vector3 sync_position;
+    private string sync_map_id;
+    private Godot.Collections.Dictionary visual_state = new Godot.Collections.Dictionary();         // The visual effects from status conditions
+
+    public void SetFocusedEntity(AbstractEntity ent)
+    {
+        GD.Print("Client " + Name + " focused entity updated to " + ent);
+        focused_entity = ent;
+        focused_map_id = focused_entity.map_id_string;
+        focused_position = focused_entity.GridPos.WorldPos();
+        AccountController.UpdateAccount(this,ent);
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
+    }
+    public AbstractEntity GetFocusedEntity()
+    {
+        return focused_entity;
+    }
+
+    public void ClearFocusedEntity()
+    {
+        GD.Print(Name + " Client focused entity cleared");
+        focused_entity = null;
+        AccountController.UpdateAccount(this,null);
+    }
+
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferChannel = (int)MainController.RPCTransferChannels.Movement)] // Tell the client we want to forcibly move this
     public virtual void UpdateClientFocusedPos(string map_id, Vector3 new_pos)
     {
@@ -193,7 +179,29 @@ public partial class NetworkClient : Node
         sync_map_id = focused_map_id;
         sync_position = focused_position;
     }
+    
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    private void SetClientControl(string control_data)
+    {
+        client_input_data = (Godot.Collections.Dictionary)Json.ParseString(control_data);
+    }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    private void UpdateClientMobVisuals(string control_data)
+    {
+        visual_state = (Godot.Collections.Dictionary)Json.ParseString(control_data);
+        bool blind = TOOLS.ApplyExistingTag(visual_state,"blind",false);
+        float white_fade = TOOLS.ApplyExistingTag(visual_state,"white_fade",0);
+        float black_fade = TOOLS.ApplyExistingTag(visual_state,"black_fade",0);
+    }
+
+
+    /*****************************************************************
+     * Client processing and input handling
+     ****************************************************************/
+    private Godot.Collections.Dictionary client_input_data = new Godot.Collections.Dictionary();    // current inputs from client
+    [Export]
+    CanvasLayer my_hud;
     public void Tick()
     {
         if(TOOLS.PeerConnecting(this)) return;
@@ -225,13 +233,11 @@ public partial class NetworkClient : Node
         // One of the few things we actually update rather regularly... Visual hud update stuff
         if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientMobVisuals), Json.Stringify(new_visual_state));
     }
-
     private void UpdateClientControl()
     {
         focused_entity?.ControlUpdate(client_input_data);
         client_input_data = new Godot.Collections.Dictionary();
     }
-
     public override void _Process(double delta)
     {
         if(!TOOLS.PeerConnected(this)) return;
@@ -301,22 +307,12 @@ public partial class NetworkClient : Node
         }
     }
 
-    public override void _PhysicsProcess(double delta)
-    {
-        if(!IsMultiplayerAuthority()) return;
-        // Client only camera update
-        if(camera.Current == false)
-        {
-            camera.Current = true;
-            listener.MakeCurrent();
-            my_hud.Show();
-        }
-        float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
-        camera.Position = camera.Position.MoveToward(focused_position + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0), (float)delta * lerp_speed);
-        camera.LookAt(focused_position + new Vector3(0,0.1f,0));
-        listener.Position = focused_position + Vector3.Up;
-    }
 
+    /*****************************************************************
+     * Client click handling
+     ****************************************************************/
+    private AbstractEntity current_click_held_entity;
+    private Vector3 current_click_start_pos;
     public override void _UnhandledInput(InputEvent @event)
     {
         if(!IsMultiplayerAuthority()) return;
@@ -362,14 +358,15 @@ public partial class NetworkClient : Node
                 new_inputs["state"] = mouse_button.Pressed;
                 click = true;
             }
-            if(click) Rpc(nameof(ClientClickTurf), Json.Stringify(new_inputs));
+            if(click) Rpc(nameof(ClickTurf), Json.Stringify(new_inputs));
         }
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
-    private void ClientClickTurf(string parameters_json)
+    private void ClickTurf(string parameters_json)
     {
         if(!Multiplayer.IsServer()) return; // Server only
+        if(current_click_held_entity != null) return; // holding or clicking an entity!
         Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
         if(client_click_data.Keys.Count == 0) return;
         if(client_click_data["button"].AsInt32() == (int)MouseButton.Left)
@@ -396,45 +393,70 @@ public partial class NetworkClient : Node
             }
         }
     }
+    public void ClickEntityStart(AbstractEntity ent,string parameters_json)
+    {
+        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        current_click_held_entity = ent;
+        current_click_start_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
+    }
+    public void ClickEntityEnd(AbstractEntity ent,string parameters_json)
+    {
+        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        Vector3 release_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
+        if(TOOLS.VecDist(release_pos, current_click_start_pos) > 0.05f)
+        {
+            // drag to turf if no entity is at mouse location!
+            ent ??= MapController.GetTurfAtPosition(focused_map_id, new MapController.GridPos(release_pos.X, release_pos.Z, release_pos.Y), true); 
+            current_click_held_entity.Drag(focused_entity,ent,TOOLS.ParseJson(parameters_json));
+        }
+        else
+        {
+            current_click_held_entity.Click(focused_entity,TOOLS.ParseJson(parameters_json));
+        }
+        // Cleanup
+        current_click_start_pos = Vector3.Zero;
+        current_click_held_entity = null;
+    }
 
+
+    /*****************************************************************
+     * Client camera handling
+     ****************************************************************/
+    [Export]
+    public Camera3D camera;
+    private float zoom_level = 1f;
+    private float view_rotation = 0f;
+    [Export]
+    public AudioListener3D listener;
     public Vector3 CamRotationVector3()
     {
         Vector2 vec = CamRotationVector2();
         return new Vector3(vec.X,0,vec.Y).Normalized();
     }
-
     public Vector2 CamRotationVector2()
     {
         return new Vector2(Mathf.Sin(view_rotation),Mathf.Cos(view_rotation)).Normalized();
     }
-
-    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
-    private void SetClientControl(string control_data)
+    public override void _PhysicsProcess(double delta)
     {
-        client_input_data = (Godot.Collections.Dictionary)Json.ParseString(control_data);
+        if(!IsMultiplayerAuthority()) return;
+        // Client only camera update
+        if(camera.Current == false)
+        {
+            camera.Current = true;
+            listener.MakeCurrent();
+            my_hud.Show();
+        }
+        float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
+        camera.Position = camera.Position.MoveToward(focused_position + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0), (float)delta * lerp_speed);
+        camera.LookAt(focused_position + new Vector3(0,0.1f,0));
+        listener.Position = focused_position + Vector3.Up;
     }
 
 
-    public void DisconnectClient()
-    {
-        // Server handling client DC
-        AccountController.ClientLeave(this);
-        focused_entity?.ClearClientOwner();
-        MainController.controller.Multiplayer.MultiplayerPeer.DisconnectPeer(int.Parse(Name)); // Calls Kill() remotely
-    }
-    
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
-    private void UpdateClientMobVisuals(string control_data)
-    {
-        visual_state = (Godot.Collections.Dictionary)Json.ParseString(control_data);
-        bool blind = TOOLS.ApplyExistingTag(visual_state,"blind",false);
-        float white_fade = TOOLS.ApplyExistingTag(visual_state,"white_fade",0);
-        float black_fade = TOOLS.ApplyExistingTag(visual_state,"black_fade",0);
-    }
-
-
-
-
+    /*****************************************************************
+     * Client sound transmission
+     ****************************************************************/
     public void PlaySoundAt(string path, Vector3 pos, float range, float volume_mod)
     {
         if(!has_logged_in) return;
@@ -461,5 +483,17 @@ public partial class NetworkClient : Node
         newsound.path = path;
         newsound.Position = pos;
         GetTree().Root.AddChild(newsound);
+    }
+
+
+    /*****************************************************************
+     * Client disconnetion
+     ****************************************************************/
+    public void DisconnectClient()
+    {
+        // Server handling client DC
+        AccountController.ClientLeave(this);
+        focused_entity?.ClearClientOwner();
+        MainController.controller.Multiplayer.MultiplayerPeer.DisconnectPeer(int.Parse(Name)); // Calls Kill() remotely
     }
 }

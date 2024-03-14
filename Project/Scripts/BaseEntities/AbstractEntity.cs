@@ -309,7 +309,14 @@ public partial class AbstractEntity
 
     public void Drag(AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params)
     {
-        behavior_type?.Drag(this,entity_type,user,new_destination,click_params);
+        if(this == new_destination)
+        {
+            behavior_type?.DragSelf(this,entity_type,user,click_params);
+        }
+        else
+        {
+            behavior_type?.Drag(this,entity_type,user,new_destination,click_params);
+        }
     }
 
     public static bool Adjacent(AbstractEntity A,AbstractEntity B)

@@ -92,10 +92,6 @@ public partial class MeshUpdater : Node3D
         get {return cached_texpath;}
     }
     private AssetLoader.LoadedTexture cached_current_texdata;
-    public AssetLoader.LoadedTexture CachedTextureData
-    {
-        get {return cached_current_texdata;}
-    }
     private string cached_icon_state;
     private string cached_animation_suffix;
     public void RotateDirectionInRelationToCamera()
@@ -142,15 +138,40 @@ public partial class MeshUpdater : Node3D
         {
             if(button.ButtonIndex == MouseButton.Left)
             {
-                if(button.Pressed)
-                {   
-                    (GetParent() as NetworkEntity).ClickPressed(position,collider);
-                }
-                else
-                {   
-                    (GetParent() as NetworkEntity).ClickReleased(position,collider);
+                Vector2 texspace = ColliderUVSpace(position,collider);
+                if(CheckTexturePressed(texspace.X,texspace.Y)) 
+                {
+                    if(button.Pressed)
+                    {
+                        (GetParent() as NetworkEntity).ClickPressed(position);
+                    }
+                    else
+                    {
+                        (GetParent() as NetworkEntity).ClickReleased(position);
+                    }
                 }
             }
         }
+    }
+
+    public Vector2 ColliderUVSpace(Vector3 position,StaticBody3D collider)
+    {
+        // Godot, please explain to me why you don't have the ability to get texcoord from a click off a mesh...
+        // Massively crippling for anyone doing pixel detection or mesh painting..
+        position = collider.ToLocal(position);
+        position *= collider.Quaternion.Inverse();
+        float meshu = Mathf.InverseLerp(-1f,1f,position.X);
+        float meshv = Mathf.InverseLerp(-1f,1f,position.Z);
+        return new Vector2(meshu,meshv);
+    }
+
+    public bool CheckTexturePressed(float meshu, float meshv)
+    {
+        // Check texture information
+        AssetLoader.LoadedTexture tex_data = cached_current_texdata;
+        float ux = tex_data.u + (tex_data.width * meshu);
+        float vy = tex_data.v + (tex_data.height * meshv);
+        Color col = AssetLoader.texture_pages[tex_data.tex_page].GetPixel(Mathf.FloorToInt(ux),Mathf.FloorToInt(vy));
+        return col.A > 0.01f;
     }
 }
