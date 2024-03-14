@@ -80,26 +80,14 @@ public partial class NetworkEntity : Node3D
     public void ClickPressed(Vector3 pos)
     {
         if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
-        Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
-        new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
-        new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
-        new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
-        new_inputs["x"]             = pos.X;
-        new_inputs["y"]             = pos.Y;
-        new_inputs["z"]             = pos.Z;
+        Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
         Rpc(nameof(ClientUpdateClickedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
     }
 
     public void ClickReleased(Vector3 pos)
     {
         if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
-        Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
-        new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
-        new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
-        new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
-        new_inputs["x"]             = pos.X;
-        new_inputs["y"]             = pos.Y;
-        new_inputs["z"]             = pos.Z;
+        Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
         Rpc(nameof(ClientUpdateReleasedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
     }
 

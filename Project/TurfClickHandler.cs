@@ -9,13 +9,7 @@ public partial class TurfClickHandler : Node3D
         if(evnt is InputEventMouseButton mouse_button)
         {
             bool click = false;
-            Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
-            new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
-            new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
-            new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
-            new_inputs["x"]             = pos.X;
-            new_inputs["y"]             = pos.Y;
-            new_inputs["z"]             = pos.Z;
+            Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
             if(mouse_button.ButtonIndex == MouseButton.Left)
             {
                 new_inputs["button"] = (int)MouseButton.Left;

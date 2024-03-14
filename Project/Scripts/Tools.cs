@@ -3,6 +3,17 @@ using System;
 
 public static class TOOLS
 {
+    public static Godot.Collections.Dictionary AssembleStandardClick(Vector3 pos)
+    {
+        Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
+        new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
+        new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
+        new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
+        new_inputs["x"]             = pos.X;
+        new_inputs["y"]             = pos.Y;
+        new_inputs["z"]             = pos.Z;
+        return new_inputs;
+    }
     public static bool PeerDisconnected(Node node)
     {
         if(node == null) return true;
