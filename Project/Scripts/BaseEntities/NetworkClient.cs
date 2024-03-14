@@ -240,6 +240,8 @@ public partial class NetworkClient : Node3D
     }
     public override void _Process(double delta)
     {
+        click_cooldown -= (float)delta;
+        if(click_cooldown < 0f) click_cooldown = 0f;
         if(!TOOLS.PeerConnected(this)) return;
         if(!IsMultiplayerAuthority()) return;
         // Get client inputs!
@@ -313,6 +315,12 @@ public partial class NetworkClient : Node3D
      ****************************************************************/
     private AbstractEntity current_click_held_entity;
     private Vector3 current_click_start_pos;
+    private float click_cooldown = 0f;
+
+    public void SetClickCooldown()
+    {
+        click_cooldown = 0.05f; // fixed time
+    }
 
     public override void _UnhandledInput(InputEvent @event)
     {
@@ -330,6 +338,7 @@ public partial class NetworkClient : Node3D
                 }
             }
         }
+        if(click_cooldown > 0f) return; // Prevent abuse
         if(@event is InputEventMouseButton mouse_button)
         {
             // Only handle LR presses
@@ -370,6 +379,7 @@ public partial class NetworkClient : Node3D
                     if(turf_handler.ClickInput(current_camera, @event,from + (raynormal * dat.Key),dat.Value)) break;
                 }
             }
+            SetClickCooldown();
         }
     }
 
