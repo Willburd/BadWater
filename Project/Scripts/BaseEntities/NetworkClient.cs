@@ -465,8 +465,7 @@ public partial class NetworkClient : Node3D
     public Camera3D camera;
     private float zoom_level = 1f;
     private float view_rotation = 0f;
-    [Export]
-    public AudioListener3D listener;
+    private AudioListener3D listener;
     public Vector3 CamRotationVector3()
     {
         Vector2 vec = CamRotationVector2();
@@ -483,7 +482,8 @@ public partial class NetworkClient : Node3D
         if(camera.Current == false)
         {
             camera.Current = true;
-            listener.MakeCurrent();
+            listener = new AudioListener3D();
+            AddChild(listener);
             my_hud.Show();
         }
         float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
