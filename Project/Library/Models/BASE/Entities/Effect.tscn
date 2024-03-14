@@ -1,9 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://c2j1ac4uflg23"]
+[gd_scene load_steps=5 format=3 uid="uid://c2j1ac4uflg23"]
 
 [ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_gj3hx"]
+[ext_resource type="Script" path="res://Library/Models/BASE/Entities/ClickReciever.gd" id="2_ibooe"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_wnhxs"]
 size = Vector2(1, 1)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_apvic"]
+points = PackedVector3Array(-1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1)
 
 [node name="Constraint" type="Node3D" node_paths=PackedStringArray("mesh")]
 script = ExtResource("1_gj3hx")
@@ -12,3 +16,14 @@ mesh = NodePath("Effect")
 [node name="Effect" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
 mesh = SubResource("PlaneMesh_wnhxs")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Effect" node_paths=PackedStringArray("mesh_updater")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+collision_mask = 0
+script = ExtResource("2_ibooe")
+mesh_updater = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Effect/StaticBody3D"]
+shape = SubResource("ConvexPolygonShape3D_apvic")
+
+[connection signal="input_event" from="Effect/StaticBody3D" to="Effect/StaticBody3D" method="_on_input_event"]

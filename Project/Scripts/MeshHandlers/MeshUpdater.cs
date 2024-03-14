@@ -65,11 +65,11 @@ public partial class MeshUpdater : Node3D
             }
             if(!AssetLoader.loaded_textures.ContainsKey(texture_path)) texture_path = "res://Library/Textures/Error.png";
             cached_texpath = texture_path;
-            AssetLoader.LoadedTexture tex_data = AssetLoader.loaded_textures[cached_texpath];
+            cached_current_texdata = AssetLoader.loaded_textures[cached_texpath];
             // Load from assetloader's material cache. Get the page the texture is on, and set it's offset from the atlas we built on launch!
-            mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[tex_data.tex_page]);
-            mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)tex_data.u / AssetLoader.tex_page_size,(float)tex_data.v / AssetLoader.tex_page_size) );
-            mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)tex_data.width / AssetLoader.tex_page_size,(float)tex_data.height / AssetLoader.tex_page_size) );
+            mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[cached_current_texdata.tex_page]);
+            mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)cached_current_texdata.u / AssetLoader.tex_page_size,(float)cached_current_texdata.v / AssetLoader.tex_page_size) );
+            mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
         }
         else
         {
@@ -91,6 +91,11 @@ public partial class MeshUpdater : Node3D
     {
         get {return cached_texpath;}
     }
+    private AssetLoader.LoadedTexture cached_current_texdata;
+    public AssetLoader.LoadedTexture CachedTextureData
+    {
+        get {return cached_current_texdata;}
+    }
     private string cached_icon_state;
     private string cached_animation_suffix;
     public void RotateDirectionInRelationToCamera()
@@ -107,11 +112,11 @@ public partial class MeshUpdater : Node3D
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + cached_animation_suffix + "/Base.png";
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/Base.png";
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/Error.png";
-        AssetLoader.LoadedTexture tex_data = AssetLoader.loaded_textures[direction_tex];
+        cached_current_texdata = AssetLoader.loaded_textures[direction_tex];
         // Load from assetloader's material cache. Get the page the texture is on, and set it's offset from the atlas we built on launch!
-        mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[tex_data.tex_page]);
-        mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)tex_data.u / AssetLoader.tex_page_size,(float)tex_data.v / AssetLoader.tex_page_size) );
-        mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)tex_data.width / AssetLoader.tex_page_size,(float)tex_data.height / AssetLoader.tex_page_size) );
+        mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[cached_current_texdata.tex_page]);
+        mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)cached_current_texdata.u / AssetLoader.tex_page_size,(float)cached_current_texdata.v / AssetLoader.tex_page_size) );
+        mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
     }
     
     public override void _PhysicsProcess(double delta)
@@ -127,6 +132,25 @@ public partial class MeshUpdater : Node3D
             camera_relational_vector.Y = 0;
             camera_relational_vector = camera_relational_vector.Normalized();
             RotateDirectionInRelationToCamera();
+        }
+    }
+
+
+    public void ClickInput(Camera3D camera, InputEvent evnt, Vector3 position, Vector3 normal, StaticBody3D collider, int shape_idx)
+    {
+        if(evnt is InputEventMouseButton button)
+        {
+            if(button.ButtonIndex == MouseButton.Left)
+            {
+                if(button.Pressed)
+                {   
+                    (GetParent() as NetworkEntity).ClickPressed(position,collider);
+                }
+                else
+                {   
+                    (GetParent() as NetworkEntity).ClickReleased(position,collider);
+                }
+            }
         }
     }
 }

@@ -64,12 +64,16 @@ public partial class MainController : Node
 		get 
 		{
 			List<NetworkClient> ret = new List<NetworkClient>();
-			for(int i = 0; i < controller.client_container.GetChildCount(); i++) 
+			for(int i = 0; i < ClientContainer.GetChildCount(); i++) 
 			{
-				ret.Add(controller.client_container.GetChild(i) as NetworkClient);
+				ret.Add(ClientContainer.GetChild(i) as NetworkClient);
 			}
 			return ret;
 		}
+	} 
+	public static Node ClientContainer
+	{
+		get{return MainController.controller.client_container;}
 	} 
 
 	public void Init(ServerConfig state)
