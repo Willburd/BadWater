@@ -183,7 +183,7 @@ public static class TOOLS
     public static bool Adjacent(AbstractEntity A,AbstractEntity B)
     {
         if(A.map_id_string != B.map_id_string) return false;
-        return TOOLS.VecDist(A.GridPos.WorldPos(),B.GridPos.WorldPos()) < 1f;
+        return TOOLS.VecDist(A.GridPos.WorldPos(),B.GridPos.WorldPos()) < 1.5f;
     }
 
     public static DAT.Dir RotateTowardEntity(AbstractEntity A,AbstractEntity B)

@@ -5,6 +5,24 @@ using System.Collections.Generic;
 // Machine entities are objects on a map that perform a regular update, are not living things, and often interact directly with the map. Rarely some objects that are not machines may use this type.
 public partial class AbstractMachine : AbstractEntity
 {
+    public static AbstractMachine CreateMachine(PackData data)
+    {
+        AbstractMachine new_machine = null;
+        switch(data.behaviorID)
+        {
+            
+
+            /*****************************************************************
+             * Debugging purposes only.
+             ****************************************************************/
+            default:
+            case "_BEHAVIOR_":
+                new_machine = new AbstractMachine();
+            break;
+        }
+        return new_machine;
+    }
+
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {

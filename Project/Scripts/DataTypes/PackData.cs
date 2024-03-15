@@ -34,6 +34,7 @@ public partial class PackData : Resource
         texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
         anim_speed      = TOOLS.ApplyExistingTag(data,"anim_speed",(double)0);
         intangible      = TOOLS.ApplyExistingTag(data,"intangible",intangible);
+        reach           = TOOLS.ApplyExistingTag(data,"reach",reach);
     }
 
     public Godot.Collections.Dictionary GetTempData()
@@ -66,6 +67,7 @@ public partial class PackData : Resource
         texture             = source.texture;
         anim_speed          = source.anim_speed;
         intangible          = source.intangible;
+        reach               = source.reach;
     }
 
     protected virtual string GetVarString()
@@ -119,5 +121,6 @@ public partial class PackData : Resource
     public string model = "BASE/Turfs/Plane.tscn";
     public string texture = "";
     public double anim_speed = 0;
-    public bool intangible;
+    public bool intangible = false;
+    public int reach = 1;
 }

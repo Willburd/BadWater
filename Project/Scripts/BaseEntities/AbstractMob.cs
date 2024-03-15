@@ -5,7 +5,42 @@ using System.Diagnostics;
 
 // Mob entities are objects on a map perform regular life updates, have special inventory slots to wear things, and recieve inputs from clients that they decide how to interpret.
 public partial class AbstractMob : AbstractEntity
-{
+{ // Returns subtypes of behavior object
+    public static AbstractMob CreateMob(PackData data)
+    {
+        AbstractMob new_mob = null;
+        switch(data.behaviorID)
+        {
+            /*****************************************************************
+             * MOB BEHAVIORS (Living creatures and players)
+             ****************************************************************/
+            case "MOB_SIMPLE": // Life, death, status effects, breathing, eating, reagent processing.
+                new_mob = new Behaviors_BASE.AbstractSimpleMob();
+            break;
+
+            case "MOB_COMPLEX": // Has species, unique markings, Has organs and limbs, DNA, traits, mutations, on top of all the stuff MOB has.
+                new_mob = new Behaviors_BASE.AbstractSimpleMob();
+            break;
+
+            /*****************************************************************
+             * UNIQUE MOB BEHAVIORS (Hyper specialized mobs that need entirely unique features)
+             ****************************************************************/
+            case "MOB_BORER":
+                new_mob = new Behaviors_BASE.AbstractSimpleMob();
+            break;
+
+            /*****************************************************************
+             * Debugging purposes only.
+             ****************************************************************/
+            default:
+            case "_BEHAVIOR_":
+                new_mob = new AbstractMob();
+            break;
+        }
+        return new_mob;
+    }
+
+
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {
@@ -151,7 +186,9 @@ public partial class AbstractMob : AbstractEntity
     {
         DAT.Dir old_dir = direction;
         if(client_input_data.Keys.Count == 0) return;
-        behavior_type.HandleInput(this,client_input_data);
+
+
+
         if(old_dir != direction) UpdateNetwork(false);
     }
 }

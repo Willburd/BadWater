@@ -4,6 +4,45 @@ using System.Collections.Generic;
 
 public partial class AbstractTurf : AbstractEntity
 {
+    public static AbstractTurf CreateTurf(PackData data)
+    {
+        AbstractTurf new_turf = null;
+        switch(data.behaviorID)
+        {
+            /*****************************************************************
+             * TURF BEHAVIORS (turf that behaves in certain ways)
+             ****************************************************************/
+            case "TURF_RAW":
+                new_turf = new Behaviors_BASE.AbstractBasicTurf(0); // Bottommost turf build level! Dirt/Sand/Rock.
+            break;
+
+            case "TURF_PANEL":
+                new_turf = new Behaviors_BASE.AbstractBasicTurf(1); // Second level of construction, PANEL
+            break;
+            
+            case "TURF_FLOOR":
+                new_turf = new Behaviors_BASE.AbstractBasicTurf(2); // Flooring over top of a panel!
+            break;
+            
+            case "TURF_WALL":
+                new_turf = new Behaviors_BASE.AbstractBasicTurf(4); // Wall over top of a panel!
+            break;
+
+            case "TURF_MINEABLE":
+                new_turf = new Behaviors_BASE.AbstractMineableTurf(); // Wall over top of a panel!
+            break;
+
+            /*****************************************************************
+             * Debugging purposes only.
+             ****************************************************************/
+            default:
+            case "_BEHAVIOR_":
+                new_turf = new AbstractTurf();
+            break;
+        }
+        return new_turf;
+    }
+
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {

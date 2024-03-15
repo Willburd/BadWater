@@ -24,11 +24,15 @@ public partial class AbstractEntity
         PackData template_data = TemplateWrite();
         template_data.SetVars(data); // Override with custom set!
         TemplateRead(template_data);
+        MapLoadVars(data);
+    }
+    public virtual void MapLoadVars(Godot.Collections.Dictionary data)
+    {
+        
     }
     public virtual void TemplateRead(PackData data)
     {
         PackRef = new PackRef( data, entity_type);
-        SetBehavior(Behavior.CreateBehavior(data));
         SetTag(data.tag);
         display_name = data.display_name;
         description = data.description;
@@ -36,6 +40,7 @@ public partial class AbstractEntity
         model = data.model;
         texture = data.texture;
         anim_speed = data.anim_speed;
+        reach = data.reach;
     }
     public PackData TemplateWrite()
     {
@@ -83,6 +88,7 @@ public partial class AbstractEntity
     public bool opaque = false;               // blocks vision
     public bool intangible = false;           // can move through solids
     public string step_sound = "";              // Sound pack ID for steps
+    public int reach = 1;
     // End of template data
     private float last_bump_time = 0;
     private const float bump_reset_time = 30; // Ticks
@@ -98,44 +104,44 @@ public partial class AbstractEntity
         switch(type)
         {
             case MainController.DataType.Area:
+                typeData = AssetLoader.loaded_areas[type_ID];
                 newEnt = new AbstractArea();
                 newEnt.entity_type = type;
-                typeData = AssetLoader.loaded_areas[type_ID];
                 break;
             case MainController.DataType.Turf:
-                newEnt = new AbstractTurf();
-                newEnt.entity_type = type;
                 typeData = AssetLoader.loaded_turfs[type_ID];
+                newEnt = AbstractTurf.CreateTurf(typeData);
+                newEnt.entity_type = type;
                 break;
             case MainController.DataType.Effect:
+                typeData = AssetLoader.loaded_effects[type_ID];
                 newEnt = new AbstractEffect();
                 newEnt.entity_type = type;
                 MapController.effects.Add(newEnt as AbstractEffect);
-                typeData = AssetLoader.loaded_effects[type_ID];
                 break;
             case MainController.DataType.Item:
-                newEnt = new AbstractItem();
+                typeData = AssetLoader.loaded_items[type_ID];
+                newEnt = AbstractItem.CreateItem(typeData);
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
-                typeData = AssetLoader.loaded_items[type_ID];
                 break;
             case MainController.DataType.Structure:
-                newEnt = new AbstractStructure();
+                typeData = AssetLoader.loaded_structures[type_ID];
+                newEnt = AbstractStructure.CreateStructure(typeData);
                 newEnt.entity_type = type;
                 MapController.entities.Add(newEnt);
-                typeData = AssetLoader.loaded_structures[type_ID];
                 break;
             case MainController.DataType.Machine:
-                newEnt = new AbstractMachine();
+                typeData = AssetLoader.loaded_machines[type_ID];
+                newEnt = AbstractMachine.CreateMachine(typeData);
                 newEnt.entity_type = type;
                 MachineController.entities.Add(newEnt);
-                typeData = AssetLoader.loaded_machines[type_ID];
                 break;
             case MainController.DataType.Mob:
-                newEnt = new AbstractMob();
+                typeData = AssetLoader.loaded_mobs[type_ID];
+                newEnt = AbstractMob.CreateMob(typeData);
                 newEnt.entity_type = type;
                 MobController.entities.Add(newEnt);
-                typeData = AssetLoader.loaded_mobs[type_ID];
                 break;
         }
         // NetworkEntity init
@@ -152,19 +158,20 @@ public partial class AbstractEntity
     {
         get {return loaded_entity;}
     }
-    protected Behavior behavior_type;         // Behavior processing object
-    public void SetBehavior(Behavior set_behavior) { behavior_type = set_behavior; }
-    public void Init() { behavior_type.Init(this); } // Called upon creation to set variables or state, usually detected by map information.
-    public void LateInit() { behavior_type.LateInit(this); } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
-    public void Tick() { behavior_type.Tick(this); } // Called every process tick on the Fire() tick of the subcontroller that owns them
-    public void UpdateIcon() { behavior_type.UpdateIcon(this); } // It's tradition~ Pushes graphical state changes.
-    public virtual void Crossed(AbstractEntity crosser) { behavior_type.Crossed( this, crosser); }
-    public virtual void UnCrossed(AbstractEntity crosser) { behavior_type.UnCrossed( this, crosser); }
+    public virtual void Init() {} // Called upon creation to set variables or state, usually detected by map information.
+    public void LateInit() { } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    public virtual void Tick() { } // Called every process tick on the Fire() tick of the subcontroller that owns them
+    public virtual void Crossed(AbstractEntity crosser) { }
+    public virtual void UnCrossed(AbstractEntity crosser) { }
+    public virtual void UpdateIcon() // Remember to call base.UpdateIcon() to handle transmitting data to the clients!
+    { 
+        // It's tradition~ Pushes graphical state changes.
+        UpdateNetwork(true);
+    } 
     public void Bump(AbstractEntity hitby) // When we are bumped by an incoming entity
     {
         if(MainController.WorldTicks <= last_bump_time + bump_reset_time) return;
         last_bump_time = MainController.WorldTicks;
-        behavior_type.Bump( this, hitby);
     }
 
     /*****************************************************************
@@ -264,58 +271,82 @@ public partial class AbstractEntity
         if(old_dir != direction) UpdateNetwork(false);
     }
     // Clicking other entities
-    public void Clicked( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
+    public virtual void Clicked( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
     {
-        DAT.Dir old_dir = direction; 
-        behavior_type.Clicked(this,used_item,target,click_params); 
-        if(old_dir != direction) UpdateNetwork(false);
+        GD.Print(display_name + " CLICKED " + target?.display_name + " USING " + used_item?.display_name); // REPLACE ME!!!
     }
     // Being dragged by other entities to somewhere else
-    public void Dragged( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) 
+    public virtual void Dragged( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) 
     { 
-        DAT.Dir old_dir = direction; 
-        behavior_type.Dragged(this,user,target,click_params);
-        if(old_dir != direction) UpdateNetwork(false);
+        GD.Print(user?.display_name + " DRAGGED " + display_name + " TO " + target?.display_name); // REPLACE ME!!!
     }
-    public void AttackSelf( AbstractEntity user ) 
+
+    /*****************************************************************
+     * Item interaction and weapon handling
+     ****************************************************************/
+    public bool AttackCanReach(AbstractEntity user, AbstractEntity target, int range)
+    {
+        if(TOOLS.Adjacent(user,target)) return true; // Already adjacent.
+        /*
+        if(AStar(get_turf(us), get_turf(them), /turf/proc/AdjacentTurfsRangedSting, /turf/proc/Distance, max_nodes=25, max_node_depth=range))
+            return TRUE
+        */
+        return false;
+    }
+
+    public virtual void AttackSelf( AbstractEntity user ) 
     { 
-        DAT.Dir old_dir = direction; 
-        behavior_type.AttackSelf(this,user);
-        if(old_dir != direction) UpdateNetwork(false);
+        GD.Print(user?.display_name + " USED " + display_name + " ON ITSELF"); // REPLACE ME!!!
+    }
+
+    public virtual bool PreAttack( AbstractEntity user, AbstractEntity target, Godot.Collections.Dictionary click_parameters) 
+    {
+        return false; //return TRUE to avoid calling attackby after this proc does stuff
     }
 
     public bool Attack( AbstractEntity user, AbstractEntity target, float attack_modifier, Godot.Collections.Dictionary click_parameters)
     {
-        DAT.Dir old_dir = direction; 
-        bool ret = false;
-        if(behavior_type != null) ret = behavior_type.Attack(this, user, target,attack_modifier, click_parameters);
-        if(old_dir != direction) UpdateNetwork(false);
-        return ret;
+        if(PreAttack( user, target,click_parameters)) return true; // We're returning the value of pre_attack, important if it has a special return.
+        return target.AttackedBy( user, this, attack_modifier, click_parameters);
     }
 
-    public bool AttackedBy( AbstractEntity user, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    public bool AttackedBy( AbstractEntity user, AbstractEntity used_item, float attack_modifier, Godot.Collections.Dictionary click_parameters)
     {
-        DAT.Dir old_dir = direction; 
-        bool ret = false;
-        if(behavior_type != null) ret = behavior_type.AttackedBy( this, this, user, attack_modifier, click_parameters);
-        if(old_dir != direction) UpdateNetwork(false);
-        return ret;
+        if(user is not AbstractMob) return false;
+        /*if(can_operate(src, user) && I.do_surgery(src,user,user.zone_sel.selecting))
+            return TRUE*/
+        return used_item.WeaponAttack( user, this, /*user.zone_sel.selecting*/ 0, attack_modifier);
     }
 
-    public bool WeaponAttack(AbstractEntity self,  AbstractEntity user, AbstractEntity target, int target_zone, float attack_modifier)
+    public virtual bool WeaponAttack( AbstractEntity user, AbstractEntity target, int target_zone, float attack_modifier)
     {
-        DAT.Dir old_dir = direction; 
-        bool ret = false;
-        if(behavior_type != null) ret = behavior_type.WeaponAttack( this, this, user, target_zone, attack_modifier);
-        if(old_dir != direction) UpdateNetwork(false);
-        return ret;
+        /*
+        if(!force || (flags & NOBLUDGEON)) return false;
+        if(M == user && user.a_intent != I_HURT) return false;
+
+        /////////////////////////
+        user.lastattacked = M
+        M.lastattacker = user
+
+        if(!no_attack_log) add_attack_logs(user,M,"attacked with [name] (INTENT: [uppertext(user.a_intent)]) (DAMTYE: [uppertext(damtype)])")
+        /////////////////////////
+
+        user.SetClickCooldown(user.GetAttackSpeed(src))
+        user.do_attack_animation(M)
+
+        var/hit_zone = M.resolve_item_attack(src, user, target_zone)
+        if(hit_zone)
+        {
+            apply_hit_effect(M, user, hit_zone, attack_modifier);
+        }
+        */
+        GD.Print(user.display_name + " RANGED ATTACKED " + target.display_name + " USING " + display_name); // REPLACE ME!!!
+        return true;
     }
 
-    public void AfterAttack( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
+    public virtual void AfterAttack( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
     {
-        DAT.Dir old_dir = direction; 
-        behavior_type?.AfterAttack(this, user, target, proximity, click_parameters);
-        if(old_dir != direction) UpdateNetwork(false);
+
     }
 
     /*****************************************************************
@@ -599,7 +630,7 @@ public partial class AbstractEntity
     {
         if(location is AbstractTurf)
         {
-            if(behavior_type != null) return behavior_type.IsNetworkVisible();
+
             return true; // By default, visible on turfs.
         }
         if(location is AbstractMob)
