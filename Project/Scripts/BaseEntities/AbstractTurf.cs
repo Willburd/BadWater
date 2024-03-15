@@ -43,7 +43,7 @@ public partial class AbstractTurf : AbstractEntity
 
     public void AtmosphericsCheck()
     {
-        // check all four directions for any atmo diffs, if any flag for update - TODO
+        // check all four directions for any atmo diffs, if any flag for update - TODO =================================================================================================================================
     }
 
     public AbstractArea Area

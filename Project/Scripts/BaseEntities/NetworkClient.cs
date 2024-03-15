@@ -44,7 +44,7 @@ public partial class NetworkClient : Node3D
         if(!IsMultiplayerAuthority()) return; // Only on a client, and...
         if(Name != peerid.ToString()) return; // Only the client we're asking!
         // DUMP TEMPORARY STUFF
-        // TODO - Actual login
+        // TODO - Actual login =================================================================================================================================
         string assign_name = ((TextEdit)GetTree().Root.GetChild(0).GetChild<CanvasLayer>(2).GetChild(6)).Text;
         string pass_hash = ((TextEdit)GetTree().Root.GetChild(0).GetChild<CanvasLayer>(2).GetChild(7)).Text;
         peer_active_client = this; // Set the client reference for clicks!
@@ -407,9 +407,9 @@ public partial class NetworkClient : Node3D
                     current_click_held_entity = null;
                     current_click_start_pos = Vector3.Zero;
                 }
-                else
+                else if(turf != null)
                 {
-                    turf?.Click( focused_entity, client_click_data);
+                    focused_entity.Click( focused_entity, turf, client_click_data);
                 }
             }
         }
@@ -449,7 +449,7 @@ public partial class NetworkClient : Node3D
             else
             {
                 // Click on same entity!
-                current_click_held_entity.Click(focused_entity,TOOLS.ParseJson(parameters_json));
+                focused_entity.Click(focused_entity,current_click_held_entity,TOOLS.ParseJson(parameters_json));
             }
             // Cleanup
             current_click_start_pos = Vector3.Zero;

@@ -31,7 +31,7 @@ public partial class AtmoController : DeligateController
         while(pending_turfs.Count > 0)
         {
             AbstractTurf turf = pending_turfs[0];
-            // PROCESS ATMO - TODO, big growing flood fill that triggers other atmo updates, repeatedly ripping out until satisfied.
+            // PROCESS ATMO - TODO, big growing flood fill that triggers other atmo updates, repeatedly ripping out until satisfied.=================================================================================================================================
             pending_turfs.RemoveAt(0);
         }
     }
@@ -43,7 +43,7 @@ public partial class AtmoController : DeligateController
 
     public class AtmoCell
     {
-        // TODO - replace fixed gas types with some kind of reagent chemical system with them being able to turn into gasses at certain temps?
+        // TODO - replace fixed gas types with some kind of reagent chemical system with them being able to turn into gasses at certain temps?=================================================================================================================================
         enum GasType
         {
             oxygen,
@@ -64,7 +64,7 @@ public partial class AtmoController : DeligateController
                 {
                     total += gasses[i];
                 }
-                return total * 1; // TODO - ideal gas law
+                return total * 1; // TODO - ideal gas law=================================================================================================================================
             }
         }
 

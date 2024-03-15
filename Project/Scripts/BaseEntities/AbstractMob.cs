@@ -136,13 +136,12 @@ public partial class AbstractMob : AbstractEntity
     public void UseActiveHand(AbstractEntity target)
     {
         if(ActiveHand != null) return;
-        //ActiveHand?.Interact(this,true,target);
+        Click(this,ActiveHand,TOOLS.AssembleStandardClick(grid_pos.WorldPos())); // Click self basically
     }
 
     public void EquipActiveHand(AbstractEntity target)
     {
         if(ActiveHand != null) return;
-        //ActiveHand?.Equip(this);
     }
 
     /*****************************************************************

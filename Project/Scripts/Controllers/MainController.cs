@@ -183,7 +183,7 @@ public partial class MainController : Node
 
 	private void EditorTick()
 	{
-		// TODO - editor mode!
+		// TODO - editor mode!=================================================================================================================================
 		ticks += 1;
 	}
 

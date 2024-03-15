@@ -140,27 +140,14 @@ public partial class Behavior
         return true;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Click interactions
-    public void Click(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, Godot.Collections.Dictionary click_params)
+    public void Click(AbstractEntity self, MainController.DataType entity_type, AbstractEntity target, Godot.Collections.Dictionary click_params)
     {
         GD.Print("CLICKED " + self.display_name); // REPLACE ME!!!
     }
 
-    public void Drag(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params)
+    public void Drag(AbstractEntity self, MainController.DataType entity_type, AbstractEntity target,Godot.Collections.Dictionary click_params)
     {
-        GD.Print("DRAGGED " + self.display_name + " TO " + new_destination.display_name); // REPLACE ME!!!
+        GD.Print("DRAGGED " + self.display_name + " TO " + target.display_name); // REPLACE ME!!!
     }
 }

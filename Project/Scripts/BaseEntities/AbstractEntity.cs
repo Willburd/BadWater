@@ -258,8 +258,8 @@ public partial class AbstractEntity
         Move(map_id_string, new_pos);
         if(old_dir != direction) UpdateNetwork(false);
     }
-    public void Click(AbstractEntity user,Godot.Collections.Dictionary click_params) { behavior_type.Click(this,entity_type,user,click_params); }
-    public void Drag(AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params) { behavior_type.Drag(this,entity_type,user,new_destination,click_params);}
+    public void Click( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) { behavior_type.Click(this,entity_type,target,click_params); }
+    public void Drag( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) { behavior_type.Drag(this,entity_type,target,click_params);}
 
     /*****************************************************************
      * Movement and storage
@@ -532,7 +532,7 @@ public partial class AbstractEntity
         if(location is AbstractMob)
         {
             // Handle.... HANDS... And other slots.
-            // TODO - mob hands and other slots!
+            // TODO - mob hands and other slots! =================================================================================================================================
             return false;
         }
         return false;
