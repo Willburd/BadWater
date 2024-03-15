@@ -151,7 +151,7 @@ public partial class AbstractMob : AbstractEntity
     {
         DAT.Dir old_dir = direction;
         if(client_input_data.Keys.Count == 0) return;
-        behavior_type.HandleInput(this,entity_type,client_input_data);
+        behavior_type.HandleInput(this,client_input_data);
         if(old_dir != direction) UpdateNetwork(false);
     }
 }

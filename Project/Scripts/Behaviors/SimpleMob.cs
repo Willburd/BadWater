@@ -17,14 +17,15 @@ namespace BehaviorEvents
         
         public LifeState stat = LifeState.Alive;
 
-        public float footstep_timer = 0;
+        public float footstep_timer = 0f;
+        public int click_cooldown = 0;  // Time when mob cooldown has finished
 
         public SimpleMob()
         {
 
         }
 
-        public override void Init(AbstractEntity owner, MainController.DataType entity_type)
+        public override void Init(AbstractEntity owner)
         {
             
         }
@@ -34,10 +35,10 @@ namespace BehaviorEvents
 
         }
 
-        public override void HandleInput(AbstractEntity owner, MainController.DataType entity_type, Godot.Collections.Dictionary input)
+        public override void HandleInput(AbstractEntity owner,  Godot.Collections.Dictionary input)
         {
             AbstractMob mob = owner as AbstractMob;
-
+            
             // Got an actual control update!
             double dat_x = Mathf.Clamp(input["x"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
             double dat_y = Mathf.Clamp(input["y"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
@@ -120,25 +121,25 @@ namespace BehaviorEvents
             }
         }
 
-        public override void Tick(AbstractEntity owner, MainController.DataType entity_type)
+        public override void Tick(AbstractEntity owner)
         {
             AbstractMob mob = owner as AbstractMob;
 
             if(stat != LifeState.Dead)
             {
-                LifeUpdate(owner, entity_type);
+                LifeUpdate(owner);
                 mob_ai?.Alive();
             }
             else
             {
-                DeathUpdate(owner, entity_type);
+                DeathUpdate(owner);
                 mob_ai?.Dead();
             }
-            ProcessSlotDrops(owner, entity_type);
+            ProcessSlotDrops(owner);
         }
 
         // Check our current inventory and status... See if we need to drop objects from our hands or slots that no longer exist (uniforms for example give us pockets!)
-        public virtual void ProcessSlotDrops(AbstractEntity owner, MainController.DataType entity_type)
+        public virtual void ProcessSlotDrops(AbstractEntity owner)
         {   
             AbstractMob mob = owner as AbstractMob;
             // knocked out and dead drops hands!
@@ -160,12 +161,12 @@ namespace BehaviorEvents
             }
         }
 
-        protected virtual void LifeUpdate(AbstractEntity owner, MainController.DataType entity_type)
+        protected virtual void LifeUpdate(AbstractEntity owner)
         {
 
         }
 
-        protected virtual void DeathUpdate(AbstractEntity owner, MainController.DataType entity_type)
+        protected virtual void DeathUpdate(AbstractEntity owner)
         {
             
         }
@@ -197,8 +198,12 @@ namespace BehaviorEvents
         }
 
         // Click interactions
-        public override void Clicked(AbstractEntity self, MainController.DataType entity_type, AbstractEntity use_item, AbstractEntity target, Godot.Collections.Dictionary click_params)
+        public override void Clicked(AbstractEntity self,  AbstractEntity use_item, AbstractEntity target, Godot.Collections.Dictionary click_params)
         {
+            // Don't react if click cooldown
+            if(CheckClickCooldown()) return;
+            SetClickCooldown(1);
+
             // Handle special clicks
             if(click_params["mod_shift"].AsBool())
             {
@@ -230,7 +235,7 @@ namespace BehaviorEvents
             // Check restrained
             if(IsRestrained())
             {
-                RestrainedClick(self,entity_type,target);
+                RestrainedClick(self,target);
                 return;
             }
             // Check throwmode
@@ -248,36 +253,64 @@ namespace BehaviorEvents
             {
                 if(hand_item != null)
                 {
-                    bool resolved = false; //hand_item.resolve_attackby(target, self, click_parameters = params);
+                    bool resolved = hand_item.Attack( self, target, 1, click_params);
                     if(!resolved && target != null && hand_item != null)
                     {
-                        //hand_item.afterattack(target, self, 1, params); // 1 indicates adjacency
+                        hand_item.AfterAttack( self, target, true, click_params); // 1 indicates adjacency
                     }
                 }
                 else
                 {
                     if(target is AbstractMob); // No instant mob attacking
                     {
-                        //SetClickCooldown(get_attack_speed());
+                        SetClickCooldown(GetAttackCooldown(hand_item));
                     }
-                    //UnarmedAttack(target, 1);
+                    UnarmedAttack( self, target, true);
                 }
                 return;
             }
+
+
+
+
+
+
             
-
-
             GD.Print(self.display_name + " CLICKED " + target.display_name + " using " + use_item?.display_name); // REPLACE ME!!!
         }
 
-        public override void Dragged(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params)
+        public override bool UnarmedAttack(AbstractEntity self,  AbstractEntity target, bool proximity)
+        {
+            if(IsIntangible(self)) return false;
+            if(stat != LifeState.Alive) return false;
+            return true;
+        }
+
+        public override void Dragged(AbstractEntity self,  AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params)
         {
             GD.Print(user.display_name + " DRAGGED " + self.display_name + " TO " + target.display_name); // REPLACE ME!!!
         }
 
-        public virtual void RestrainedClick(AbstractEntity self, MainController.DataType entity_type, AbstractEntity target)
+        public virtual void RestrainedClick(AbstractEntity self,  AbstractEntity target)
         {
             GD.Print(self.display_name + " CLICKED " + target.display_name + " WHILE RESTRAINED"); // REPLACE ME!!!
         }
+
+
+        // Attacking procs!
+        public void SetClickCooldown(int delay)
+        {
+            click_cooldown = Math.Max(MainController.WorldTicks + delay,click_cooldown);
+        }
+        public bool CheckClickCooldown()
+        {
+            return click_cooldown > MainController.WorldTicks;
+        }
+        public int GetAttackCooldown(AbstractEntity item_used)
+        {
+            // TODO - item_used attack speed reading ========================================================================================================
+            return DAT.DEFAULT_ATTACK_COOLDOWN;
+        }
+
     }
 }

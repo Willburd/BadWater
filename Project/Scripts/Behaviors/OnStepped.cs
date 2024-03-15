@@ -18,7 +18,7 @@ namespace BehaviorEvents
             teleport_tag = TOOLS.ApplyExistingTag(data,"teleport_pos",teleport_tag);
         }
 
-        public override void Crossed(AbstractEntity owner, MainController.DataType entity_type, AbstractEntity crosser)
+        public override void Crossed(AbstractEntity owner, AbstractEntity crosser)
         {
             
         }

@@ -14,6 +14,9 @@ public static class DAT
     public const string starsys_name	= "SL-340";
 
 
+    public const int DEFAULT_ATTACK_COOLDOWN = 8; //Default timeout for aggressive actions
+    public const int DEFAULT_QUICK_COOLDOWN = 4;
+
 
     public enum Dir
     {

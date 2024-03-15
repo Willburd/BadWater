@@ -154,17 +154,17 @@ public partial class AbstractEntity
     }
     protected Behavior behavior_type;         // Behavior processing object
     public void SetBehavior(Behavior set_behavior) { behavior_type = set_behavior; }
-    public void Init() { behavior_type.Init(this, entity_type); } // Called upon creation to set variables or state, usually detected by map information.
-    public void LateInit() { behavior_type.LateInit(this, entity_type); } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
-    public void Tick() { behavior_type.Tick(this, entity_type); } // Called every process tick on the Fire() tick of the subcontroller that owns them
-    public void UpdateIcon() { behavior_type.UpdateIcon(this, entity_type); } // It's tradition~ Pushes graphical state changes.
-    public virtual void Crossed(AbstractEntity crosser) { behavior_type.Crossed( this, entity_type, crosser); }
-    public virtual void UnCrossed(AbstractEntity crosser) { behavior_type.UnCrossed( this, entity_type, crosser); }
+    public void Init() { behavior_type.Init(this); } // Called upon creation to set variables or state, usually detected by map information.
+    public void LateInit() { behavior_type.LateInit(this); } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    public void Tick() { behavior_type.Tick(this); } // Called every process tick on the Fire() tick of the subcontroller that owns them
+    public void UpdateIcon() { behavior_type.UpdateIcon(this); } // It's tradition~ Pushes graphical state changes.
+    public virtual void Crossed(AbstractEntity crosser) { behavior_type.Crossed( this, crosser); }
+    public virtual void UnCrossed(AbstractEntity crosser) { behavior_type.UnCrossed( this, crosser); }
     public void Bump(AbstractEntity hitby) // When we are bumped by an incoming entity
     {
         if(MainController.WorldTicks <= last_bump_time + bump_reset_time) return;
         last_bump_time = MainController.WorldTicks;
-        behavior_type.Bump( this, entity_type, hitby);
+        behavior_type.Bump( this, hitby);
     }
 
     /*****************************************************************
@@ -267,20 +267,54 @@ public partial class AbstractEntity
     public void Clicked( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
     {
         DAT.Dir old_dir = direction; 
-        behavior_type.Clicked(this,entity_type,used_item,target,click_params); 
+        behavior_type.Clicked(this,used_item,target,click_params); 
         if(old_dir != direction) UpdateNetwork(false);
     }
     // Being dragged by other entities to somewhere else
     public void Dragged( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) 
     { 
         DAT.Dir old_dir = direction; 
-        behavior_type.Dragged(this,entity_type,user,target,click_params);
+        behavior_type.Dragged(this,user,target,click_params);
         if(old_dir != direction) UpdateNetwork(false);
     }
     public void AttackSelf( AbstractEntity user ) 
     { 
         DAT.Dir old_dir = direction; 
-        behavior_type.AttackSelf(this,entity_type,user);
+        behavior_type.AttackSelf(this,user);
+        if(old_dir != direction) UpdateNetwork(false);
+    }
+
+    public bool Attack( AbstractEntity user, AbstractEntity target, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    {
+        DAT.Dir old_dir = direction; 
+        bool ret = false;
+        if(behavior_type != null) ret = behavior_type.Attack(this, user, target,attack_modifier, click_parameters);
+        if(old_dir != direction) UpdateNetwork(false);
+        return ret;
+    }
+
+    public bool AttackedBy( AbstractEntity user, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    {
+        DAT.Dir old_dir = direction; 
+        bool ret = false;
+        if(behavior_type != null) ret = behavior_type.AttackedBy( this, this, user, attack_modifier, click_parameters);
+        if(old_dir != direction) UpdateNetwork(false);
+        return ret;
+    }
+
+    public bool WeaponAttack(AbstractEntity self,  AbstractEntity user, AbstractEntity target, int target_zone, float attack_modifier)
+    {
+        DAT.Dir old_dir = direction; 
+        bool ret = false;
+        if(behavior_type != null) ret = behavior_type.WeaponAttack( this, this, user, target_zone, attack_modifier);
+        if(old_dir != direction) UpdateNetwork(false);
+        return ret;
+    }
+
+    public void AfterAttack( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
+    {
+        DAT.Dir old_dir = direction; 
+        behavior_type?.AfterAttack(this, user, target, proximity, click_parameters);
         if(old_dir != direction) UpdateNetwork(false);
     }
 

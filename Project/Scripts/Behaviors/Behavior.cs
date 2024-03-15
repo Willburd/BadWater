@@ -90,45 +90,45 @@ public partial class Behavior
     }
 
     // Called upon creation to set variables or state, usually detected by map information.
-    public virtual void Init(AbstractEntity self, MainController.DataType entity_type)
+    public virtual void Init(AbstractEntity self)
     {
         //GD.Print("INIT " + self.display_name); // REPLACE ME!!!
     }
     
     // Same as above, but when we NEED everything else Init() before we can properly tell our state!
-    public virtual void LateInit(AbstractEntity self, MainController.DataType entity_type)
+    public virtual void LateInit(AbstractEntity self)
     {
         //GD.Print("LATE INIT " + self.display_name); // REPLACE ME!!!
     }
 
     // Tick every game tick from the object it's inside of! Different for abstract and networked entities...
-    public virtual void Tick(AbstractEntity self, MainController.DataType entity_type)
+    public virtual void Tick(AbstractEntity self)
     {
         //GD.Print("TICK " + self.display_name); // REPLACE ME!!!
     }
 
-    public virtual void HandleInput(AbstractEntity self, MainController.DataType entity_type, Godot.Collections.Dictionary input)
+    public virtual void HandleInput(AbstractEntity self, Godot.Collections.Dictionary input)
     {
         //GD.Print("INPUTS " + self.display_name); // REPLACE ME!!!
     }
 
     // Update graphical state of host entity/abstract! Different for abstract and networked entities... 
-    public virtual void UpdateIcon(AbstractEntity self, MainController.DataType entity_type)
+    public virtual void UpdateIcon(AbstractEntity self)
     {
         // ALWAYS CALL base.UpdateIcon() AT END;
         self.UpdateNetwork(true);
     }
 
-    public virtual void Crossed(AbstractEntity self, MainController.DataType entity_type, AbstractEntity crosser)
+    public virtual void Crossed(AbstractEntity self, AbstractEntity crosser)
     {
         //GD.Print("CROSSED " + self.display_name); // REPLACE ME!!!
     }
-    public virtual void UnCrossed(AbstractEntity self, MainController.DataType entity_type, AbstractEntity crosser)
+    public virtual void UnCrossed(AbstractEntity self, AbstractEntity crosser)
     {
         //GD.Print("UNCROSSED " + self.display_name); // REPLACE ME!!!
     }
 
-    public virtual void Bump(AbstractEntity self, MainController.DataType entity_type, AbstractEntity hitby)
+    public virtual void Bump(AbstractEntity self, AbstractEntity hitby)
     {
         GD.Print("BUMPED " + self.display_name); // REPLACE ME!!!
     }
@@ -140,19 +140,80 @@ public partial class Behavior
         return true;
     }
 
+    public virtual bool IsIntangible(AbstractEntity self)
+    {
+        return self.intangible;
+    }
+
     // Click interactions
-    public virtual void Clicked(AbstractEntity self, MainController.DataType entity_type, AbstractEntity use_item, AbstractEntity target, Godot.Collections.Dictionary click_params)
+    public virtual void Clicked(AbstractEntity self, AbstractEntity use_item, AbstractEntity target, Godot.Collections.Dictionary click_params)
     {
         GD.Print(self?.display_name + " CLICKED " + target?.display_name + " USING " + use_item?.display_name); // REPLACE ME!!!
     }
 
-    public virtual void Dragged(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params)
+    public virtual void Dragged(AbstractEntity self, AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params)
     {
         GD.Print(user?.display_name + " DRAGGED " + self?.display_name + " TO " + target?.display_name); // REPLACE ME!!!
     }
 
-    public virtual void AttackSelf(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user)
+    public virtual void AttackSelf(AbstractEntity self, AbstractEntity user)
     {
         GD.Print(user?.display_name + " USED " + self?.display_name + " ON ITSELF"); // REPLACE ME!!!
+    }
+
+    //do stuff before attackby!
+    public virtual bool PreAttack(AbstractEntity self, AbstractEntity user, AbstractEntity target, Godot.Collections.Dictionary click_parameters) 
+    {
+        return false; //return TRUE to avoid calling attackby after this proc does stuff
+    }
+    
+    public bool Attack(AbstractEntity self, AbstractEntity user, AbstractEntity target, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    {
+        bool success = PreAttack( self, user, target,click_parameters);
+        if(success)	return true; // We're returning the value of pre_attack, important if it has a special return.
+        return target.AttackedBy( user, attack_modifier, click_parameters);
+    }
+
+
+    public bool AttackedBy(AbstractEntity self, AbstractEntity use_item, AbstractEntity user, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    {
+        if(user is not AbstractMob) return false;
+        /*if(can_operate(src, user) && I.do_surgery(src,user,user.zone_sel.selecting))
+            return TRUE*/
+        return use_item.WeaponAttack( self, user, self, /*user.zone_sel.selecting*/ 0, attack_modifier);
+    }   
+
+    public bool WeaponAttack(AbstractEntity self, AbstractEntity user, AbstractEntity target, int target_zone, float attack_modifier)
+    {
+        /*
+        if(!force || (flags & NOBLUDGEON)) return false;
+        if(M == user && user.a_intent != I_HURT) return false;
+
+        /////////////////////////
+        user.lastattacked = M
+        M.lastattacker = user
+
+        if(!no_attack_log) add_attack_logs(user,M,"attacked with [name] (INTENT: [uppertext(user.a_intent)]) (DAMTYE: [uppertext(damtype)])")
+        /////////////////////////
+
+        user.SetClickCooldown(user.GetAttackSpeed(src))
+        user.do_attack_animation(M)
+
+        var/hit_zone = M.resolve_item_attack(src, user, target_zone)
+        if(hit_zone)
+        {
+            apply_hit_effect(M, user, hit_zone, attack_modifier);
+        }
+        */
+        return true;
+    }
+
+    public virtual bool UnarmedAttack(AbstractEntity self, AbstractEntity target, bool proximity)
+    {
+        return false;
+    }
+    public virtual void AfterAttack(AbstractEntity self, AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
+    {
+
     }
 }
