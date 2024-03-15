@@ -153,54 +153,19 @@ public partial class AbstractEntity
         get {return loaded_entity;}
     }
     protected Behavior behavior_type;         // Behavior processing object
-    public void SetBehavior(Behavior set_behavior)
-    {
-        behavior_type = set_behavior;
-    }
-    public void Init()          // Called upon creation to set variables or state, usually detected by map information.
-    {
-        behavior_type?.Init(this, entity_type);
-    }
-    public void LateInit()      // Same as above, but when we NEED everything else Init() before we can properly tell our state!
-    {
-        behavior_type?.LateInit(this, entity_type);
-    }
-    public void Tick()                  // Called every process tick on the Fire() tick of the subcontroller that owns them
-    {
-        // Ask our behavior for info!
-        behavior_type?.Tick(this, entity_type);
-    }
-    public virtual void SyncNetwork(bool include_mesh)
-    {
-        if(loaded_entity == null) return;
-        loaded_entity.Position = grid_pos.WorldPos();
-        loaded_entity.direction = direction;
-        if(include_mesh) loaded_entity.MeshUpdate();
-    }
-    public void UpdateIcon()    // It's tradition~ Pushes graphical state changes.
-    {
-        // Ask our behavior for info!
-        behavior_type?.UpdateIcon(this, entity_type);
-        UpdateNetworkVisibility();
-    }
-
-    public virtual void Crossed(AbstractEntity crosser)
-    {
-        behavior_type?.Crossed( this, entity_type, crosser);
-    }
-
-    public virtual void UnCrossed(AbstractEntity crosser)
-    {
-        behavior_type?.UnCrossed( this, entity_type, crosser);
-    }
-    
+    public void SetBehavior(Behavior set_behavior) { behavior_type = set_behavior; }
+    public void Init() { behavior_type?.Init(this, entity_type); } // Called upon creation to set variables or state, usually detected by map information.
+    public void LateInit() { behavior_type?.LateInit(this, entity_type); } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    public void Tick() { behavior_type?.Tick(this, entity_type); } // Called every process tick on the Fire() tick of the subcontroller that owns them
+    public void UpdateIcon() { behavior_type?.UpdateIcon(this, entity_type); } // It's tradition~ Pushes graphical state changes.
+    public virtual void Crossed(AbstractEntity crosser) { behavior_type?.Crossed( this, entity_type, crosser); }
+    public virtual void UnCrossed(AbstractEntity crosser) { behavior_type?.UnCrossed( this, entity_type, crosser); }
     public void Bump(AbstractEntity hitby) // When we are bumped by an incoming entity
     {
         if(MainController.WorldTicks <= last_bump_time + bump_reset_time) return;
         last_bump_time = MainController.WorldTicks;
         behavior_type?.Bump( this, entity_type, hitby);
     }
-
 
     /*****************************************************************
      * Processing
@@ -212,7 +177,7 @@ public partial class AbstractEntity
         DAT.Dir old_dir = direction;
         Tick();
         ProcessVelocity();
-        if(old_dir != direction) SyncNetwork(false);
+        if(old_dir != direction) UpdateNetwork(false);
     }
     private void ProcessVelocity()
     {
@@ -262,7 +227,6 @@ public partial class AbstractEntity
         owner_client?.ClearFocusedEntity();
         ClearClientOwner();
     }
-
     public void UnloadNetworkEntity()
     {
         loaded_entity?.Kill();
@@ -292,37 +256,10 @@ public partial class AbstractEntity
         new_pos.hor += (float)dat_x;
         new_pos.ver += (float)dat_y;
         Move(map_id_string, new_pos);
-        if(old_dir != direction) SyncNetwork(false);
+        if(old_dir != direction) UpdateNetwork(false);
     }
-
-    public void Click(AbstractEntity user,Godot.Collections.Dictionary click_params)
-    {
-        if(user == this)
-        {
-            behavior_type?.ClickSelf(this,entity_type,click_params);
-        }
-        else
-        {
-            behavior_type?.Click(this,entity_type,user,click_params);
-        }
-    }
-
-    public void Drag(AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params)
-    {
-        if(this == new_destination)
-        {
-            behavior_type?.DragSelf(this,entity_type,user,click_params);
-        }
-        else
-        {
-            behavior_type?.Drag(this,entity_type,user,new_destination,click_params);
-        }
-    }
-
-    public static bool Adjacent(AbstractEntity A,AbstractEntity B)
-    {
-        return TOOLS.VecDist(A.grid_pos.WorldPos(),B.grid_pos.WorldPos()) < 1f;
-    }
+    public void Click(AbstractEntity user,Godot.Collections.Dictionary click_params) { behavior_type?.Click(this,entity_type,user,click_params); }
+    public void Drag(AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params) { behavior_type?.Drag(this,entity_type,user,new_destination,click_params);}
 
     /*****************************************************************
      * Movement and storage
@@ -492,7 +429,7 @@ public partial class AbstractEntity
             // Move around in current turf
             map_id_string = new_mapID;
             grid_pos = new_grid;
-            SyncNetwork(false);
+            UpdateNetwork(false);
             return location;
         }
 
@@ -503,7 +440,7 @@ public partial class AbstractEntity
         // Enter new location!
         AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos,true);
         new_turf?.EntityEntered(this,perform_turf_actions);
-        SyncNetwork(false);
+        UpdateNetwork(false);
         return location;
     }
     public AbstractEntity Move(AbstractEntity new_destination, bool perform_turf_actions = true)
@@ -520,7 +457,7 @@ public partial class AbstractEntity
         // Enter new location
         map_id_string = "BAG";
         new_destination.EntityEntered(this,perform_turf_actions);
-        SyncNetwork(false);
+        UpdateNetwork(false);
         return location;
     }
     public AbstractEntity Move(bool perform_turf_actions = true) // Move to nullspace
@@ -529,7 +466,7 @@ public partial class AbstractEntity
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
         map_id_string = "NULL";
-        SyncNetwork(false);
+        UpdateNetwork(false);
         return location;
     }
     public void Drop(AbstractEntity new_destination, AbstractEntity user)
@@ -541,16 +478,6 @@ public partial class AbstractEntity
     {
         Move(new_destination,true);
         behavior_type?.ContainerMoved(this,entity_type,user,user);
-    }
-
-    public void Interact(AbstractEntity user, bool in_inventory, AbstractEntity target)
-    {
-        behavior_type?.Interact(this,entity_type,user,in_inventory,target);
-    }
-
-    public void Equip(AbstractEntity user)
-    {
-        behavior_type?.Equip(this,entity_type,user);
     }
 
     // Another entity has entered us...
@@ -591,19 +518,13 @@ public partial class AbstractEntity
         MapController.Internal_UpdateTag(this,new_tag);
         tag = new_tag;
     }
-    public void ClearTag()
-    {
-        SetTag("");
-    }
-    public string GetTag()
-    {
-        return tag;
-    }
+    public void ClearTag() { SetTag(""); }
+    public string GetTag() { return tag; }
 
     /*****************************************************************
      * Network entity spawning/despawning and visibility
      ****************************************************************/
-    protected virtual bool IsNetworkVisible()
+    public bool IsNetworkVisible()
     {
         if(location is AbstractTurf)
         {
@@ -618,7 +539,7 @@ public partial class AbstractEntity
         }
         return false;
     }
-    private void UpdateNetworkVisibility()
+    public void UpdateNetwork(bool mesh_update) // Spawns and despawns currently loaded entity. While calling SyncPositionRotation(bool mesh_update) is cheaper... Calling this is safer.
     {
         if(MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos())) 
         {
@@ -634,12 +555,44 @@ public partial class AbstractEntity
             if(is_vis && loaded_entity == null)
             {
                 loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
-                SyncNetwork(true);
+                SyncPositionRotation(true);
+                return;
             }
             if(!is_vis && loaded_entity != null)
             {
                 UnloadNetworkEntity();
+                return;
+            }
+            if(is_vis && loaded_entity != null)
+            {
+                SyncPositionRotation(mesh_update);
+                return;
             }
         }
+        else
+        {
+            // Entity loaded in an unloaded chunk?
+            if(loaded_entity != null)
+            {
+                UnloadNetworkEntity();
+                return;
+            }
+        }
+    }
+    private void SyncPositionRotation(bool mesh_update) // Updates position and rotation of currently loaded entity
+    {
+        if(loaded_entity == null) return;
+        loaded_entity.Position = grid_pos.WorldPos();
+        loaded_entity.direction = direction;
+        if(mesh_update) loaded_entity.MeshUpdate();
+    }
+
+    /*****************************************************************
+     * Entity tools, things like adjacency checks etc
+     ****************************************************************/
+    public static bool Adjacent(AbstractEntity A,AbstractEntity B)
+    {
+        if(A.map_id_string != B.map_id_string) return false;
+        return TOOLS.VecDist(A.grid_pos.WorldPos(),B.grid_pos.WorldPos()) < 1f;
     }
 }

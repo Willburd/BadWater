@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection.Metadata;
 
 public partial class Behavior
 {
@@ -105,25 +106,16 @@ public partial class Behavior
         //GD.Print("TICK " + self.display_name); // REPLACE ME!!!
     }
 
-    public virtual void Interact(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, bool in_inventory, AbstractEntity target)
-    {
-        GD.Print("USED " + self.display_name); // REPLACE ME!!!
-    }
-
-    public virtual void Equip(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user)
-    {
-        GD.Print("EQUIP " + self.display_name); // REPLACE ME!!!
-    }
-
     public virtual void HandleInput(AbstractEntity self, MainController.DataType entity_type, Godot.Collections.Dictionary input)
     {
         //GD.Print("INPUTS " + self.display_name); // REPLACE ME!!!
     }
 
-    // Update graphical state of host entity/abstract! Different for abstract and networked entities...
+    // Update graphical state of host entity/abstract! Different for abstract and networked entities... 
     public virtual void UpdateIcon(AbstractEntity self, MainController.DataType entity_type)
     {
-        //GD.Print("UPDATEICON " + self.display_name); // REPLACE ME!!!
+        // ALWAYS CALL base.UpdateIcon() AT END;
+        self.UpdateNetwork(true);
     }
 
     public virtual void Crossed(AbstractEntity self, MainController.DataType entity_type, AbstractEntity crosser)
@@ -155,24 +147,27 @@ public partial class Behavior
         return true;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Click interactions
     public void Click(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, Godot.Collections.Dictionary click_params)
     {
         GD.Print("CLICKED " + self.display_name); // REPLACE ME!!!
     }
 
-    public void ClickSelf(AbstractEntity self, MainController.DataType entity_type, Godot.Collections.Dictionary click_params)
-    {
-        GD.Print("CLICKSELF " + self.display_name); // REPLACE ME!!!
-    }
-
     public void Drag(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params)
     {
         GD.Print("DRAGGED " + self.display_name + " TO " + new_destination.display_name); // REPLACE ME!!!
-    }
-
-    public void DragSelf(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user,Godot.Collections.Dictionary click_params)
-    {
-        GD.Print("DRAGGED " + self.display_name + " TO SELF"); // REPLACE ME!!!
     }
 }

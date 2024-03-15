@@ -102,7 +102,6 @@ public partial class ChunkController : DeligateController
                 foreach(AbstractEntity ent in turf.Contents)
                 {
                     ent.UpdateIcon();
-                    ent.SyncNetwork(true);
                 }
             }
         }
