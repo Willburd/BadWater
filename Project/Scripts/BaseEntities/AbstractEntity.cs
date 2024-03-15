@@ -429,7 +429,7 @@ public partial class AbstractEntity
             // Move around in current turf
             map_id_string = new_mapID;
             grid_pos = new_grid;
-            UpdateNetwork(false);
+            SyncPositionRotation(false);
             return location;
         }
 
@@ -547,7 +547,7 @@ public partial class AbstractEntity
                 MapController.GetChunk(map_id_string,grid_pos.ChunkPos()).MeshUpdate();
                 return;
             }
-            else if(location == null) return; // nullspace vanish
+            if(location == null) return; // nullspace vanish
             // Otherwise, what does our behavior say?
             bool is_vis = IsNetworkVisible();
             if(is_vis && loaded_entity == null)
