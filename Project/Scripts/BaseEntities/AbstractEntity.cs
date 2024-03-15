@@ -154,17 +154,17 @@ public partial class AbstractEntity
     }
     protected Behavior behavior_type;         // Behavior processing object
     public void SetBehavior(Behavior set_behavior) { behavior_type = set_behavior; }
-    public void Init() { behavior_type?.Init(this, entity_type); } // Called upon creation to set variables or state, usually detected by map information.
-    public void LateInit() { behavior_type?.LateInit(this, entity_type); } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
-    public void Tick() { behavior_type?.Tick(this, entity_type); } // Called every process tick on the Fire() tick of the subcontroller that owns them
-    public void UpdateIcon() { behavior_type?.UpdateIcon(this, entity_type); } // It's tradition~ Pushes graphical state changes.
-    public virtual void Crossed(AbstractEntity crosser) { behavior_type?.Crossed( this, entity_type, crosser); }
-    public virtual void UnCrossed(AbstractEntity crosser) { behavior_type?.UnCrossed( this, entity_type, crosser); }
+    public void Init() { behavior_type.Init(this, entity_type); } // Called upon creation to set variables or state, usually detected by map information.
+    public void LateInit() { behavior_type.LateInit(this, entity_type); } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    public void Tick() { behavior_type.Tick(this, entity_type); } // Called every process tick on the Fire() tick of the subcontroller that owns them
+    public void UpdateIcon() { behavior_type.UpdateIcon(this, entity_type); } // It's tradition~ Pushes graphical state changes.
+    public virtual void Crossed(AbstractEntity crosser) { behavior_type.Crossed( this, entity_type, crosser); }
+    public virtual void UnCrossed(AbstractEntity crosser) { behavior_type.UnCrossed( this, entity_type, crosser); }
     public void Bump(AbstractEntity hitby) // When we are bumped by an incoming entity
     {
         if(MainController.WorldTicks <= last_bump_time + bump_reset_time) return;
         last_bump_time = MainController.WorldTicks;
-        behavior_type?.Bump( this, entity_type, hitby);
+        behavior_type.Bump( this, entity_type, hitby);
     }
 
     /*****************************************************************
@@ -258,8 +258,8 @@ public partial class AbstractEntity
         Move(map_id_string, new_pos);
         if(old_dir != direction) UpdateNetwork(false);
     }
-    public void Click(AbstractEntity user,Godot.Collections.Dictionary click_params) { behavior_type?.Click(this,entity_type,user,click_params); }
-    public void Drag(AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params) { behavior_type?.Drag(this,entity_type,user,new_destination,click_params);}
+    public void Click(AbstractEntity user,Godot.Collections.Dictionary click_params) { behavior_type.Click(this,entity_type,user,click_params); }
+    public void Drag(AbstractEntity user, AbstractEntity new_destination,Godot.Collections.Dictionary click_params) { behavior_type.Drag(this,entity_type,user,new_destination,click_params);}
 
     /*****************************************************************
      * Movement and storage
@@ -472,12 +472,10 @@ public partial class AbstractEntity
     public void Drop(AbstractEntity new_destination, AbstractEntity user)
     {
         Move(new_destination,true);
-        behavior_type?.Dropped(this,entity_type,user,new_destination);
     }
     public void PickedUp(AbstractEntity new_destination, AbstractEntity user)
     {
         Move(new_destination,true);
-        behavior_type?.ContainerMoved(this,entity_type,user,user);
     }
 
     // Another entity has entered us...

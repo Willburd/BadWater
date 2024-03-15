@@ -136,13 +136,13 @@ public partial class AbstractMob : AbstractEntity
     public void UseActiveHand(AbstractEntity target)
     {
         if(ActiveHand != null) return;
-        ActiveHand?.Interact(this,true,target);
+        //ActiveHand?.Interact(this,true,target);
     }
 
     public void EquipActiveHand(AbstractEntity target)
     {
         if(ActiveHand != null) return;
-        ActiveHand?.Equip(this);
+        //ActiveHand?.Equip(this);
     }
 
     /*****************************************************************
@@ -152,7 +152,7 @@ public partial class AbstractMob : AbstractEntity
     {
         DAT.Dir old_dir = direction;
         if(client_input_data.Keys.Count == 0) return;
-        behavior_type?.HandleInput(this,entity_type,client_input_data);
-        if(old_dir != direction) SyncNetwork(false);
+        behavior_type.HandleInput(this,entity_type,client_input_data);
+        if(old_dir != direction) UpdateNetwork(false);
     }
 }

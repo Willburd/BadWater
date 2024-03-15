@@ -73,6 +73,7 @@ public partial class Behavior
             /*****************************************************************
              * Debugging purposes only.
              ****************************************************************/
+            default:
             case "_BEHAVIOR_":
                 new_behave = new Behavior();
             break;
@@ -132,14 +133,6 @@ public partial class Behavior
         GD.Print("BUMPED " + self.display_name); // REPLACE ME!!!
     }
 
-    public virtual void Dropped(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity new_location)
-    {
-        GD.Print("DROPPED " + self.display_name); // REPLACE ME!!!
-    }
-    public virtual void ContainerMoved(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity new_location)
-    {
-        GD.Print("PLACEDINCONTAINER " + self.display_name); // REPLACE ME!!!
-    }
 
     // visibility state of entity, only matters if on a turf and not inside anything.
     public virtual bool IsNetworkVisible()
