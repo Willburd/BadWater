@@ -141,13 +141,18 @@ public partial class Behavior
     }
 
     // Click interactions
-    public void Click(AbstractEntity self, MainController.DataType entity_type, AbstractEntity target, Godot.Collections.Dictionary click_params)
+    public virtual void Clicked(AbstractEntity self, MainController.DataType entity_type, AbstractEntity use_item, AbstractEntity target, Godot.Collections.Dictionary click_params)
     {
-        GD.Print("CLICKED " + self.display_name); // REPLACE ME!!!
+        GD.Print(self?.display_name + " CLICKED " + target?.display_name + " USING " + use_item?.display_name); // REPLACE ME!!!
     }
 
-    public void Drag(AbstractEntity self, MainController.DataType entity_type, AbstractEntity target,Godot.Collections.Dictionary click_params)
+    public virtual void Dragged(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params)
     {
-        GD.Print("DRAGGED " + self.display_name + " TO " + target.display_name); // REPLACE ME!!!
+        GD.Print(user?.display_name + " DRAGGED " + self?.display_name + " TO " + target?.display_name); // REPLACE ME!!!
+    }
+
+    public virtual void AttackSelf(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user)
+    {
+        GD.Print(user?.display_name + " USED " + self?.display_name + " ON ITSELF"); // REPLACE ME!!!
     }
 }

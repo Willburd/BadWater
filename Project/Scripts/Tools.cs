@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Reflection.Metadata.Ecma335;
 
 public static class TOOLS
 {
@@ -9,6 +10,8 @@ public static class TOOLS
         new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
         new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
         new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
+        new_inputs["button"]        = (int)MouseButton.None;
+        new_inputs["state"]         = false;
         new_inputs["x"]             = pos.X;
         new_inputs["y"]             = pos.Y;
         new_inputs["z"]             = pos.Z;
@@ -172,5 +175,33 @@ public static class TOOLS
         {
             if(steps == Mathf.Floor(Mathf.Floor(max_steps / 10) * b)) GD.Print("-" + (b * 10) + "%");
         }
+    }
+
+    /*****************************************************************
+     * Entity tools, things like adjacency checks etc
+     ****************************************************************/
+    public static bool Adjacent(AbstractEntity A,AbstractEntity B)
+    {
+        if(A.map_id_string != B.map_id_string) return false;
+        return TOOLS.VecDist(A.GridPos.WorldPos(),B.GridPos.WorldPos()) < 1f;
+    }
+
+    public static DAT.Dir RotateTowardEntity(AbstractEntity A,AbstractEntity B)
+    {
+        if(A.map_id_string != B.map_id_string || B.GetLocation() is not AbstractTurf)
+        {
+            // ignore...
+            GD.Print("NO DIR CHANGE");
+            return A.direction;
+        }
+        Vector3 offsetA = Vector3.Zero;
+        Vector3 offsetB = Vector3.Zero;
+        if(A is AbstractTurf) offsetA = new Vector3(0.5f,0,0.5f);
+        if(B is AbstractTurf) offsetB = new Vector3(0.5f,0,0.5f);
+        Vector3 dirvec = TOOLS.DirVec(A.GridPos.WorldPos() + offsetA,B.GridPos.WorldPos() + offsetB);
+        // Final sanity check
+        DAT.Dir ret = DAT.InputToCardinalDir(dirvec.X,dirvec.Z);
+        if(ret == DAT.Dir.None) return A.direction;
+        return ret;
     }
 }

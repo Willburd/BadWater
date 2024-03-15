@@ -403,13 +403,13 @@ public partial class NetworkClient : Node3D
                 AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
                 if(current_click_held_entity != null)
                 {
-                    current_click_held_entity.Drag( focused_entity, turf, client_click_data);
+                    current_click_held_entity.Dragged( focused_entity, turf, client_click_data);
                     current_click_held_entity = null;
                     current_click_start_pos = Vector3.Zero;
                 }
                 else if(turf != null)
                 {
-                    focused_entity.Click( focused_entity, turf, client_click_data);
+                    focused_entity?.Clicked( focused_entity?.ActiveHand, turf,client_click_data);
                 }
             }
         }
@@ -444,12 +444,12 @@ public partial class NetworkClient : Node3D
             if(TOOLS.VecDist(release_pos, current_click_start_pos) > 0.1f || current_click_held_entity != ent)
             {
                 // Dragged onto another entity!
-                current_click_held_entity.Drag(focused_entity,ent,TOOLS.ParseJson(parameters_json));
+                current_click_held_entity.Dragged(focused_entity,ent,TOOLS.ParseJson(parameters_json));
             }
             else
             {
                 // Click on same entity!
-                focused_entity.Click(focused_entity,current_click_held_entity,TOOLS.ParseJson(parameters_json));
+                focused_entity?.Clicked(focused_entity?.ActiveHand,ent,TOOLS.ParseJson(parameters_json));
             }
             // Cleanup
             current_click_start_pos = Vector3.Zero;

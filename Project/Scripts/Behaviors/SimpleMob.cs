@@ -180,5 +180,104 @@ namespace BehaviorEvents
         {
             stat = LifeState.Dead;
         }
+
+
+        // Conditions
+        public virtual bool IsRestrained()
+        {
+            return false;
+        }
+        public virtual bool IsBlind()
+        {
+            return false;
+        }
+        public virtual bool IsDeaf()
+        {
+            return false;
+        }
+
+        // Click interactions
+        public override void Clicked(AbstractEntity self, MainController.DataType entity_type, AbstractEntity use_item, AbstractEntity target, Godot.Collections.Dictionary click_params)
+        {
+            // Handle special clicks
+            if(click_params["mod_shift"].AsBool())
+            {
+                // TODO, Print description in chat EXAMINATE! =======================================================================================================
+                GD.Print(target.description);
+                return;
+            }
+
+            // Check status effects
+            if(stat != LifeState.Alive)
+            {
+                return;
+            }
+            // Handle special clicks that require you to be concious
+            if(click_params["mod_shift"].AsBool() && click_params["button"].AsInt32() == (int)MouseButton.Middle)
+            {
+                // Point to object TODO ==========================================================================================================================
+                return;
+            }
+            if(click_params["mod_control"].AsBool())
+            {
+                // Pulling objects TODO ==========================================================================================================================
+                return;
+            }
+
+            // Turn to face it
+            self.direction = TOOLS.RotateTowardEntity(self,target);
+            // Mecha held control
+            // Check restrained
+            if(IsRestrained())
+            {
+                RestrainedClick(self,entity_type,target);
+                return;
+            }
+            // Check throwmode
+            // Vehicle helm control
+            
+            // Handle using items on themselves
+            AbstractEntity hand_item = self.ActiveHand;
+            if(hand_item == target) 
+            {
+                hand_item.AttackSelf(self);
+            }
+            // Interacting with entities directly in your inventory
+            int storage_depth = target.StorageDepth(self);
+            if((target is not AbstractTurf && target == self.GetLocation()) || (storage_depth != -1 && storage_depth <= 1))
+            {
+                if(hand_item != null)
+                {
+                    bool resolved = false; //hand_item.resolve_attackby(target, self, click_parameters = params);
+                    if(!resolved && target != null && hand_item != null)
+                    {
+                        //hand_item.afterattack(target, self, 1, params); // 1 indicates adjacency
+                    }
+                }
+                else
+                {
+                    if(target is AbstractMob); // No instant mob attacking
+                    {
+                        //SetClickCooldown(get_attack_speed());
+                    }
+                    //UnarmedAttack(target, 1);
+                }
+                return;
+            }
+            
+
+
+            GD.Print(self.display_name + " CLICKED " + target.display_name + " using " + use_item?.display_name); // REPLACE ME!!!
+        }
+
+        public override void Dragged(AbstractEntity self, MainController.DataType entity_type, AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params)
+        {
+            GD.Print(user.display_name + " DRAGGED " + self.display_name + " TO " + target.display_name); // REPLACE ME!!!
+        }
+
+        public virtual void RestrainedClick(AbstractEntity self, MainController.DataType entity_type, AbstractEntity target)
+        {
+            GD.Print(self.display_name + " CLICKED " + target.display_name + " WHILE RESTRAINED"); // REPLACE ME!!!
+        }
     }
 }

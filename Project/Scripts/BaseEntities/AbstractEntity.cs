@@ -236,6 +236,11 @@ public partial class AbstractEntity
     /*****************************************************************
      * Client input and control
      ****************************************************************/
+    public virtual AbstractEntity ActiveHand // Used to get activehand from mob, but in any other entity...
+    {
+        get {return null;}
+        set {}
+    }
     public void SetClientOwner(NetworkClient client)
     {
         Debug.Assert(client != null);
@@ -258,8 +263,26 @@ public partial class AbstractEntity
         Move(map_id_string, new_pos);
         if(old_dir != direction) UpdateNetwork(false);
     }
-    public void Click( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) { behavior_type.Click(this,entity_type,target,click_params); }
-    public void Drag( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) { behavior_type.Drag(this,entity_type,target,click_params);}
+    // Clicking other entities
+    public void Clicked( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
+    {
+        DAT.Dir old_dir = direction; 
+        behavior_type.Clicked(this,entity_type,used_item,target,click_params); 
+        if(old_dir != direction) UpdateNetwork(false);
+    }
+    // Being dragged by other entities to somewhere else
+    public void Dragged( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) 
+    { 
+        DAT.Dir old_dir = direction; 
+        behavior_type.Dragged(this,entity_type,user,target,click_params);
+        if(old_dir != direction) UpdateNetwork(false);
+    }
+    public void AttackSelf( AbstractEntity user ) 
+    { 
+        DAT.Dir old_dir = direction; 
+        behavior_type.AttackSelf(this,entity_type,user);
+        if(old_dir != direction) UpdateNetwork(false);
+    }
 
     /*****************************************************************
      * Movement and storage
@@ -508,6 +531,22 @@ public partial class AbstractEntity
         abs.ClearLocation();
     }
 
+    //Returns the storage depth of an atom. This is the number of storage items the atom is contained in before reaching toplevel (the turf).
+    //Returns -1 if the atom was not found in a container.
+    public int StorageDepth(AbstractEntity container)
+    {
+        int depth = 0;
+        AbstractEntity cur_entity = this;
+        while(cur_entity != null && !container.contains.Contains(cur_entity))
+        {
+            if(cur_entity.location is AbstractTurf) return -1;
+            cur_entity = cur_entity.location;
+            depth++;
+        }
+        if(cur_entity == null) return -1;	//inside something with a null location.
+        return depth;
+    }
+
     /*****************************************************************
      * Tag control
      ****************************************************************/
@@ -583,14 +622,5 @@ public partial class AbstractEntity
         loaded_entity.Position = grid_pos.WorldPos();
         loaded_entity.direction = direction;
         if(mesh_update) loaded_entity.MeshUpdate();
-    }
-
-    /*****************************************************************
-     * Entity tools, things like adjacency checks etc
-     ****************************************************************/
-    public static bool Adjacent(AbstractEntity A,AbstractEntity B)
-    {
-        if(A.map_id_string != B.map_id_string) return false;
-        return TOOLS.VecDist(A.grid_pos.WorldPos(),B.grid_pos.WorldPos()) < 1f;
     }
 }

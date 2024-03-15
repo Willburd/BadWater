@@ -77,7 +77,7 @@ public partial class AbstractMob : AbstractEntity
     }
     private int active_hand = 0; // L or R
     private AbstractEntity[] inventory_slots;
-    public AbstractEntity ActiveHand    { get {return inventory_slots[active_hand];} set {inventory_slots[active_hand] = value;}}
+    public override AbstractEntity ActiveHand    { get {return inventory_slots[active_hand];} set {inventory_slots[active_hand] = value;}}
     public AbstractEntity R_hand        { get {return inventory_slots[(int)InventorySlot.Rhand];}   set {inventory_slots[(int)InventorySlot.Rhand] = value;}}
     public AbstractEntity L_hand        { get {return inventory_slots[(int)InventorySlot.Lhand];}   set {inventory_slots[(int)InventorySlot.Lhand] = value;}}
     public AbstractEntity R_handlower   { get {return inventory_slots[(int)InventorySlot.Rhand];}   set {inventory_slots[(int)InventorySlot.Rhand] = value;}}
@@ -135,8 +135,7 @@ public partial class AbstractMob : AbstractEntity
 
     public void UseActiveHand(AbstractEntity target)
     {
-        if(ActiveHand != null) return;
-        Click(this,ActiveHand,TOOLS.AssembleStandardClick(grid_pos.WorldPos())); // Click self basically
+        ActiveHand?.AttackSelf(this);
     }
 
     public void EquipActiveHand(AbstractEntity target)
