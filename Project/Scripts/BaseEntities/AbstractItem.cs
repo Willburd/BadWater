@@ -68,32 +68,9 @@ public partial class AbstractItem : AbstractEntity
     };
     // End of template data
 
-    public override bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
+    protected override bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
-        if(force == 0 || flags.NOBLUDGEON) return false; // TODO ======================================================================================
-        if(target == user && user.SelectingIntent != DAT.Intent.Hurt) return false;
-        
-        if(user is AbstractMob user_mob)
-        {
-            /////////////////////////
-            user_mob.lastattacked = target;
-            if(target is AbstractMob) (target as AbstractMob).lastattacker = user;
-            //add_attack_logs(user,M,"attacked with [name] (INTENT: [uppertext(user.a_intent)]) (DAMTYE: [uppertext(damtype)])");
-            /////////////////////////
-            user_mob.SetClickCooldown( user_mob.GetAttackCooldown(this) );
-            // user_mob.DoAttackAnimation( target); // TODO - attack animation for items ======================================================================================
-        }
-
-        if(target is AbstractMob)
-        {
-            var hit_zone = (target as AbstractMob).ResolveItemAttack(this, user, target_zone);
-            if(hit_zone != DAT.ZoneSelection.Miss)
-            {
-                //ApplyHitEffect(M, user, hit_zone, attack_modifier); // TODO ======================================================================================
-            }
-        }
-        
-        GD.Print(user.display_name + " WEAPON ATTACKED " + target.display_name + " USING " + display_name); // REPLACE ME!!!
-        return true;
+        if(force == 0 || flags.NOBLUDGEON) return false;
+        return base.WeaponAttack( user, target, target_zone, attack_modifier);
     }
 }

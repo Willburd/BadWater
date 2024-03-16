@@ -1,3 +1,4 @@
+using Behaviors_BASE;
 using Godot;
 using GodotPlugins.Game;
 using System;
@@ -306,39 +307,58 @@ public partial class AbstractEntity
         return target.AttackedBy( user, this, attack_modifier, click_parameters);
     }
 
-    public bool AttackedBy( AbstractEntity user, AbstractEntity used_entity, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    protected bool AttackedBy( AbstractEntity user, AbstractEntity used_entity, float attack_modifier, Godot.Collections.Dictionary click_parameters)
     {
         if(user is not AbstractMob) return false;
-        /*if(can_operate(src, user) && I.do_surgery(src,user,user.zone_sel.selecting))
-            return TRUE*/  // TODO - Surgery hook! =================================================================================================================================
+        if(used_entity is AbstractItem used_item && this is AbstractComplexMob this_complexmob)
+        {
+            /*if(can_operate(this_complexmob, user) && used_item.do_surgery(this_complexmob,user,user.SelectingZone))
+                return TRUE*/  // TODO - Surgery hook! =================================================================================================================================
+        }
         return used_entity.WeaponAttack( user, this, user.SelectingZone, attack_modifier);
     }
     
-    public bool AttackCanReach(AbstractMob user, AbstractEntity target, int range)
+    public virtual bool AttackCanReach(AbstractMob user, AbstractEntity target, int range)
     {
-        if(TOOLS.Adjacent(user,target)) return true; // Already adjacent.
-        /*
-        if(AStar(get_turf(us), get_turf(them), /turf/proc/AdjacentTurfsRangedSting, /turf/proc/Distance, max_nodes=25, max_node_depth=range))
-            return TRUE // TODO - pathfinding based range =================================================================================================================================
-        */
+        if(TOOLS.Adjacent(user,target)) return true; // Already adjacent. TODO Handle corners and walls =================================================================================================================================
         return false;
     }
-
-    // Overrides for responding to attacks
-    public virtual bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
+    protected virtual bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
-        // What happens when an object is used on a mob
+        if(target == user && user.SelectingIntent != DAT.Intent.Hurt) return false;
+        if(user is AbstractMob user_mob)
+        {
+            /////////////////////////
+            user_mob.lastattacked = target;
+            if(target is AbstractMob) (target as AbstractMob).lastattacker = user;
+            //add_attack_logs(user,M,"attacked with [name] (INTENT: [uppertext(user.a_intent)]) (DAMTYE: [uppertext(damtype)])");
+            /////////////////////////
+            user_mob.SetClickCooldown( user_mob.GetAttackCooldown(this) );
+            // user_mob.DoAttackAnimation( target); // TODO - attack animation for items ======================================================================================
+        }
+
+        if(target is AbstractMob)
+        {
+            var hit_zone = (target as AbstractMob).ResolveItemAttack(this, user, target_zone);
+            if(hit_zone != DAT.ZoneSelection.Miss)
+            {
+                //ApplyHitEffect(M, user, hit_zone, attack_modifier); // TODO ======================================================================================
+                GD.Print(user.display_name + " WEAPON ATTACKED " + target.display_name + " USING " + display_name); // REPLACE ME!!!
+            }
+        }
+        
         return true;
     }
-
-    public virtual DAT.ZoneSelection ResolveItemAttack(AbstractEntity user, AbstractEntity used_item, DAT.ZoneSelection target_zone)
+    protected virtual DAT.ZoneSelection ResolveItemAttack(AbstractEntity user, AbstractEntity used_item, DAT.ZoneSelection target_zone)
     {
-        return target_zone;
+        return target_zone; // assumes hit... See overrides for proper implimentations. This is how items can miss mid attack.
     }
+
+
+    // Overrides for responding to attacks
     public virtual void AttackSelf( AbstractEntity user ) 
     { 
         // What happens when an object is used on itself.
-        GD.Print(user?.display_name + " USED " + display_name + " ON ITSELF"); // REPLACE ME!!!
     }
     
     public virtual bool PreAttack( AbstractEntity user, AbstractEntity target, Godot.Collections.Dictionary click_parameters) 
@@ -434,7 +454,7 @@ public partial class AbstractEntity
                 }
             }
             
-            if(!intangible)
+            if(!IsIntangible())
             {
                 // Check to see on each axis if we bump... This allows sliding!
                 bool bump_h = false;
@@ -698,5 +718,14 @@ public partial class AbstractEntity
         loaded_entity.Position = grid_pos.WorldPos();
         loaded_entity.direction = direction;
         if(mesh_update) loaded_entity.MeshUpdate();
+    }
+
+
+    /*****************************************************************
+     * Conditions
+     ****************************************************************/
+    public virtual bool IsIntangible()
+    {
+        return intangible;
     }
 }

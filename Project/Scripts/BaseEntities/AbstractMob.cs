@@ -100,12 +100,12 @@ public partial class AbstractMob : AbstractEntity
     /*****************************************************************
      * Click cooldown
      ****************************************************************/
-    public int click_cooldown = 0;  // Time when mob cooldown has finished
+    protected int click_cooldown = 0;  // Time when mob cooldown has finished
     public void SetClickCooldown(int delay)
     {
         click_cooldown = Math.Max(MainController.WorldTicks + delay,click_cooldown);
     }
-    public bool CheckClickCooldown()
+    protected bool CheckClickCooldown()
     {
         return click_cooldown > MainController.WorldTicks;
     }

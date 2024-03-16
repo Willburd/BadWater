@@ -7,7 +7,7 @@ namespace Behaviors_BASE
     {
         
 
-        public override void RangedAttack(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
+        protected override void RangedAttack(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
         {
             if(false /*(LASER in mutations)*/ && SelectingIntent == DAT.Intent.Hurt)
             {
@@ -24,7 +24,7 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Specialty and mutations
          ****************************************************************/
-        public void LaserEyes(AbstractEntity target)
+        protected void LaserEyes(AbstractEntity target)
         {
             GD.Print("PEW PEW PEW TODO!"); // TODO =======================================================================================================================
         }
@@ -32,10 +32,10 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Conditions
          ****************************************************************/
-        public override bool HasTelegrip()
+        protected override bool HasTelegrip()
         {
             if(false /*(TELE in mutations)*/ ) return true; // TODO =======================================================================================================================
-            return HasTelegrip();
+            return base.HasTelegrip();
         }
     }
 }

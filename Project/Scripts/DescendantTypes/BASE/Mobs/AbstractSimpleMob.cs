@@ -161,7 +161,7 @@ namespace Behaviors_BASE
             }
 
             if(GetLocation() is not AbstractTurf) return; // This is going to stop you from telekinesing from inside a closet, but I don't shed many tears for that
-            if(intangible) return; // shadekin can't interact with anything else! They already can't use their bag
+            if(IsIntangible()) return; // shadekin can't interact with anything else! They already can't use their bag
                 
             //Atoms on turfs (not on your person)
             // A is a turf or is on a turf, or in something on a turf (pen in a box); but not something in something on a turf (pen in a box in a backpack)
@@ -196,7 +196,7 @@ namespace Behaviors_BASE
             }
             return;
         }
-        public virtual void RestrainedClick(AbstractEntity target)
+        protected virtual void RestrainedClick(AbstractEntity target)
         {
             GD.Print(display_name + " CLICKED " + target.display_name + " WHILE RESTRAINED"); // REPLACE ME!!!
         }
@@ -205,15 +205,15 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Attack handling
          ****************************************************************/
-        public bool UnarmedAttack(AbstractEntity target, bool proximity)
+        protected bool UnarmedAttack(AbstractEntity target, bool proximity)
         {
-            if(intangible) return false;
+            if(IsIntangible()) return false;
             if(stat != DAT.LifeState.Alive) return false;
             GD.Print(display_name + " UNARMED ATTACKED " + target.display_name); // REPLACE ME!!!
             return true;
         }
 
-        public virtual void RangedAttack(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
+        protected virtual void RangedAttack(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
         {
             if(HasTelegrip())
             {
@@ -334,7 +334,7 @@ namespace Behaviors_BASE
         }
 
         // Check our current inventory and status... See if we need to drop objects from our hands or slots that no longer exist (uniforms for example give us pockets!)
-        public virtual void ProcessSlotDrops()
+        protected virtual void ProcessSlotDrops()
         {   
             // knocked out and dead drops hands!
             if(stat != DAT.LifeState.Alive)
@@ -356,7 +356,7 @@ namespace Behaviors_BASE
         }
 
 
-        public virtual void Bleed()
+        protected virtual void Bleed()
         {
 
         }
@@ -382,7 +382,7 @@ namespace Behaviors_BASE
         {
             return false;
         }
-        public virtual bool HasTelegrip()
+        protected virtual bool HasTelegrip()
         {
             if(flags.WEARGLOVES && false /*SlotGloves == TK GLOVES HERE */) return true; // TODO =======================================================================================================================
             return false;
