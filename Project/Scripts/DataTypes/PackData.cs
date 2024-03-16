@@ -34,7 +34,8 @@ public partial class PackData : Resource
         texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
         anim_speed      = TOOLS.ApplyExistingTag(data,"anim_speed",(double)0);
         intangible      = TOOLS.ApplyExistingTag(data,"intangible",intangible);
-        reach           = TOOLS.ApplyExistingTag(data,"reach",reach);
+        attack_range    = TOOLS.ApplyExistingTag(data,"attack_range",attack_range);
+        unstoppable     = TOOLS.ApplyExistingTag(data,"unstoppable",unstoppable);
     }
 
     public Godot.Collections.Dictionary GetTempData()
@@ -67,7 +68,8 @@ public partial class PackData : Resource
         texture             = source.texture;
         anim_speed          = source.anim_speed;
         intangible          = source.intangible;
-        reach               = source.reach;
+        attack_range        = source.attack_range;
+        unstoppable         = source.unstoppable;
     }
 
     protected virtual string GetVarString()
@@ -122,5 +124,6 @@ public partial class PackData : Resource
     public string texture = "";
     public double anim_speed = 0;
     public bool intangible = false;
-    public int reach = 1;
+    public int attack_range = 1;
+    public bool unstoppable = false; // Can not be stopped from moving from Cross(), CanPass(), or Uncross() failing. Still bumps everything it passes through, though.
 }

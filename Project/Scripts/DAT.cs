@@ -17,6 +17,10 @@ public static class DAT
     public const int DEFAULT_ATTACK_COOLDOWN = 8; //Default timeout for aggressive actions
     public const int DEFAULT_QUICK_COOLDOWN = 4;
 
+    public const int TK_MAXRANGE = 15;
+
+    public const float ADJACENT_DISTANCE = 0.98f;
+
 
     public enum Dir
     {
@@ -118,5 +122,59 @@ public static class DAT
             }
         }
         return Dir.None;
+    }
+
+    public enum LifeState
+    {
+        Alive,
+        Unconscious,
+        Dead
+    }
+
+    public enum Intent
+    {
+        Help,
+        Hurt
+    }
+
+    public enum ZoneSelection
+    {
+        Miss,
+        UpperBody,
+        LowerBody,
+        Head,
+        Eyes,
+        Mouse,
+        LeftArm,
+        RightArm,
+        LeftHand,
+        RightHand,
+        RightLeg,
+        LeftLeg,
+        RightFoot,
+        LeftFoot
+    }
+
+    public enum InventorySlot
+    {
+        Rhand,
+        Lhand,
+        RhandLower,
+        LhandLower,
+        Head,
+        Mask,
+        Eyes,
+        Uniform,
+        Suit,
+        Shoes,
+        Lear,
+        Rear,
+        Gloves,
+        Back,
+        ID,
+        Belt,
+        Bag,
+        Lpocket,
+        Rpocket
     }
 }

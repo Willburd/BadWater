@@ -40,7 +40,8 @@ public partial class AbstractEntity
         model = data.model;
         texture = data.texture;
         anim_speed = data.anim_speed;
-        reach = data.reach;
+        attack_range = data.attack_range;
+        unstoppable = data.unstoppable;
     }
     public PackData TemplateWrite()
     {
@@ -88,15 +89,29 @@ public partial class AbstractEntity
     public bool opaque = false;               // blocks vision
     public bool intangible = false;           // can move through solids
     public string step_sound = "";              // Sound pack ID for steps
-    public int reach = 1;
+    public int attack_range = 1;
+    public bool unstoppable = false; 
     // End of template data
+
+    // state data
     private float last_bump_time = 0;
     private const float bump_reset_time = 30; // Ticks
     public string GetUniqueID
     {
         get { return PackRef.modid; }
     }
+    public virtual DAT.ZoneSelection SelectingZone
+    {
+        get {return DAT.ZoneSelection.UpperBody;}
+    }
+    private DAT.Intent internal_selecting_intent = DAT.Intent.Help;
+    public DAT.Intent SelectingIntent
+    {
+        get {return internal_selecting_intent;}
+    }
     protected MainController.DataType entity_type;
+    // end state data
+
     public static AbstractEntity CreateEntity(string mapID, string type_ID, MainController.DataType type)
     {
         PackData typeData = null;
@@ -184,7 +199,7 @@ public partial class AbstractEntity
         DAT.Dir old_dir = direction;
         Tick();
         ProcessVelocity();
-        if(old_dir != direction) UpdateNetwork(false);
+        UpdateNetworkDirection(old_dir);
     }
     private void ProcessVelocity()
     {
@@ -268,12 +283,12 @@ public partial class AbstractEntity
         new_pos.hor += (float)dat_x;
         new_pos.ver += (float)dat_y;
         Move(map_id_string, new_pos);
-        if(old_dir != direction) UpdateNetwork(false);
+        UpdateNetworkDirection(old_dir);
     }
     // Clicking other entities
-    public virtual void Clicked( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
+    public virtual void Clicked( AbstractEntity used_entity, AbstractEntity target, Godot.Collections.Dictionary click_params) 
     {
-        GD.Print(display_name + " CLICKED " + target?.display_name + " USING " + used_item?.display_name); // REPLACE ME!!!
+        GD.Print(display_name + " CLICKED " + target?.display_name + " USING " + used_entity?.display_name); // REPLACE ME!!!
     }
     // Being dragged by other entities to somewhere else
     public virtual void Dragged( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) 
@@ -282,71 +297,63 @@ public partial class AbstractEntity
     }
 
     /*****************************************************************
-     * Item interaction and weapon handling
+     * Attack handling
      ****************************************************************/
-    public bool AttackCanReach(AbstractEntity user, AbstractEntity target, int range)
+    // Base attack logic
+    public bool Attack( AbstractEntity user, AbstractEntity target, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    {
+        if(PreAttack( user, target,click_parameters)) return true; // PreAttack returns true if it performs a unique action that does not actually cause an attack
+        return target.AttackedBy( user, this, attack_modifier, click_parameters);
+    }
+
+    public bool AttackedBy( AbstractEntity user, AbstractEntity used_entity, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    {
+        if(user is not AbstractMob) return false;
+        /*if(can_operate(src, user) && I.do_surgery(src,user,user.zone_sel.selecting))
+            return TRUE*/  // TODO - Surgery hook! =================================================================================================================================
+        return used_entity.WeaponAttack( user, this, user.SelectingZone, attack_modifier);
+    }
+    
+    public bool AttackCanReach(AbstractMob user, AbstractEntity target, int range)
     {
         if(TOOLS.Adjacent(user,target)) return true; // Already adjacent.
         /*
         if(AStar(get_turf(us), get_turf(them), /turf/proc/AdjacentTurfsRangedSting, /turf/proc/Distance, max_nodes=25, max_node_depth=range))
-            return TRUE
+            return TRUE // TODO - pathfinding based range =================================================================================================================================
         */
         return false;
     }
 
-    public virtual void AttackSelf( AbstractEntity user ) 
-    { 
-        GD.Print(user?.display_name + " USED " + display_name + " ON ITSELF"); // REPLACE ME!!!
+    // Overrides for responding to attacks
+    public virtual bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
+    {
+        // What happens when an object is used on a mob
+        return true;
     }
 
+    public virtual DAT.ZoneSelection ResolveItemAttack(AbstractEntity user, AbstractEntity used_item, DAT.ZoneSelection target_zone)
+    {
+        return target_zone;
+    }
+    public virtual void AttackSelf( AbstractEntity user ) 
+    { 
+        // What happens when an object is used on itself.
+        GD.Print(user?.display_name + " USED " + display_name + " ON ITSELF"); // REPLACE ME!!!
+    }
+    
     public virtual bool PreAttack( AbstractEntity user, AbstractEntity target, Godot.Collections.Dictionary click_parameters) 
     {
         return false; //return TRUE to avoid calling attackby after this proc does stuff
     }
 
-    public bool Attack( AbstractEntity user, AbstractEntity target, float attack_modifier, Godot.Collections.Dictionary click_parameters)
-    {
-        if(PreAttack( user, target,click_parameters)) return true; // We're returning the value of pre_attack, important if it has a special return.
-        return target.AttackedBy( user, this, attack_modifier, click_parameters);
-    }
-
-    public bool AttackedBy( AbstractEntity user, AbstractEntity used_item, float attack_modifier, Godot.Collections.Dictionary click_parameters)
-    {
-        if(user is not AbstractMob) return false;
-        /*if(can_operate(src, user) && I.do_surgery(src,user,user.zone_sel.selecting))
-            return TRUE*/
-        return used_item.WeaponAttack( user, this, /*user.zone_sel.selecting*/ 0, attack_modifier);
-    }
-
-    public virtual bool WeaponAttack( AbstractEntity user, AbstractEntity target, int target_zone, float attack_modifier)
-    {
-        /*
-        if(!force || (flags & NOBLUDGEON)) return false;
-        if(M == user && user.a_intent != I_HURT) return false;
-
-        /////////////////////////
-        user.lastattacked = M
-        M.lastattacker = user
-
-        if(!no_attack_log) add_attack_logs(user,M,"attacked with [name] (INTENT: [uppertext(user.a_intent)]) (DAMTYE: [uppertext(damtype)])")
-        /////////////////////////
-
-        user.SetClickCooldown(user.GetAttackSpeed(src))
-        user.do_attack_animation(M)
-
-        var/hit_zone = M.resolve_item_attack(src, user, target_zone)
-        if(hit_zone)
-        {
-            apply_hit_effect(M, user, hit_zone, attack_modifier);
-        }
-        */
-        GD.Print(user.display_name + " RANGED ATTACKED " + target.display_name + " USING " + display_name); // REPLACE ME!!!
-        return true;
-    }
-
     public virtual void AfterAttack( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
     {
+        // What happens after an attack successfully hits.
+    }
 
+    public virtual void AttackTK( AbstractEntity user)
+    {
+        // What happens when telekinetically used.
     }
 
     /*****************************************************************
@@ -640,6 +647,10 @@ public partial class AbstractEntity
             return false;
         }
         return false;
+    }
+    public void UpdateNetworkDirection(DAT.Dir old_dir)
+    {
+        if(old_dir != direction) UpdateNetwork(false);
     }
     public void UpdateNetwork(bool mesh_update) // Spawns and despawns currently loaded entity. While calling SyncPositionRotation(bool mesh_update) is cheaper... Calling this is safer.
     {
