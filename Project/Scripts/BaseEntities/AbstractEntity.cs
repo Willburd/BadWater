@@ -317,13 +317,7 @@ public partial class AbstractEntity
         }
         return used_entity.WeaponAttack( user, this, user.SelectingZone, attack_modifier);
     }
-    
-    public virtual bool AttackCanReach(AbstractMob user, AbstractEntity target, int range)
-    {
-        if(TOOLS.Adjacent(user,target)) return true; // Already adjacent. TODO Handle corners and walls =================================================================================================================================
-        return false;
-    }
-    protected virtual bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
+    protected bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
         if(target == user && user.SelectingIntent != DAT.Intent.Hurt) return false;
         if(user is AbstractMob user_mob)
@@ -353,28 +347,48 @@ public partial class AbstractEntity
     {
         return target_zone; // assumes hit... See overrides for proper implimentations. This is how items can miss mid attack.
     }
-
+    
+    public virtual bool AttackCanReach(AbstractMob user, AbstractEntity target, int range)
+    {
+        if(TOOLS.Adjacent(user,target)) return true; // Already adjacent. TODO Handle corners and walls =================================================================================================================================
+        return false;
+    }
 
     // Overrides for responding to attacks
-    public virtual void AttackSelf( AbstractEntity user ) 
+    public virtual void AttackedSelf( AbstractEntity user ) 
     { 
         // What happens when an object is used on itself.
     }
-    
+
     public virtual bool PreAttack( AbstractEntity user, AbstractEntity target, Godot.Collections.Dictionary click_parameters) 
     {
-        return false; //return TRUE to avoid calling attackby after this proc does stuff
+        return false; //return TRUE to skip calling AttackedBy() on target after this proc does stuff, and go straight to AfterAttack()
+    }
+    
+    protected virtual bool UnarmedAttack(AbstractEntity target, bool proximity)
+    {
+        return true;
     }
 
     public virtual void AfterAttack( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
     {
-        // What happens after an attack successfully hits.
+        // What happens after an attack that misses, or for which PreAttack returned true
     }
 
-    public virtual void AttackTK( AbstractEntity user)
+    public virtual void AttackedByTK( AbstractEntity user)
     {
-        // What happens when telekinetically used.
+        // Telekinetic attack: By default, emulate the user's unarmed attack
+        if(user is AbstractMob user_mob)
+        {
+            if(user_mob.Stat != DAT.LifeState.Alive) return;
+            user_mob.UnarmedAttack(user,false); // attack_hand, attack_paw, etc
+        }
     }
+    public virtual void AttackedSelfTK( AbstractEntity user)
+    {
+        // Called when you click the TK grab in your hand, or closets overriding AttackedByTK()
+    }
+
 
     /*****************************************************************
      * Movement and storage
@@ -454,7 +468,7 @@ public partial class AbstractEntity
                 }
             }
             
-            if(!IsIntangible())
+            if(!IsIntangible() && !unstoppable) // ghosts, and unstoppable movers do not bump
             {
                 // Check to see on each axis if we bump... This allows sliding!
                 bool bump_h = false;

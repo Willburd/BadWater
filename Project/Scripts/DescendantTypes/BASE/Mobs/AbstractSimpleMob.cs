@@ -13,7 +13,6 @@ namespace Behaviors_BASE
 
 
         // state data
-        private DAT.LifeState stat = DAT.LifeState.Alive;
         private DAT.ZoneSelection internal_selecting_zone = DAT.ZoneSelection.UpperBody;
         public override DAT.ZoneSelection SelectingZone
         {
@@ -81,7 +80,7 @@ namespace Behaviors_BASE
 
         public void UseActiveHand(AbstractEntity target)
         {
-            ActiveHand?.AttackSelf(this);
+            ActiveHand?.AttackedSelf(this);
         }
 
         public void EquipActiveHand(AbstractEntity target)
@@ -141,7 +140,7 @@ namespace Behaviors_BASE
             AbstractEntity hand_item = ActiveHand;
             if(hand_item == target) 
             {
-                hand_item.AttackSelf(this);
+                hand_item.AttackedSelf(this);
             }
             // Interacting with entities directly in your inventory
             int storage_depth = target.StorageDepth(this);
@@ -205,7 +204,8 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Attack handling
          ****************************************************************/
-        protected bool UnarmedAttack(AbstractEntity target, bool proximity)
+
+        protected override bool UnarmedAttack(AbstractEntity target, bool proximity)
         {
             if(IsIntangible()) return false;
             if(stat != DAT.LifeState.Alive) return false;
@@ -218,7 +218,7 @@ namespace Behaviors_BASE
             if(HasTelegrip())
             {
                 if(TOOLS.VecDist(GridPos.WorldPos(), target.GridPos.WorldPos()) > DAT.TK_MAXRANGE) return;
-                target.AttackTK(this);
+                target.AttackedByTK(this);
             }
         }
 

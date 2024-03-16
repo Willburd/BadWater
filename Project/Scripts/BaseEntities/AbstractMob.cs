@@ -66,6 +66,11 @@ public partial class AbstractMob : AbstractEntity
         flags.WEARBELT      = temp.wears_belt;
     }
     // Gameplay interaction
+    protected DAT.LifeState stat = DAT.LifeState.Alive;
+    public DAT.LifeState Stat
+    {
+        get {return stat;}
+    }
     public float max_health = 0;   // Size of item in world and bags
     public float health = 0;    // Size of item in world and bags
     public float walk_speed = (float)0.25;
