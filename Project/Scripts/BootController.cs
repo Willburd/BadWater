@@ -4,6 +4,8 @@ using System;
 [GlobalClass]
 public partial class BootController : Node
 {
+    public static BootController controller;
+
     [Export]
     public Node entity_container;
     [Export]
@@ -41,6 +43,7 @@ public partial class BootController : Node
 
     public override void _Ready()
     {
+        controller = this;
         //Link signals
         Multiplayer.PeerConnected += _PeerJoin;
         Multiplayer.PeerDisconnected += _PeerLeave;

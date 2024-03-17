@@ -10,9 +10,8 @@ properties/1/path = NodePath(".:focused_position")
 properties/1/spawn = true
 properties/1/replication_mode = 1
 
-[node name="NetworkClient" type="Node3D" node_paths=PackedStringArray("my_hud", "camera")]
+[node name="NetworkClient" type="Node3D" node_paths=PackedStringArray("camera")]
 script = ExtResource("1_04naj")
-my_hud = NodePath("PlayerHud")
 camera = NodePath("ClientCamera")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
@@ -21,117 +20,3 @@ replication_config = SubResource("SceneReplicationConfig_ulbxs")
 
 [node name="ClientCamera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
-
-[node name="PlayerHud" type="CanvasLayer" parent="."]
-
-[node name="Control" type="Control" parent="PlayerHud"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="PanelLeft" type="Panel" parent="PlayerHud/Control"]
-clip_contents = true
-layout_mode = 0
-offset_left = -5.0
-offset_top = -6.0
-offset_right = 255.0
-offset_bottom = 657.0
-
-[node name="PanelRight" type="Panel" parent="PlayerHud/Control"]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -254.0
-offset_top = -5.0
-offset_right = 6.0
-offset_bottom = 658.0
-grow_horizontal = 0
-
-[node name="LeftHand" type="Panel" parent="PlayerHud/Control"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -64.0
-offset_top = -66.0
-offset_right = -4.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="LeftHandExtra" type="Panel" parent="PlayerHud/Control"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -110.0
-offset_top = -50.0
-offset_right = -66.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="RightHand" type="Panel" parent="PlayerHud/Control"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = -66.0
-offset_right = 64.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="RightHandExtra" type="Panel" parent="PlayerHud/Control"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 66.0
-offset_top = -50.0
-offset_right = 110.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="PocketLeft" type="Panel" parent="PlayerHud/Control"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 147.0
-offset_top = -51.0
-offset_right = 191.0
-offset_bottom = -7.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="PocketRight" type="Panel" parent="PlayerHud/Control"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 196.0
-offset_top = -51.0
-offset_right = 240.0
-offset_bottom = -7.0
-grow_horizontal = 2
-grow_vertical = 0

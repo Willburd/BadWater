@@ -45,8 +45,8 @@ public partial class NetworkClient : Node3D
         if(Name != peerid.ToString()) return; // Only the client we're asking!
         // DUMP TEMPORARY STUFF
         // TODO - Actual login =================================================================================================================================
-        string assign_name = ((TextEdit)GetTree().Root.GetChild(0).GetChild<CanvasLayer>(2).GetChild(6)).Text;
-        string pass_hash = ((TextEdit)GetTree().Root.GetChild(0).GetChild<CanvasLayer>(2).GetChild(7)).Text;
+        string assign_name = BootController.controller.account_entry.Text;
+        string pass_hash = BootController.controller.accpass_entry.Text;
         peer_active_client = this; // Set the client reference for clicks!
         Rpc(nameof(AcknowledgeCredentials), Name, assign_name, pass_hash);
     }
@@ -103,7 +103,6 @@ public partial class NetworkClient : Node3D
     public void Spawn()
     {
         camera.Current = false;
-        my_hud.Hide();
         // Check for a spawner!
         if(MapController.spawners.ContainsKey("PLAYER"))
         {
@@ -200,8 +199,6 @@ public partial class NetworkClient : Node3D
      * Client processing and input handling
      ****************************************************************/
     private Godot.Collections.Dictionary client_input_data = new Godot.Collections.Dictionary();    // current inputs from client
-    [Export]
-    CanvasLayer my_hud;
     public void Tick()
     {
         if(TOOLS.PeerConnecting(this)) return;
@@ -487,7 +484,6 @@ public partial class NetworkClient : Node3D
             camera.Current = true;
             listener = new AudioListener3D();
             AddChild(listener);
-            my_hud.Show();
         }
         float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
         camera.Position = camera.Position.MoveToward(focused_position + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0), (float)delta * lerp_speed);
