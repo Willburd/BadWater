@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://brrxe5wurx84s"]
 
-[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkStructure.cs" id="1_etmmc"]
+[ext_resource type="Script" path="res://Scripts/NetworkSyncObjects/NetworkStructure.cs" id="1_etmmc"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:rotation")

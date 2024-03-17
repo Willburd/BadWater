@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://darn5dx2bt2p4"]
 
-[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkChunk.cs" id="1_fkcyw"]
+[ext_resource type="Script" path="res://Scripts/NetworkSyncObjects/NetworkChunk.cs" id="1_fkcyw"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bnqg0"]
 properties/0/path = NodePath(".:map_id_string")

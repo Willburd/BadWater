@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://gcow2uo4uiia"]
 
-[ext_resource type="Script" path="res://Scripts/BaseEntities/NetworkClient.cs" id="1_3ymcw"]
+[ext_resource type="Script" path="res://Scripts/NetworkSyncObjects/NetworkClient.cs" id="1_04naj"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ulbxs"]
 properties/0/path = NodePath(".:focused_map_id")
@@ -10,11 +10,10 @@ properties/1/path = NodePath(".:focused_position")
 properties/1/spawn = true
 properties/1/replication_mode = 1
 
-[node name="NetworkClient" type="Node3D" node_paths=PackedStringArray("my_hud", "camera", "listener")]
-script = ExtResource("1_3ymcw")
+[node name="NetworkClient" type="Node3D" node_paths=PackedStringArray("my_hud", "camera")]
+script = ExtResource("1_04naj")
 my_hud = NodePath("PlayerHud")
 camera = NodePath("ClientCamera")
-listener = NodePath("")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.12
