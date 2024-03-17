@@ -31,6 +31,7 @@ public partial class AbstractItem : AbstractEntity
         ItemData temp   = data as ItemData;
         size_category   = temp.size_category;
         force           = temp.force;
+        tool_tag        = temp.tool_tag;
         // set flags
         flags.NOBLUDGEON              = temp.NOBLUDGEON;
         flags.NOCONDUCT               = temp.NOCONDUCT;
@@ -46,9 +47,10 @@ public partial class AbstractItem : AbstractEntity
         flags.FLEXIBLEMATERIAL        = temp.FLEXIBLEMATERIAL;
         flags.ALLOW_SURVIVALFOOD      = temp.ALLOW_SURVIVALFOOD;
     }
-    public ItemData.SizeCategory size_category = ItemData.SizeCategory.Tiny;   // Size of item in world and bags
-    float force = 0f; // Weapon impact force
-    Flags flags;
+    public DAT.SizeCategory size_category = DAT.SizeCategory.SMALL;   // Size of item in world and bags
+    public float force = 0f; // Weapon impact force
+    public DAT.ToolTag tool_tag = DAT.ToolTag.NONE;
+    public Flags flags;
     public struct Flags
     {
         public Flags() {}
@@ -67,10 +69,4 @@ public partial class AbstractItem : AbstractEntity
         public bool ALLOW_SURVIVALFOOD      = false; // Allows special survival food items to be eaten through it
     };
     // End of template data
-
-    protected override bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
-    {
-        if(force == 0 || flags.NOBLUDGEON) return false;
-        return base.WeaponAttack( user, target, target_zone, attack_modifier);
-    }
 }

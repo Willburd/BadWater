@@ -177,4 +177,42 @@ public static class DAT
         Lpocket,
         Rpocket
     }
+
+    public enum ToolTag
+    {
+        NONE,
+        CROWBAR,
+        MULTITOOL,
+        SCREWDRIVER,
+        WIRECUTTER,
+        WRENCH,
+        WELDER,
+        CABLE_COIL,
+        ANALYZER,
+        MINING,
+        SHOVEL,
+        RETRACTOR,
+        HEMOSTAT,
+        CAUTERY,
+        DRILL,
+        SCALPEL,
+        SAW,
+        BONESET,
+        KNIFE,
+        BLOODFILTER,
+        ROLLINGPIN
+    }
+
+
+    public enum SizeCategory
+    {
+        TINY,
+        SMALL,
+        MEDIUM,
+        LARGE,
+        HUGE,
+        GIANT,
+        MASSIVE,
+        GIGANTIC
+    }
 }

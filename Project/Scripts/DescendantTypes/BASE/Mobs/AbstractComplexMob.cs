@@ -3,7 +3,7 @@ using System;
 
 namespace Behaviors_BASE
 {
-    public class AbstractComplexMob : AbstractSimpleMob
+    public class AbstractComplexMob : AbstractMob
     {
         
 

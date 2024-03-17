@@ -317,9 +317,10 @@ public partial class AbstractEntity
         }
         return used_entity.WeaponAttack( user, this, user.SelectingZone, attack_modifier);
     }
-    protected bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
+    protected virtual bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
         if(target == user && user.SelectingIntent != DAT.Intent.Hurt) return false;
+        if(this is AbstractItem self_item && (self_item.force == 0 || self_item.flags.NOBLUDGEON)) return false;
         if(user is AbstractMob user_mob)
         {
             /////////////////////////
@@ -367,6 +368,9 @@ public partial class AbstractEntity
     
     protected virtual bool UnarmedAttack(AbstractEntity target, bool proximity)
     {
+        if(IsIntangible()) return false;
+        if(this is AbstractMob self_mob && self_mob.Stat != DAT.LifeState.Alive) return false;
+        GD.Print(display_name + " UNARMED ATTACKED " + target.display_name); // REPLACE ME!!!
         return true;
     }
 

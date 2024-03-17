@@ -4,26 +4,15 @@ using System;
 [GlobalClass] 
 public partial class ItemData : PackData
 {
-    public enum SizeCategory
-    {
-        Tiny,
-        Small,
-        Medium,
-        Large,
-        Huge,
-        Giant,
-        Massive,
-        Gigantic
-    }
-
     public override void SetVars(Godot.Collections.Dictionary data_override = null)
     {
         base.SetVars(data_override);
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        size_category           = (SizeCategory)TOOLS.ApplyExistingTag(data,"size_category",(int)size_category);
+        size_category           = StringToSizeCategory( TOOLS.ApplyExistingTag(data,"size_category",size_category.ToString()));
+        tool_tag                = StringToTooltag(      TOOLS.ApplyExistingTag(data,"tool_tag",tool_tag.ToString()));
         force                   = TOOLS.ApplyExistingTag(data,"force",(int)force);
-        NOBLUDGEON              = TOOLS.ApplyExistingTag(data,"no_bludgeion",NOBLUDGEON);
+        NOBLUDGEON              = TOOLS.ApplyExistingTag(data,"no_bludgeon",NOBLUDGEON);
         NOCONDUCT               = TOOLS.ApplyExistingTag(data,"no_conduct",NOCONDUCT);
         ON_BORDER               = TOOLS.ApplyExistingTag(data,"on_border",ON_BORDER);
         NOBLOODY                = TOOLS.ApplyExistingTag(data,"no_bloody",NOBLOODY);
@@ -44,25 +33,37 @@ public partial class ItemData : PackData
         return " name: " + display_name + " description: " + description + " tag: " + tag + " size: "  + size_category;
     }
     
-    public static int InventorySlots(SizeCategory size)
+    private static DAT.ToolTag StringToTooltag(string parse)
+    {
+        if(Enum.TryParse(parse, out DAT.ToolTag ret)) return ret;
+        return DAT.ToolTag.NONE;
+    }
+
+    private static DAT.SizeCategory StringToSizeCategory(string parse)
+    {
+        if(Enum.TryParse(parse, out DAT.SizeCategory ret)) return ret;
+        return DAT.SizeCategory.SMALL;
+    }
+
+    public static int InventorySlots(DAT.SizeCategory size)
     {
         switch(size)
         {
-            case SizeCategory.Tiny:
+            case DAT.SizeCategory.TINY:
                 return 1;
-            case SizeCategory.Small:
+            case DAT.SizeCategory.SMALL:
                 return 1;
-            case SizeCategory.Medium:
+            case DAT.SizeCategory.MEDIUM:
                 return 2;
-            case SizeCategory.Large:
+            case DAT.SizeCategory.LARGE:
                 return 3;
-            case SizeCategory.Huge:
+            case DAT.SizeCategory.HUGE:
                 return 4;
-            case SizeCategory.Giant:
+            case DAT.SizeCategory.GIANT:
                 return 6;
-            case SizeCategory.Massive:
+            case DAT.SizeCategory.MASSIVE:
                 return 8;
-            case SizeCategory.Gigantic:
+            case DAT.SizeCategory.GIGANTIC:
                 return 9;
         }
         return 1;
@@ -74,6 +75,7 @@ public partial class ItemData : PackData
         base.Clone(temp);
         size_category           = temp.size_category;
         force                   = temp.force;
+        tool_tag                = temp.tool_tag;
         NOBLUDGEON              = temp.NOBLUDGEON;
         NOCONDUCT               = temp.NOCONDUCT;
         ON_BORDER               = temp.ON_BORDER;
@@ -90,7 +92,8 @@ public partial class ItemData : PackData
     }
 
     // Unique data
-    public SizeCategory size_category;
+    public DAT.SizeCategory size_category;
+    public DAT.ToolTag tool_tag = DAT.ToolTag.NONE;
     public float force;
     // flags
     public bool NOBLUDGEON              = false;

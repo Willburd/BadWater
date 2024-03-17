@@ -296,13 +296,6 @@ public partial class AbstractMob : AbstractEntity
     /*****************************************************************
      * Attack handling
      ****************************************************************/
-    protected override bool UnarmedAttack(AbstractEntity target, bool proximity)
-    {
-        if(IsIntangible()) return false;
-        if(stat != DAT.LifeState.Alive) return false;
-        GD.Print(display_name + " UNARMED ATTACKED " + target.display_name); // REPLACE ME!!!
-        return true;
-    }
 
     protected virtual void RangedAttack(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
     {
