@@ -49,6 +49,30 @@ public static class DAT
         SouthEastDown = South | East | Down,
     }
 
+    public static bool DirIsCardinal(Dir dir)
+    {
+        if(((int)dir & (int)Dir.North)  == (int)Dir.North) return true;
+        if(((int)dir & (int)Dir.South)  == (int)Dir.South) return true;
+        if(((int)dir & (int)Dir.East)  == (int)Dir.East) return true;
+        if(((int)dir & (int)Dir.West)  == (int)Dir.West) return true;
+        return false;
+    }
+
+    public static bool DirIsUpDown(Dir dir)
+    {
+        if(((int)dir & (int)Dir.Up)  == (int)Dir.Up) return true;
+        if(((int)dir & (int)Dir.Down)  == (int)Dir.Down) return true;
+        return false;
+    }
+
+    public static bool DirIsDiagonal(Dir dir)
+    {
+        // checks if not cardinal, and NOT updown either! Just inversing DirIsCardinal() won't do this, infact it will be true on up/down!
+        if(DirIsUpDown(dir)) return false;
+        return !DirIsCardinal(dir);
+    }
+
+
     public static Dir ReverseDir(Dir dir)
     {
         if(dir == Dir.None) return Dir.None;
@@ -62,7 +86,7 @@ public static class DAT
         return (Dir)rev;
     }
 
-    public static Dir InputToDir(float x, float y)
+    public static Dir VectorToDir(float x, float y)
     {
         Dir newdir = Dir.None;
         if(x < 0) newdir |= Dir.West;
@@ -72,7 +96,7 @@ public static class DAT
         return newdir;
     }
 
-    public static Dir InputToCardinalDir(float x, float y)
+    public static Dir VectorToCardinalDir(float x, float y)
     {
         Dir newdir = Dir.None;
         if(Mathf.Abs(x) > Mathf.Abs(y))

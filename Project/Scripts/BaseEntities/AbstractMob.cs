@@ -351,7 +351,7 @@ public partial class AbstractMob : AbstractEntity
                 // slower safer movement
                 new_pos.hor += (float)dat_x * walk_speed;
                 new_pos.ver += (float)dat_y * walk_speed;
-                if(!client_input_data["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) direction = DAT.InputToCardinalDir((float)dat_x,(float)dat_y);
+                if(!client_input_data["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) direction = DAT.VectorToCardinalDir((float)dat_x,(float)dat_y);
                 speed = walk_speed;
             }
             else
@@ -359,7 +359,7 @@ public partial class AbstractMob : AbstractEntity
                 // zoomies as normal
                 new_pos.hor += (float)dat_x * run_speed;
                 new_pos.ver += (float)dat_y * run_speed;
-                if(!client_input_data["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) direction = DAT.InputToCardinalDir((float)dat_x,(float)dat_y);
+                if(!client_input_data["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) direction = DAT.VectorToCardinalDir((float)dat_x,(float)dat_y);
                 speed = run_speed;
             }
             // math for feet speed

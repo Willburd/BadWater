@@ -182,8 +182,33 @@ public static class TOOLS
      ****************************************************************/
     public static bool Adjacent(AbstractEntity A,AbstractEntity B)
     {
-        if(A.map_id_string != B.map_id_string) return false;
-        return TOOLS.VecDist(A.GridPos.WorldPos(),B.GridPos.WorldPos()) <= DAT.ADJACENT_DISTANCE;
+        // different maps, and depth doesn't count
+        if(A.map_id_string != B.map_id_string || A.GridPos.dep != B.GridPos.dep) return false;
+        MapController.GridPos A_pos = A.GridPos;
+        MapController.GridPos B_pos = B.GridPos;
+        Vector3 dir_vec;
+        // center of turfs
+        if(A is AbstractTurf || B is AbstractTurf)
+        {
+            A_pos.hor = Mathf.Floor(A_pos.hor) + 0.5f; 
+            A_pos.ver = Mathf.Floor(A_pos.ver) + 0.5f; 
+            B_pos.hor = Mathf.Floor(B_pos.hor) + 0.5f; 
+            B_pos.ver = Mathf.Floor(B_pos.ver) + 0.5f; 
+            dir_vec = DirVec(A_pos.WorldPos(),B_pos.WorldPos());
+            if(DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
+            {
+                // Check corner blockages
+            }
+            return Mathf.Abs(A.GridPos.hor - B_pos.hor) < 1 || Mathf.Abs(A.GridPos.ver - B_pos.ver) < 1;
+        }
+
+        // Entity checking
+        dir_vec = DirVec(A_pos.WorldPos(),B_pos.WorldPos());
+        if(DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
+        {
+            // Check corner blockages
+        }
+        return TOOLS.VecDist(A_pos.WorldPos(),B_pos.WorldPos()) <= DAT.ADJACENT_DISTANCE;
     }
 
     public static DAT.Dir RotateTowardEntity(AbstractEntity A,AbstractEntity B)
@@ -200,7 +225,7 @@ public static class TOOLS
         if(B is AbstractTurf) offsetB = new Vector3(0.5f,0,0.5f);
         Vector3 dirvec = TOOLS.DirVec(A.GridPos.WorldPos() + offsetA,B.GridPos.WorldPos() + offsetB);
         // Final sanity check
-        DAT.Dir ret = DAT.InputToCardinalDir(dirvec.X,dirvec.Z);
+        DAT.Dir ret = DAT.VectorToCardinalDir(dirvec.X,dirvec.Z);
         if(ret == DAT.Dir.None) return A.direction;
         return ret;
     }
