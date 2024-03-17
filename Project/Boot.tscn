@@ -1,13 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://it0x18qe03km"]
+[gd_scene load_steps=6 format=3 uid="uid://it0x18qe03km"]
 
-[ext_resource type="Script" path="res://Scripts/Boot.gd" id="1_vcouu"]
+[ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
+[ext_resource type="Script" path="res://JoinMenu.gd" id="2_gqm1w"]
 [ext_resource type="Script" path="res://TurfClickHandler.cs" id="3_jstcs"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_dtkm3"]
 
 [node name="Main" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry", "join_menu")]
-script = ExtResource("1_vcouu")
+script = ExtResource("1_frm1i")
 entity_container = NodePath("Entities")
 client_container = NodePath("Clients")
 client_prefab = ExtResource("2_doepm")
@@ -25,7 +26,9 @@ join_menu = NodePath("JoinMenu")
 
 [node name="Clients" type="Node" parent="."]
 
-[node name="JoinMenu" type="CanvasLayer" parent="."]
+[node name="JoinMenu" type="CanvasLayer" parent="." node_paths=PackedStringArray("controller")]
+script = ExtResource("2_gqm1w")
+controller = NodePath("..")
 
 [node name="Client" type="Button" parent="JoinMenu"]
 offset_left = 5.0
@@ -128,7 +131,7 @@ script = ExtResource("3_jstcs")
 [node name="TurfPlane" type="CollisionShape3D" parent="TurfClickHandler/TurfStaticBody"]
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
 
-[connection signal="pressed" from="JoinMenu/Client" to="." method="_on_client_pressed"]
-[connection signal="pressed" from="JoinMenu/Server" to="." method="_on_server_pressed"]
-[connection signal="pressed" from="JoinMenu/Editor" to="." method="_on_editor_pressed"]
+[connection signal="pressed" from="JoinMenu/Client" to="JoinMenu" method="_on_client_pressed"]
+[connection signal="pressed" from="JoinMenu/Server" to="JoinMenu" method="_on_server_pressed"]
+[connection signal="pressed" from="JoinMenu/Editor" to="JoinMenu" method="_on_editor_pressed"]
 [connection signal="input_event" from="TurfClickHandler/TurfStaticBody" to="TurfClickHandler/TurfStaticBody" method="_on_input_event"]
