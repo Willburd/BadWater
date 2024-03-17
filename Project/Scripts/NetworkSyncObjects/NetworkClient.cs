@@ -482,6 +482,9 @@ public partial class NetworkClient : Node3D
         if(camera.Current == false)
         {
             camera.Current = true;
+        }
+        if(listener == null)
+        {
             listener = new AudioListener3D();
             AddChild(listener);
         }

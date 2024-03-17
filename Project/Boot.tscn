@@ -11,19 +11,22 @@
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="MainWindow" type="SubViewportContainer" parent="Control"]
 offset_left = 162.0
 offset_top = 51.0
-offset_right = 962.0
-offset_bottom = 651.0
+offset_right = 802.0
+offset_bottom = 531.0
 
 [node name="SubViewport" type="SubViewport" parent="Control/MainWindow"]
 handle_input_locally = false
-size = Vector2i(800, 600)
+audio_listener_enable_3d = true
+size = Vector2i(640, 480)
 render_target_update_mode = 4
 
 [node name="BootController" type="Node" parent="Control/MainWindow/SubViewport" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry", "join_menu")]

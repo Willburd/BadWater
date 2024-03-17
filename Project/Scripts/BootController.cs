@@ -44,9 +44,6 @@ public partial class BootController : Node
     public override void _Ready()
     {
         controller = this;
-        //Link signals
-        Multiplayer.PeerConnected += _PeerJoin;
-        Multiplayer.PeerDisconnected += _PeerLeave;
         // UI controls
         join_menu.Show();
         // Load config
@@ -82,7 +79,9 @@ public partial class BootController : Node
         ENetMultiplayerPeer peer = new ENetMultiplayerPeer();
         if(server)
         {
-            
+            //Link signals
+            Multiplayer.PeerConnected += _PeerJoin;
+            Multiplayer.PeerDisconnected += _PeerLeave;
             //Set limits
             max_players = (int)client_spawner.SpawnLimit;
             max_entities = (int)entity_spawner.SpawnLimit;
