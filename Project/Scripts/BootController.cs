@@ -93,6 +93,7 @@ public partial class BootController : Node
                 ResetJoinMenu();
                 return;
             }
+            peer.Host.Compress(ENetConnection.CompressionMode.Fastlz);
             // Set Spawn limits
             client_spawner.SpawnLimit = (uint)config.max_clients;
             entity_spawner.SpawnLimit = (uint)config.max_entities;
@@ -108,7 +109,14 @@ public partial class BootController : Node
         else
         {
             //Create godot client connection to server
-            peer.CreateClient(ip_entry.Text,int.Parse(port_entry.Text));
+            Error status = peer.CreateClient(ip_entry.Text,int.Parse(port_entry.Text));
+            if (status != Error.Ok)
+            {
+                GD.PrintErr("Creating client FAILED.");
+                ResetJoinMenu();
+                return;
+            }
+            peer.Host.Compress(ENetConnection.CompressionMode.Fastlz);
         }
         Multiplayer.MultiplayerPeer = peer;
     }
