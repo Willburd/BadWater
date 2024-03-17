@@ -236,9 +236,12 @@ public partial class NetworkClient : Node3D
     private void UpdateClientControl()
     {
         // Only update focused entity if we have actual inputs to give
-        DAT.Dir? old_dir = focused_entity?.direction; 
-        if(client_input_data.Keys.Count > 0) focused_entity?.ControlUpdate(client_input_data);
-        if(old_dir != null && focused_entity?.direction != old_dir.Value) focused_entity?.UpdateNetwork(false);
+        if(client_input_data.Keys.Count > 0 && focused_entity != null) 
+        {
+            DAT.Dir old_dir = focused_entity.direction;
+            focused_entity.ControlUpdate(client_input_data);
+            focused_entity.UpdateNetworkDirection(old_dir);
+        }
         client_input_data = new Godot.Collections.Dictionary();
     }
     public override void _Process(double delta)
@@ -400,9 +403,11 @@ public partial class NetworkClient : Node3D
                     current_click_held_entity = null;
                     current_click_start_pos = Vector3.Zero;
                 }
-                else if(turf != null)
+                else if(turf != null && focused_entity != null)
                 {
+                    DAT.Dir old_dir = focused_entity.direction;
                     focused_entity?.Clicked( focused_entity?.ActiveHand, turf,client_click_data);
+                    focused_entity.UpdateNetworkDirection(old_dir);
                 }
             }
         }
@@ -442,7 +447,12 @@ public partial class NetworkClient : Node3D
             else
             {
                 // Click on same entity!
-                focused_entity?.Clicked(focused_entity?.ActiveHand,ent,TOOLS.ParseJson(parameters_json));
+                if(focused_entity != null)
+                {
+                    DAT.Dir old_dir = focused_entity.direction;
+                    focused_entity.Clicked(focused_entity?.ActiveHand,ent,TOOLS.ParseJson(parameters_json));
+                    focused_entity.UpdateNetworkDirection(old_dir);
+                }
             }
             // Cleanup
             current_click_start_pos = Vector3.Zero;

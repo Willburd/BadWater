@@ -275,7 +275,6 @@ public partial class AbstractEntity
     }
     public virtual void ControlUpdate(Godot.Collections.Dictionary client_input_data)
     {
-        DAT.Dir old_dir = direction;
         if(client_input_data.Keys.Count == 0) return;
         // Got an actual control update!
         MapController.GridPos new_pos = grid_pos;
@@ -284,7 +283,6 @@ public partial class AbstractEntity
         new_pos.hor += (float)dat_x;
         new_pos.ver += (float)dat_y;
         Move(map_id_string, new_pos);
-        UpdateNetworkDirection(old_dir);
     }
     // Clicking other entities
     public virtual void Clicked( AbstractEntity used_entity, AbstractEntity target, Godot.Collections.Dictionary click_params) 
