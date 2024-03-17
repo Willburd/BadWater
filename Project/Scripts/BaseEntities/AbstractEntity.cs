@@ -310,7 +310,7 @@ public partial class AbstractEntity
     protected bool AttackedBy( AbstractEntity user, AbstractEntity used_entity, float attack_modifier, Godot.Collections.Dictionary click_parameters)
     {
         if(user is not AbstractMob) return false;
-        if(used_entity is AbstractItem used_item && this is AbstractComplexMob this_complexmob)
+        if(used_entity is AbstractItem used_item && this is AbstractMob this_complexmob)
         {
             /*if(can_operate(this_complexmob, user) && used_item.do_surgery(this_complexmob,user,user.SelectingZone))
                 return TRUE*/  // TODO - Surgery hook! =================================================================================================================================
