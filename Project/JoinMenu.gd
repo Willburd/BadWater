@@ -2,6 +2,9 @@ extends CanvasLayer
 
 @export var controller : Node
 
+func _ready():
+	controller.join_menu.show()
+
 func _on_client_pressed():
 	if controller.account_entry.text.length() <= 0:
 		return
