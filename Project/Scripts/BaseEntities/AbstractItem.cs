@@ -11,7 +11,9 @@ public partial class AbstractItem : AbstractEntity
         AbstractItem new_item = null;
         switch(data.behaviorID)
         {
-            
+            case "ITEM":
+                new_item = new AbstractItem();
+            break;
 
             /*****************************************************************
              * Debugging purposes only.
