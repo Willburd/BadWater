@@ -245,68 +245,81 @@ public partial class NetworkClient : Node3D
     {
         if(!TOOLS.PeerConnected(this)) return;
         if(!IsMultiplayerAuthority()) return;
-        // Get client inputs!
-        Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
-        new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
-        new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
-        new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
-        // Hotkeys
-        new_inputs["walk"]     = new_inputs["mod_shift"];
-        new_inputs["swap"]     = Input.IsActionPressed("game_swap");
-        new_inputs["resist"]   = Input.IsActionPressed("game_resist");
-        new_inputs["rest"]     = Input.IsActionPressed("game_rest");
-        new_inputs["throw"]    = Input.IsActionPressed("game_throw");
-        new_inputs["equip"]    = Input.IsActionPressed("game_equip");
-        new_inputs["drop"]     = Input.IsActionPressed("game_drop");
-        new_inputs["useheld"]      = Input.IsActionPressed("game_useheld");
-        // Shifting input only triggers on taps, otherwise normal inputs
-        new_inputs["x"] = 0;
-        new_inputs["y"] = 0;
-        if(!new_inputs["mod_control"].AsBool() || Input.IsActionJustPressed("game_left") || Input.IsActionJustPressed("game_right") || Input.IsActionJustPressed("game_up") || Input.IsActionJustPressed("game_down") )
+        if(WindowManager.controller.main_window.HasFocus())
         {
-            // perform camera transform 
-            Vector2 tf_vec = new Vector2(Input.GetAxis("game_left","game_right"),Input.GetAxis("game_up","game_down"));
-            tf_vec = tf_vec.Rotated(CamRotationVector2().Angle() - 1.5708f); // -90 degrees, but in radians
-            tf_vec.Normalized();
-            // assign actual values
-            new_inputs["x"] = tf_vec.X;
-            new_inputs["y"] = tf_vec.Y;
-        }
-        // Limit to only sending if we have useful input
-        if(new_inputs["x"].AsDouble() != 0 
-        || new_inputs["y"].AsDouble() != 0 
-        || new_inputs["swap"].AsBool()
-        || new_inputs["resist"].AsBool()
-        || new_inputs["rest"].AsBool()
-        || new_inputs["throw"].AsBool()
-        || new_inputs["equip"].AsBool()
-        || new_inputs["drop"].AsBool()
-        || new_inputs["useheld"].AsBool())
-        {
-            Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
-        }
-        // Unzoom and zoom
-        if(Input.IsActionJustPressed("game_zoom"))
-        {
-            zoom_level -= 0.05f;
-            if(zoom_level < 0) zoom_level = 0f;
-        }
-        else if(Input.IsActionJustPressed("game_unzoom"))
-        {
-            zoom_level += 0.05f;
-            if(zoom_level > 1) zoom_level = 1f;
-        }
-        // camera stepped movements
-        float cam_steps = (Mathf.Pi / 4);
-        if(Input.IsActionJustPressed("game_camstepright"))
-        {
-            view_rotation = Mathf.Round(view_rotation / cam_steps) * cam_steps;
-            view_rotation += cam_steps;
-        }
-        if(Input.IsActionJustPressed("game_camstepleft"))
-        {
-            view_rotation = Mathf.Round(view_rotation / cam_steps) * cam_steps;
-            view_rotation -= cam_steps;
+            /*****************************************************************
+             * Client side hotkeys and camera input
+             ****************************************************************/
+            if(Input.IsActionJustPressed("game_talk"))      { ChatWindow.ChatFocus(false,false);    return; }
+            if(Input.IsActionJustPressed("game_whisper"))   { ChatWindow.ChatFocus(true,false);     return; }
+            if(Input.IsActionJustPressed("game_emote"))     { ChatWindow.ChatFocus(false,true);     return; }
+            if(Input.IsActionJustPressed("game_subtle"))    { ChatWindow.ChatFocus(true,true);      return; }
+            // Unzoom and zoom
+            if(Input.IsActionJustPressed("game_zoom"))
+            {
+                zoom_level -= 0.05f;
+                if(zoom_level < 0) zoom_level = 0f;
+            }
+            else if(Input.IsActionJustPressed("game_unzoom"))
+            {
+                zoom_level += 0.05f;
+                if(zoom_level > 1) zoom_level = 1f;
+            }
+            // camera stepped movements
+            float cam_steps = (Mathf.Pi / 4);
+            if(Input.IsActionJustPressed("game_camstepright"))
+            {
+                view_rotation = Mathf.Round(view_rotation / cam_steps) * cam_steps;
+                view_rotation += cam_steps;
+            }
+            if(Input.IsActionJustPressed("game_camstepleft"))
+            {
+                view_rotation = Mathf.Round(view_rotation / cam_steps) * cam_steps;
+                view_rotation -= cam_steps;
+            }
+
+            /*****************************************************************
+             * Client sending server side inputs to entity
+             ****************************************************************/
+            Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
+            new_inputs["mod_control"]   = Input.IsActionPressed("mod_control");
+            new_inputs["mod_alt"]       = Input.IsActionPressed("mod_alt");
+            new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
+            // Hotkeys
+            new_inputs["walk"]     = new_inputs["mod_shift"];
+            new_inputs["swap"]     = Input.IsActionPressed("game_swap");
+            new_inputs["resist"]   = Input.IsActionPressed("game_resist");
+            new_inputs["rest"]     = Input.IsActionPressed("game_rest");
+            new_inputs["throw"]    = Input.IsActionPressed("game_throw");
+            new_inputs["equip"]    = Input.IsActionPressed("game_equip");
+            new_inputs["drop"]     = Input.IsActionPressed("game_drop");
+            new_inputs["useheld"]  = Input.IsActionPressed("game_useheld");
+            // Shifting input only triggers on taps, otherwise normal inputs
+            new_inputs["x"] = 0;
+            new_inputs["y"] = 0;
+            if(!new_inputs["mod_control"].AsBool() || Input.IsActionJustPressed("game_left") || Input.IsActionJustPressed("game_right") || Input.IsActionJustPressed("game_up") || Input.IsActionJustPressed("game_down") )
+            {
+                // perform camera transform 
+                Vector2 tf_vec = new Vector2(Input.GetAxis("game_left","game_right"),Input.GetAxis("game_up","game_down"));
+                tf_vec = tf_vec.Rotated(CamRotationVector2().Angle() - 1.5708f); // -90 degrees, but in radians
+                tf_vec.Normalized();
+                // assign actual values
+                new_inputs["x"] = tf_vec.X;
+                new_inputs["y"] = tf_vec.Y;
+            }
+            // Limit to only sending if we have useful input
+            if(new_inputs["x"].AsDouble() != 0 
+            || new_inputs["y"].AsDouble() != 0 
+            || new_inputs["swap"].AsBool()
+            || new_inputs["resist"].AsBool()
+            || new_inputs["rest"].AsBool()
+            || new_inputs["throw"].AsBool()
+            || new_inputs["equip"].AsBool()
+            || new_inputs["drop"].AsBool()
+            || new_inputs["useheld"].AsBool())
+            {
+                Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
+            }
         }
     }
 
@@ -320,7 +333,6 @@ public partial class NetworkClient : Node3D
     public override void _UnhandledInput(InputEvent @event)
     {
         if(!IsMultiplayerAuthority()) return;
-        // Client only input handling
         if(@event is InputEventMouseMotion mouse_move)
         {
             if(mouse_move.Velocity.Length() > 0)

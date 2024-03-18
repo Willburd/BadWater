@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://biqov4ddbg4pb"]
+
+[ext_resource type="Script" path="res://WindowScripts/ChatWindow.cs" id="1_rrvgy"]
+
+[node name="ChatWindow" type="Window" node_paths=PackedStringArray("chat_history", "chat_entry", "chat_marker")]
+title = "Chat"
+size = Vector2i(580, 200)
+script = ExtResource("1_rrvgy")
+chat_history = NodePath("Control/VBoxContainer/ChatHistory")
+chat_entry = NodePath("Control/VBoxContainer/HBoxContainer/ChatLine")
+chat_marker = NodePath("Control/VBoxContainer/HBoxContainer/Mode")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ChatHistory" type="RichTextLabel" parent="Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 20.0
+bbcode_enabled = true
+scroll_following = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+
+[node name="Mode" type="Label" parent="Control/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = " SPEAK: "
+
+[node name="ChatLine" type="LineEdit" parent="Control/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3

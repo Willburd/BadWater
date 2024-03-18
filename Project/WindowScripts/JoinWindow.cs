@@ -12,16 +12,16 @@ public partial class JoinWindow : GameWindows
     public Button button_edit;
 
     [Export]
-    public TextEdit ip_entry;
+    public LineEdit ip_entry;
     [Export]
-    public TextEdit port_entry;
+    public LineEdit port_entry;
     [Export]
-    public TextEdit pass_entry;
+    public LineEdit pass_entry;
 
     [Export]
-    public TextEdit account_entry;
+    public LineEdit account_entry;
     [Export]
-    public TextEdit accpass_entry;
+    public LineEdit accpass_entry;
 
     public override void _Ready()
     {
@@ -38,6 +38,7 @@ public partial class JoinWindow : GameWindows
     {
         if(account_entry.Text.Length <= 0) return;
         WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.MainGame);
+        WindowManager.controller.main_window.GrabFocus(); // demand attention
         BootController.controller.StartNetwork(false,false);
     }
 

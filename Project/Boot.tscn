@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://WindowScripts/WindowManager.cs" id="3_tp275"]
 [ext_resource type="Script" path="res://WindowScripts/MainWindow.cs" id="4_w1nj2"]
 [ext_resource type="PackedScene" uid="uid://cwhio5wmd2p5p" path="res://WindowScripts/Prefabs/JoinWindow.tscn" id="6_3dkhe"]
-[ext_resource type="Script" path="res://WindowScripts/ChatWindow.cs" id="7_xi7yk"]
+[ext_resource type="PackedScene" uid="uid://biqov4ddbg4pb" path="res://WindowScripts/Prefabs/ChatWindow.tscn" id="7_fsgwk"]
 
 [sub_resource type="Gradient" id="Gradient_dkvv8"]
 colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
@@ -139,10 +139,7 @@ shape = SubResource("WorldBoundaryShape3D_dtkm3")
 position = Vector2i(80, 300)
 visible = false
 
-[node name="ChatWindow" type="Window" parent="WindowManager"]
-title = "Chat"
+[node name="ChatWindow" parent="WindowManager" instance=ExtResource("7_fsgwk")]
 position = Vector2i(550, 400)
-size = Vector2i(580, 200)
-script = ExtResource("7_xi7yk")
 
 [connection signal="input_event" from="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" to="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" method="_on_input_event"]
