@@ -245,6 +245,7 @@ public partial class AbstractMob : AbstractEntity
         if(hand_item == target) 
         {
             hand_item.InteractionSelf(this);
+            return;
         }
         // Interacting with entities directly in your inventory
         int storage_depth = target.StorageDepth(this);

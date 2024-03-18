@@ -348,7 +348,7 @@ public partial class AbstractEntity
 
     public virtual void InteractionAfter( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
     {
-        // What happens after an attack that misses, or for which PreAttack returned true
+        // What happens after an attack that misses, or for which InteractionSpecial returned true
     }
 
     public virtual void InteractionTouched( AbstractEntity user)
@@ -362,6 +362,7 @@ public partial class AbstractEntity
         // Telekinetic attack: By default, emulate the user's unarmed attack
         if(user is AbstractMob user_mob)
         {
+            if(IsIntangible()) return;
             if(user_mob.Stat != DAT.LifeState.Alive) return;
             user_mob._UnarmedInteract(user,false); // attack_hand, attack_paw, etc
         }
