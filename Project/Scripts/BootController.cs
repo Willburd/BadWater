@@ -20,18 +20,6 @@ public partial class BootController : Node
     [Export]
     public MultiplayerSpawner chunk_spawner;
 
-    [Export]
-    public TextEdit ip_entry;
-    [Export]
-    public TextEdit port_entry;
-    [Export]
-    public TextEdit pass_entry;
-
-    [Export]
-    public TextEdit account_entry;
-    [Export]
-    public TextEdit accpass_entry;
-
     int max_players = 0;	//Set from the ClientSpawner's data
     int max_entities = 0;  //Set from the EntitySpawners's data
     int max_chunks = 0;    //Set from the EntitySpawners's data
@@ -39,13 +27,17 @@ public partial class BootController : Node
     ConfigData config; 
 
     [Export]
-    public CanvasLayer join_menu; // TEMP
+    public WindowManager window_manager;
+
+    public override void _EnterTree()
+    {
+        controller = this;
+    }
 
     public override void _Ready()
     {
-        controller = this;
         // UI controls
-        join_menu.Show();
+        window_manager.join_window.Show();
         // Load config
         config = new ConfigData();
         config.Load("res://Config/Setup.json");
@@ -69,7 +61,7 @@ public partial class BootController : Node
         if(arguments.ContainsKey("s") || arguments.ContainsKey("e") || arguments.ContainsKey("headless"))
         {
             StartNetwork(true,arguments.ContainsKey("e"));
-            join_menu.Hide();
+            window_manager.join_window.Hide();
         }
     }
 
@@ -111,7 +103,7 @@ public partial class BootController : Node
         else
         {
             //Create godot client connection to server
-            Error status = peer.CreateClient(ip_entry.Text,int.Parse(port_entry.Text));
+            Error status = peer.CreateClient(window_manager.join_window.ip_entry.Text,int.Parse(window_manager.join_window.port_entry.Text));
             if (status != Error.Ok)
             {
                 GD.PrintErr("Creating client FAILED.");
@@ -147,6 +139,6 @@ public partial class BootController : Node
 
     public void ResetJoinMenu()
     {
-        join_menu.Show();
+        window_manager.join_window.Show();
     }
 }

@@ -1,9 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://it0x18qe03km"]
+[gd_scene load_steps=12 format=3 uid="uid://it0x18qe03km"]
 
 [ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
-[ext_resource type="Script" path="res://JoinMenu.gd" id="2_gqm1w"]
-[ext_resource type="Script" path="res://TurfClickHandler.cs" id="3_jstcs"]
+[ext_resource type="Script" path="res://Scripts/TurfClickHandler.cs" id="3_jstcs"]
+[ext_resource type="Script" path="res://WindowScripts/WindowManager.cs" id="3_tp275"]
+[ext_resource type="Script" path="res://WindowScripts/JoinWindow.cs" id="4_ak737"]
+[ext_resource type="Script" path="res://WindowScripts/MainWindow.cs" id="4_w1nj2"]
 
 [sub_resource type="Gradient" id="Gradient_dkvv8"]
 colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
@@ -20,9 +22,22 @@ width = 512
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_dtkm3"]
 
-[node name="WindowManager" type="Node"]
+[node name="BootController" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner", "window_manager")]
+script = ExtResource("1_frm1i")
+entity_container = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/Entities")
+client_container = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/Clients")
+client_prefab = ExtResource("2_doepm")
+client_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/ClientSpawner")
+entity_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/EntitySpawner")
+chunk_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/ChunkSpawner")
+window_manager = NodePath("WindowManager")
 
-[node name="BackBlack" type="TextureRect" parent="."]
+[node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window")]
+script = ExtResource("3_tp275")
+main_window = NodePath("MainWindow")
+join_window = NodePath("JoinWindow")
+
+[node name="BackBlack" type="TextureRect" parent="WindowManager"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -30,14 +45,16 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("GradientTexture1D_sdk6d")
 
-[node name="Window" type="Window" parent="."]
+[node name="MainWindow" type="Window" parent="WindowManager"]
 title = "Main"
-position = Vector2i(200, 200)
+position = Vector2i(60, 90)
 size = Vector2i(512, 512)
 min_size = Vector2i(128, 128)
 keep_title_visible = true
+script = ExtResource("4_w1nj2")
+lock_aspect = true
 
-[node name="BackBG" type="TextureRect" parent="Window"]
+[node name="BackBG" type="TextureRect" parent="WindowManager/MainWindow"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -47,7 +64,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 texture = SubResource("GradientTexture1D_fatin")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Window/BackBG"]
+[node name="RichTextLabel" type="RichTextLabel" parent="WindowManager/MainWindow/BackBG"]
 clip_contents = false
 layout_mode = 1
 anchors_preset = 8
@@ -76,7 +93,7 @@ hint_underlined = false
 deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="Window"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="WindowManager/MainWindow"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -84,73 +101,72 @@ grow_horizontal = 2
 grow_vertical = 2
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="Window/SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="WindowManager/MainWindow/SubViewportContainer"]
 handle_input_locally = false
 audio_listener_enable_3d = true
 size_2d_override_stretch = true
 render_target_update_mode = 4
 
-[node name="BootController" type="Node" parent="Window/SubViewportContainer/SubViewport" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry", "join_menu")]
-script = ExtResource("1_frm1i")
-entity_container = NodePath("Entities")
-client_container = NodePath("Clients")
-client_prefab = ExtResource("2_doepm")
-client_spawner = NodePath("ClientSpawner")
-entity_spawner = NodePath("EntitySpawner")
-chunk_spawner = NodePath("ChunkSpawner")
-ip_entry = NodePath("../../../../JoinMenu/IPEntry")
-port_entry = NodePath("../../../../JoinMenu/PortEntry")
-pass_entry = NodePath("../../../../JoinMenu/PasswordEntry")
-account_entry = NodePath("../../../../JoinMenu/AccountEntry")
-accpass_entry = NodePath("../../../../JoinMenu/AccountPass")
-join_menu = NodePath("../../../../JoinMenu")
+[node name="Entities" type="Node" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport"]
 
-[node name="Entities" type="Node" parent="Window/SubViewportContainer/SubViewport/BootController"]
+[node name="Clients" type="Node" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport"]
 
-[node name="Clients" type="Node" parent="Window/SubViewportContainer/SubViewport/BootController"]
-
-[node name="ClientSpawner" type="MultiplayerSpawner" parent="Window/SubViewportContainer/SubViewport/BootController"]
+[node name="ClientSpawner" type="MultiplayerSpawner" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport"]
 _spawnable_scenes = PackedStringArray("res://Prefabs/NetworkClient.tscn")
 spawn_path = NodePath("../Clients")
 spawn_limit = 64
 
-[node name="EntitySpawner" type="MultiplayerSpawner" parent="Window/SubViewportContainer/SubViewport/BootController"]
+[node name="EntitySpawner" type="MultiplayerSpawner" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport"]
 _spawnable_scenes = PackedStringArray("res://Prefabs/NetworkEffect.tscn", "res://Prefabs/NetworkItem.tscn", "res://Prefabs/NetworkMachine.tscn", "res://Prefabs/NetworkMob.tscn", "res://Prefabs/NetworkStructure.tscn")
 spawn_path = NodePath("../Entities")
 spawn_limit = 65535
 
-[node name="ChunkSpawner" type="MultiplayerSpawner" parent="Window/SubViewportContainer/SubViewport/BootController"]
+[node name="ChunkSpawner" type="MultiplayerSpawner" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport"]
 _spawnable_scenes = PackedStringArray("res://Prefabs/NetworkChunk.tscn")
 spawn_path = NodePath("../Entities")
 spawn_limit = 4096
 
-[node name="TurfClickHandler" type="Node3D" parent="Window/SubViewportContainer/SubViewport/BootController"]
+[node name="TurfClickHandler" type="Node3D" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport"]
 script = ExtResource("3_jstcs")
 
-[node name="TurfStaticBody" type="StaticBody3D" parent="Window/SubViewportContainer/SubViewport/BootController/TurfClickHandler"]
+[node name="TurfStaticBody" type="StaticBody3D" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler"]
 
-[node name="TurfPlane" type="CollisionShape3D" parent="Window/SubViewportContainer/SubViewport/BootController/TurfClickHandler/TurfStaticBody"]
+[node name="TurfPlane" type="CollisionShape3D" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody"]
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
 
-[node name="JoinMenu" type="CanvasLayer" parent="." node_paths=PackedStringArray("controller")]
-script = ExtResource("2_gqm1w")
-controller = NodePath("../Window/SubViewportContainer/SubViewport/BootController")
+[node name="JoinWindow" type="Window" parent="WindowManager" node_paths=PackedStringArray("button_client", "button_server", "button_edit", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry")]
+title = "Login"
+position = Vector2i(80, 300)
+size = Vector2i(965, 150)
+unresizable = true
+always_on_top = true
+script = ExtResource("4_ak737")
+button_client = NodePath("JoinMenu/Client")
+button_server = NodePath("JoinMenu/Server")
+button_edit = NodePath("JoinMenu/Editor")
+ip_entry = NodePath("JoinMenu/IPEntry")
+port_entry = NodePath("JoinMenu/PortEntry")
+pass_entry = NodePath("JoinMenu/PasswordEntry")
+account_entry = NodePath("JoinMenu/AccountEntry")
+accpass_entry = NodePath("JoinMenu/AccountPass")
 
-[node name="Client" type="Button" parent="JoinMenu"]
+[node name="JoinMenu" type="CanvasLayer" parent="WindowManager/JoinWindow"]
+
+[node name="Client" type="Button" parent="WindowManager/JoinWindow/JoinMenu"]
 offset_left = 5.0
 offset_top = 5.0
 offset_right = 180.0
 offset_bottom = 47.0
 text = "CLIENT"
 
-[node name="Server" type="Button" parent="JoinMenu"]
+[node name="Server" type="Button" parent="WindowManager/JoinWindow/JoinMenu"]
 offset_left = 5.0
 offset_top = 52.0
 offset_right = 179.0
 offset_bottom = 95.0
 text = "SERVER"
 
-[node name="Editor" type="Button" parent="JoinMenu"]
+[node name="Editor" type="Button" parent="WindowManager/JoinWindow/JoinMenu"]
 offset_left = 5.0
 offset_top = 100.0
 offset_right = 179.0
@@ -158,7 +174,7 @@ offset_bottom = 143.0
 text = "EDIT SERVER
 "
 
-[node name="IPEntry" type="TextEdit" parent="JoinMenu"]
+[node name="IPEntry" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
 offset_left = 193.0
 offset_top = 12.0
 offset_right = 424.0
@@ -169,7 +185,7 @@ text = "127.0.0.1"
 placeholder_text = "IP Address"
 scroll_fit_content_height = true
 
-[node name="PortEntry" type="TextEdit" parent="JoinMenu"]
+[node name="PortEntry" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
 offset_left = 434.0
 offset_top = 12.0
 offset_right = 665.0
@@ -180,7 +196,7 @@ text = "2279"
 placeholder_text = "Port"
 scroll_fit_content_height = true
 
-[node name="PasswordEntry" type="TextEdit" parent="JoinMenu"]
+[node name="PasswordEntry" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
 offset_left = 674.0
 offset_top = 13.0
 offset_right = 958.0
@@ -190,7 +206,7 @@ localize_numeral_system = false
 placeholder_text = "Server Password"
 scroll_fit_content_height = true
 
-[node name="AccountEntry" type="TextEdit" parent="JoinMenu"]
+[node name="AccountEntry" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
 offset_left = 193.0
 offset_top = 60.0
 offset_right = 666.0
@@ -201,7 +217,7 @@ text = "Tester"
 placeholder_text = "Account Name"
 scroll_fit_content_height = true
 
-[node name="AccountPass" type="TextEdit" parent="JoinMenu"]
+[node name="AccountPass" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
 offset_left = 193.0
 offset_top = 103.0
 offset_right = 666.0
@@ -211,7 +227,4 @@ localize_numeral_system = false
 placeholder_text = "Account Password"
 scroll_fit_content_height = true
 
-[connection signal="input_event" from="Window/SubViewportContainer/SubViewport/BootController/TurfClickHandler/TurfStaticBody" to="Window/SubViewportContainer/SubViewport/BootController/TurfClickHandler/TurfStaticBody" method="_on_input_event"]
-[connection signal="pressed" from="JoinMenu/Client" to="JoinMenu" method="_on_client_pressed"]
-[connection signal="pressed" from="JoinMenu/Server" to="JoinMenu" method="_on_server_pressed"]
-[connection signal="pressed" from="JoinMenu/Editor" to="JoinMenu" method="_on_editor_pressed"]
+[connection signal="input_event" from="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" to="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" method="_on_input_event"]
