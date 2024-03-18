@@ -1,3 +1,4 @@
+using Behaviors_BASE;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,28 @@ public partial class AbstractItem : AbstractEntity
             case "ITEM":
                 new_item = new AbstractItem();
             break;
+
+            // Toolset
+            case "CROWBAR":     new_item = new AbstractTool(DAT.ToolTag.CROWBAR); break;
+            case "MULTITOOL":   new_item = new AbstractTool(DAT.ToolTag.MULTITOOL); break;
+            case "SCREWDRIVER": new_item = new AbstractTool(DAT.ToolTag.SCREWDRIVER); break;
+            case "WIRECUTTER":  new_item = new AbstractTool(DAT.ToolTag.WIRECUTTER); break;
+            case "WRENCH":      new_item = new AbstractTool(DAT.ToolTag.WRENCH); break;
+            case "WELDER":      new_item = new AbstractTool(DAT.ToolTag.WELDER); break;
+            case "CABLE_COIL":  new_item = new AbstractTool(DAT.ToolTag.CABLE_COIL); break;
+            case "ANALYZER":    new_item = new AbstractTool(DAT.ToolTag.ANALYZER); break;
+            case "MINING":      new_item = new AbstractTool(DAT.ToolTag.MINING); break;
+            case "SHOVEL":      new_item = new AbstractTool(DAT.ToolTag.SHOVEL); break;
+            case "RETRACTOR":   new_item = new AbstractTool(DAT.ToolTag.RETRACTOR); break;
+            case "HEMOSTAT":    new_item = new AbstractTool(DAT.ToolTag.HEMOSTAT); break;
+            case "CAUTERY":     new_item = new AbstractTool(DAT.ToolTag.CAUTERY); break;
+            case "DRILL":       new_item = new AbstractTool(DAT.ToolTag.DRILL); break;
+            case "SCALPEL":     new_item = new AbstractTool(DAT.ToolTag.SCALPEL); break;
+            case "SAW":         new_item = new AbstractTool(DAT.ToolTag.SAW); break;
+            case "BONESET":     new_item = new AbstractTool(DAT.ToolTag.BONESET); break;
+            case "KNIFE":       new_item = new AbstractTool(DAT.ToolTag.KNIFE); break;
+            case "BLOODFILTER": new_item = new AbstractTool(DAT.ToolTag.BLOODFILTER); break;
+            case "ROLLINGPIN":  new_item = new AbstractTool(DAT.ToolTag.ROLLINGPIN); break;
 
             /*****************************************************************
              * Debugging purposes only.
@@ -33,7 +56,6 @@ public partial class AbstractItem : AbstractEntity
         ItemData temp   = data as ItemData;
         size_category   = temp.size_category;
         force           = temp.force;
-        tool_tag        = temp.tool_tag;
         // set flags
         flags.NOBLUDGEON              = temp.NOBLUDGEON;
         flags.NOCONDUCT               = temp.NOCONDUCT;
@@ -51,7 +73,6 @@ public partial class AbstractItem : AbstractEntity
     }
     public DAT.SizeCategory size_category = DAT.SizeCategory.SMALL;   // Size of item in world and bags
     public float force = 0f; // Weapon impact force
-    public DAT.ToolTag tool_tag = DAT.ToolTag.NONE;
     public Flags flags;
     public struct Flags
     {

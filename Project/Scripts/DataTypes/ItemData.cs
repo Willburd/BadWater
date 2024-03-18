@@ -10,7 +10,6 @@ public partial class ItemData : PackData
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
         size_category           = StringToSizeCategory( TOOLS.ApplyExistingTag(data,"size_category",size_category.ToString()));
-        tool_tag                = StringToTooltag(      TOOLS.ApplyExistingTag(data,"tool_tag",tool_tag.ToString()));
         force                   = TOOLS.ApplyExistingTag(data,"force",(int)force);
         NOBLUDGEON              = TOOLS.ApplyExistingTag(data,"no_bludgeon",NOBLUDGEON);
         NOCONDUCT               = TOOLS.ApplyExistingTag(data,"no_conduct",NOCONDUCT);
@@ -33,12 +32,6 @@ public partial class ItemData : PackData
         return " name: " + display_name + " description: " + description + " tag: " + tag + " size: "  + size_category;
     }
     
-    private static DAT.ToolTag StringToTooltag(string parse)
-    {
-        if(Enum.TryParse(parse, out DAT.ToolTag ret)) return ret;
-        return DAT.ToolTag.NONE;
-    }
-
     private static DAT.SizeCategory StringToSizeCategory(string parse)
     {
         if(Enum.TryParse(parse, out DAT.SizeCategory ret)) return ret;
@@ -75,7 +68,6 @@ public partial class ItemData : PackData
         base.Clone(temp);
         size_category           = temp.size_category;
         force                   = temp.force;
-        tool_tag                = temp.tool_tag;
         NOBLUDGEON              = temp.NOBLUDGEON;
         NOCONDUCT               = temp.NOCONDUCT;
         ON_BORDER               = temp.ON_BORDER;
@@ -93,7 +85,6 @@ public partial class ItemData : PackData
 
     // Unique data
     public DAT.SizeCategory size_category;
-    public DAT.ToolTag tool_tag = DAT.ToolTag.NONE;
     public float force;
     // flags
     public bool NOBLUDGEON              = false;

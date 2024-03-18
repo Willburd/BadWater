@@ -204,7 +204,6 @@ public static class DAT
 
     public enum ToolTag
     {
-        NONE,
         CROWBAR,
         MULTITOOL,
         SCREWDRIVER,
