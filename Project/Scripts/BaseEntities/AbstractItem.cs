@@ -54,9 +54,10 @@ public partial class AbstractItem : AbstractEntity
     {
         base.TemplateRead(data);
         ItemData temp   = data as ItemData;
-        size_category   = temp.size_category;
-        force           = temp.force;
+        internal_size_category        = temp.size_category;
         // set flags
+        flags.ISSHARP                 = temp.ISSHARP;
+        flags.HASEDGE                 = temp.HASEDGE;
         flags.NOBLUDGEON              = temp.NOBLUDGEON;
         flags.NOCONDUCT               = temp.NOCONDUCT;
         flags.ON_BORDER               = temp.ON_BORDER;
@@ -64,6 +65,7 @@ public partial class AbstractItem : AbstractEntity
         flags.CHEMCONTAINER           = temp.CHEMCONTAINER;
         flags.PHORONGUARD	          = temp.PHORONGUARD;
         flags.NOREACT	              = temp.NOREACT;
+        // Rest of these probably moved to clothing when that is added! TODO =====================================================================
         flags.THICKMATERIAL           = temp.THICKMATERIAL;
         flags.AIRTIGHT                = temp.AIRTIGHT;
         flags.NOSLIP                  = temp.NOSLIP;
@@ -71,12 +73,18 @@ public partial class AbstractItem : AbstractEntity
         flags.FLEXIBLEMATERIAL        = temp.FLEXIBLEMATERIAL;
         flags.ALLOW_SURVIVALFOOD      = temp.ALLOW_SURVIVALFOOD;
     }
-    public DAT.SizeCategory size_category = DAT.SizeCategory.SMALL;   // Size of item in world and bags
+    public DAT.SizeCategory internal_size_category = DAT.SizeCategory.SMALL;   // Size of item in world and bags
+    public override DAT.SizeCategory SizeCategory
+    {
+        get { return internal_size_category; }
+    }
     public float force = 0f; // Weapon impact force
     public Flags flags;
     public struct Flags
     {
         public Flags() {}
+        public bool ISSHARP                 = false; // Can item puncture things like a needle
+        public bool HASEDGE                 = false; // Does item have a cutting edge to interact with
         public bool NOBLUDGEON              = false; // When an item has this it produces no "X has been hit by Y with Z" message with the default handler.
         public bool NOCONDUCT               = false; // Conducts electricity. (metal etc.)
         public bool ON_BORDER               = false; // Item has priority to check when entering or leaving.

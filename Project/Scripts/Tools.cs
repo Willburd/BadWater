@@ -180,7 +180,7 @@ public static class TOOLS
     /*****************************************************************
      * Entity tools, things like adjacency checks etc
      ****************************************************************/
-    public static bool Adjacent(AbstractEntity A,AbstractEntity B)
+    public static bool Adjacent(AbstractEntity A,AbstractEntity B, bool ignore_corner_density)
     {
         // different maps, and depth doesn't count
         if(A.map_id_string != B.map_id_string || A.GridPos.dep != B.GridPos.dep) return false;
@@ -195,7 +195,7 @@ public static class TOOLS
             B_pos.hor = Mathf.Floor(B_pos.hor) + 0.5f; 
             B_pos.ver = Mathf.Floor(B_pos.ver) + 0.5f; 
             dir_vec = DirVec(A_pos.WorldPos(),B_pos.WorldPos());
-            if(DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
+            if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
             {
                 // Check corner blockages
             }
@@ -204,7 +204,7 @@ public static class TOOLS
 
         // Entity checking
         dir_vec = DirVec(A_pos.WorldPos(),B_pos.WorldPos());
-        if(DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
+        if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
         {
             // Check corner blockages
         }

@@ -54,7 +54,7 @@ public partial class NetworkEntity : Node3D
     [Export]
     public DAT.Dir direction = DAT.Dir.South;
 
-    public void Kill()
+    public void DeleteEntity()
     {
         QueueFree();
     }

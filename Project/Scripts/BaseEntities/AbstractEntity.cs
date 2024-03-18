@@ -35,14 +35,17 @@ public partial class AbstractEntity
     {
         PackRef = new PackRef( data, entity_type);
         SetTag(data.tag);
-        display_name = data.display_name;
-        description = data.description;
-        intangible = data.intangible;
-        model = data.model;
-        texture = data.texture;
-        anim_speed = data.anim_speed;
-        attack_range = data.attack_range;
-        unstoppable = data.unstoppable;
+        display_name    = data.display_name;
+        description     = data.description;
+        model           = data.model;
+        texture         = data.texture;
+        anim_speed      = data.anim_speed;
+        attack_range    = data.attack_range;
+        attack_force    = data.attack_force;
+        damtype         = data.damtype;
+        intangible      = data.intangible;
+        unstoppable     = data.unstoppable;
+        hit_sound       = data.hit_sound;
     }
     public PackData TemplateWrite()
     {
@@ -88,9 +91,12 @@ public partial class AbstractEntity
     public string description;
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
-    public bool intangible = false;           // can move through solids
     public string step_sound = "";              // Sound pack ID for steps
+    public string hit_sound = "";               // Weapon attack sound when used
     public int attack_range = 1;
+    public float attack_force = 1f;
+    public DAT.DamageType damtype = DAT.DamageType.BRUTE;
+    public bool intangible = false;           // can move through solids
     public bool unstoppable = false; 
     // End of template data
 
@@ -109,6 +115,10 @@ public partial class AbstractEntity
     public DAT.Intent SelectingIntent
     {
         get {return internal_selecting_intent;}
+    }
+    public virtual DAT.SizeCategory SizeCategory
+    {
+        get { return DAT.SizeCategory.MEDIUM; }
     }
     protected MainController.DataType entity_type;
     // end state data
@@ -217,7 +227,7 @@ public partial class AbstractEntity
             Move(map_id_string, TOOLS.GridToPosWithOffset(grid_pos) + velocity);
         }
     }
-    public void Kill()
+    public void DeleteEntity()
     {
         UnloadNetworkEntity();
         switch(entity_type)
@@ -252,7 +262,7 @@ public partial class AbstractEntity
     }
     public void UnloadNetworkEntity()
     {
-        loaded_entity?.Kill();
+        loaded_entity?.DeleteEntity();
         loaded_entity = null;
     }
 
@@ -295,27 +305,77 @@ public partial class AbstractEntity
         GD.Print(user?.display_name + " DRAGGED " + display_name + " TO " + target?.display_name); // REPLACE ME!!!
     }
 
+
     /*****************************************************************
-     * Attack handling
+     * Interaction handling
      ****************************************************************/
-    // Base attack logic
-    public bool Attack( AbstractEntity user, AbstractEntity target, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    public virtual bool InteractCanReach(AbstractMob user, AbstractEntity target, int range)
     {
-        if(PreAttack( user, target,click_parameters)) return true; // PreAttack returns true if it performs a unique action that does not actually cause an attack
-        return target.AttackedBy( user, this, attack_modifier, click_parameters);
+        if(TOOLS.Adjacent(user,target,false)) return true; // Already adjacent.
+        return false;
     }
 
-    protected bool AttackedBy( AbstractEntity user, AbstractEntity used_entity, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    public bool _Interact( AbstractEntity user, AbstractEntity target, float attack_modifier, Godot.Collections.Dictionary click_parameters)
     {
-        if(user is not AbstractMob) return false;
-        if(used_entity is AbstractItem used_item && this is AbstractMob this_complexmob)
+        if(InteractionSpecial( user, target,click_parameters)) return true; // SpecialInteraction returns true if it performs a unique action that does not call RespondToInteraction()
+        if(this is AbstractItem used_item && this is AbstractMob this_complexmob)
         {
             /*if(can_operate(this_complexmob, user) && used_item.do_surgery(this_complexmob,user,user.SelectingZone))
                 return TRUE*/  // TODO - Surgery hook! =================================================================================================================================
         }
-        return used_entity.WeaponAttack( user, this, user.SelectingZone, attack_modifier);
+        return target._RespondToInteraction( user, this, attack_modifier, click_parameters);
     }
-    protected virtual bool WeaponAttack( AbstractEntity user, AbstractEntity target, DAT.ZoneSelection target_zone, float attack_modifier)
+
+    protected bool _RespondToInteraction( AbstractEntity user, AbstractEntity used_entity, float attack_modifier, Godot.Collections.Dictionary click_parameters)
+    {
+        if(user is not AbstractMob) return false;
+        return used_entity.UsedAsWeapon( user, this as AbstractMob, user.SelectingZone, attack_modifier);
+    }
+
+
+    /*****************************************************************
+     * Interaction Overrides, USE THESE, and not the others PLEASE.
+     ****************************************************************/
+    public virtual void InteractionSelf( AbstractEntity user ) 
+    { 
+        // What happens when an object is used on itself.
+    }
+
+    public virtual bool InteractionSpecial( AbstractEntity user, AbstractEntity target, Godot.Collections.Dictionary click_parameters) 
+    {
+        return false; //return TRUE to skip calling InteractBy() on target after this proc does stuff, and go straight to AfterAttack()
+    }
+
+    public virtual void InteractionAfter( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
+    {
+        // What happens after an attack that misses, or for which PreAttack returned true
+    }
+
+    public virtual void InteractionTouched( AbstractEntity user)
+    {
+        GD.Print(display_name + " was touched by " + user.display_name);
+    }
+
+    // TK interaction...
+    public virtual void InteractWithTK( AbstractEntity user)
+    {
+        // Telekinetic attack: By default, emulate the user's unarmed attack
+        if(user is AbstractMob user_mob)
+        {
+            if(user_mob.Stat != DAT.LifeState.Alive) return;
+            user_mob._UnarmedInteract(user,false); // attack_hand, attack_paw, etc
+        }
+    }
+    public virtual void InteractSelfTK( AbstractEntity user)
+    {
+        // Called when you click the TK grab in your hand, or closets overriding InteractWithTK()
+    }
+
+
+    /*****************************************************************
+     * Attack handling, we've got past just interacting, we're now doing harm!
+     ****************************************************************/
+    protected virtual bool UsedAsWeapon( AbstractEntity user, AbstractMob target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
         if(target == user && user.SelectingIntent != DAT.Intent.Hurt) return false;
         if(this is AbstractItem self_item && (self_item.force == 0 || self_item.flags.NOBLUDGEON)) return false;
@@ -323,74 +383,35 @@ public partial class AbstractEntity
         {
             /////////////////////////
             user_mob.lastattacked = target;
-            if(target is AbstractMob) (target as AbstractMob).lastattacker = user;
+            target.lastattacker = user;
             //add_attack_logs(user,M,"attacked with [name] (INTENT: [uppertext(user.a_intent)]) (DAMTYE: [uppertext(damtype)])");
             /////////////////////////
             user_mob.SetClickCooldown( user_mob.GetAttackCooldown(this) );
             // user_mob.DoAttackAnimation( target); // TODO - attack animation for items ======================================================================================
         }
-
-        if(target is AbstractMob)
-        {
-            var hit_zone = (target as AbstractMob).ResolveItemAttack(this, user, target_zone);
-            if(hit_zone != DAT.ZoneSelection.Miss)
-            {
-                //ApplyHitEffect(M, user, hit_zone, attack_modifier); // TODO ======================================================================================
-                GD.Print(user.display_name + " WEAPON ATTACKED " + target.display_name + " USING " + display_name); // REPLACE ME!!!
-            }
-        }
-        
+        var hit_zone = target.ResolveWeaponHit(this, user, target_zone);
+        if(hit_zone != DAT.ZoneSelection.Miss) WeaponHitMobEffect( user, target, hit_zone, attack_modifier);
         return true;
     }
-    protected virtual DAT.ZoneSelection ResolveItemAttack(AbstractEntity user, AbstractEntity used_item, DAT.ZoneSelection target_zone)
+    protected float WeaponHitMobEffect( AbstractEntity user, AbstractMob target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
-        return target_zone; // assumes hit... See overrides for proper implimentations. This is how items can miss mid attack.
-    }
-    
-    public virtual bool AttackCanReach(AbstractMob user, AbstractEntity target, int range)
-    {
-        if(TOOLS.Adjacent(user,target)) return true; // Already adjacent. TODO Handle corners and walls =================================================================================================================================
-        return false;
-    }
+        //user.break_cloak() // TODO Cloaking devices ================================================================================================================================
+        AudioController.PlayAt(hit_sound, target.map_id_string ,target.grid_pos.WorldPos(), AudioController.screen_range, 5);
 
-    // Overrides for responding to attacks
-    public virtual void AttackedSelf( AbstractEntity user ) 
-    { 
-        // What happens when an object is used on itself.
-    }
-
-    public virtual bool PreAttack( AbstractEntity user, AbstractEntity target, Godot.Collections.Dictionary click_parameters) 
-    {
-        return false; //return TRUE to skip calling AttackedBy() on target after this proc does stuff, and go straight to AfterAttack()
-    }
-    
-    protected virtual bool UnarmedAttack(AbstractEntity target, bool proximity)
-    {
-        if(IsIntangible()) return false;
-        if(this is AbstractMob self_mob && self_mob.Stat != DAT.LifeState.Alive) return false;
-        GD.Print(display_name + " UNARMED ATTACKED " + target.display_name); // REPLACE ME!!!
-        return true;
-    }
-
-    public virtual void AfterAttack( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
-    {
-        // What happens after an attack that misses, or for which PreAttack returned true
-    }
-
-    public virtual void AttackedByTK( AbstractEntity user)
-    {
-        // Telekinetic attack: By default, emulate the user's unarmed attack
-        if(user is AbstractMob user_mob)
+        float power = attack_force;
+        /*
+        if(HULK in user.mutations)
         {
-            if(user_mob.Stat != DAT.LifeState.Alive) return;
-            user_mob.UnarmedAttack(user,false); // attack_hand, attack_paw, etc
+            power *= 2;
         }
+        */
+        power *= attack_modifier; // Insert motionvalues reference here
+        return target.HitByWeapon(this, user, power, target_zone);
     }
-    public virtual void AttackedSelfTK( AbstractEntity user)
+    protected virtual DAT.ZoneSelection ResolveWeaponHit(AbstractEntity user, AbstractEntity used_item, DAT.ZoneSelection target_zone)
     {
-        // Called when you click the TK grab in your hand, or closets overriding AttackedByTK()
+        return target_zone; // Entities that can miss when used to attack. return DAT.ZoneSelection.None, otherwise resolve to another target_zone or return the same target zone if attack was successful.
     }
-
 
     /*****************************************************************
      * Movement and storage

@@ -10,7 +10,8 @@ public partial class ItemData : PackData
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
         size_category           = StringToSizeCategory( TOOLS.ApplyExistingTag(data,"size_category",size_category.ToString()));
-        force                   = TOOLS.ApplyExistingTag(data,"force",(int)force);
+        ISSHARP                 = TOOLS.ApplyExistingTag(data,"is_sharp",ISSHARP);
+        HASEDGE                 = TOOLS.ApplyExistingTag(data,"has_edge",HASEDGE);
         NOBLUDGEON              = TOOLS.ApplyExistingTag(data,"no_bludgeon",NOBLUDGEON);
         NOCONDUCT               = TOOLS.ApplyExistingTag(data,"no_conduct",NOCONDUCT);
         ON_BORDER               = TOOLS.ApplyExistingTag(data,"on_border",ON_BORDER);
@@ -49,15 +50,11 @@ public partial class ItemData : PackData
             case DAT.SizeCategory.MEDIUM:
                 return 2;
             case DAT.SizeCategory.LARGE:
-                return 3;
-            case DAT.SizeCategory.HUGE:
                 return 4;
-            case DAT.SizeCategory.GIANT:
-                return 6;
-            case DAT.SizeCategory.MASSIVE:
+            case DAT.SizeCategory.HUGE:
                 return 8;
-            case DAT.SizeCategory.GIGANTIC:
-                return 9;
+            case DAT.SizeCategory.ITEMSIZE_NO_CONTAINER:
+                return 0;
         }
         return 1;
     }
@@ -67,7 +64,8 @@ public partial class ItemData : PackData
         ItemData temp = source as ItemData;
         base.Clone(temp);
         size_category           = temp.size_category;
-        force                   = temp.force;
+        ISSHARP                 = temp.ISSHARP;
+        HASEDGE                 = temp.HASEDGE;
         NOBLUDGEON              = temp.NOBLUDGEON;
         NOCONDUCT               = temp.NOCONDUCT;
         ON_BORDER               = temp.ON_BORDER;
@@ -85,8 +83,9 @@ public partial class ItemData : PackData
 
     // Unique data
     public DAT.SizeCategory size_category;
-    public float force;
     // flags
+    public bool ISSHARP                 = false;
+    public bool HASEDGE                 = false;
     public bool NOBLUDGEON              = false;
     public bool NOCONDUCT               = false;
     public bool ON_BORDER               = false;

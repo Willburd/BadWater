@@ -54,10 +54,10 @@ public partial class AbstractMob : AbstractEntity
         base.TemplateRead(data);
         MobData temp = data as MobData;
         max_health      = temp.max_health;
-        health          = temp.max_health;
         walk_speed      = temp.walk_speed;
         run_speed       = temp.run_speed;
         // flags
+        flags.GODMODE       = false;
         flags.HASHANDS      = temp.has_hands;
         flags.EXTRAHANDS    = temp.extra_hands;
         flags.COMPLEXTOOLS  = temp.complex_tools;
@@ -72,8 +72,19 @@ public partial class AbstractMob : AbstractEntity
         flags.WEARGLOVES    = temp.wears_glove;
         flags.WEARBELT      = temp.wears_belt;
     }
-    public float max_health = 0;   // Size of item in world and bags
-    public float health = 0;    // Size of item in world and bags
+    public int max_health = 0;   // Size of item in world and bags
+    public struct HealthData
+    {
+        public HealthData() {}
+        public int brute = 0;
+        public int fire = 0;
+        public int tox = 0;
+        public int oxy = 0;
+        public int clone = 0;
+        public int halloss = 0;
+    }
+    public HealthData health = new HealthData();    // Size of item in world and bags
+
     public float walk_speed = (float)0.25;
     public float run_speed = 1;
     public Flags flags;
@@ -81,6 +92,7 @@ public partial class AbstractMob : AbstractEntity
     {
         public Flags() {}
         // flags
+        public bool GODMODE = false;
         public bool HASHANDS = false;      // Can pick up objects
         public bool EXTRAHANDS = false;    // Has extra hand slots(basically just pockets without needing uniform)
         public bool COMPLEXTOOLS = false;  // If mob can use complex tools 
@@ -172,7 +184,7 @@ public partial class AbstractMob : AbstractEntity
 
     public void UseActiveHand(AbstractEntity target)
     {
-        ActiveHand?.AttackedSelf(this);
+        ActiveHand?.InteractionSelf(this);
     }
 
     public void EquipActiveHand(AbstractEntity target)
@@ -232,7 +244,7 @@ public partial class AbstractMob : AbstractEntity
         AbstractEntity hand_item = ActiveHand;
         if(hand_item == target) 
         {
-            hand_item.AttackedSelf(this);
+            hand_item.InteractionSelf(this);
         }
         // Interacting with entities directly in your inventory
         int storage_depth = target.StorageDepth(this);
@@ -240,13 +252,13 @@ public partial class AbstractMob : AbstractEntity
         {
             if(hand_item != null)
             {
-                bool resolved = hand_item.Attack( this, target, 1, click_params);
-                if(!resolved && target != null && hand_item != null) hand_item.AfterAttack( this, target, true, click_params);
+                bool resolved = hand_item._Interact( this, target, 1, click_params);
+                if(!resolved && target != null && hand_item != null) hand_item.InteractionAfter( this, target, true, click_params);
             }
             else
             {
                 if(target is AbstractMob) SetClickCooldown( GetAttackCooldown(hand_item)); // No instant mob attacking
-                UnarmedAttack(target, true);
+                _UnarmedInteract(target, true);
             }
             return;
         }
@@ -259,17 +271,17 @@ public partial class AbstractMob : AbstractEntity
         storage_depth = target.StorageDepth(this);
         if(target is AbstractTurf || target.GetLocation() is AbstractTurf  || (storage_depth != -1 && storage_depth <= 1))
         {
-            if(TOOLS.Adjacent(this,target) || (hand_item != null && hand_item.AttackCanReach(this, target, hand_item.attack_range)) )
+            if(TOOLS.Adjacent(this,target,false) || (hand_item != null && hand_item.InteractCanReach(this, target, hand_item.attack_range)) )
             {
                 if(hand_item != null)
                 {
-                    // Return 1 in AttackedBy() to prevent AfterAttack() effects (when safely moving items for example)
-                    if(!hand_item.Attack( target, this, 1f, click_params) && target != null && hand_item != null) hand_item.AfterAttack(target, this, true, click_params);
+                    // Return 1 in AttackedBy() to prevent AfterInteraction() effects (when safely moving items for example)
+                    if(!hand_item._Interact( target, this, 1f, click_params) && target != null && hand_item != null) hand_item.InteractionAfter(target, this, true, click_params);
                 }
                 else
                 {
                     if(target is AbstractMob) SetClickCooldown( GetAttackCooldown(null)); // No instant mob attacking
-                    UnarmedAttack(target, true);
+                    _UnarmedInteract(target, true);
                 }
                 return;
             }
@@ -277,16 +289,66 @@ public partial class AbstractMob : AbstractEntity
             {
                 if(hand_item != null)
                 {
-                    hand_item.AfterAttack(target, this, false, click_params);
+                    hand_item.InteractionAfter(target, this, false, click_params);
                 }
                 else
                 {
-                    RangedAttack(target, click_params);
+                    RangedInteraction(target, click_params);
                 }
             }
         }
         return;
     }
+
+    public void _UnarmedInteract(AbstractEntity target, bool proximity)
+    {
+        if(IsIntangible()) return;
+        if(this is AbstractMob self_mob && self_mob.Stat != DAT.LifeState.Alive) return;
+
+        /* TODO Funny glove magic ==============================================================================================================
+        // Special glove functions:
+        // If the gloves do anything, have them return 1 to stop
+        // normal attack_hand() here.
+        var/obj/item/clothing/gloves/G = gloves // not typecast specifically enough in defines
+        if(istype(G) && G.Touch(A,1))
+            return
+        */
+
+        if( flags.HASHANDS && ( target is AbstractStructure || target is AbstractMachine ) && SelectingIntent != DAT.Intent.Hurt)
+        {
+            target.InteractionTouched(this);
+            return;
+        }
+
+        switch(SelectingIntent)
+        {
+            case DAT.Intent.Help:
+                if(target is AbstractMob target_mob)
+                {
+                    GD.Print(this.display_name + " pets the " + target_mob.display_name);
+                    // custom_emote(1,"[pick(friendly)] \the [A]!"); // TODO pet the dog =================================================================
+                }
+                break;
+
+            /*
+            case DAT.Intent.Hurt:
+                if(can_special_attack(A) && special_attack_target(A))
+                {
+                    return;
+                }
+                else if(melee_damage_upper == 0 && isliving(A))
+                {
+                    custom_emote(1,"[pick(friendly)] \the [A]!")
+                }
+                else
+                {
+                    attack_target(A);
+                }
+                break;
+            */
+        }
+    }
+
     protected virtual void RestrainedClick(AbstractEntity target)
     {
         GD.Print(display_name + " CLICKED " + target.display_name + " WHILE RESTRAINED"); // REPLACE ME!!!
@@ -296,16 +358,216 @@ public partial class AbstractMob : AbstractEntity
     /*****************************************************************
      * Attack handling
      ****************************************************************/
+    public int BruteLoss
+    {
+        get { return health.brute;}
+        set { 
+                if(flags.GODMODE) return;
+                health.brute = Math.Min(Math.Max(health.brute + value, 0),max_health*2);
+                UpdateHealth();
+            }
+    } 
+    public int FireLoss
+    {
+        get { return health.fire;}
+        set { 
+                if(flags.GODMODE) return;
+                health.fire = Math.Min(Math.Max(health.fire + value, 0),max_health*2);
+                UpdateHealth();
+            }
+    } 
+    public int ToxLoss 
+    {
+        get { return health.tox;}
+        set { 
+                if(flags.GODMODE) return;
+                health.tox = Math.Min(Math.Max(health.tox + value, 0),max_health*2);
+                UpdateHealth();
+            }
+    } 
+    public int OxyLoss
+    {
+        get { return health.oxy;}
+        set { 
+                if(flags.GODMODE) return;
+                health.oxy = Math.Min(Math.Max(health.oxy + value, 0),max_health*2);
+                UpdateHealth();
+            }
+    } 
+    public int CloneLoss
+    {
+        get { return health.clone;}
+        set { 
+                if(flags.GODMODE) return;
+                health.clone = Math.Min(Math.Max(health.clone + value, 0),max_health*2);
+                UpdateHealth();
+            }
+    } 
+    public int HalLoss
+    {
+        get { return health.halloss;}
+        set { 
+                if(flags.GODMODE) return;
+                health.halloss = Math.Min(Math.Max(health.halloss + value, 0),max_health*2);
+                UpdateHealth();
+            }
+    } 
 
-    protected virtual void RangedAttack(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
+    protected virtual void RangedInteraction(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
     {
         if(HasTelegrip())
         {
             if(TOOLS.VecDist(GridPos.WorldPos(), target.GridPos.WorldPos()) > DAT.TK_MAXRANGE) return;
-            target.AttackedByTK(this);
+            target.InteractWithTK(this);
         }
     }
 
+    /*****************************************************************
+     * Damage handling
+     ****************************************************************/
+    public float HitByWeapon(AbstractEntity used_item, AbstractEntity user, float effective_force, DAT.ZoneSelection target_zone)
+    {
+        // TODO Visibile and chat messages ================================================================================================================
+        //visible_message("<span class='danger'>[src] has been [LAZYLEN(I.attack_verb) ? pick(I.attack_verb) : "attacked"] with [I.name] by [user]!</span>")
+
+        /* // TODO Mob AI ================================================================================================================
+        if(ai_holder)
+        {
+            ai_holder.react_to_attack(user)
+        }
+        */
+
+        // TODO Armor damage reduction ================================================================================================================
+        float soaked = 0f;//get_armor_soak(hit_zone, "melee");
+        float blocked = 0f;//run_armor_check(hit_zone, "melee");
+        StandardWeaponHitEffects(used_item, user, effective_force, blocked, soaked, target_zone);
+
+        if(DAT.DamageTypeBleeds(used_item.damtype) && TOOLS.Prob(33)) // Added blood for whacking non-humans too
+        {
+            if(GetLocation() is AbstractTurf turf_loc)
+            {
+                // turf_loc.AddBloodToFloor(this); // TODO bloody turf ================================================================================================================
+            }
+        }
+        return blocked;
+    }
+    protected bool StandardWeaponHitEffects(AbstractEntity used_item, AbstractEntity user, float effective_force, float blocked, float soaked, DAT.ZoneSelection target_zone)
+    {
+        if(effective_force <= 0 || blocked >= 100f) return false;
+
+        //If the armor soaks all of the damage, it just skips the rest of the checks
+        if(effective_force <= soaked) return false;
+
+        //Apply weapon damage
+        bool weapon_sharp = false;
+        bool weapon_edge = false;
+        //float hit_embed_chance = 0f; // TODO
+        if(used_item is AbstractItem used_weapon)
+        {
+            weapon_sharp = used_weapon.flags.ISSHARP;
+            weapon_edge = used_weapon.flags.HASEDGE;
+            //hit_embed_chance = used_weapon.embed_chance; // TODO
+        }
+        /* TODO Armor damage edge mitigation ================================================================================================================
+        if(TOOLS.Prob(getarmor(hit_zone, "melee"))) //melee armour provides a chance to turn sharp/edge weapon attacks into blunt ones
+        {
+            weapon_sharp = false;
+            weapon_edge = false;
+            hit_embed_chance = used_item.attack_force/(used_item.w_class*3);
+        }
+        */
+
+        ApplyDamage(effective_force, used_item.damtype, target_zone, blocked, soaked, used_item, weapon_sharp, weapon_edge);
+
+        /* TODO Weapons getting embedded in target on hit ================================================================================================================
+        //Melee weapon embedded object code.
+        if (used_item != null && used_item.damtype == DAT.DamageType.BRUTE && !used_item.anchored && !is_robot_module(used_item) && used_item.embed_chance > 0)
+        {
+            float damage = effective_force;
+            if(blocked > 0)
+            {
+                damage *= (100 - blocked)/100;
+                hit_embed_chance *= (100 - blocked)/100;
+            }
+            //blunt objects should really not be embedding in things unless a huge amount of force is involved
+            float embed_threshold = weapon_sharp? 5*(int)used_item.SizeCategory : 15*(int)used_item.SizeCategory;
+            if(damage > embed_threshold && TOOLS.Prob(hit_embed_chance)) Embed(I, hit_zone);
+        }
+        */
+        return true;
+    }
+    protected bool ApplyDamage(float damage = 0, DAT.DamageType damagetype = DAT.DamageType.BRUTE, DAT.ZoneSelection target_zone = DAT.ZoneSelection.Miss, float blocked = 0, float soaked = 0, AbstractEntity used_item = null, bool sharp = false, bool edge = false)
+    {
+        if(damage <= 0 || (blocked >= 100)) return false;
+        if(soaked > 0)
+        {
+            if(soaked >= Mathf.Round(damage*0.8f))
+            {
+                damage -= Mathf.Round(damage*0.8f);
+            }
+            else
+            {
+                damage -= soaked;
+            }
+        }
+
+        float initial_blocked = blocked;
+        blocked = (100-blocked)/100;
+        switch(damagetype)
+        {
+            case DAT.DamageType.BRUTE:
+                BruteLoss = (int)(damage * blocked);
+                break;
+            case DAT.DamageType.BURN:
+                FireLoss = (int)(damage * blocked);
+                break;
+            case DAT.DamageType.FREEZE:
+                FireLoss = (int)(damage * blocked);
+                break;
+            case DAT.DamageType.SEARING:
+                ApplyDamage(Mathf.Round(damage / 3), DAT.DamageType.BURN, target_zone, initial_blocked, soaked, used_item, sharp, edge);
+                ApplyDamage(Mathf.Round(damage / 3 * 2), DAT.DamageType.BRUTE, target_zone, initial_blocked, soaked, used_item, sharp, edge);
+                break;
+            case DAT.DamageType.TOX:
+                ToxLoss = (int)(damage * blocked);
+                break;
+            case DAT.DamageType.OXY:
+                OxyLoss = (int)(damage * blocked);
+                break;
+            case DAT.DamageType.CLONE:
+                CloneLoss = (int)(damage * blocked);
+                break;
+            case DAT.DamageType.HALLOSS:
+                HalLoss = (int)(damage * blocked);
+                break;
+            case DAT.DamageType.ELECTROCUTE:
+                // electrocute_act(damage, used_item, 1.0, target_zone); // TODO electrocution =========================================================================
+                break;
+            case DAT.DamageType.ACID:
+                if(IsSynthetic())
+                {
+                    ApplyDamage(damage, DAT.DamageType.BURN, target_zone, initial_blocked, soaked, used_item, sharp, edge);	// Handle it as normal burn.
+                }
+                else
+                {
+                    ApplyDamage(Mathf.Round(damage / 3), DAT.DamageType.TOX, target_zone, initial_blocked, soaked, used_item, sharp, edge);
+                    ApplyDamage(Mathf.Round(damage / 3 * 2), DAT.DamageType.BRUTE, target_zone, initial_blocked, soaked, used_item, sharp, edge);
+                }
+                break;
+        }
+        UpdateHealth();
+        return true;
+    }
+
+    private void UpdateHealth()
+    {
+        float cur_health = max_health - FireLoss - BruteLoss - ToxLoss - OxyLoss - CloneLoss;
+        //Alive, becoming dead
+        if((stat != DAT.LifeState.Dead) && (cur_health <= 0)) Die();
+        //Overhealth
+        if(cur_health > max_health) cur_health = max_health;
+        // TODO hud update ============================================================================================================
+    }
 
     /*****************************************************************
      * Processing
@@ -455,6 +717,10 @@ public partial class AbstractMob : AbstractEntity
     /*****************************************************************
      * Conditions
      ****************************************************************/
+    public virtual bool IsSynthetic()
+    {
+        return false;
+    }
     public virtual bool IsRestrained()
     {
         return false;

@@ -33,8 +33,14 @@ public partial class PackData : Resource
         model           = TOOLS.ApplyExistingTag(data,"model",model);
         texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
         anim_speed      = TOOLS.ApplyExistingTag(data,"anim_speed",(double)0);
-        intangible      = TOOLS.ApplyExistingTag(data,"intangible",intangible);
+        // Sounds
+        hit_sound       = TOOLS.ApplyExistingTag(data,"hit_sound",hit_sound);
+        // When used as a weapon
+        damtype         = StringToDamageType(TOOLS.ApplyExistingTag(data,"damage_type",damtype.ToString()));
         attack_range    = TOOLS.ApplyExistingTag(data,"attack_range",attack_range);
+        attack_force    = TOOLS.ApplyExistingTag(data,"attack_force",attack_force);
+        // Movement
+        intangible      = TOOLS.ApplyExistingTag(data,"intangible",intangible);
         unstoppable     = TOOLS.ApplyExistingTag(data,"unstoppable",unstoppable);
     }
 
@@ -67,14 +73,23 @@ public partial class PackData : Resource
         model               = source.model;
         texture             = source.texture;
         anim_speed          = source.anim_speed;
-        intangible          = source.intangible;
+        hit_sound           = source.hit_sound;
+        damtype             = source.damtype;
         attack_range        = source.attack_range;
+        attack_force        = source.attack_force;
+        intangible          = source.intangible;
         unstoppable         = source.unstoppable;
     }
 
     protected virtual string GetVarString()
     {
         return "";
+    }
+
+    private static DAT.DamageType StringToDamageType(string parse)
+    {
+        if(Enum.TryParse(parse, out DAT.DamageType ret)) return ret;
+        return DAT.DamageType.BRUTE;
     }
 
     public void ShowVars()
@@ -123,7 +138,13 @@ public partial class PackData : Resource
     public string model = "BASE/Turfs/Plane.tscn";
     public string texture = "";
     public double anim_speed = 0;
-    public bool intangible = false;
+    // Sounds
+    public string hit_sound = "BASE/Itemhit/Generic";
+    // When used as a weapon
+    public DAT.DamageType damtype = DAT.DamageType.BRUTE;
     public int attack_range = 1;
+    public float attack_force = 1f;
+    // Movement 
+    public bool intangible = false;
     public bool unstoppable = false; // Can not be stopped from moving from Cross(), CanPass(), or Uncross() failing. Still bumps everything it passes through, though.
 }

@@ -231,11 +231,50 @@ public static class DAT
     {
         TINY,
         SMALL,
-        MEDIUM,
+        MEDIUM, // Normal
         LARGE,
         HUGE,
-        GIANT,
-        MASSIVE,
-        GIGANTIC
+        ITEMSIZE_NO_CONTAINER
+    }
+
+    public enum DamageType
+    {
+        // Standard damages
+        BRUTE,      // Your basic vanilla bonking damage
+        BURN,       // Can be caused with firestacks as well, burns are likely to get infected too!
+        FREEZE,     // Burn but without fire stacks, and different stuff resists it... Also bleeds cause that's cool
+        TOX,        // Poison in the body that will eventually kill you
+        OXY,        // Suffocation
+        CLONE,      // Genetic or nerve damage
+        HALLOSS,    // Fake damage caused by hallucinations
+        // Special damages
+        ELECTROCUTE,// Special burn type with special resistances
+        ACID,       // Generic chemical burns, doesn't have much in the way of any resistances to it!
+        SEARING     // Brute + Burn combo damage
+    }
+
+    public enum WoundType
+    {
+        CUT,
+        BRUISE,
+        PIERCE
+    }
+
+    public enum StatusEffectType
+    {
+        STUN,
+        WEAKEN,
+        PARALYZE,
+        IRRADIATE,
+        AGONY,
+        SLUR,
+        STUTTER,
+        EYE_BLUR,
+        DROWSY
+    }
+
+    public static bool DamageTypeBleeds(DamageType type)
+    {
+        return type == DamageType.BRUTE || type == DamageType.FREEZE;
     }
 }

@@ -57,7 +57,7 @@ public partial class MobData : PackData
         wears_belt      = temp.wears_belt;
     }
     // Unique data
-    public float max_health;
+    public int max_health;
     public float walk_speed = (float)0.25;
     public float run_speed = 1;
     public bool has_hands;

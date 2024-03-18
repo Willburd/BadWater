@@ -520,7 +520,7 @@ public partial class MapController : DeligateController
             else
             {
                 // Or void it
-                Internal_GetTurf(grid_pos, submaps).Kill();
+                Internal_GetTurf(grid_pos, submaps).DeleteEntity();
                 Internal_SetTurf(grid_pos, null, submaps);
             }
         }
@@ -638,7 +638,7 @@ public partial class MapController : DeligateController
         public void UnloadChunk(NetworkChunk chunk)
         {
             ChunkPos chunk_pos = new ChunkPos(chunk.Position);
-            if(chunk.Unload()) // Safer than just calling Kill() lets chunks decide some stuff if they should unload...
+            if(chunk.Unload()) // Safer than just calling DeleteEntity() lets chunks decide some stuff if they should unload...
             {
                 ChunkController.CleanChunk(chunk);
                 chunk_grid[chunk_pos.hor,chunk_pos.ver,chunk_pos.dep] = null;

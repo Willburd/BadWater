@@ -7,7 +7,7 @@ namespace Behaviors_BASE
     {
         
 
-        protected override void RangedAttack(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
+        protected override void RangedInteraction(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
         {
             if(false /*(LASER in mutations)*/ && SelectingIntent == DAT.Intent.Hurt)
             {
@@ -17,7 +17,7 @@ namespace Behaviors_BASE
             else
             {
                 // Handle TK
-                base.RangedAttack(target,click_parameters);
+                base.RangedInteraction(target,click_parameters);
             }
         }
 

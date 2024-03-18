@@ -535,6 +535,6 @@ public partial class NetworkClient : Node3D
         // Server handling client DC
         AccountController.ClientLeave(this);
         focused_entity?.ClearClientOwner();
-        MainController.controller.Multiplayer.MultiplayerPeer.DisconnectPeer(int.Parse(Name)); // Calls Kill() remotely
+        MainController.controller.Multiplayer.MultiplayerPeer.DisconnectPeer(int.Parse(Name)); // Calls DeleteEntity() remotely
     }
 }

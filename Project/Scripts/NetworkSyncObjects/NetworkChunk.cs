@@ -95,7 +95,7 @@ public partial class NetworkChunk : NetworkEntity
         // handles unique situations where a chunk shouldn't unload just yet...
         if(!do_not_unload)
         {
-            Kill();
+            DeleteEntity();
             return true;
         }
         return false;

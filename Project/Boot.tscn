@@ -23,7 +23,7 @@ width = 512
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_dtkm3"]
 
-[node name="BootController" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner", "window_manager")]
+[node name="BootController" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner")]
 script = ExtResource("1_frm1i")
 entity_container = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/Entities")
 client_container = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/Clients")
@@ -31,7 +31,6 @@ client_prefab = ExtResource("2_doepm")
 client_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/ClientSpawner")
 entity_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/EntitySpawner")
 chunk_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/ChunkSpawner")
-window_manager = NodePath("WindowManager")
 
 [node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window", "chat_window")]
 script = ExtResource("3_tp275")
