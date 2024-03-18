@@ -31,29 +31,25 @@ public partial class JoinWindow : GameWindows
         button_server.Pressed   += _on_server_pressed;
         button_edit.Pressed     += _on_editor_pressed;
         // Show it!
-        BootController.controller.window_manager.join_window.Show();
-        BootController.controller.window_manager.main_window.Hide();
+        WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.JoinMenu);
     }
 
     public void _on_client_pressed()
     {
         if(account_entry.Text.Length <= 0) return;
-        BootController.controller.window_manager.join_window.Hide();
-        BootController.controller.window_manager.main_window.Show();
+        WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.MainGame);
         BootController.controller.StartNetwork(false,false);
     }
 
     public void _on_server_pressed()
     {
-        BootController.controller.window_manager.join_window.Hide();
-        BootController.controller.window_manager.main_window.Hide();
+        WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.ServerConfig);
         BootController.controller.StartNetwork(true,false);
     }
         
     public void _on_editor_pressed()
     {
-        BootController.controller.window_manager.join_window.Hide();
-        BootController.controller.window_manager.main_window.Show();
+        WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.ServerConfig);
         BootController.controller.StartNetwork(true,true);
     }
 }

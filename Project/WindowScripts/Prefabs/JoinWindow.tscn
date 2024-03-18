@@ -1,0 +1,93 @@
+[gd_scene load_steps=2 format=3 uid="uid://cwhio5wmd2p5p"]
+
+[ext_resource type="Script" path="res://WindowScripts/JoinWindow.cs" id="1_7oyw0"]
+
+[node name="JoinWindow" type="Window" node_paths=PackedStringArray("button_client", "button_server", "button_edit", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry")]
+title = "Login"
+size = Vector2i(965, 150)
+unresizable = true
+always_on_top = true
+script = ExtResource("1_7oyw0")
+button_client = NodePath("Client")
+button_server = NodePath("Server")
+button_edit = NodePath("Editor")
+ip_entry = NodePath("IPEntry")
+port_entry = NodePath("PortEntry")
+pass_entry = NodePath("PasswordEntry")
+account_entry = NodePath("AccountEntry")
+accpass_entry = NodePath("AccountPass")
+
+[node name="Client" type="Button" parent="."]
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 180.0
+offset_bottom = 47.0
+text = "CLIENT"
+
+[node name="Server" type="Button" parent="."]
+offset_left = 5.0
+offset_top = 52.0
+offset_right = 179.0
+offset_bottom = 95.0
+text = "SERVER"
+
+[node name="Editor" type="Button" parent="."]
+offset_left = 5.0
+offset_top = 100.0
+offset_right = 179.0
+offset_bottom = 143.0
+text = "EDIT SERVER
+"
+
+[node name="IPEntry" type="TextEdit" parent="."]
+offset_left = 193.0
+offset_top = 12.0
+offset_right = 424.0
+offset_bottom = 47.0
+auto_translate = false
+localize_numeral_system = false
+text = "127.0.0.1"
+placeholder_text = "IP Address"
+scroll_fit_content_height = true
+
+[node name="PortEntry" type="TextEdit" parent="."]
+offset_left = 434.0
+offset_top = 12.0
+offset_right = 665.0
+offset_bottom = 47.0
+auto_translate = false
+localize_numeral_system = false
+text = "2279"
+placeholder_text = "Port"
+scroll_fit_content_height = true
+
+[node name="PasswordEntry" type="TextEdit" parent="."]
+offset_left = 674.0
+offset_top = 13.0
+offset_right = 958.0
+offset_bottom = 48.0
+auto_translate = false
+localize_numeral_system = false
+placeholder_text = "Server Password"
+scroll_fit_content_height = true
+
+[node name="AccountEntry" type="TextEdit" parent="."]
+offset_left = 193.0
+offset_top = 60.0
+offset_right = 666.0
+offset_bottom = 95.0
+auto_translate = false
+localize_numeral_system = false
+text = "Tester"
+placeholder_text = "Account Name"
+scroll_fit_content_height = true
+
+[node name="AccountPass" type="TextEdit" parent="."]
+offset_left = 193.0
+offset_top = 103.0
+offset_right = 666.0
+offset_bottom = 138.0
+auto_translate = false
+localize_numeral_system = false
+placeholder_text = "Account Password"
+scroll_fit_content_height = true

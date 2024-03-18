@@ -45,8 +45,8 @@ public partial class NetworkClient : Node3D
         if(Name != peerid.ToString()) return; // Only the client we're asking!
         // DUMP TEMPORARY STUFF
         // TODO - Actual login =================================================================================================================================
-        string assign_name = BootController.controller.window_manager.join_window.account_entry.Text;
-        string pass_hash = BootController.controller.window_manager.join_window.accpass_entry.Text;
+        string assign_name = WindowManager.controller.join_window.account_entry.Text;
+        string pass_hash = WindowManager.controller.join_window.accpass_entry.Text;
         peer_active_client = this; // Set the client reference for clicks!
         Rpc(nameof(AcknowledgeCredentials), Name, assign_name, pass_hash);
     }

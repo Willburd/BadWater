@@ -5,6 +5,11 @@ using System;
 public partial class BootController : Node
 {
     public static BootController controller;
+    public override void _EnterTree()
+    {
+        controller = this;
+    }
+
 
     [Export]
     public Node entity_container;
@@ -26,18 +31,10 @@ public partial class BootController : Node
     AssetLoader asset_library;
     ConfigData config; 
 
-    [Export]
-    public WindowManager window_manager;
-
-    public override void _EnterTree()
-    {
-        controller = this;
-    }
-
     public override void _Ready()
     {
         // UI controls
-        window_manager.join_window.Show();
+        WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.JoinMenu);
         // Load config
         config = new ConfigData();
         config.Load("res://Config/Setup.json");
@@ -61,7 +58,7 @@ public partial class BootController : Node
         if(arguments.ContainsKey("s") || arguments.ContainsKey("e") || arguments.ContainsKey("headless"))
         {
             StartNetwork(true,arguments.ContainsKey("e"));
-            window_manager.join_window.Hide();
+            WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.ServerConfig);
         }
     }
 
@@ -84,7 +81,7 @@ public partial class BootController : Node
             {
                 GD.PrintErr("Server could not be created:");
                 GD.PrintErr("Port: " + config.port);
-                ResetJoinMenu();
+                WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.JoinMenu);
                 return;
             }
             peer.Host.Compress(ENetConnection.CompressionMode.Fastlz);
@@ -103,11 +100,11 @@ public partial class BootController : Node
         else
         {
             //Create godot client connection to server
-            Error status = peer.CreateClient(window_manager.join_window.ip_entry.Text,int.Parse(window_manager.join_window.port_entry.Text));
+            Error status = peer.CreateClient(WindowManager.controller.join_window.ip_entry.Text,int.Parse(WindowManager.controller.join_window.port_entry.Text));
             if (status != Error.Ok)
             {
                 GD.PrintErr("Creating client FAILED.");
-                ResetJoinMenu();
+                WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.JoinMenu);
                 return;
             }
             peer.Host.Compress(ENetConnection.CompressionMode.Fastlz);
@@ -134,11 +131,6 @@ public partial class BootController : Node
         while(entity_container.GetChildCount() > 0) entity_container.GetChild(0).QueueFree();
         while(client_container.GetChildCount() > 0)client_container.GetChild(0).QueueFree();
         GD.Print("LEFT GAME");
-        ResetJoinMenu();
-    }
-
-    public void ResetJoinMenu()
-    {
-        window_manager.join_window.Show();
+        WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.JoinMenu);
     }
 }

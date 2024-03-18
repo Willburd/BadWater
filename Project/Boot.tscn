@@ -1,11 +1,12 @@
-[gd_scene load_steps=12 format=3 uid="uid://it0x18qe03km"]
+[gd_scene load_steps=13 format=3 uid="uid://it0x18qe03km"]
 
 [ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
 [ext_resource type="Script" path="res://Scripts/TurfClickHandler.cs" id="3_jstcs"]
 [ext_resource type="Script" path="res://WindowScripts/WindowManager.cs" id="3_tp275"]
-[ext_resource type="Script" path="res://WindowScripts/JoinWindow.cs" id="4_ak737"]
 [ext_resource type="Script" path="res://WindowScripts/MainWindow.cs" id="4_w1nj2"]
+[ext_resource type="PackedScene" uid="uid://cwhio5wmd2p5p" path="res://WindowScripts/Prefabs/JoinWindow.tscn" id="6_3dkhe"]
+[ext_resource type="Script" path="res://WindowScripts/ChatWindow.cs" id="7_xi7yk"]
 
 [sub_resource type="Gradient" id="Gradient_dkvv8"]
 colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
@@ -32,10 +33,11 @@ entity_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubView
 chunk_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/ChunkSpawner")
 window_manager = NodePath("WindowManager")
 
-[node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window")]
+[node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window", "chat_window")]
 script = ExtResource("3_tp275")
 main_window = NodePath("MainWindow")
 join_window = NodePath("JoinWindow")
+chat_window = NodePath("ChatWindow")
 
 [node name="BackBlack" type="TextureRect" parent="WindowManager"]
 anchors_preset = 15
@@ -47,7 +49,7 @@ texture = SubResource("GradientTexture1D_sdk6d")
 
 [node name="MainWindow" type="Window" parent="WindowManager"]
 title = "Main"
-position = Vector2i(60, 90)
+position = Vector2i(20, 40)
 size = Vector2i(512, 512)
 min_size = Vector2i(128, 128)
 keep_title_visible = true
@@ -134,97 +136,14 @@ script = ExtResource("3_jstcs")
 [node name="TurfPlane" type="CollisionShape3D" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody"]
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
 
-[node name="JoinWindow" type="Window" parent="WindowManager" node_paths=PackedStringArray("button_client", "button_server", "button_edit", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry")]
-title = "Login"
+[node name="JoinWindow" parent="WindowManager" instance=ExtResource("6_3dkhe")]
 position = Vector2i(80, 300)
-size = Vector2i(965, 150)
-unresizable = true
-always_on_top = true
-script = ExtResource("4_ak737")
-button_client = NodePath("JoinMenu/Client")
-button_server = NodePath("JoinMenu/Server")
-button_edit = NodePath("JoinMenu/Editor")
-ip_entry = NodePath("JoinMenu/IPEntry")
-port_entry = NodePath("JoinMenu/PortEntry")
-pass_entry = NodePath("JoinMenu/PasswordEntry")
-account_entry = NodePath("JoinMenu/AccountEntry")
-accpass_entry = NodePath("JoinMenu/AccountPass")
+visible = false
 
-[node name="JoinMenu" type="CanvasLayer" parent="WindowManager/JoinWindow"]
-
-[node name="Client" type="Button" parent="WindowManager/JoinWindow/JoinMenu"]
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 180.0
-offset_bottom = 47.0
-text = "CLIENT"
-
-[node name="Server" type="Button" parent="WindowManager/JoinWindow/JoinMenu"]
-offset_left = 5.0
-offset_top = 52.0
-offset_right = 179.0
-offset_bottom = 95.0
-text = "SERVER"
-
-[node name="Editor" type="Button" parent="WindowManager/JoinWindow/JoinMenu"]
-offset_left = 5.0
-offset_top = 100.0
-offset_right = 179.0
-offset_bottom = 143.0
-text = "EDIT SERVER
-"
-
-[node name="IPEntry" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
-offset_left = 193.0
-offset_top = 12.0
-offset_right = 424.0
-offset_bottom = 47.0
-auto_translate = false
-localize_numeral_system = false
-text = "127.0.0.1"
-placeholder_text = "IP Address"
-scroll_fit_content_height = true
-
-[node name="PortEntry" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
-offset_left = 434.0
-offset_top = 12.0
-offset_right = 665.0
-offset_bottom = 47.0
-auto_translate = false
-localize_numeral_system = false
-text = "2279"
-placeholder_text = "Port"
-scroll_fit_content_height = true
-
-[node name="PasswordEntry" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
-offset_left = 674.0
-offset_top = 13.0
-offset_right = 958.0
-offset_bottom = 48.0
-auto_translate = false
-localize_numeral_system = false
-placeholder_text = "Server Password"
-scroll_fit_content_height = true
-
-[node name="AccountEntry" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
-offset_left = 193.0
-offset_top = 60.0
-offset_right = 666.0
-offset_bottom = 95.0
-auto_translate = false
-localize_numeral_system = false
-text = "Tester"
-placeholder_text = "Account Name"
-scroll_fit_content_height = true
-
-[node name="AccountPass" type="TextEdit" parent="WindowManager/JoinWindow/JoinMenu"]
-offset_left = 193.0
-offset_top = 103.0
-offset_right = 666.0
-offset_bottom = 138.0
-auto_translate = false
-localize_numeral_system = false
-placeholder_text = "Account Password"
-scroll_fit_content_height = true
+[node name="ChatWindow" type="Window" parent="WindowManager"]
+title = "Chat"
+position = Vector2i(550, 400)
+size = Vector2i(580, 200)
+script = ExtResource("7_xi7yk")
 
 [connection signal="input_event" from="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" to="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" method="_on_input_event"]
