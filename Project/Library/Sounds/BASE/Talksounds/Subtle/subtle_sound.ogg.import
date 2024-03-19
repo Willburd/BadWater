@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://bda0xb50k73wr"
-path="res://.godot/imported/subtle_sound.ogg-e0b6a4139824ecc66ff9eab823b85b8b.oggvorbisstr"
+path="res://.godot/imported/subtle_sound.ogg-91c6f4a3c88d63cb5ac6f08f61e3b466.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/talksounds/subtle_sound.ogg"
-dest_files=["res://.godot/imported/subtle_sound.ogg-e0b6a4139824ecc66ff9eab823b85b8b.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Talksounds/Subtle/subtle_sound.ogg"
+dest_files=["res://.godot/imported/subtle_sound.ogg-91c6f4a3c88d63cb5ac6f08f61e3b466.oggvorbisstr"]
 
 [params]
 

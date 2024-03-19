@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://e6nvkvd061y5"
-path="res://.godot/imported/glassknock.ogg-a22550251b0fc2e750deaeba06c04639.oggvorbisstr"
+path="res://.godot/imported/glassknock.ogg-d60ebd03fb5124aeee233b2f797df0c0.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/glassknock.ogg"
-dest_files=["res://.godot/imported/glassknock.ogg-a22550251b0fc2e750deaeba06c04639.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Glass/Knock/glassknock.ogg"
+dest_files=["res://.godot/imported/glassknock.ogg-d60ebd03fb5124aeee233b2f797df0c0.oggvorbisstr"]
 
 [params]
 

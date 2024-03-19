@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://1wb3jyaw2gg5"
-path="res://.godot/imported/extinguish.ogg-987bdd4618f86bb6f53b1dae9a823bec.oggvorbisstr"
+path="res://.godot/imported/extinguish.ogg-623ddd8ecc3178182c3f8282b9e72078.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/extinguish.ogg"
-dest_files=["res://.godot/imported/extinguish.ogg-987bdd4618f86bb6f53b1dae9a823bec.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Extinguish/extinguish.ogg"
+dest_files=["res://.godot/imported/extinguish.ogg-623ddd8ecc3178182c3f8282b9e72078.oggvorbisstr"]
 
 [params]
 

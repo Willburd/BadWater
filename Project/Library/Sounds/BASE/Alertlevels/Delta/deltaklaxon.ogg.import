@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://crmyhrvgkksxh"
-path="res://.godot/imported/deltaklaxon.ogg-7271b13dcc16c1f748b542a267bed99e.oggvorbisstr"
+path="res://.godot/imported/deltaklaxon.ogg-a1cc9524f3e96c9af0e11123b84fdabf.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/alert_levels/deltaklaxon.ogg"
-dest_files=["res://.godot/imported/deltaklaxon.ogg-7271b13dcc16c1f748b542a267bed99e.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Alertlevels/Delta/deltaklaxon.ogg"
+dest_files=["res://.godot/imported/deltaklaxon.ogg-a1cc9524f3e96c9af0e11123b84fdabf.oggvorbisstr"]
 
 [params]
 

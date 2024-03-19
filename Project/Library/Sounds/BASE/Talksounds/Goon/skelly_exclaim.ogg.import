@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://b8ccjedkhaly1"
-path="res://.godot/imported/skelly_exclaim.ogg-d88267372b408e98b26a45fb2714ad2f.oggvorbisstr"
+path="res://.godot/imported/skelly_exclaim.ogg-6901e169af1b9b425c796934e0ef42b0.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/talksounds/goon/skelly_exclaim.ogg"
-dest_files=["res://.godot/imported/skelly_exclaim.ogg-d88267372b408e98b26a45fb2714ad2f.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Talksounds/Goon/skelly_exclaim.ogg"
+dest_files=["res://.godot/imported/skelly_exclaim.ogg-6901e169af1b9b425c796934e0ef42b0.oggvorbisstr"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://bc0eg610ufjt6"
-path="res://.godot/imported/break_stone.ogg-5fa8bd90227be720111a95d116b2e732.oggvorbisstr"
+path="res://.godot/imported/break_stone.ogg-2e54ea1daab551d6c52944ceea64aa6e.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/break_stone.ogg"
-dest_files=["res://.godot/imported/break_stone.ogg-5fa8bd90227be720111a95d116b2e732.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Breakstone/break_stone.ogg"
+dest_files=["res://.godot/imported/break_stone.ogg-2e54ea1daab551d6c52944ceea64aa6e.oggvorbisstr"]
 
 [params]
 

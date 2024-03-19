@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://bhx7rq30dbpmh"
-path="res://.godot/imported/i_see_you1.ogg-57bf3b33b17769098e120cf542c6ca4d.oggvorbisstr"
+path="res://.godot/imported/i_see_you1.ogg-5c3fd31fc8718848b259399ca4378ce8.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/hallucinations/i_see_you1.ogg"
-dest_files=["res://.godot/imported/i_see_you1.ogg-57bf3b33b17769098e120cf542c6ca4d.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Hallucinations/i_see_you1.ogg"
+dest_files=["res://.godot/imported/i_see_you1.ogg-5c3fd31fc8718848b259399ca4378ce8.oggvorbisstr"]
 
 [params]
 

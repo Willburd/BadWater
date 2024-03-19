@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://civ2en8jkutu5"
-path="res://.godot/imported/alert_raise.ogg-e54d14269c346c72e7fce3601e4d9cac.oggvorbisstr"
+path="res://.godot/imported/alert_raise.ogg-bff4a61dfe37210828b3643afa38d2f9.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/alert_levels/alert_raise.ogg"
-dest_files=["res://.godot/imported/alert_raise.ogg-e54d14269c346c72e7fce3601e4d9cac.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Alertlevels/Raised/alert_raise.ogg"
+dest_files=["res://.godot/imported/alert_raise.ogg-bff4a61dfe37210828b3643afa38d2f9.oggvorbisstr"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://dem3k161pmncq"
-path="res://.godot/imported/behind_you1.ogg-f5ae1d2cb106e58e7af134f154d5eca2.oggvorbisstr"
+path="res://.godot/imported/behind_you1.ogg-2f585a3df6e7f3d257186cbe205c86f4.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/hallucinations/behind_you1.ogg"
-dest_files=["res://.godot/imported/behind_you1.ogg-f5ae1d2cb106e58e7af134f154d5eca2.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Hallucinations/behind_you1.ogg"
+dest_files=["res://.godot/imported/behind_you1.ogg-2f585a3df6e7f3d257186cbe205c86f4.oggvorbisstr"]
 
 [params]
 

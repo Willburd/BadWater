@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://c570k6letwwr4"
-path="res://.godot/imported/wail.ogg-5975088f93b9dff4c984c91b6d6d3d24.oggvorbisstr"
+path="res://.godot/imported/wail.ogg-487930b639a231ff5e808b26a79bcc67.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/hallucinations/wail.ogg"
-dest_files=["res://.godot/imported/wail.ogg-5975088f93b9dff4c984c91b6d6d3d24.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Hallucinations/wail.ogg"
+dest_files=["res://.godot/imported/wail.ogg-487930b639a231ff5e808b26a79bcc67.oggvorbisstr"]
 
 [params]
 

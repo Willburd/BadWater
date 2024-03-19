@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://2mwq77l3ilvi"
-path="res://.godot/imported/bubbles2.ogg-e15e2bf4c358dd30022af5414eec851f.oggvorbisstr"
+path="res://.godot/imported/bubbles2.ogg-adf675e5e142b8668559a8f8f202689f.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/bubbles2.ogg"
-dest_files=["res://.godot/imported/bubbles2.ogg-e15e2bf4c358dd30022af5414eec851f.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Bubbles/bubbles2.ogg"
+dest_files=["res://.godot/imported/bubbles2.ogg-adf675e5e142b8668559a8f8f202689f.oggvorbisstr"]
 
 [params]
 

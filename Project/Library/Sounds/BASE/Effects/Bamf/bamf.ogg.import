@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://dketwmom1ljg6"
-path="res://.godot/imported/bamf.ogg-923231b29770dfe509dbc0dd65d8b1c0.oggvorbisstr"
+path="res://.godot/imported/bamf.ogg-4f7263e071f4bd0b1a135433f480d974.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/bamf.ogg"
-dest_files=["res://.godot/imported/bamf.ogg-923231b29770dfe509dbc0dd65d8b1c0.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Bamf/bamf.ogg"
+dest_files=["res://.godot/imported/bamf.ogg-4f7263e071f4bd0b1a135433f480d974.oggvorbisstr"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://dch0ypixd500y"
-path="res://.godot/imported/tincanopen.ogg-61024c4f3600a363b66ab23921faa76a.oggvorbisstr"
+path="res://.godot/imported/tincanopen.ogg-1eb812a0f4b749991f8f6d4ce47cb3fb.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/tincanopen.ogg"
-dest_files=["res://.godot/imported/tincanopen.ogg-61024c4f3600a363b66ab23921faa76a.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Tinopen/tincanopen.ogg"
+dest_files=["res://.godot/imported/tincanopen.ogg-1eb812a0f4b749991f8f6d4ce47cb3fb.oggvorbisstr"]
 
 [params]
 

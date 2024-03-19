@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://d4jqlk7wq1v4f"
-path="res://.godot/imported/bottalk_2.ogg-6640992bf391a7a5ec4555a0f8d782ca.oggvorbisstr"
+path="res://.godot/imported/bottalk_2.ogg-b192a25f570228f47e5929d4f4d1249f.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/talksounds/goon/bottalk_2.ogg"
-dest_files=["res://.godot/imported/bottalk_2.ogg-6640992bf391a7a5ec4555a0f8d782ca.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Talksounds/Goon/bottalk_2.ogg"
+dest_files=["res://.godot/imported/bottalk_2.ogg-b192a25f570228f47e5929d4f4d1249f.oggvorbisstr"]
 
 [params]
 

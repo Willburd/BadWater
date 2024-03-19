@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://fvpvixl8tj1w"
-path="res://.godot/imported/look_up2.ogg-c843817fde4f2ce9f1bcb453b50ca64a.oggvorbisstr"
+path="res://.godot/imported/look_up2.ogg-7d5934a91463e43042450d304c8b3726.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/hallucinations/look_up2.ogg"
-dest_files=["res://.godot/imported/look_up2.ogg-c843817fde4f2ce9f1bcb453b50ca64a.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Hallucinations/look_up2.ogg"
+dest_files=["res://.godot/imported/look_up2.ogg-7d5934a91463e43042450d304c8b3726.oggvorbisstr"]
 
 [params]
 

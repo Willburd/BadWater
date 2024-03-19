@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://dfm25qbwpswb0"
-path="res://.godot/imported/glass_step.ogg-16e276ad8d8241f78b59316f19dc9c43.oggvorbisstr"
+path="res://.godot/imported/glass_step.ogg-7d3109f657cb12f62e36925c3a167bdb.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/glass_step.ogg"
-dest_files=["res://.godot/imported/glass_step.ogg-16e276ad8d8241f78b59316f19dc9c43.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Glass/Step/glass_step.ogg"
+dest_files=["res://.godot/imported/glass_step.ogg-7d3109f657cb12f62e36925c3a167bdb.oggvorbisstr"]
 
 [params]
 

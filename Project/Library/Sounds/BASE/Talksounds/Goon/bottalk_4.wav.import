@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bhqyyaq8wnxe4"
-path="res://.godot/imported/bottalk_4.wav-3f9b57fe0ce6a24ba93f96c22c2069fd.sample"
+path="res://.godot/imported/bottalk_4.wav-c1590cd1a73b98d278f65c9412e3a417.sample"
 
 [deps]
 
-source_file="res://Library/IMPORT/talksounds/goon/bottalk_4.wav"
-dest_files=["res://.godot/imported/bottalk_4.wav-3f9b57fe0ce6a24ba93f96c22c2069fd.sample"]
+source_file="res://Library/Sounds/BASE/Talksounds/Goon/bottalk_4.wav"
+dest_files=["res://.godot/imported/bottalk_4.wav-c1590cd1a73b98d278f65c9412e3a417.sample"]
 
 [params]
 

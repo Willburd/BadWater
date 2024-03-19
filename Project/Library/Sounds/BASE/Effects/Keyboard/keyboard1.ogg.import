@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://b3nwspcapehao"
-path="res://.godot/imported/keyboard1.ogg-63d36e0328d9ebcb8c5d7e9960f03b06.oggvorbisstr"
+path="res://.godot/imported/keyboard1.ogg-512c91feb062cec22778937c484abfa3.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/keyboard/keyboard1.ogg"
-dest_files=["res://.godot/imported/keyboard1.ogg-63d36e0328d9ebcb8c5d7e9960f03b06.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Keyboard/keyboard1.ogg"
+dest_files=["res://.godot/imported/keyboard1.ogg-512c91feb062cec22778937c484abfa3.oggvorbisstr"]
 
 [params]
 

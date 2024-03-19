@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://dlysor6tvv6g"
-path="res://.godot/imported/button3.ogg-54946c028e0e1bae0427415720e799d8.oggvorbisstr"
+path="res://.godot/imported/button3.ogg-72076e94ce8d0d3e702ea9cad17437b9.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/machines/button3.ogg"
-dest_files=["res://.godot/imported/button3.ogg-54946c028e0e1bae0427415720e799d8.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Machines/Button/button3.ogg"
+dest_files=["res://.godot/imported/button3.ogg-72076e94ce8d0d3e702ea9cad17437b9.oggvorbisstr"]
 
 [params]
 

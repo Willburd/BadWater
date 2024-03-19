@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://sih6160dn1yx"
-path="res://.godot/imported/roach_exclaim.ogg-eee81458398d3426a664df409cfd2eb5.oggvorbisstr"
+path="res://.godot/imported/roach_exclaim.ogg-1b7335d401072946d7c8eaa18ff855ab.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/talksounds/goon/roach_exclaim.ogg"
-dest_files=["res://.godot/imported/roach_exclaim.ogg-eee81458398d3426a664df409cfd2eb5.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Talksounds/Goon/roach_exclaim.ogg"
+dest_files=["res://.godot/imported/roach_exclaim.ogg-1b7335d401072946d7c8eaa18ff855ab.oggvorbisstr"]
 
 [params]
 

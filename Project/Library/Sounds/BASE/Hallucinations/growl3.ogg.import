@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://bce42cp557b6n"
-path="res://.godot/imported/growl3.ogg-d65b69fde4701e5d35fa182720b84d30.oggvorbisstr"
+path="res://.godot/imported/growl3.ogg-ce95fdfbf69b6511d820b034a801e2a0.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/hallucinations/growl3.ogg"
-dest_files=["res://.godot/imported/growl3.ogg-d65b69fde4701e5d35fa182720b84d30.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Hallucinations/growl3.ogg"
+dest_files=["res://.godot/imported/growl3.ogg-ce95fdfbf69b6511d820b034a801e2a0.oggvorbisstr"]
 
 [params]
 

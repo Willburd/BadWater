@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://hjtb5jggun81"
-path="res://.godot/imported/genetics.ogg-6ad16e553cc61bbc0b2b6b0c6ea0e584.oggvorbisstr"
+path="res://.godot/imported/genetics.ogg-34aeae2b984c177254e8007b82013b43.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/genetics.ogg"
-dest_files=["res://.godot/imported/genetics.ogg-6ad16e553cc61bbc0b2b6b0c6ea0e584.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Genetics/genetics.ogg"
+dest_files=["res://.godot/imported/genetics.ogg-34aeae2b984c177254e8007b82013b43.oggvorbisstr"]
 
 [params]
 

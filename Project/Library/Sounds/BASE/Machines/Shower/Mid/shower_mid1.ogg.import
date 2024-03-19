@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://77afoj732jdq"
-path="res://.godot/imported/shower_mid1.ogg-1399b7ae5ffce3d8e7b39851005e2b38.oggvorbisstr"
+path="res://.godot/imported/shower_mid1.ogg-771c3969bc4c35b4aafde1afcfc1baed.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/machines/shower/shower_mid1.ogg"
-dest_files=["res://.godot/imported/shower_mid1.ogg-1399b7ae5ffce3d8e7b39851005e2b38.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Machines/Shower/Mid/shower_mid1.ogg"
+dest_files=["res://.godot/imported/shower_mid1.ogg-771c3969bc4c35b4aafde1afcfc1baed.oggvorbisstr"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://cg3t62ca5s61k"
-path="res://.godot/imported/over_here1.ogg-9f4c4ceb3e7c3a4a929540c868da8cf6.oggvorbisstr"
+path="res://.godot/imported/over_here1.ogg-7b869bc9a429765729dbf578cb8a7274.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/hallucinations/over_here1.ogg"
-dest_files=["res://.godot/imported/over_here1.ogg-9f4c4ceb3e7c3a4a929540c868da8cf6.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Hallucinations/over_here1.ogg"
+dest_files=["res://.godot/imported/over_here1.ogg-7b869bc9a429765729dbf578cb8a7274.oggvorbisstr"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://c2d47xe2gfisc"
-path="res://.godot/imported/a.ogg-33ba01020e46c7ffb81ac57dc32fbe75.oggvorbisstr"
+path="res://.godot/imported/a.ogg-fa10900f26cf6c5691eb08e3a2b62b1c.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/talksounds/a.ogg"
-dest_files=["res://.godot/imported/a.ogg-33ba01020e46c7ffb81ac57dc32fbe75.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Talksounds/Speak/a.ogg"
+dest_files=["res://.godot/imported/a.ogg-fa10900f26cf6c5691eb08e3a2b62b1c.oggvorbisstr"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://ccei53uwlhknm"
-path="res://.godot/imported/far_noise.ogg-0077e3f025fc85fb9904c3a3a10aacbd.oggvorbisstr"
+path="res://.godot/imported/far_noise.ogg-2793374ea0321fc2251d21bf17614947.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/hallucinations/far_noise.ogg"
-dest_files=["res://.godot/imported/far_noise.ogg-0077e3f025fc85fb9904c3a3a10aacbd.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Hallucinations/far_noise.ogg"
+dest_files=["res://.godot/imported/far_noise.ogg-2793374ea0321fc2251d21bf17614947.oggvorbisstr"]
 
 [params]
 

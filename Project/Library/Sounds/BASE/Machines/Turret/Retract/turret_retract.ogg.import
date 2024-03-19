@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://bqnyg3l73jg1a"
-path="res://.godot/imported/turret_retract.ogg-b224fe8685155b3b6c99e0fbeb08f17c.oggvorbisstr"
+path="res://.godot/imported/turret_retract.ogg-13b3970399a02874651ee2af6f33515f.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/machines/turrets/turret_retract.ogg"
-dest_files=["res://.godot/imported/turret_retract.ogg-b224fe8685155b3b6c99e0fbeb08f17c.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Machines/Turret/Retract/turret_retract.ogg"
+dest_files=["res://.godot/imported/turret_retract.ogg-13b3970399a02874651ee2af6f33515f.oggvorbisstr"]
 
 [params]
 

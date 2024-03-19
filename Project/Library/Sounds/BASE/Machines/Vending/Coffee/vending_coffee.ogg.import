@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://vsoiqc0qf86u"
-path="res://.godot/imported/vending_coffee.ogg-3fa8ab505deecb2b837f069a4c793404.oggvorbisstr"
+path="res://.godot/imported/vending_coffee.ogg-2a96f2ff5f09efe7355b9e582af9c116.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/machines/vending/vending_coffee.ogg"
-dest_files=["res://.godot/imported/vending_coffee.ogg-3fa8ab505deecb2b837f069a4c793404.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Machines/Vending/Coffee/vending_coffee.ogg"
+dest_files=["res://.godot/imported/vending_coffee.ogg-2a96f2ff5f09efe7355b9e582af9c116.oggvorbisstr"]
 
 [params]
 

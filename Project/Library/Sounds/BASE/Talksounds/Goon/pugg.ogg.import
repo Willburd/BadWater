@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://toye4xb8mcfv"
-path="res://.godot/imported/pugg.ogg-6f1bca5b9ad1c50540bd70d5cc72a707.oggvorbisstr"
+path="res://.godot/imported/pugg.ogg-c8d46c807a94f54cb2124b4e79dd7eaf.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/talksounds/goon/pugg.ogg"
-dest_files=["res://.godot/imported/pugg.ogg-6f1bca5b9ad1c50540bd70d5cc72a707.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Talksounds/Goon/pugg.ogg"
+dest_files=["res://.godot/imported/pugg.ogg-c8d46c807a94f54cb2124b4e79dd7eaf.oggvorbisstr"]
 
 [params]
 

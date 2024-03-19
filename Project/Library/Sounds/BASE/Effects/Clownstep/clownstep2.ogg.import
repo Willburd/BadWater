@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://dini03t004b0a"
-path="res://.godot/imported/clownstep2.ogg-2331fd65c9f8d5baad437c43393c9126.oggvorbisstr"
+path="res://.godot/imported/clownstep2.ogg-70b0fab288cfcc9e95f7402a93f4e8c5.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/clownstep2.ogg"
-dest_files=["res://.godot/imported/clownstep2.ogg-2331fd65c9f8d5baad437c43393c9126.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Clownstep/clownstep2.ogg"
+dest_files=["res://.godot/imported/clownstep2.ogg-70b0fab288cfcc9e95f7402a93f4e8c5.oggvorbisstr"]
 
 [params]
 

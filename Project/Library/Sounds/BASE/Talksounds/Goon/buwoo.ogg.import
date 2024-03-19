@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://3gr58q55wrs1"
-path="res://.godot/imported/buwoo.ogg-86143368d81a8884f2e7a95508883d3d.oggvorbisstr"
+path="res://.godot/imported/buwoo.ogg-b4ba31a897fe3c99778562cde6552a64.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/talksounds/goon/buwoo.ogg"
-dest_files=["res://.godot/imported/buwoo.ogg-86143368d81a8884f2e7a95508883d3d.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Talksounds/Goon/buwoo.ogg"
+dest_files=["res://.godot/imported/buwoo.ogg-b4ba31a897fe3c99778562cde6552a64.oggvorbisstr"]
 
 [params]
 

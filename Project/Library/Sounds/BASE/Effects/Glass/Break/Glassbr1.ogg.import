@@ -3,12 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://w0kjh5adcs4e"
-path="res://.godot/imported/Glassbr1.ogg-9ee2f9306c4854c634ef6944d962d155.oggvorbisstr"
+path="res://.godot/imported/Glassbr1.ogg-c15b3472f5fc33a629afd2a455a7a10d.oggvorbisstr"
 
 [deps]
 
-source_file="res://Library/IMPORT/effects/Glassbr1.ogg"
-dest_files=["res://.godot/imported/Glassbr1.ogg-9ee2f9306c4854c634ef6944d962d155.oggvorbisstr"]
+source_file="res://Library/Sounds/BASE/Effects/Glass/Break/Glassbr1.ogg"
+dest_files=["res://.godot/imported/Glassbr1.ogg-c15b3472f5fc33a629afd2a455a7a10d.oggvorbisstr"]
 
 [params]
 
