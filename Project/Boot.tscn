@@ -4,16 +4,12 @@
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
 [ext_resource type="Script" path="res://Scripts/TurfClickHandler.cs" id="3_jstcs"]
 [ext_resource type="Script" path="res://WindowScripts/WindowManager.cs" id="3_tp275"]
+[ext_resource type="Material" uid="uid://jtpiovu64mws" path="res://Materials/BgTile.tres" id="4_bousx"]
 [ext_resource type="Script" path="res://WindowScripts/MainWindow.cs" id="4_w1nj2"]
+[ext_resource type="Texture2D" uid="uid://bq77px6p5wx4x" path="res://Materials/ClientBackground/BgTile.png" id="5_x7gbt"]
 [ext_resource type="PackedScene" uid="uid://cwhio5wmd2p5p" path="res://WindowScripts/Prefabs/JoinWindow.tscn" id="6_3dkhe"]
 [ext_resource type="PackedScene" uid="uid://nqucwtphnshe" path="res://WindowScripts/Prefabs/LoggingWindow.tscn" id="6_foubn"]
 [ext_resource type="PackedScene" uid="uid://biqov4ddbg4pb" path="res://WindowScripts/Prefabs/ChatWindow.tscn" id="7_fsgwk"]
-
-[sub_resource type="Gradient" id="Gradient_dkvv8"]
-colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_sdk6d"]
-gradient = SubResource("Gradient_dkvv8")
 
 [sub_resource type="Gradient" id="Gradient_fv2ux"]
 colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
@@ -41,12 +37,14 @@ chat_window = NodePath("ChatWindow")
 logging_window = NodePath("LoggingWindow")
 
 [node name="BackBlack" type="TextureRect" parent="WindowManager"]
+material = ExtResource("4_bousx")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = SubResource("GradientTexture1D_sdk6d")
+texture = ExtResource("5_x7gbt")
+stretch_mode = 1
 
 [node name="MainWindow" type="Window" parent="WindowManager"]
 title = "Main"
