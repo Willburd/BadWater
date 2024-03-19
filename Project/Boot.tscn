@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://it0x18qe03km"]
+[gd_scene load_steps=14 format=3 uid="uid://it0x18qe03km"]
 
 [ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://WindowScripts/WindowManager.cs" id="3_tp275"]
 [ext_resource type="Script" path="res://WindowScripts/MainWindow.cs" id="4_w1nj2"]
 [ext_resource type="PackedScene" uid="uid://cwhio5wmd2p5p" path="res://WindowScripts/Prefabs/JoinWindow.tscn" id="6_3dkhe"]
+[ext_resource type="PackedScene" uid="uid://nqucwtphnshe" path="res://WindowScripts/Prefabs/LoggingWindow.tscn" id="6_foubn"]
 [ext_resource type="PackedScene" uid="uid://biqov4ddbg4pb" path="res://WindowScripts/Prefabs/ChatWindow.tscn" id="7_fsgwk"]
 
 [sub_resource type="Gradient" id="Gradient_dkvv8"]
@@ -32,11 +33,12 @@ client_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubView
 entity_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/EntitySpawner")
 chunk_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/ChunkSpawner")
 
-[node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window", "chat_window")]
+[node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window", "chat_window", "logging_window")]
 script = ExtResource("3_tp275")
 main_window = NodePath("MainWindow")
 join_window = NodePath("JoinWindow")
 chat_window = NodePath("ChatWindow")
+logging_window = NodePath("LoggingWindow")
 
 [node name="BackBlack" type="TextureRect" parent="WindowManager"]
 anchors_preset = 15
@@ -134,6 +136,9 @@ script = ExtResource("3_jstcs")
 
 [node name="TurfPlane" type="CollisionShape3D" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody"]
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
+
+[node name="LoggingWindow" parent="WindowManager" instance=ExtResource("6_foubn")]
+position = Vector2i(400, 200)
 
 [node name="ChatWindow" parent="WindowManager" instance=ExtResource("7_fsgwk")]
 position = Vector2i(550, 400)

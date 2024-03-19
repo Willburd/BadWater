@@ -28,18 +28,18 @@ public partial class AccountController : DeligateController
                 {
                     if(acc.password_hash == pass_hash) 
                     {
-                        GD.Print("-" + assign_name + " was allowed to join");
+                        ChatController.DebugLog("-" + assign_name + " was allowed to join");
                         return true;
                     }
-                    GD.Print("-Could not join as " + assign_name + " password mismatch");
+                    ChatController.DebugLog("-Could not join as " + assign_name + " password mismatch");
                     return false;
                 } 
-                GD.Print("-Could not join as " + assign_name + " already active client");
+                ChatController.DebugLog("-Could not join as " + assign_name + " already active client");
                 return false;
             }
         }
         // New account trying to join!
-        GD.Print("-FRESH Account: " + assign_name);
+        ChatController.DebugLog("-FRESH Account: " + assign_name);
         if(!MainController.controller.config.allow_new_accounts) return false; // Disallow new accounts!
         return true;
     }
@@ -55,16 +55,16 @@ public partial class AccountController : DeligateController
             {
                 if(acc_check.password_hash == pass_hash)
                 {
-                    GD.Print("-Account: " + acc_check.id_name + " correct password, client set to " + client.Name);
+                    ChatController.DebugLog("-Account: " + acc_check.id_name + " correct password, client set to " + client.Name);
                     acc_check.active_client = client;
                     return true;
                 }
-                GD.Print("-Account: " + acc_check.id_name + " failed to validate, password mismatch");
+                ChatController.DebugLog("-Account: " + acc_check.id_name + " failed to validate, password mismatch");
                 return false; // Somehow not the same password as before.
             }
         }
         // Fresh account joining
-        GD.Print("-Fresh account " + assign_name + " initializing...");
+        ChatController.DebugLog("-Fresh account " + assign_name + " initializing...");
         Account acc = new Account
         {
             id_name = assign_name,
@@ -114,13 +114,13 @@ public partial class AccountController : DeligateController
 
     public static void ClientLeave(NetworkClient client)
     {
-        GD.Print("Client DC");
+        ChatController.DebugLog("Client DC");
         for(int i = 0; i < loaded_accounts.Count; i++) 
         {
             Account acc = loaded_accounts[i];
             if(acc.active_client == client)
             {
-                GD.Print("-Account: " + acc.id_name + " client cleared");
+                ChatController.DebugLog("-Account: " + acc.id_name + " client cleared");
                 acc.active_client = null;
                 return;
             }
@@ -130,13 +130,13 @@ public partial class AccountController : DeligateController
 
     public static AbstractEntity GetClientEntity(NetworkClient client)
     {
-        GD.Print("Client requesting saved entitiy");
+        ChatController.DebugLog("Client requesting saved entitiy");
         for(int i = 0; i < loaded_accounts.Count; i++) 
         {
             Account acc = loaded_accounts[i];
             if(acc.active_client == client)
             {
-                GD.Print("-Account: " + acc.id_name + " reserved entity reloaded: " + loaded_accounts[i].registered_entity);
+                ChatController.DebugLog("-Account: " + acc.id_name + " reserved entity reloaded: " + loaded_accounts[i].registered_entity);
                 return loaded_accounts[i].registered_entity;
             }
         }

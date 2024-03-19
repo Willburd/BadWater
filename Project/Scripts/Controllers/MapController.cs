@@ -46,7 +46,7 @@ public partial class MapController : DeligateController
             string map_id = loaded[i];
             if(!AssetLoader.loaded_maps.ContainsKey(map_id)) continue;
             MapData map_data = AssetLoader.loaded_maps[map_id];
-            GD.Print("-Loading map: " + map_data.display_name);
+            ChatController.DebugLog("-Loading map: " + map_data.display_name);
             loading.Add(new MapLoader(map_id,map_data.width,map_data.height,map_data.depth));
         }
         return true;
@@ -135,7 +135,7 @@ public partial class MapController : DeligateController
     }
     private void InitAreas()
     {
-        GD.Print("INIT AREAS " + AssetLoader.loaded_areas.Count + " ------------------------------------------------");
+        ChatController.DebugLog("INIT AREAS " + AssetLoader.loaded_areas.Count + " ------------------------------------------------");
         // Create all areas from resources
         foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
@@ -146,7 +146,7 @@ public partial class MapController : DeligateController
     }
     private void InitEffects()
     {
-        GD.Print("INIT EFFECTS " + effects.Count + " ------------------------------------------------");
+        ChatController.DebugLog("INIT EFFECTS " + effects.Count + " ------------------------------------------------");
         for(int i = 0; i < effects.Count; i++) 
         {
             AbstractTurf turf = effects[i].GetTurf();
@@ -165,7 +165,7 @@ public partial class MapController : DeligateController
                 {
                     spawners[spawn_tag] = new List<AbstractEffect>();
                 }
-                GD.Print("-Added spawner, tag: " + spawn_tag);
+                ChatController.DebugLog("-Added spawner, tag: " + spawn_tag);
                 spawners[spawn_tag].Add(effects[i]);
             }
         }
@@ -177,7 +177,7 @@ public partial class MapController : DeligateController
         all_entities.AddRange(MapController.entities);
         all_entities.AddRange(MachineController.entities);
         all_entities.AddRange(MobController.entities);
-        GD.Print("INIT ENTITIES " + all_entities.Count + " ------------------------------------------------");
+        ChatController.DebugLog("INIT ENTITIES " + all_entities.Count + " ------------------------------------------------");
         for(int i = 0; i < all_entities.Count; i++) 
         {
             // Directly add to turf's contents, we're still initting, no need to call Crossed() or Entered()
@@ -730,7 +730,7 @@ public partial class MapController : DeligateController
             Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
             area_data = (Godot.Collections.Dictionary)map_json["area_data"];
             turf_data = (Godot.Collections.Dictionary)map_json["turf_data"];
-            GD.Print("LOADING MAP" + map_id + " =========================");
+            ChatController.DebugLog("LOADING MAP" + map_id + " =========================");
         }
 
         public override void Process()
@@ -790,7 +790,7 @@ public partial class MapController : DeligateController
         {
             map_id = input_map.MapID;
             output_map = input_map;
-            GD.Print("INITING MAP" + map_id + " =========================");
+            ChatController.DebugLog("INITING MAP" + map_id + " =========================");
         }
 
         public override void Process()
@@ -816,7 +816,7 @@ public partial class MapController : DeligateController
         {
             map_id = input_map.MapID;
             output_map = input_map;
-            GD.Print("UPDATING MAP" + map_id + " =========================");
+            ChatController.DebugLog("UPDATING MAP" + map_id + " =========================");
         }
 
         public override void Process()
@@ -867,7 +867,7 @@ public partial class MapController : DeligateController
             structure_data  = (Godot.Collections.Array<string[]>)map_json["structures"];// array of string[EntityID,X,Y,Z,CustomData]
             machine_data    = (Godot.Collections.Array<string[]>)map_json["machines"];  // array of string[EntityID,X,Y,Z,CustomData]
             mob_data        = (Godot.Collections.Array<string[]>)map_json["mobs"];      // array of string[EntityID,X,Y,Z,CustomData]
-            GD.Print("CREATING ENTITIES " + map_id + " =========================");
+            ChatController.DebugLog("CREATING ENTITIES " + map_id + " =========================");
         }
 
         public override void Process()

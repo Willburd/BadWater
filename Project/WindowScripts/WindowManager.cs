@@ -16,7 +16,8 @@ public partial class WindowManager : Node
     public JoinWindow join_window;
     [Export]
     public ChatWindow chat_window;
-
+    [Export]
+    public LoggingWindow logging_window;
 
     public enum WindowStates
     {
@@ -33,18 +34,21 @@ public partial class WindowManager : Node
                 join_window.Show();
                 main_window.Hide();
                 chat_window.Hide();
+                logging_window.Hide();
             break;
 
             case WindowStates.MainGame:
                 join_window.Hide();
                 main_window.Show();
                 chat_window.Show();
+                logging_window.Hide();
             break;
 
             case WindowStates.ServerConfig:
                 join_window.Hide();
                 main_window.Hide();
                 chat_window.Hide();
+                logging_window.Show();
             break;
         }
     }

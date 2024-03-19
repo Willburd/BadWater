@@ -31,11 +31,11 @@ public partial class ChatWindow : GameWindows
         {
             if(whisper)
             {
-                mode = ChatController.ChatMode.Loooc;
+                mode = ChatController.ChatMode.Looc;
             }
             else
             {
-                mode = ChatController.ChatMode.Goooc;
+                mode = ChatController.ChatMode.Gooc;
             }
         }
         else if(emoting)
@@ -67,7 +67,7 @@ public partial class ChatWindow : GameWindows
     public void CycleMode()
     {
         chat_mode += 1;
-        if(chat_mode > ChatController.ChatMode.Goooc) chat_mode = ChatController.ChatMode.Speak;
+        if(chat_mode > ChatController.ChatMode.Gooc) chat_mode = ChatController.ChatMode.Speak;
         SetMode(chat_mode);
     }
 

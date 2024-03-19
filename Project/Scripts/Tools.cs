@@ -89,7 +89,7 @@ public static class TOOLS
         // Read text from file and then call parsejson.
         if(!Godot.FileAccess.FileExists(file_path)) 
         {
-            GD.Print("Missing file: " + file_path);
+            ChatController.DebugLog("Missing file: " + file_path);
             return new Godot.Collections.Dictionary();
         }
         Godot.FileAccess file = Godot.FileAccess.Open(file_path, Godot.FileAccess.ModeFlags.Read);
@@ -97,7 +97,7 @@ public static class TOOLS
         file.Close();
         if(json_dat == "") 
         {
-            GD.Print("Empty Json passed from: " + file_path);
+            ChatController.DebugLog("Empty Json passed from: " + file_path);
             return new Godot.Collections.Dictionary();
         }
         return ParseJson(json_dat);
@@ -173,7 +173,7 @@ public static class TOOLS
     {
         for(int b = 1; b <= 10; b++) 
         {
-            if(steps == Mathf.Floor(Mathf.Floor(max_steps / 10) * b)) GD.Print("-" + (b * 10) + "%");
+            if(steps == Mathf.Floor(Mathf.Floor(max_steps / 10) * b)) ChatController.DebugLog("-" + (b * 10) + "%");
         }
     }
 
@@ -216,7 +216,6 @@ public static class TOOLS
         if(A.map_id_string != B.map_id_string || B.GetLocation() is not AbstractTurf)
         {
             // ignore...
-            GD.Print("NO DIR CHANGE");
             return A.direction;
         }
         Vector3 offsetA = Vector3.Zero;

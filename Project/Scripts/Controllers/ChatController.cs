@@ -1,4 +1,5 @@
 using Godot;
+using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
 
@@ -14,8 +15,8 @@ public partial class ChatController : DeligateController
         Whisper,
         Emote,
         Subtle,
-        Loooc,
-        Goooc,
+        Looc,
+        Gooc,
         Admin,
         VisibleMessage,
         AttackLog,
@@ -33,9 +34,9 @@ public partial class ChatController : DeligateController
                 return "EMOTE";
             case ChatMode.Subtle:
                 return "SUBTLE";
-            case ChatMode.Loooc:
+            case ChatMode.Looc:
                 return "LOOC";
-            case ChatMode.Goooc:
+            case ChatMode.Gooc:
                 return "OOC";
             case ChatMode.Admin:
                 return "ADMIN";
@@ -49,6 +50,22 @@ public partial class ChatController : DeligateController
         return "SPEAK";
     }
 
+
+    public  static void ServerCommand(string message)
+    {
+        // Perform commands
+        if(message.Substr(0,1) == "/")
+        {
+            // Log it
+            SubmitMessage( null, null, message, ChatMode.Debug);
+            // Perform it!
+        }
+        else
+        {
+            // Announcements
+            SubmitMessage( null, null, message, ChatMode.Admin);
+        }
+    }
 
     public  static void DebugLog(string message)
     {
@@ -93,14 +110,22 @@ public partial class ChatController : DeligateController
         string output = "";
         if(mode == ChatMode.Debug || mode == ChatMode.AttackLog)
         {
-            output += message;
+            output += "[b][color=orange]LOG[/color][/b] " + message;
         }
         else if(mode == ChatMode.Admin)
         {
-            AccountController.Account acc = AccountController.ClientGetAccount(client);
-            output += "[b][color=red]" + acc.id_name + "[/color][/b] : " + message;
+            if(client == null && MainController.controller != null)
+            {
+                // We're the server
+                output += "[b][color=red]SERVER[/color][/b] : " + message;
+            }
+            else
+            {
+                AccountController.Account acc = AccountController.ClientGetAccount(client);
+                output += "[b][color=red]" + acc.id_name + "[/color][/b] : " + message;
+            }
         }
-        else if(mode == ChatMode.Loooc || mode == ChatMode.Goooc)
+        else if(mode == ChatMode.Looc || mode == ChatMode.Gooc)
         {
             AccountController.Account acc = AccountController.ClientGetAccount(client);
             output += "[b][color=blue]" + acc.id_name + "[/color][/b] : " + message;
@@ -135,21 +160,32 @@ public partial class ChatController : DeligateController
             }
         }
 
-        // Add to chat log
+        // Add to chat log and server logging
         chat_log.Add(output);
         GD.Print(output);
 
         // server side only debugging stops here
-        if(mode == ChatMode.Debug) return;
+        if(mode == ChatMode.Speak || mode == ChatMode.Whisper || mode == ChatMode.Looc || mode == ChatMode.Gooc || mode == ChatMode.Debug || mode == ChatMode.AttackLog || mode == ChatMode.Admin)
+        {
+            WindowManager.controller.logging_window.RecieveLogMessage(output);
+        }
+        if(mode == ChatMode.Debug || mode == ChatMode.AttackLog) return;
 
         // Determine the clients that recieve the message!
         for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
         {
             NetworkClient scan_cli = (NetworkClient)MainController.controller.client_container.GetChild(i);
-            // TODO Proper map adjacency, client visual distance, and any other status for sending messages to clients in visible range!
-            if(scan_cli.focused_map_id == speaking_ent?.map_id_string)
+            if(mode == ChatMode.Looc || mode == ChatMode.Gooc || mode == ChatMode.Admin)
             {
                 scan_cli.BroadcastChatMessage(output);
+            }
+            else
+            {
+                // TODO Proper map adjacency, client visual distance, and any other status for sending messages to clients in visible range!
+                if(scan_cli.focused_map_id == speaking_ent?.map_id_string)
+                {
+                    scan_cli.BroadcastChatMessage(output);
+                }
             }
         }
     }
