@@ -48,7 +48,7 @@ public partial class MainController : Node
 
 	public const int min_zoom = 3;
 	public const int max_zoom = 9;
-	public const int tick_rate = 40;
+	public const int tick_rate = 25; // Match ss13
 	
 	private static double tick_internal;	// delta_time counter for tick_rate calculation
 	private static bool setup_phase = true;
@@ -159,7 +159,7 @@ public partial class MainController : Node
 		
 		// server ticker
 		tick_internal += delta;
-		while(tick_internal >= delta_rate)
+		if(tick_internal > delta_rate)
 		{	
 			ServerTick();
 			tick_internal -= delta_rate;

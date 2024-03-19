@@ -645,7 +645,7 @@ public partial class AbstractMob : AbstractEntity
                 speed = run_speed;
             }
             // math for feet speed
-            if(dat_x != 0 || dat_y != 0) footstep_timer += Mathf.Lerp(0.05f,0.08f, Mathf.Clamp(speed,0,1.5f));
+            if(dat_x != 0 || dat_y != 0) footstep_timer += Mathf.Lerp(0.075f,0.10f, Mathf.Clamp(speed,0,1.5f));
             AbstractEntity newloc = Move(map_id_string, new_pos);
             if(footstep_timer > 1)
             {

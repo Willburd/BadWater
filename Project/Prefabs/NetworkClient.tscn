@@ -3,12 +3,6 @@
 [ext_resource type="Script" path="res://Scripts/NetworkSyncObjects/NetworkClient.cs" id="1_04naj"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ulbxs"]
-properties/0/path = NodePath(".:focused_map_id")
-properties/0/spawn = true
-properties/0/replication_mode = 1
-properties/1/path = NodePath(".:focused_position")
-properties/1/spawn = true
-properties/1/replication_mode = 1
 
 [node name="NetworkClient" type="Node3D" node_paths=PackedStringArray("camera")]
 script = ExtResource("1_04naj")

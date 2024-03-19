@@ -491,8 +491,14 @@ public partial class NetworkClient : Node3D
     }
     public override void _PhysicsProcess(double delta)
     {
-        if(!IsMultiplayerAuthority()) return;
         // Client only camera update
+        UpdateClientCamera();
+    }
+
+    private void UpdateClientCamera()
+    {
+        // Client only camera update
+        if(!IsMultiplayerAuthority()) return;
         if(camera.Current == false)
         {
             camera.Current = true;
@@ -502,10 +508,10 @@ public partial class NetworkClient : Node3D
             listener = new AudioListener3D();
             AddChild(listener);
         }
-        float lerp_speed = Mathf.Lerp(2f,40f, Mathf.Max(0 , Mathf.InverseLerp(-1,22,TOOLS.VecDist(camera.Position,focused_position) )));
-        camera.Position = camera.Position.MoveToward(focused_position + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0), (float)delta * lerp_speed);
-        camera.LookAt(focused_position + new Vector3(0,0.1f,0));
-        listener.Position = focused_position + Vector3.Up;
+        Vector3 stored_pos = focused_position;
+        camera.Position = stored_pos + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0);
+        camera.LookAt(stored_pos + new Vector3(0,0.1f,0));
+        listener.Position = stored_pos + Vector3.Up;
     }
 
 

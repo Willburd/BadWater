@@ -9,8 +9,8 @@
 		"intangible": 0,
 
 		"max_health": 100,
-		"move_speed": 0.25,
-		"run_speed": 1,
+		"move_speed": 0.75,
+		"run_speed": 1.75,
 		
 		"has_hands": 1,
 		"extra_hands": 0,

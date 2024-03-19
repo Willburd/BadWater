@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://it0x18qe03km"]
+[gd_scene load_steps=14 format=3 uid="uid://dfd237ybvqioj"]
 
 [ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
