@@ -311,12 +311,12 @@ public partial class AssetLoader : Node
         }
     }
 
-    public void BuildInheritance(List<PackData> todo)
+    public void BuildInheritance(List<PackData> assemble)
     {
-        List<PackData> next_todo = new List<PackData>();
-        while(todo.Count > 0)
+        List<PackData> next_assemble = new List<PackData>();
+        while(assemble.Count > 0)
         {
-            foreach(PackData data in todo)
+            foreach(PackData data in assemble)
             {
                 // Check if this is a base type. It'll already have it's parent flag set!
                 if(data.ParentFlag)
@@ -331,7 +331,7 @@ public partial class AssetLoader : Node
                 if(!parent.ParentFlag)
                 {
                     // Parent is not yet ready...
-                    next_todo.Add(data); // lets wait for a future loop...
+                    next_assemble.Add(data); // lets wait for a future loop...
                     continue;
                 }
                 // Parent's data is set, loop through parent chain, and set data repeatedly...
@@ -354,8 +354,8 @@ public partial class AssetLoader : Node
                 data.ShowVars();
             }
             // Next iteration
-            todo = next_todo;
-            next_todo = new List<PackData>();
+            assemble = next_assemble;
+            next_assemble = new List<PackData>();
         }
     }
 

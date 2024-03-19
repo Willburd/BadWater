@@ -228,8 +228,6 @@ public partial class AbstractMob : AbstractEntity
         if(click_params["mod_shift"].AsBool())
         {
             Examinate(target);
-            // TODO, Print description in chat EXAMINATE! =======================================================================================================
-            GD.Print(target.description);
             return;
         }
 
