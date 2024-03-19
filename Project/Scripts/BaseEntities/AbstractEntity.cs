@@ -304,7 +304,23 @@ public partial class AbstractEntity
     { 
         GD.Print(user?.display_name + " DRAGGED " + display_name + " TO " + target?.display_name); // REPLACE ME!!!
     }
-
+    public virtual string Examine( AbstractEntity user, string infix = "", string suffix = "")
+    {
+        //This reformat names to get a/an properly working on item descriptions when they are bloody
+        string f_name = "a " + display_name + infix;
+        /* // TODO Plurality forms ==================================================================================================
+        if(src.blood_DNA && !istype(src, /obj/effect/decal))
+            if(gender == PLURAL)
+                f_name = "some "
+            else
+                f_name = "a "
+            if(blood_color != SYNTH_BLOOD_COLOUR)
+                f_name += "<span class='danger'>blood-stained</span> [name][infix]!"
+            else
+                f_name += "oil-stained [name][infix]."
+        */
+        return "[b]That's " + f_name + suffix + ".[/b] " + description;
+    }
 
     /*****************************************************************
      * Interaction handling

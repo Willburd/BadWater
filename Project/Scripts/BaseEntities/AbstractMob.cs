@@ -193,6 +193,27 @@ public partial class AbstractMob : AbstractEntity
         // TODO =================================================================================================================================
     }
 
+    public void Examinate(AbstractEntity target)
+    {
+        if(IsBlind() || stat != DAT.LifeState.Alive)
+        {
+            ChatController.InspectMessage( this, "Something is there but you can't see it.", ChatController.VisibleMessageFormatting.Notice);
+            return;
+        }
+
+        //Could be gone by the time they finally pick something
+        if(target is null) return;
+
+        direction = TOOLS.RotateTowardEntity(this,target);
+
+        string results = target.Examine(this);
+        if(results == null || results.Length <= 0)
+        {
+            results = "You were unable to examine that. Tell a developer!";
+        }
+        ChatController.InspectMessage( this, results);
+    }
+
 
     /*****************************************************************
      * Click handling
@@ -206,6 +227,7 @@ public partial class AbstractMob : AbstractEntity
         // Handle special clicks
         if(click_params["mod_shift"].AsBool())
         {
+            Examinate(target);
             // TODO, Print description in chat EXAMINATE! =======================================================================================================
             GD.Print(target.description);
             return;

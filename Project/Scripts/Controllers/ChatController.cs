@@ -190,6 +190,44 @@ public partial class ChatController : DeligateController
         }
     }
 
+    // Send message to only one client
+    public static void InspectMessage(AbstractEntity to_entity, string message, VisibleMessageFormatting format = VisibleMessageFormatting.Nothing)
+    {
+        switch(format)
+        {
+            case VisibleMessageFormatting.Notice:
+                message = "[color=cyan]" + message + "[/color]";
+                break;
+            case VisibleMessageFormatting.Warning:
+                message = "[color=orange]" + message + "[/color]";
+                break;
+            case VisibleMessageFormatting.Danger:
+                message = "[color=red]" + message + "[/color]";
+                break;
+        }
+        DirectMessage( to_entity, message);
+    }
+
+    public static void DirectMessage(AbstractEntity to_entity, string message)
+    {
+        // Determine the clients that recieve the message!
+        for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
+        {
+            NetworkClient scan_cli = (NetworkClient)MainController.controller.client_container.GetChild(i);
+            if(scan_cli.GetFocusedEntity() == to_entity)
+            {
+                DirectMessage(scan_cli, message);
+                break;
+            }
+        }
+    }
+    public static void DirectMessage(NetworkClient to_client, string message)
+    {
+        to_client.BroadcastChatMessage(message);
+    }
+
+
+
     public override bool CanInit()
     {
         return true;
