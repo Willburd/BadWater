@@ -182,8 +182,23 @@ public partial class ChatController : DeligateController
             else
             {
                 // TODO Proper map adjacency, client visual distance, and any other status for sending messages to clients in visible range!
-                if(scan_cli.focused_map_id == speaking_ent?.map_id_string)
+                if(speaking_ent != null && scan_cli.focused_map_id == speaking_ent.map_id_string)
                 {
+                    switch(mode)
+                    {
+                        case ChatMode.Speak:
+                            AudioController.PlayAt("BASE/Talksounds/Speak", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.screen_range, -10, scan_cli);
+                        break;
+                        case ChatMode.Whisper:
+                            AudioController.PlayAt("BASE/Talksounds/Speak", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.short_range, -15, scan_cli);
+                        break;
+                        case ChatMode.Emote:
+                            AudioController.PlayAt("BASE/Talksounds/Emote", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.screen_range, -10, scan_cli);
+                        break;
+                        case ChatMode.Subtle:
+                            AudioController.PlayAt("BASE/Talksounds/Subtle", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.short_range, -10, scan_cli);
+                        break;
+                    }
                     scan_cli.BroadcastChatMessage(output);
                 }
             }
