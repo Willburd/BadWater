@@ -441,6 +441,10 @@ public partial class AbstractEntity
     {
         return target_zone; // Entities that can miss when used to attack. return DAT.ZoneSelection.None, otherwise resolve to another target_zone or return the same target zone if attack was successful.
     }
+    public virtual bool AttackedGeneric(AbstractEntity user, int damage, string attack_message)
+    {
+        return true;
+    }
 
     /*****************************************************************
      * Movement and storage

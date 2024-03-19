@@ -10,7 +10,7 @@ namespace Behaviors_BASE
         {
             inventory_slots = new AbstractEntity[ Enum.GetNames(typeof(DAT.InventorySlot)).Length ];
         }
-        private MobAI mob_ai;
+        private MobAI ai_holder;
 
         public override void TemplateRead(PackData data)
         {
@@ -477,16 +477,14 @@ namespace Behaviors_BASE
             }
 
             int damage_to_do = TOOLS.RandI(attacks.melee_damage_lower, attacks.melee_damage_upper);
-
-            //damage_to_do = apply_bonus_melee_damage(A, damage_to_do);
+            damage_to_do = ApplyBonusMeleeDamage( target, damage_to_do);
 
             if(target is AbstractMob mob_target) // Check defenses.
             {
                 if(TOOLS.Prob(attacks.melee_miss_chance))
                 {
                     ChatController.LogAttack(display_name + " Animal-attacked (miss) " + mob_target?.display_name);
-                    //do_attack_animation(src)
-                    // TODO assign proper punch miss sound ====================================================================================================================================
+                    //do_attack_animation(src) // TODO attack animations ========================================================================================================================
                     AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
                     return; // We missed.
                 }
@@ -494,13 +492,32 @@ namespace Behaviors_BASE
                 // if(H.check_shields(damage = damage_to_do, damage_source = src, attacker = src, def_zone = null, attack_text = "the attack")) return; // We were blocked.
             }
 
-            /*
-            if(apply_attack(A, damage_to_do))
+            if(ApplyAttack( target, damage_to_do))
             {
-                apply_melee_effects(A);
+                ApplyMeleeEffects(target);
                 AudioController.PlayAt(attacks.attack_sound, map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
             }
-            */
+        }
+
+        // Override for special effects after a successful attack, like injecting poison or stunning the target.
+        public virtual void ApplyMeleeEffects( AbstractEntity target)
+        {
+
+        }
+
+        // Override to modify the amount of damage the mob does conditionally.
+        // This must return the amount of outgoing damage.
+        // Note that this is done before mob modifiers scale the damage.
+        public virtual int ApplyBonusMeleeDamage( AbstractEntity target, int damage_amount)
+        {
+            return damage_amount;
+        }
+
+        // Generally used to do the regular attack.
+        // Override for doing special stuff with the direct result of the attack.
+        public bool ApplyAttack(AbstractEntity target, int damage_to_do)
+        {
+            return target.AttackedGeneric( this, damage_to_do, TOOLS.Pick(attacks.attacktext));
         }
 
         /*****************************************************************
@@ -639,6 +656,24 @@ namespace Behaviors_BASE
             return true;
         }
 
+        public override bool AttackedGeneric(AbstractEntity user, int damage, string attack_message)
+        {
+            if(damage <= 0) return false;
+
+            BruteLoss = damage;
+            
+            ChatController.LogAttack(user?.display_name + " Generic attacked (probably animal) " + display_name); //Usually due to simple_mob attacks
+            if(ai_holder != null)
+            { 
+                //ai_holder.react_to_attack(user) // TODO AI reaction to attacks ===============================================================================
+            }
+            
+            ChatController.VisibleMessage(this,"The " + user?.display_name + " has " + attack_message + " the " + display_name + "!", ChatController.VisibleMessageFormatting.Danger);
+            // user.do_attack_animation(src) // TODO attack animations ===============================================================================
+            UpdateHealth();
+            return true;
+        }
+
         private void UpdateHealth()
         {
             float cur_health = max_health - FireLoss - BruteLoss - ToxLoss - OxyLoss - CloneLoss;
@@ -744,12 +779,12 @@ namespace Behaviors_BASE
             if(stat != DAT.LifeState.Dead)
             {
                 LifeUpdate();
-                mob_ai?.Alive();
+                ai_holder?.Alive();
             }
             else
             {
                 DeathUpdate();
-                mob_ai?.Dead();
+                ai_holder?.Dead();
             }
             ProcessSlotDrops();
         }
