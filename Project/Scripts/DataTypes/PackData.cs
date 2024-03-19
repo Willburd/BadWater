@@ -139,7 +139,7 @@ public partial class PackData : Resource
     public string texture = "";
     public double anim_speed = 0;
     // Sounds
-    public string hit_sound = "BASE/Itemhit/Generic";
+    public string hit_sound = "BASE/Attack/Generic";
     // When used as a weapon
     public DAT.DamageType damtype = DAT.DamageType.BRUTE;
     public int attack_range = 1;

@@ -85,6 +85,47 @@ public partial class AbstractMob : AbstractEntity
     }
     public HealthData health = new HealthData();    // Size of item in world and bags
 
+    public struct AttackData
+    {
+        public AttackData() {}
+        //Attack ranged settings
+        //var/projectiletype				// The projectiles I shoot
+        //var/projectilesound				// The sound I make when I do it
+        //var/projectile_accuracy = 0		// Accuracy modifier to add onto the bullet when its fired.
+        //var/projectile_dispersion = 0	// How many degrees to vary when I do it.
+        //var/casingtype					// What to make the hugely laggy casings pile out of
+
+        // Reloading settings, part of ranged code
+        public bool needs_reload = true;							// If TRUE, mob needs to reload occasionally
+        public int reload_max = 1;									// How many shots the mob gets before it has to reload, will not be used if needs_reload is FALSE
+        public int reload_count = 0;								// A counter to keep track of how many shots the mob has fired so far. Reloads when it hits reload_max.
+        //int reload_time = 4 SECONDS						// How long it takes for a mob to reload. This is to buy a player a bit of time to run or fight.
+        public string reload_sound = "sound/weapons/flipblade.ogg";// What sound gets played when the mob successfully reloads. Defaults to the same sound as reloading guns. Can be null.
+
+        //Mob melee settings
+        public int melee_damage_lower = 2;		// Lower bound of randomized melee damage
+        public int melee_damage_upper = 6;		// Upper bound of randomized melee damage
+        public List<string> attacktext = new List<string>{"attacked"};  // "You are [attacktext] by the mob!"
+        public List<string> friendly = new List<string>{"nuzzles"}; // "The mob [friendly] the person."
+        public string attack_sound = null;				// Sound to play when I attack
+        public int melee_miss_chance = 0;			// percent chance to miss a melee attack.
+        public string attack_armor_type = "melee";		// What armor does this check?
+        public int attack_armor_pen = 0;			// How much armor pen this attack has.
+        public bool attack_sharp = false;			// Is the attack sharp?
+        public bool attack_edge = false;				// Does the attack have an edge?
+
+        public int? melee_attack_delay = 2;			// If set, the mob will do a windup animation and can miss if the target moves out of the way.
+        public int ranged_attack_delay = 0;
+        public int special_attack_delay = 0;
+
+        //Special attacks
+        public int special_attack_min_range = 0;		// The minimum distance required for an attempt to be made.
+        public int special_attack_max_range = 0;		// The maximum for an attempt.
+        public int? special_attack_charges = null;		// If set, special attacks will work off of a charge system, and won't be usable if all charges are expended. Good for grenades.
+        public int? special_attack_cooldown = null;    // If set, special attacks will have a cooldown between uses.
+    }
+    public AttackData attacks = new AttackData();    // Size of item in world and bags
+
     public float walk_speed = (float)0.25;
     public float run_speed = 1;
     public Flags flags;
@@ -346,27 +387,25 @@ public partial class AbstractMob : AbstractEntity
             case DAT.Intent.Help:
                 if(target is AbstractMob target_mob)
                 {
-                    ChatController.VisibleMessage( this, this.display_name + " pets the " + target_mob.display_name);
-                    // custom_emote(1,"[pick(friendly)] \the [A]!"); // TODO pet the dog =================================================================
+                    ChatController.VisibleMessage( this, this.display_name + " " + TOOLS.Pick(attacks.friendly) + " the " + target_mob.display_name + ".");
                 }
                 break;
 
-            /*
+            
             case DAT.Intent.Hurt:
-                if(can_special_attack(A) && special_attack_target(A))
+                /*if(can_special_attack(A) && special_attack_target(A))
                 {
                     return;
                 }
-                else if(melee_damage_upper == 0 && isliving(A))
+                else*/ if(attacks.melee_damage_upper == 0 && target is AbstractMob)
                 {
-                    custom_emote(1,"[pick(friendly)] \the [A]!")
+                    ChatController.VisibleMessage( this, this.display_name + " " + TOOLS.Pick(attacks.friendly) + " the " + target.display_name + "!");
                 }
                 else
                 {
-                    attack_target(A);
+                    UnarmedAttackTarget(target);
                 }
                 break;
-            */
         }
     }
 
@@ -375,6 +414,14 @@ public partial class AbstractMob : AbstractEntity
         GD.Print(display_name + " CLICKED " + target.display_name + " WHILE RESTRAINED"); // REPLACE ME!!!
     }
 
+    protected virtual void RangedInteraction(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
+    {
+        if(HasTelegrip())
+        {
+            if(TOOLS.VecDist(GridPos.WorldPos(), target.GridPos.WorldPos()) > DAT.TK_MAXRANGE) return;
+            target.InteractWithTK(this);
+        }
+    }
 
     /*****************************************************************
      * Attack handling
@@ -434,14 +481,81 @@ public partial class AbstractMob : AbstractEntity
             }
     } 
 
-    protected virtual void RangedInteraction(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
+    public void UnarmedAttackTarget(AbstractEntity target)
     {
-        if(HasTelegrip())
+        if(!TOOLS.Adjacent( this, target, false)) return;
+        AbstractTurf turf = target.GetTurf();
+
+        direction = TOOLS.RotateTowardEntity(this,target);
+
+        if(attacks.melee_attack_delay != null && attacks.melee_attack_delay.Value > 0)
         {
-            if(TOOLS.VecDist(GridPos.WorldPos(), target.GridPos.WorldPos()) > DAT.TK_MAXRANGE) return;
-            target.InteractWithTK(this);
+            // TODO =======================================================================================================================
+            //melee_pre_animation(target)
+            //. = ATTACK_SUCCESSFUL //Shoving this in here as a 'best guess' since this proc is about to sleep and return and we won't be able to know the real value
+            //handle_attack_delay(target, melee_attack_delay) // This will sleep this proc for a bit, which is why waitfor is false.
+        }
+
+        // Cooldown testing is done at click code (for players) and interface code (for AI).
+        SetClickCooldown(GetAttackCooldown(null));
+
+        // Returns a value, but will be lost if 
+        DoUnarmedAttack( target, turf);
+
+        if(attacks.melee_attack_delay != null && attacks.melee_attack_delay.Value > 0)
+        {
+            // TODO =======================================================================================================================
+            //melee_post_animation(target);
         }
     }
+
+    public void DoUnarmedAttack(AbstractEntity target, AbstractTurf turf)
+    {
+        direction = TOOLS.RotateTowardEntity(this,target);
+        bool missed = false;
+        if(target is not AbstractTurf && !turf.Contents.Contains(target) ) // Turfs don't contain themselves so checking contents is pointless if we're targeting a turf.
+        {
+            missed = true;
+        }
+        else if(!TOOLS.Adjacent(this,turf,false))
+        {
+            missed = true;
+        }
+        if(missed) // Most likely we have a slow attack and they dodged it or we somehow got moved.
+        {
+            ChatController.LogAttack(display_name + " Animal-attacked (dodged) " + target?.display_name);
+            AudioController.PlayAt("sound/weapons/punchmiss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+            ChatController.VisibleMessage(this,"The " + display_name + " misses their attack.", ChatController.VisibleMessageFormatting.Warning);
+            return;
+        }
+
+        int damage_to_do = TOOLS.RandI(attacks.melee_damage_lower, attacks.melee_damage_upper);
+
+        //damage_to_do = apply_bonus_melee_damage(A, damage_to_do);
+
+        if(target is AbstractMob mob_target) // Check defenses.
+        {
+            if(TOOLS.Prob(attacks.melee_miss_chance))
+            {
+                ChatController.LogAttack(display_name + " Animal-attacked (miss) " + mob_target?.display_name);
+                //do_attack_animation(src)
+                // TODO assign proper punch miss sound ====================================================================================================================================
+                AudioController.PlayAt("sound/weapons/punchmiss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+                return; // We missed.
+            }
+            // TODO shields ==================================================================================================================================
+            // if(H.check_shields(damage = damage_to_do, damage_source = src, attacker = src, def_zone = null, attack_text = "the attack")) return; // We were blocked.
+        }
+
+        /*
+        if(apply_attack(A, damage_to_do))
+        {
+            apply_melee_effects(A);
+            AudioController.PlayAt(attacks.attack_sound, map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+        }
+        */
+    }
+
 
     /*****************************************************************
      * Damage handling

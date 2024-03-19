@@ -1,9 +1,15 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 
 public static class TOOLS
 {
+    public static T Pick<T>(List<T> list)
+    {   
+        return list[RandI(list.Count)];
+    }
+
     public static Godot.Collections.Dictionary AssembleStandardClick(Vector3 pos)
     {
         Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
@@ -45,10 +51,19 @@ public static class TOOLS
     {
         return GD.Randf() * max;
     }
+    public static float RandF(float min, float max)
+    {
+        return min + RandF(max - min);
+    }
 
     public static int RandI(int max)
     {
         return Mathf.Abs((int)GD.Randi()) % max;
+    }
+
+    public static int RandI(int min, int max)
+    {
+        return min + RandI(max - min);
     }
 
     static public float VecDist(float x1, float y1, float x2, float y2)
