@@ -385,7 +385,7 @@ public partial class AbstractEntity
             /////////////////////////
             user_mob.lastattacked = target;
             target.lastattacker = user;
-            //add_attack_logs(user,M,"attacked with [name] (INTENT: [uppertext(user.a_intent)]) (DAMTYE: [uppertext(damtype)])");
+            ChatController.LogAttack(user?.display_name + "attacked" + target?.display_name + " with " + this.display_name + " (INTENT: " + user?.SelectingIntent + ") (DAMTYE: [" + this.damtype + "])");
             /////////////////////////
             user_mob.SetClickCooldown( user_mob.GetAttackCooldown(this) );
             // user_mob.DoAttackAnimation( target); // TODO - attack animation for items ======================================================================================

@@ -135,11 +135,10 @@ script = ExtResource("3_jstcs")
 [node name="TurfPlane" type="CollisionShape3D" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody"]
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
 
-[node name="JoinWindow" parent="WindowManager" instance=ExtResource("6_3dkhe")]
-position = Vector2i(80, 300)
-visible = false
-
 [node name="ChatWindow" parent="WindowManager" instance=ExtResource("7_fsgwk")]
 position = Vector2i(550, 400)
+
+[node name="JoinWindow" parent="WindowManager" instance=ExtResource("6_3dkhe")]
+position = Vector2i(80, 300)
 
 [connection signal="input_event" from="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" to="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" method="_on_input_event"]

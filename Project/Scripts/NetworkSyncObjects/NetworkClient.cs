@@ -65,7 +65,7 @@ public partial class NetworkClient : Node3D
     }
     public void Init()
     {
-        GD.Print("Client init " + Name);
+        ChatController.DebugLog("Client init " + Name);
         // Check if valid, we can't login if this account is already online!
         if(!AccountController.CanJoin( login_name, login_hash)) 
         {
@@ -81,19 +81,19 @@ public partial class NetworkClient : Node3D
             return;
         }
         // Assign tracking mob from account
-        GD.Print("Successful account login " + login_name);
+        ChatController.DebugLog("Successful account login " + login_name);
         has_logged_in = true;
         AbstractEntity foc = AccountController.GetClientEntity(this);
         if(foc == null) 
         {
             // TODO - properly handle first spawn!
-            GD.Print("-No entity stored.");
+            ChatController.DebugLog("-No entity stored.");
             Spawn();
         }
         else
         {
             // logging back in from DC
-            GD.Print("-Syncing to entity: " + foc);
+            ChatController.DebugLog("-Syncing to entity: " + foc);
             foc.SetClientOwner(this);
             SetFocusedEntity(foc);
         }
@@ -110,18 +110,18 @@ public partial class NetworkClient : Node3D
             List<AbstractEffect> spawners = MapController.spawners["PLAYER"];
             if(spawners.Count > 0)
             {
-                GD.Print("Client RESPAWN: " + Name);
+                ChatController.DebugLog("Client RESPAWN: " + Name);
                 int rand = TOOLS.RandI(spawners.Count);
                 SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].GridPos);
                 return;
             }
             else
             {
-                GD.Print("-NO SPAWNERS!");
+                ChatController.DebugLog("-NO SPAWNERS!");
             }
         }
         // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
-        GD.Print("Client FALLBACK RESPAWN: " + Name);
+        ChatController.DebugLog("Client FALLBACK RESPAWN: " + Name);
         SpawnHostEntity(MapController.FallbackMap(),new MapController.GridPos((float)0.5,(float)0.5,0));
     }
     private void SpawnHostEntity(string new_map, MapController.GridPos new_pos)
@@ -250,10 +250,12 @@ public partial class NetworkClient : Node3D
             /*****************************************************************
              * Client side hotkeys and camera input
              ****************************************************************/
-            if(Input.IsActionJustPressed("game_talk"))      { ChatWindow.ChatFocus(false,false);    return; }
-            if(Input.IsActionJustPressed("game_whisper"))   { ChatWindow.ChatFocus(true,false);     return; }
-            if(Input.IsActionJustPressed("game_emote"))     { ChatWindow.ChatFocus(false,true);     return; }
-            if(Input.IsActionJustPressed("game_subtle"))    { ChatWindow.ChatFocus(true,true);      return; }
+            if(Input.IsActionJustPressed("game_talk"))      { ChatWindow.ChatFocus(false,false,false);    return; }
+            if(Input.IsActionJustPressed("game_whisper"))   { ChatWindow.ChatFocus(true,false,false);     return; }
+            if(Input.IsActionJustPressed("game_emote"))     { ChatWindow.ChatFocus(false,true,false);     return; }
+            if(Input.IsActionJustPressed("game_subtle"))    { ChatWindow.ChatFocus(true,true,false);      return; }
+            if(Input.IsActionJustPressed("game_gooc"))      { ChatWindow.ChatFocus(false,false,true);     return; }
+            if(Input.IsActionJustPressed("game_looc"))      { ChatWindow.ChatFocus(true,false,true);      return; }
             // Unzoom and zoom
             if(Input.IsActionJustPressed("game_zoom"))
             {
@@ -538,6 +540,50 @@ public partial class NetworkClient : Node3D
         GetTree().Root.AddChild(newsound);
     }
 
+    
+    /*****************************************************************
+     * Client chat handling
+     ****************************************************************/
+    public void SendChatMessage(string send_text, ChatController.ChatMode mode)
+    {   
+        if(send_text.Length <= 0) return;
+        if(send_text.Length > ChatController.chatmessage_max_length) return;
+        Godot.Collections.Dictionary chat_data = new Godot.Collections.Dictionary();
+        chat_data["id"] = Name;
+        chat_data["message"] = send_text;
+        chat_data["mode"] = (int)mode;
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(ServerRecieveChatMessage),Json.Stringify(chat_data));
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    public void ServerRecieveChatMessage(string message_json)
+    {
+        if(!Multiplayer.IsServer()) return;
+        Godot.Collections.Dictionary message_data = TOOLS.ParseJson(message_json);
+        if(message_data["id"].AsString() == Name)
+        {
+            ChatController.SubmitMessage( this, focused_entity , message_data["message"].AsString() , (ChatController.ChatMode)message_data["mode"].AsInt32() );
+        }
+    }
+
+
+    // Send to client player!
+    public void BroadcastChatMessage(string message)
+    {
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientRecieveChatMessage), int.Parse(Name), message);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    public void ClientRecieveChatMessage(int id, string message)
+    {
+        if(Multiplayer.IsServer()) return;
+        if(!IsMultiplayerAuthority()) return;
+        if(id.ToString() != Name) return;
+        // SANITIZE
+
+        // Send to chat
+        WindowManager.controller.chat_window.RecieveChatMessage(message);
+    }
 
     /*****************************************************************
      * Client disconnetion

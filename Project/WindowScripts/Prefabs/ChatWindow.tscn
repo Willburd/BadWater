@@ -37,7 +37,7 @@ scroll_following = true
 layout_mode = 2
 size_flags_vertical = 10
 
-[node name="Mode" type="Label" parent="Control/VBoxContainer/HBoxContainer"]
+[node name="Mode" type="Button" parent="Control/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = " SPEAK: "
 

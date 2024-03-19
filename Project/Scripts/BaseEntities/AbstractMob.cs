@@ -326,7 +326,7 @@ public partial class AbstractMob : AbstractEntity
             case DAT.Intent.Help:
                 if(target is AbstractMob target_mob)
                 {
-                    GD.Print(this.display_name + " pets the " + target_mob.display_name);
+                    ChatController.VisibleMessage( this, this.display_name + " pets the " + target_mob.display_name);
                     // custom_emote(1,"[pick(friendly)] \the [A]!"); // TODO pet the dog =================================================================
                 }
                 break;
@@ -428,8 +428,7 @@ public partial class AbstractMob : AbstractEntity
      ****************************************************************/
     public float HitByWeapon(AbstractEntity used_item, AbstractEntity user, float effective_force, DAT.ZoneSelection target_zone)
     {
-        // TODO Visibile and chat messages ================================================================================================================
-        //visible_message("<span class='danger'>[src] has been [LAZYLEN(I.attack_verb) ? pick(I.attack_verb) : "attacked"] with [I.name] by [user]!</span>")
+        ChatController.VisibleMessage(this,this.display_name + " has been attacked with " + used_item?.display_name + " by " + user?.display_name + "!", ChatController.VisibleMessageFormatting.Danger);
 
         /* // TODO Mob AI ================================================================================================================
         if(ai_holder)

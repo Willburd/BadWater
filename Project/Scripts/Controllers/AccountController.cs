@@ -94,6 +94,23 @@ public partial class AccountController : DeligateController
         client.DisconnectClient();
     }
 
+    
+    public static Account ClientGetAccount(NetworkClient client)
+    {
+        for(int i = 0; i < loaded_accounts.Count; i++) 
+        {
+            Account acc = loaded_accounts[i];
+            if(acc.active_client == client)
+            {
+                return acc;
+            }
+        }
+        // How did you get on the server without an account?
+        GD.Print("Client had no account... Disconnecting " + client.Name);
+        ClientLeave(client);
+        return null;
+    }
+
 
     public static void ClientLeave(NetworkClient client)
     {
