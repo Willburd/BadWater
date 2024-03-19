@@ -56,10 +56,8 @@ public partial class AbstractMob : AbstractEntity
         direction = TOOLS.RotateTowardEntity(this,target);
 
         string results = target.Examine(this);
-        if(results == null || results.Length <= 0)
-        {
-            results = "You were unable to examine that. Tell a developer!";
-        }
+        if(results == null || results.Length <= 0) results = "You were unable to examine that. Tell a developer!";
+
         ChatController.InspectMessage( this, results);
     }
 
