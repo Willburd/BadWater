@@ -192,7 +192,7 @@ public partial class AbstractEntity
     public virtual void UpdateIcon() // Remember to call base.UpdateIcon() to handle transmitting data to the clients!
     { 
         // It's tradition~ Pushes graphical state changes.
-        UpdateNetwork(true);
+        UpdateNetwork(true,false);
     } 
     public void Bump(AbstractEntity hitby) // When we are bumped by an incoming entity
     {
@@ -598,7 +598,7 @@ public partial class AbstractEntity
             // Move around in current turf
             map_id_string = new_mapID;
             grid_pos = new_grid;
-            SyncPositionRotation(false);
+            SyncPositionRotation(false,false);
             return location;
         }
 
@@ -609,7 +609,7 @@ public partial class AbstractEntity
         // Enter new location!
         AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos,true);
         new_turf?.EntityEntered(this,perform_turf_actions);
-        UpdateNetwork(false);
+        UpdateNetwork(false,false);
         return location;
     }
     public AbstractEntity Move(AbstractEntity new_destination, bool perform_turf_actions = true)
@@ -626,7 +626,7 @@ public partial class AbstractEntity
         // Enter new location
         map_id_string = "BAG";
         new_destination.EntityEntered(this,perform_turf_actions);
-        UpdateNetwork(false);
+        UpdateNetwork(false,false);
         return location;
     }
     public AbstractEntity Move(bool perform_turf_actions = true) // Move to nullspace
@@ -635,7 +635,7 @@ public partial class AbstractEntity
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
         map_id_string = "NULL";
-        UpdateNetwork(false);
+        UpdateNetwork(false,false);
         return location;
     }
     public void Drop(AbstractEntity new_destination, AbstractEntity user)
@@ -724,9 +724,9 @@ public partial class AbstractEntity
     }
     public void UpdateNetworkDirection(DAT.Dir old_dir)
     {
-        if(old_dir != direction) UpdateNetwork(false);
+        if(old_dir != direction) UpdateNetwork(false,false);
     }
-    public void UpdateNetwork(bool mesh_update) // Spawns and despawns currently loaded entity. While calling SyncPositionRotation(bool mesh_update) is cheaper... Calling this is safer.
+    public void UpdateNetwork(bool mesh_update, bool force) // Spawns and despawns currently loaded entity. While calling SyncPositionRotation(bool mesh_update) is cheaper... Calling this is safer.
     {
         if(MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos())) 
         {
@@ -742,7 +742,7 @@ public partial class AbstractEntity
             if(is_vis && loaded_entity == null)
             {
                 loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
-                SyncPositionRotation(true);
+                SyncPositionRotation(true,true);
                 return;
             }
             if(!is_vis && loaded_entity != null)
@@ -752,7 +752,7 @@ public partial class AbstractEntity
             }
             if(is_vis && loaded_entity != null)
             {
-                SyncPositionRotation(mesh_update);
+                SyncPositionRotation(mesh_update,force);
                 return;
             }
         }
@@ -766,10 +766,10 @@ public partial class AbstractEntity
             }
         }
     }
-    private void SyncPositionRotation(bool mesh_update) // Updates position and rotation of currently loaded entity
+    private void SyncPositionRotation(bool mesh_update, bool force) // Updates position and rotation of currently loaded entity
     {
         if(loaded_entity == null) return;
-        loaded_entity.Position = grid_pos.WorldPos();
+        loaded_entity.SetUpdatedPosition(grid_pos.WorldPos(),force);
         loaded_entity.direction = direction;
         if(mesh_update) loaded_entity.MeshUpdate();
     }

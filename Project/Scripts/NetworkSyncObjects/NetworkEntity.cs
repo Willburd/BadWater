@@ -91,6 +91,60 @@ public partial class NetworkEntity : Node3D
         Rpc(nameof(ClientUpdateReleasedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
     }
 
+
+    // Interpolated movement solver
+    struct MoveStep
+    {
+        public MoveStep(Vector3 getpos, ulong getstep)
+        {
+            pos = getpos;
+            step = getstep;
+        }
+        public Vector3 pos;
+        public ulong step;
+    }
+    public void SetUpdatedPosition() // Force an update based on the current serverside position it's already at... So basically what's done on client join.
+    {
+        Rpc(nameof(ClientUpdatePosition),Position,true);
+    }
+    public void SetUpdatedPosition(Vector3 pos, bool forced)
+    {
+        Position = pos;
+        Rpc(nameof(ClientUpdatePosition),Position,forced);
+    }
+    private List<MoveStep> movement_steps = new List<MoveStep>();
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    public void ClientUpdatePosition(Vector3 new_pos, bool force)
+    {
+        if(movement_steps.Count == 0 || force)
+        {
+            // teleport if first movement queue
+            movement_steps.Clear();
+            movement_steps.Add(new MoveStep(new_pos,Time.GetTicksUsec()));
+            movement_steps.Add(new MoveStep(new_pos,Time.GetTicksUsec()));
+        }
+        movement_steps.Add(new MoveStep(new_pos,Time.GetTicksUsec()));
+    }
+    public override void _PhysicsProcess(double delta)
+    {
+        ulong render_time = Time.GetTicksUsec();
+        if(movement_steps.Count > 1)
+        {
+            while(movement_steps.Count > 2 && render_time > movement_steps[1].step) movement_steps.RemoveAt(0);
+            if( movement_steps[0].pos == movement_steps[1].pos)
+            {
+                Position = movement_steps[0].pos; // Already there!
+                return;
+            }
+            // Interpolate!
+            float interpo = (render_time - movement_steps[0].step) / (movement_steps[1].step - movement_steps[0].step);
+            Position = movement_steps[0].pos.Lerp(movement_steps[1].pos,Mathf.Min(interpo,1f));
+        }
+    }
+
+
+
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
     public void ClientUpdateClickedEntity(int clientID,string parameters_json)
     {

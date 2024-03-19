@@ -15,11 +15,11 @@ public partial class NetworkMachine : NetworkEntity
             { "anim_speed", abstract_owner.anim_speed }
         };
         // Update json on other end.
-        Rpc(nameof(ClientMeshUpdate), Position, Json.Stringify(entity_data));
+        Rpc(nameof(ClientMeshUpdate), Json.Stringify(entity_data));
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = debug_visual, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
-    private void ClientMeshUpdate(Vector3 pos, string mesh_json)
+    private void ClientMeshUpdate( string mesh_json)
     {
         Godot.Collections.Dictionary turf_data = TOOLS.ParseJson(mesh_json);
         // Get new model

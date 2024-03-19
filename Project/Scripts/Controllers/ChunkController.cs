@@ -147,5 +147,9 @@ public partial class ChunkController : DeligateController
         {
             SetupChunk(chunk);
         }
+        foreach(NetworkEntity ent in MainController.controller.entity_container.GetChildren())
+        {
+            if(ent is not NetworkChunk) ent.SetUpdatedPosition();
+        }
     }
 }

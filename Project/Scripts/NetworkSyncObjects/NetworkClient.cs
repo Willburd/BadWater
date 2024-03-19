@@ -133,6 +133,7 @@ public partial class NetworkClient : Node3D
             new_ent.SetClientOwner(this);
             SetFocusedEntity(new_ent);
             new_ent.Move(new_map,new_pos,false);
+            new_ent.UpdateNetwork(false,true);
         }
         // Inform client of movment from server
         if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
