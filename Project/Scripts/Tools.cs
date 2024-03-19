@@ -201,7 +201,6 @@ public static class TOOLS
         if(A.map_id_string != B.map_id_string || A.GridPos.dep != B.GridPos.dep) return false;
         MapController.GridPos A_pos = A.GridPos;
         MapController.GridPos B_pos = B.GridPos;
-        Vector3 dir_vec;
         // center of turfs
         if(A is AbstractTurf || B is AbstractTurf)
         {
@@ -209,7 +208,7 @@ public static class TOOLS
             A_pos.ver = Mathf.Floor(A_pos.ver) + 0.5f; 
             B_pos.hor = Mathf.Floor(B_pos.hor) + 0.5f; 
             B_pos.ver = Mathf.Floor(B_pos.ver) + 0.5f; 
-            dir_vec = DirVec(A_pos.WorldPos(),B_pos.WorldPos());
+            Vector3 dir_vec = DirVec(A_pos.WorldPos(),B_pos.WorldPos());
             if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
             {
                 // Check corner blockages
@@ -218,12 +217,17 @@ public static class TOOLS
         }
 
         // Entity checking
-        dir_vec = DirVec(A_pos.WorldPos(),B_pos.WorldPos());
+        return Adjacent(A_pos.WorldPos(),B_pos.WorldPos(),ignore_corner_density);
+    }
+
+    public static bool Adjacent(Vector3 A,Vector3 B, bool ignore_corner_density)
+    {
+        Vector3 dir_vec = DirVec(A,B);
         if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
         {
             // Check corner blockages
         }
-        return TOOLS.VecDist(A_pos.WorldPos(),B_pos.WorldPos()) <= DAT.ADJACENT_DISTANCE;
+        return TOOLS.VecDist(A,B) <= DAT.ADJACENT_DISTANCE;
     }
 
     public static DAT.Dir RotateTowardEntity(AbstractEntity A,AbstractEntity B)
