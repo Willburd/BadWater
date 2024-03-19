@@ -5,8 +5,9 @@ namespace Behaviors_BASE
 {
     public class AbstractComplexMob : AbstractSimpleMob
     {
-        
-
+        /*****************************************************************
+         * Click handling
+         ****************************************************************/
         protected override void RangedInteraction(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
         {
             if(false /*(LASER in mutations)*/ && SelectingIntent == DAT.Intent.Hurt)
