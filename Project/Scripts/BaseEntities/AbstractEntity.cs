@@ -357,7 +357,7 @@ public partial class AbstractEntity
     protected bool _RespondToInteraction( AbstractEntity user, AbstractEntity used_entity, float attack_modifier, Godot.Collections.Dictionary click_parameters)
     {
         if(user is not AbstractMob) return false;
-        return used_entity.UsedAsWeapon( user, this as AbstractMob, user.SelectingZone, attack_modifier);
+        return used_entity.UsedAsWeapon( user, this as AbstractSimpleMob, user.SelectingZone, attack_modifier);
     }
 
 
@@ -388,7 +388,7 @@ public partial class AbstractEntity
     public virtual void InteractWithTK( AbstractEntity user)
     {
         // Telekinetic attack: By default, emulate the user's unarmed attack
-        if(user is AbstractMob user_mob)
+        if(user is AbstractSimpleMob user_mob)
         {
             if(IsIntangible()) return;
             if(user_mob.Stat != DAT.LifeState.Alive) return;
@@ -404,11 +404,11 @@ public partial class AbstractEntity
     /*****************************************************************
      * Attack handling, we've got past just interacting, we're now doing harm!
      ****************************************************************/
-    protected virtual bool UsedAsWeapon( AbstractEntity user, AbstractMob target, DAT.ZoneSelection target_zone, float attack_modifier)
+    protected virtual bool UsedAsWeapon( AbstractEntity user, AbstractSimpleMob target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
         if(target == user && user.SelectingIntent != DAT.Intent.Hurt) return false;
         if(this is AbstractItem self_item && (self_item.force == 0 || self_item.flags.NOBLUDGEON)) return false;
-        if(user is AbstractMob user_mob)
+        if(user is AbstractSimpleMob user_mob)
         {
             /////////////////////////
             user_mob.lastattacked = target;
@@ -422,7 +422,7 @@ public partial class AbstractEntity
         if(hit_zone != DAT.ZoneSelection.Miss) WeaponHitMobEffect( user, target, hit_zone, attack_modifier);
         return true;
     }
-    protected float WeaponHitMobEffect( AbstractEntity user, AbstractMob target, DAT.ZoneSelection target_zone, float attack_modifier)
+    protected float WeaponHitMobEffect( AbstractEntity user, AbstractSimpleMob target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
         //user.break_cloak() // TODO Cloaking devices ================================================================================================================================
         AudioController.PlayAt(hit_sound, target.map_id_string ,target.grid_pos.WorldPos(), AudioController.screen_range, 5);
