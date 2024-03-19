@@ -559,6 +559,7 @@ public partial class NetworkClient : Node3D
     public void ServerRecieveChatMessage(string message_json)
     {
         if(!Multiplayer.IsServer()) return;
+        if(!has_logged_in) return;
         Godot.Collections.Dictionary message_data = TOOLS.ParseJson(message_json);
         if(message_data["id"].AsString() == Name)
         {
@@ -570,6 +571,7 @@ public partial class NetworkClient : Node3D
     // Send to client player!
     public void BroadcastChatMessage(string message)
     {
+        if(!has_logged_in) return;
         if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientRecieveChatMessage), int.Parse(Name), message);
     }
 
