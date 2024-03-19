@@ -116,6 +116,18 @@ public partial class AbstractEntity
     {
         get {return internal_selecting_intent;}
     }
+    public void IntentSwap()
+    {
+        if(internal_selecting_intent == DAT.Intent.Help)
+        {
+            internal_selecting_intent = DAT.Intent.Hurt;
+        }
+        else
+        {
+            internal_selecting_intent = DAT.Intent.Help;
+        }
+        GD.Print("Intent swapped to " + internal_selecting_intent);
+    }
     public virtual DAT.SizeCategory SizeCategory
     {
         get { return DAT.SizeCategory.MEDIUM; }

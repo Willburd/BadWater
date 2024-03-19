@@ -297,6 +297,7 @@ public partial class NetworkClient : Node3D
             new_inputs["equip"]    = Input.IsActionPressed("game_equip");
             new_inputs["drop"]     = Input.IsActionPressed("game_drop");
             new_inputs["useheld"]  = Input.IsActionPressed("game_useheld");
+            new_inputs["intentswap"] = Input.IsActionPressed("game_intentSwap");
             // Shifting input only triggers on taps, otherwise normal inputs
             new_inputs["x"] = 0;
             new_inputs["y"] = 0;
@@ -319,7 +320,8 @@ public partial class NetworkClient : Node3D
             || new_inputs["throw"].AsBool()
             || new_inputs["equip"].AsBool()
             || new_inputs["drop"].AsBool()
-            || new_inputs["useheld"].AsBool())
+            || new_inputs["useheld"].AsBool()
+            || new_inputs["intentswap"].AsBool())
             {
                 Rpc(nameof(SetClientControl), Json.Stringify(new_inputs));
             }

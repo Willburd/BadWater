@@ -367,14 +367,11 @@ public partial class AbstractMob : AbstractEntity
         if(IsIntangible()) return;
         if(this is AbstractMob self_mob && self_mob.Stat != DAT.LifeState.Alive) return;
 
-        /* TODO Funny glove magic ==============================================================================================================
         // Special glove functions:
-        // If the gloves do anything, have them return 1 to stop
-        // normal attack_hand() here.
-        var/obj/item/clothing/gloves/G = gloves // not typecast specifically enough in defines
-        if(istype(G) && G.Touch(A,1))
-            return
-        */
+        // If the gloves do anything, have them return true to stop
+        // normal _UnarmedInteract() here.
+        AbstractEntity gloves = SlotGloves; // not typecast specifically enough in defines
+        //if(gloves != null && gloves.Touch(target,true)) return;
 
         if( flags.HASHANDS && ( target is AbstractStructure || target is AbstractMachine ) && SelectingIntent != DAT.Intent.Hurt)
         {
@@ -524,7 +521,7 @@ public partial class AbstractMob : AbstractEntity
         if(missed) // Most likely we have a slow attack and they dodged it or we somehow got moved.
         {
             ChatController.LogAttack(display_name + " Animal-attacked (dodged) " + target?.display_name);
-            AudioController.PlayAt("sound/weapons/punchmiss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+            AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
             ChatController.VisibleMessage(this,"The " + display_name + " misses their attack.", ChatController.VisibleMessageFormatting.Warning);
             return;
         }
@@ -540,7 +537,7 @@ public partial class AbstractMob : AbstractEntity
                 ChatController.LogAttack(display_name + " Animal-attacked (miss) " + mob_target?.display_name);
                 //do_attack_animation(src)
                 // TODO assign proper punch miss sound ====================================================================================================================================
-                AudioController.PlayAt("sound/weapons/punchmiss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+                AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
                 return; // We missed.
             }
             // TODO shields ==================================================================================================================================
@@ -776,6 +773,10 @@ public partial class AbstractMob : AbstractEntity
         }
 
         // Respond in any state, as they are mostly just input states for actions!
+        if(client_input_data["intentswap"].AsBool())
+        {
+            IntentSwap();
+        }
         if(client_input_data["swap"].AsBool())
         {
             SwapHands();
