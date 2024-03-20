@@ -290,14 +290,14 @@ public partial class NetworkClient : Node3D
             new_inputs["mod_shift"]     = Input.IsActionPressed("mod_shift");
             // Hotkeys
             new_inputs["walk"]     = new_inputs["mod_shift"];
-            new_inputs["swap"]     = Input.IsActionPressed("game_swap");
-            new_inputs["resist"]   = Input.IsActionPressed("game_resist");
-            new_inputs["rest"]     = Input.IsActionPressed("game_rest");
-            new_inputs["throw"]    = Input.IsActionPressed("game_throw");
-            new_inputs["equip"]    = Input.IsActionPressed("game_equip");
-            new_inputs["drop"]     = Input.IsActionPressed("game_drop");
-            new_inputs["useheld"]  = Input.IsActionPressed("game_useheld");
-            new_inputs["intentswap"] = Input.IsActionPressed("game_intentSwap");
+            new_inputs["swap"]     = Input.IsActionJustPressed("game_swap");
+            new_inputs["resist"]   = Input.IsActionJustPressed("game_resist");
+            new_inputs["rest"]     = Input.IsActionJustPressed("game_rest");
+            new_inputs["throw"]    = Input.IsActionJustPressed("game_throw");
+            new_inputs["equip"]    = Input.IsActionJustPressed("game_equip");
+            new_inputs["drop"]     = Input.IsActionJustPressed("game_drop");
+            new_inputs["useheld"]  = Input.IsActionJustPressed("game_useheld");
+            new_inputs["intentswap"]=Input.IsActionJustPressed("game_intentSwap");
             // Shifting input only triggers on taps, otherwise normal inputs
             new_inputs["x"] = 0;
             new_inputs["y"] = 0;

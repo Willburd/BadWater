@@ -1,6 +1,8 @@
 using Godot;
+using Godot.Collections;
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 
 public partial class AbstractTurf : AbstractEntity
 {
@@ -94,5 +96,55 @@ public partial class AbstractTurf : AbstractEntity
     public void PlayStepSound(bool quiet)
     {
         AudioController.PlayAt(step_sound, map_id_string ,grid_pos.WorldPos() + new Vector3(MapController.tile_size/2,0,MapController.tile_size/2), AudioController.screen_range, quiet ? -10 : 0);
+    }
+
+    public override bool InteractionSpecial(AbstractEntity user, AbstractEntity target, Dictionary click_parameters)
+    {
+        if(user == null) return false;
+        if(user is AbstractMob user_mob)
+        {
+            if(user_mob.SelectingIntent != DAT.Intent.Help)
+            {
+                AttackTile( this, user_mob); // Be on help intent if you want to decon something.
+                return true;
+            }
+        }
+        return base.InteractionSpecial(user, target, click_parameters);
+    }
+
+    // Hits a mob on the tile.
+    private bool AttackTile(AbstractEntity used_item, AbstractEntity user)
+    {
+        if(used_item == null) return false;
+
+        List<AbstractMob> viable_targets = new List<AbstractMob>();
+        bool success = false; // Hitting something makes this true. If its still false, the miss sound is played.
+
+        foreach(AbstractEntity ent in Contents)
+        {
+            if(ent is AbstractMob && ent != user) viable_targets.Add(ent as AbstractMob);
+        }
+
+        if(viable_targets.Count <= 0) // No valid targets on this tile.
+        {
+            //if(W.can_cleave) success = W.cleave(user, src) // TODO Cleaving weapons =================================================================================================================
+        }
+        else
+        {
+            AbstractMob victim = TOOLS.Pick(viable_targets);
+            success = used_item._Interact(victim, user, 0, new Godot.Collections.Dictionary());
+        }
+
+        if(user is AbstractMob user_mob)
+        {
+            user_mob.SetClickCooldown(user_mob.GetAttackCooldown(used_item));
+            // user_mob.do_attack_animation(src, no_attack_icons = TRUE);  // TODO Attack animations =================================================================================================
+        }
+        if(!success) // Nothing got hit.
+        {
+            ChatController.VisibleMessage(user,"The " + user?.display_name + " swipes the " + used_item?.display_name + " over the " + this.display_name + ".", ChatController.VisibleMessageFormatting.Warning);
+            AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+        }
+        return success;
     }
 }

@@ -272,6 +272,17 @@ public static class DAT
         EYE_BLUR,
         DROWSY
     }
+    
+    public enum ArmorType 
+    {
+        Melee,
+        Bullet,
+        Laser,
+        Energy,
+        Bomb,
+        Bio,
+        Rad
+    }
 
     public static bool DamageTypeBleeds(DamageType type)
     {

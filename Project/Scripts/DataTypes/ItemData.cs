@@ -82,7 +82,7 @@ public partial class ItemData : PackData
     }
 
     // Unique data
-    public DAT.SizeCategory size_category;
+    public DAT.SizeCategory size_category = DAT.SizeCategory.MEDIUM;
     // flags
     public bool ISSHARP                 = false;
     public bool HASEDGE                 = false;

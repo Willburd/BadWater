@@ -39,6 +39,7 @@ public partial class PackData : Resource
         damtype         = StringToDamageType(TOOLS.ApplyExistingTag(data,"damage_type",damtype.ToString()));
         attack_range    = TOOLS.ApplyExistingTag(data,"attack_range",attack_range);
         attack_force    = TOOLS.ApplyExistingTag(data,"attack_force",attack_force);
+        embed_chance    = TOOLS.ApplyExistingTag(data,"embed_chance",embed_chance);
         // Movement
         intangible      = TOOLS.ApplyExistingTag(data,"intangible",intangible);
         unstoppable     = TOOLS.ApplyExistingTag(data,"unstoppable",unstoppable);
@@ -77,6 +78,7 @@ public partial class PackData : Resource
         damtype             = source.damtype;
         attack_range        = source.attack_range;
         attack_force        = source.attack_force;
+        embed_chance        = source.embed_chance;
         intangible          = source.intangible;
         unstoppable         = source.unstoppable;
     }
@@ -144,6 +146,7 @@ public partial class PackData : Resource
     public DAT.DamageType damtype = DAT.DamageType.BRUTE;
     public int attack_range = 1;
     public float attack_force = 1f;
+    public int embed_chance = 0;
     // Movement 
     public bool intangible = false;
     public bool unstoppable = false; // Can not be stopped from moving from Cross(), CanPass(), or Uncross() failing. Still bumps everything it passes through, though.

@@ -73,12 +73,11 @@ public partial class AbstractItem : AbstractEntity
         flags.FLEXIBLEMATERIAL        = temp.FLEXIBLEMATERIAL;
         flags.ALLOW_SURVIVALFOOD      = temp.ALLOW_SURVIVALFOOD;
     }
-    public DAT.SizeCategory internal_size_category = DAT.SizeCategory.SMALL;   // Size of item in world and bags
+    public DAT.SizeCategory internal_size_category = DAT.SizeCategory.MEDIUM;   // Size of item in world and bags
     public override DAT.SizeCategory SizeCategory
     {
         get { return internal_size_category; }
     }
-    public float force = 0f; // Weapon impact force
     public Flags flags;
     public struct Flags
     {

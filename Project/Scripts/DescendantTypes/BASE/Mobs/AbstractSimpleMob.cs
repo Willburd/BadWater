@@ -75,7 +75,7 @@ namespace Behaviors_BASE
             public List<string> friendly = new List<string>{"nuzzles"}; // "The mob [friendly] the person."
             public string attack_sound = null;				// Sound to play when I attack
             public int melee_miss_chance = 0;			// percent chance to miss a melee attack.
-            public string attack_armor_type = "melee";		// What armor does this check?
+            public DAT.ArmorType attack_armor_type = DAT.ArmorType.Melee;// What armor does this check?
             public int attack_armor_pen = 0;			// How much armor pen this attack has.
             public bool attack_sharp = false;			// Is the attack sharp?
             public bool attack_edge = false;				// Does the attack have an edge?
@@ -128,6 +128,7 @@ namespace Behaviors_BASE
         public AbstractEntity lastattacked = null;
         public AbstractEntity lastattacker = null;
         private int active_hand = 0; // L or R
+        private List<AbstractEntity> embedded_objects = new List<AbstractEntity>();
         // end state data
 
         /*****************************************************************
@@ -194,6 +195,75 @@ namespace Behaviors_BASE
         {
             if(ActiveHand != null) return;
             // TODO =================================================================================================================================
+        }
+
+        /*
+            run_armor_check(a,b)
+            args
+            a:def_zone		- What part is getting hit, if null will check entire body
+            b:attack_flag	- What type of attack, bullet, laser, energy, melee
+            c:armour_pen	- How much armor to ignore.
+            d:absorb_text	- Custom text to send to the player when the armor fully absorbs an attack.
+            e:soften_text	- Similar to absorb_text, custom text to send to the player when some damage is reduced.
+
+            Returns
+            A number between 0 and 100, with higher numbers resulting in less damage taken.
+        */
+        public float RunArmorCheck(DAT.ZoneSelection target_zone =  DAT.ZoneSelection.Miss, DAT.ArmorType attack_flag = DAT.ArmorType.Melee, float armour_pen = 0, string absorb_text = "", string soften_text = "")
+        {
+            if(armour_pen >= 100) return 0; //might as well just skip the processing
+
+            float armor = GetArmor(target_zone, attack_flag);
+            if(armor > 0)
+            {
+                float armor_variance_range = Mathf.Round(armor * 0.25f); //Armor's effectiveness has a +25%/-25% variance.
+                float armor_variance = TOOLS.RandF(-armor_variance_range, armor_variance_range); //Get a random number between -25% and +25% of the armor's base value
+                
+                armor = Mathf.Min(armor + armor_variance, 100);	//Now we calcuate damage using the new armor percentage.
+                armor = Mathf.Max(armor - armour_pen, 0);			//Armor pen makes armor less effective.
+                if(armor >= 100)
+                {
+                    if(absorb_text.Length > 0)
+                    {
+                        ChatController.InspectMessage( this, absorb_text, ChatController.VisibleMessageFormatting.Danger);
+                    }
+                    else
+                    {
+                        ChatController.InspectMessage( this, "Your armor absorbs the blow!", ChatController.VisibleMessageFormatting.Danger);
+                    }
+                }
+                else if(armor > 0)
+                {
+                    if(soften_text.Length > 0)
+                    {
+                        ChatController.InspectMessage( this, soften_text, ChatController.VisibleMessageFormatting.Danger);
+                    }
+                    else
+                    {
+                        ChatController.InspectMessage( this, "Your armor softens the blow!", ChatController.VisibleMessageFormatting.Danger);
+                    }
+                }
+            }
+            return armor;
+        }
+                
+        //Certain pieces of armor actually absorb flat amounts of damage from income attacks
+        public float GetArmorSoak(DAT.ZoneSelection target_zone = DAT.ZoneSelection.Miss, DAT.ArmorType attack_flag = DAT.ArmorType.Melee, float armour_pen = 0)
+        {
+            float soaked = GetSoak(target_zone, attack_flag);
+            //5 points of armor pen negate one point of soak
+            if(armour_pen > 0) soaked = Mathf.Max(soaked - (armour_pen/5), 0);
+            return soaked;
+        }
+
+        public virtual float GetArmor(DAT.ZoneSelection target_zone, DAT.ArmorType armor_type)
+        {
+            return 0;
+        }
+        
+        public virtual float GetSoak(DAT.ZoneSelection target_zone, DAT.ArmorType armor_type)
+        {
+            return 0;
         }
 
         /*****************************************************************
@@ -534,9 +604,8 @@ namespace Behaviors_BASE
             }
             */
 
-            // TODO Armor damage reduction ================================================================================================================
-            float soaked = 0f;//get_armor_soak(hit_zone, "melee");
-            float blocked = 0f;//run_armor_check(hit_zone, "melee");
+            float soaked = GetArmorSoak(target_zone, DAT.ArmorType.Melee);
+            float blocked = RunArmorCheck(target_zone, DAT.ArmorType.Melee);
             StandardWeaponHitEffects(used_item, user, effective_force, blocked, soaked, target_zone);
 
             if(DAT.DamageTypeBleeds(used_item.damtype) && TOOLS.Prob(33)) // Added blood for whacking non-humans too
@@ -558,27 +627,24 @@ namespace Behaviors_BASE
             //Apply weapon damage
             bool weapon_sharp = false;
             bool weapon_edge = false;
-            //float hit_embed_chance = 0f; // TODO
+            float hit_embed_chance = 0f;
             if(used_item is AbstractItem used_weapon)
             {
                 weapon_sharp = used_weapon.flags.ISSHARP;
                 weapon_edge = used_weapon.flags.HASEDGE;
-                //hit_embed_chance = used_weapon.embed_chance; // TODO
+                hit_embed_chance = used_weapon.embed_chance;
             }
-            /* TODO Armor damage edge mitigation ================================================================================================================
-            if(TOOLS.Prob(getarmor(hit_zone, "melee"))) //melee armour provides a chance to turn sharp/edge weapon attacks into blunt ones
+            if(TOOLS.Prob(GetArmor(target_zone, DAT.ArmorType.Melee))) //melee armour provides a chance to turn sharp/edge weapon attacks into blunt ones
             {
                 weapon_sharp = false;
                 weapon_edge = false;
-                hit_embed_chance = used_item.attack_force/(used_item.w_class*3);
+                hit_embed_chance = used_item.attack_force/((int)used_item.SizeCategory*3);
             }
-            */
 
             ApplyDamage(effective_force, used_item.damtype, target_zone, blocked, soaked, used_item, weapon_sharp, weapon_edge);
 
-            /* TODO Weapons getting embedded in target on hit ================================================================================================================
             //Melee weapon embedded object code.
-            if (used_item != null && used_item.damtype == DAT.DamageType.BRUTE && !used_item.anchored && !is_robot_module(used_item) && used_item.embed_chance > 0)
+            if (used_item != null && used_item.damtype == DAT.DamageType.BRUTE && !used_item.IsAnchored() && !used_item.IsRobotModule() && used_item.embed_chance > 0)
             {
                 float damage = effective_force;
                 if(blocked > 0)
@@ -588,9 +654,8 @@ namespace Behaviors_BASE
                 }
                 //blunt objects should really not be embedding in things unless a huge amount of force is involved
                 float embed_threshold = weapon_sharp? 5*(int)used_item.SizeCategory : 15*(int)used_item.SizeCategory;
-                if(damage > embed_threshold && TOOLS.Prob(hit_embed_chance)) Embed(I, hit_zone);
+                if(damage > embed_threshold && TOOLS.Prob(hit_embed_chance)) Embed(used_item, target_zone);
             }
-            */
             return true;
         }
         protected bool ApplyDamage(float damage = 0, DAT.DamageType damagetype = DAT.DamageType.BRUTE, DAT.ZoneSelection target_zone = DAT.ZoneSelection.Miss, float blocked = 0, float soaked = 0, AbstractEntity used_item = null, bool sharp = false, bool edge = false)
@@ -682,6 +747,12 @@ namespace Behaviors_BASE
             //Overhealth
             if(cur_health > max_health) cur_health = max_health;
             // TODO hud update ============================================================================================================
+        }
+
+        protected void Embed(AbstractEntity used_item, DAT.ZoneSelection target_zone)
+        {
+            used_item.Move(this,false);
+            embedded_objects.Add(used_item);
         }
 
         /*****************************************************************

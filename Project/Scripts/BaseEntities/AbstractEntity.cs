@@ -42,6 +42,7 @@ public partial class AbstractEntity
         anim_speed      = data.anim_speed;
         attack_range    = data.attack_range;
         attack_force    = data.attack_force;
+        embed_chance    = data.embed_chance;
         damtype         = data.damtype;
         intangible      = data.intangible;
         unstoppable     = data.unstoppable;
@@ -95,6 +96,7 @@ public partial class AbstractEntity
     public string hit_sound = "";               // Weapon attack sound when used
     public int attack_range = 1;
     public float attack_force = 1f;
+    public int embed_chance = 0;
     public DAT.DamageType damtype = DAT.DamageType.BRUTE;
     public bool intangible = false;           // can move through solids
     public bool unstoppable = false; 
@@ -407,7 +409,7 @@ public partial class AbstractEntity
     protected virtual bool UsedAsWeapon( AbstractEntity user, AbstractSimpleMob target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
         if(target == user && user.SelectingIntent != DAT.Intent.Hurt) return false;
-        if(this is AbstractItem self_item && (self_item.force == 0 || self_item.flags.NOBLUDGEON)) return false;
+        if(this is AbstractItem self_item && (self_item.attack_force == 0 || self_item.flags.NOBLUDGEON)) return false;
         if(user is AbstractSimpleMob user_mob)
         {
             /////////////////////////
@@ -797,5 +799,15 @@ public partial class AbstractEntity
     public virtual bool IsIntangible()
     {
         return intangible;
+    }
+
+    public virtual bool IsAnchored()
+    {
+        return false;
+    }
+
+    public virtual bool IsRobotModule()
+    {
+        return false;
     }
 }
