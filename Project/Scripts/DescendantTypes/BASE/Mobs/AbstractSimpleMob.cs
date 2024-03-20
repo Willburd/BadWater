@@ -770,21 +770,24 @@ namespace Behaviors_BASE
          ****************************************************************/
         public override AbstractEntity Move(string new_mapID, MapController.GridPos new_grid, bool perform_turf_actions = true)
         {
-            // Prior to our move it's already too far away
-            AbstractEntity pull_ent = I_Pulling as AbstractEntity;
-            if(pull_ent != null && TOOLS.VecDist(this.GridPos.WorldPos(),pull_ent.GridPos.WorldPos()) > 1.3f) I_StopPulling();
-            // Shenanigans! Pullee closed into locker for eg.
-            if(pull_ent != null && pull_ent.GetLocation() is not AbstractTurf && pull_ent.map_id_string != map_id_string) I_StopPulling();
-            // Can't pull with no hands
-            if(pull_ent != null && IsRestrained()) I_StopPulling();
-
-            // Pulling logic
-            if(I_Pulling != null && I_Pulledby is AbstractEntity pullerEnt)
+            if(GridPos.WorldPos() != new_grid.WorldPos())
             {
-                // Don't allow us to go far from what's pulling us! Use resist for that!
-                if(TOOLS.VecDist(new_grid.WorldPos(),pullerEnt.GridPos.WorldPos()) > 1.1f) return GetLocation(); // Only move toward!
+                // Prior to our move it's already too far away
+                AbstractEntity pull_ent = I_Pulling as AbstractEntity;
+                if(pull_ent != null && TOOLS.VecDist(this.GridPos.WorldPos(),pull_ent.GridPos.WorldPos()) > 1.3f) I_StopPulling();
+                // Shenanigans! Pullee closed into locker for eg.
+                if(pull_ent != null && pull_ent.GetLocation() is not AbstractTurf && pull_ent.map_id_string != map_id_string) I_StopPulling();
+                // Can't pull with no hands
+                if(pull_ent != null && IsRestrained()) I_StopPulling();
+
+                // Pulling logic
+                if(I_Pulling != null && I_Pulledby is AbstractEntity pullerEnt)
+                {
+                    // Don't allow us to go far from what's pulling us! Use resist for that!
+                    if(TOOLS.VecDist(new_grid.WorldPos(),pullerEnt.GridPos.WorldPos()) > 1.1f) return GetLocation(); // Only move toward!
+                }
+                pull_ent?.Move(new_mapID, new MapController.GridPos( pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
             }
-            pull_ent?.Move(new_mapID, new MapController.GridPos( pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
             
             return base.Move(new_mapID, new_grid, perform_turf_actions);
         }
