@@ -176,7 +176,7 @@ namespace Behaviors_BASE
         public void DropActiveHand()
         {
             // Release pulled objects before we drop anything...
-            if(ICanPull.IsPulling(this) != null)
+            if(I_Pulling != null)
             {
                 I_StopPulling();
                 return;
@@ -771,7 +771,7 @@ namespace Behaviors_BASE
         public override AbstractEntity Move(string new_mapID, MapController.GridPos new_grid, bool perform_turf_actions = true)
         {
             // Prior to our move it's already too far away
-            AbstractEntity pull_ent = ICanPull.IsPulling(this) as AbstractEntity;
+            AbstractEntity pull_ent = I_Pulling as AbstractEntity;
             if(pull_ent != null && TOOLS.VecDist(this.GridPos.WorldPos(),pull_ent.GridPos.WorldPos()) > 1.3f) I_StopPulling();
             // Shenanigans! Pullee closed into locker for eg.
             if(pull_ent != null && pull_ent.GetLocation() is not AbstractTurf && pull_ent.map_id_string != map_id_string) I_StopPulling();
@@ -779,20 +779,13 @@ namespace Behaviors_BASE
             if(pull_ent != null && IsRestrained()) I_StopPulling();
 
             // Pulling logic
-            if(IPullable.IsBeingPulling(this))
+            if(I_Pulling != null && I_Pulledby is AbstractEntity pullerEnt)
             {
-                // Don't allow it to go far!
-                AbstractEntity pullerEnt = I_Pulledby as AbstractEntity;
-                if(TOOLS.VecDist(new_grid.WorldPos(),pullerEnt.GridPos.WorldPos()) > 1.1f) return this.GetLocation(); // Only move toward!
+                // Don't allow us to go far from what's pulling us! Use resist for that!
+                if(TOOLS.VecDist(new_grid.WorldPos(),pullerEnt.GridPos.WorldPos()) > 1.1f) return GetLocation(); // Only move toward!
             }
-            if(pull_ent != null)
-            {
-                float pullspeed = TOOLS.VecDist(pull_ent.GridPos.WorldPos(),GridPos.WorldPos());
-                if(pullspeed < 0.2f) pullspeed = 0.2f; // TODO proper pulling rates ============================================================================================================
-                if(pullspeed > 1f) pullspeed = 1f;
-                pull_ent.Move(new_mapID, new MapController.GridPos( pull_ent.GridPos.WorldPos() + (TOOLS.DirVec(pull_ent.GridPos.WorldPos(),GridPos.WorldPos()) * pullspeed) ), perform_turf_actions);
-            }
-
+            pull_ent?.Move(new_mapID, new MapController.GridPos( pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
+            
             return base.Move(new_mapID, new_grid, perform_turf_actions);
         }
 
@@ -1006,14 +999,14 @@ namespace Behaviors_BASE
                 // kind of mob pull value AT ALL, you will be able to pull
                 // them, so don't bother checking that explicitly.
 
-                if( IPullable.IsBeingPulling(target) )
+                if(target.I_Pulledby != null )
                 {
                     // Ripping others out of someone ELSES grip!
                     AbstractEntity pull_ent = target.I_Pulledby as AbstractEntity;
                     if(pull_ent != this)
                     {
                         ChatController.VisibleMessage( target_ent, target_ent.display_name + " is pulled free from " + pull_ent?.display_name + "'s grip by the " + this.display_name + "!");
-                        ICanPull.EndPull(target.I_Pulledby);
+                        ICanPull.Internal_EndPull(target.I_Pulledby);
                     }
                 }
             }
@@ -1028,14 +1021,14 @@ namespace Behaviors_BASE
             }
 
             // End if already pulling
-            if(ICanPull.IsPulling(this) == target) // Clicking on object we are already pulling, release it!
+            if(I_Pulling == target) // Clicking on object we are already pulling, release it!
             {
-                ICanPull.EndPull(this);
+                ICanPull.Internal_EndPull(this);
                 return;
             }
 
             // Begin pulling!
-            ICanPull.BeginPull(this,target);
+            ICanPull.Internal_BeginPull(this,target);
             target_ent.velocity *= 0;
 
             /* TODO feedback messages for complex mobs ========================================================================================================
@@ -1057,13 +1050,13 @@ namespace Behaviors_BASE
         }
         public void I_StopPulling()
         {
-            if(ICanPull.IsPulling(this) == null) return;
-            AbstractEntity pulling_ent = ICanPull.IsPulling(this)  as AbstractEntity;
+            if(I_Pulling == null) return;
+            AbstractEntity pulling_ent = I_Pulling as AbstractEntity;
             
             // Send message and release
             ChatController.ActionMessage( this, "You release your grasp on the " + pulling_ent?.display_name,"The " + display_name + " lets go of the " + pulling_ent.display_name, null, ChatController.VisibleMessageFormatting.Warning);
             ChatController.InspectMessage( pulling_ent, "The " + display_name + " lets go of you.");
-            ICanPull.EndPull(this);
+            ICanPull.Internal_EndPull(this);
         }
     }
 }
