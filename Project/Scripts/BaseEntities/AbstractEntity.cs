@@ -238,7 +238,7 @@ public partial class AbstractEntity
         if(velocity.Length() < 0.01) velocity *= 0;
         if(velocity != Vector3.Zero)
         {
-            Move(map_id_string, TOOLS.GridToPosWithOffset(grid_pos) + velocity);
+            Move(map_id_string, new MapController.GridPos(TOOLS.GridToPosWithOffset(grid_pos) + velocity));
         }
     }
     public void DeleteEntity()
@@ -510,14 +510,9 @@ public partial class AbstractEntity
         }
     }
 
-    public AbstractEntity Move(string new_mapID, MapController.GridPos new_pos, bool perform_turf_actions = true)
-    {
-        return Move(new_mapID, TOOLS.GridToPosWithOffset(new_pos), perform_turf_actions);
-    }
-    public AbstractEntity Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
+    public virtual AbstractEntity Move(string new_mapID, MapController.GridPos new_grid, bool perform_turf_actions = true)
     {
         // Is new location valid?
-        MapController.GridPos new_grid = new MapController.GridPos(new_pos);
         Vector2 dir_vec = TOOLS.DirVec( grid_pos.hor, grid_pos.ver, new_grid.hor, new_grid.ver);
         
         if(map_id_string == new_mapID)

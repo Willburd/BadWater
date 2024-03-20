@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Behaviors_BASE
 {
-    public class AbstractSimpleMob : AbstractMob
+    public class AbstractSimpleMob : AbstractMob, ICanPull, IPullable
     {
         public AbstractSimpleMob()
         {
@@ -16,9 +16,12 @@ namespace Behaviors_BASE
         {
             base.TemplateRead(data);
             MobData temp = data as MobData;
+            max_health      = temp.max_health;
             walk_speed      = temp.walk_speed;
             run_speed       = temp.run_speed;
-            max_health      = temp.max_health;
+            mob_size        = temp.mob_size;
+            pull_size       = temp.pull_size;
+            pull_type       = temp.pull_type;
             // flags
             flags.GODMODE       = false;
             flags.HASHANDS      = temp.has_hands;
@@ -39,6 +42,9 @@ namespace Behaviors_BASE
         public int max_health = 0;   // Size of item in world and bags
         public float walk_speed = (float)0.25;
         public float run_speed = 1;
+        DAT.SizeCategory mob_size = DAT.SizeCategory.MEDIUM;
+        DAT.SizeCategory pull_size = DAT.SizeCategory.ITEMSIZE_NO_CONTAINER;
+        DAT.CanPullType pull_type = DAT.CanPullType.PULL_LARGER;
         public struct HealthData
         {
             public HealthData() {}
@@ -169,6 +175,13 @@ namespace Behaviors_BASE
         }
         public void DropActiveHand()
         {
+            // Release pulled objects before we drop anything...
+            if(ICanPull.IsPulling(this) != null)
+            {
+                I_StopPulling();
+                return;
+            }
+            // Dropping whatever we're holding!
             if(ActiveHand != null) return;
             ActiveHand?.Drop(GetTurf(),this);
         }
@@ -293,7 +306,11 @@ namespace Behaviors_BASE
             }
             if(click_params["mod_control"].AsBool())
             {
-                // Pulling objects TODO ==========================================================================================================================
+                if(TOOLS.Adjacent(this,target,false))
+                {
+                    if(target is AbstractTurf) I_StopPulling();
+                    if(target is IPullable target_pull) I_TryStartPulling(target_pull);
+                }
                 return;
             }
 
@@ -747,10 +764,43 @@ namespace Behaviors_BASE
             used_item.Move(this,false);
             embedded_objects.Add(used_item);
         }
+        
+        /*****************************************************************
+         * Movement and storage
+         ****************************************************************/
+        public override AbstractEntity Move(string new_mapID, MapController.GridPos new_grid, bool perform_turf_actions = true)
+        {
+            // Prior to our move it's already too far away
+            AbstractEntity pull_ent = ICanPull.IsPulling(this) as AbstractEntity;
+            if(pull_ent != null && TOOLS.VecDist(this.GridPos.WorldPos(),pull_ent.GridPos.WorldPos()) > 1.3f) I_StopPulling();
+            // Shenanigans! Pullee closed into locker for eg.
+            if(pull_ent != null && pull_ent.GetLocation() is not AbstractTurf && pull_ent.map_id_string != map_id_string) I_StopPulling();
+            // Can't pull with no hands
+            if(pull_ent != null && IsRestrained()) I_StopPulling();
+
+            // Pulling logic
+            if(IPullable.IsBeingPulling(this))
+            {
+                // Don't allow it to go far!
+                AbstractEntity pullerEnt = I_Pulledby as AbstractEntity;
+                if(TOOLS.VecDist(new_grid.WorldPos(),pullerEnt.GridPos.WorldPos()) > 1.1f) return this.GetLocation(); // Only move toward!
+            }
+            if(pull_ent != null)
+            {
+                float pullspeed = TOOLS.VecDist(pull_ent.GridPos.WorldPos(),GridPos.WorldPos());
+                if(pullspeed < 0.2f) pullspeed = 0.2f; // TODO proper pulling rates ============================================================================================================
+                if(pullspeed > 1f) pullspeed = 1f;
+                pull_ent.Move(new_mapID, new MapController.GridPos( pull_ent.GridPos.WorldPos() + (TOOLS.DirVec(pull_ent.GridPos.WorldPos(),GridPos.WorldPos()) * pullspeed) ), perform_turf_actions);
+            }
+
+            return base.Move(new_mapID, new_grid, perform_turf_actions);
+        }
+
 
         /*****************************************************************
          * Processing
          ****************************************************************/
+
         public override void ControlUpdate(Godot.Collections.Dictionary client_input_data)
         {
             // Got an actual control update!
@@ -806,6 +856,7 @@ namespace Behaviors_BASE
             else
             {
                 // dead or knocked out...
+                I_StopPulling();
             }
 
             // Respond in any state, as they are mostly just input states for actions!
@@ -869,6 +920,7 @@ namespace Behaviors_BASE
 
         public virtual void Die()
         {
+            I_StopPulling();
             stat = DAT.LifeState.Dead;
         }
 
@@ -896,6 +948,122 @@ namespace Behaviors_BASE
         {
             if(flags.WEARGLOVES && false /*SlotGloves == TK GLOVES HERE */) return true; // TODO =======================================================================================================================
             return false;
+        }
+
+
+        /*****************************************************************
+         * Object pulling
+         ****************************************************************/
+        private ICanPull internal_pulled_by = null;
+        private IPullable internal_is_pulling = null;
+
+        public IPullable I_Pulling 
+        {
+            get {return internal_is_pulling;}
+            set {internal_is_pulling = value;}
+        }
+        public ICanPull I_Pulledby 
+        {
+            get {return internal_pulled_by;}
+            set {internal_pulled_by = value;}
+        }
+
+        public void I_TryStartPulling(IPullable target)
+        {
+            AbstractEntity target_ent = target as AbstractEntity;
+            if(target_ent == null || target_ent == this || target_ent.GetLocation() is not AbstractTurf) return;	//if there's no person pulling OR the person is pulling themself OR the object being pulled is inside something: abort!
+
+            if(IsIntangible())
+            {
+                ChatController.InspectMessage( this, "Cannot pull while phased!", ChatController.VisibleMessageFormatting.Notice);
+                return; // stop shadekin from pulling while phased
+            }
+            if(IsAnchored())
+            {
+                ChatController.InspectMessage( this, "It won't budge!", ChatController.VisibleMessageFormatting.Warning);
+                return;
+            }
+
+            if(target_ent is AbstractSimpleMob target_mob)
+            {
+                if(pull_type == DAT.CanPullType.PULL_NONE)
+                {
+                    ChatController.InspectMessage( this, "They won't budge!", ChatController.VisibleMessageFormatting.Warning);
+                    return;
+                }
+                if((mob_size < target_mob.mob_size) && (pull_type != DAT.CanPullType.PULL_LARGER))
+                {
+                    ChatController.InspectMessage( this, target_ent.display_name + " is too large for you to move!", ChatController.VisibleMessageFormatting.Warning);
+                    return;
+                }
+                if((mob_size == target_mob.mob_size) && (pull_type == DAT.CanPullType.PULL_SMALLER))
+                {
+                    ChatController.InspectMessage( this, target_ent.display_name + " is too heavy for you to move!", ChatController.VisibleMessageFormatting.Warning);
+                    return;
+                }
+
+                // If your size is larger than theirs and you have some
+                // kind of mob pull value AT ALL, you will be able to pull
+                // them, so don't bother checking that explicitly.
+
+                if( IPullable.IsBeingPulling(target) )
+                {
+                    // Ripping others out of someone ELSES grip!
+                    AbstractEntity pull_ent = target.I_Pulledby as AbstractEntity;
+                    if(pull_ent != this)
+                    {
+                        ChatController.VisibleMessage( target_ent, target_ent.display_name + " is pulled free from " + pull_ent?.display_name + "'s grip by the " + this.display_name + "!");
+                        ICanPull.EndPull(target.I_Pulledby);
+                    }
+                }
+            }
+            else if(target is AbstractMachine || target is AbstractItem || target is AbstractStructure)
+            {
+                /* Handling massive unpullable objects! TODO ==================================================================================================================
+                var/obj/I = AM
+                if(!can_pull_size || can_pull_size < I.w_class)
+                    to_chat(src, "<span class='warning'>It won't budge!</span>")
+                    return
+                */
+            }
+
+            // End if already pulling
+            if(ICanPull.IsPulling(this) == target) // Clicking on object we are already pulling, release it!
+            {
+                ICanPull.EndPull(this);
+                return;
+            }
+
+            // Begin pulling!
+            ICanPull.BeginPull(this,target);
+            target_ent.velocity *= 0;
+
+            /* TODO feedback messages for complex mobs ========================================================================================================
+            if(ishuman(AM))
+                var/mob/living/carbon/human/H = AM
+                if(H.lying) // If they're on the ground we're probably dragging their arms to move them
+                    visible_message(SPAN_WARNING("\The [src] leans down and grips \the [H]'s arms."), SPAN_NOTICE("You lean down and grip \the [H]'s arms."), exclude_mobs = list(H))
+                    if(!H.stat)
+                        to_chat(H, SPAN_WARNING("\The [src] leans down and grips your arms."))
+                else //Otherwise we're probably just holding their arm to lead them somewhere
+                    visible_message(SPAN_WARNING("\The [src] grips \the [H]'s arm."), SPAN_NOTICE("You grip \the [H]'s arm."), exclude_mobs = list(H))
+                    if(!H.stat)
+                        to_chat(H, SPAN_WARNING("\The [src] grips your arm."))
+                playsound(src.loc, 'sound/weapons/thudswoosh.ogg', 25) //Quieter than hugging/grabbing but we still want some audio feedback
+
+                if(H.pull_damage())
+                    to_chat(src, "<font color='red'><B>Pulling \the [H] in their current condition would probably be a bad idea.</B></font>")
+            */
+        }
+        public void I_StopPulling()
+        {
+            if(ICanPull.IsPulling(this) == null) return;
+            AbstractEntity pulling_ent = ICanPull.IsPulling(this)  as AbstractEntity;
+            
+            // Send message and release
+            ChatController.ActionMessage( this, "You release your grasp on the " + pulling_ent?.display_name,"The " + display_name + " lets go of the " + pulling_ent.display_name, null, ChatController.VisibleMessageFormatting.Warning);
+            ChatController.InspectMessage( pulling_ent, "The " + display_name + " lets go of you.");
+            ICanPull.EndPull(this);
         }
     }
 }

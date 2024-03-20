@@ -36,7 +36,7 @@ public partial class ItemData : PackData
     private static DAT.SizeCategory StringToSizeCategory(string parse)
     {
         if(Enum.TryParse(parse, out DAT.SizeCategory ret)) return ret;
-        return DAT.SizeCategory.SMALL;
+        return DAT.SizeCategory.MEDIUM;
     }
 
     public static int InventorySlots(DAT.SizeCategory size)

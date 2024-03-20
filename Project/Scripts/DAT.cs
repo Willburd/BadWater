@@ -236,6 +236,16 @@ public static class DAT
         HUGE,
         ITEMSIZE_NO_CONTAINER
     }
+    
+
+    public enum CanPullType
+    {
+        PULL_NONE,
+        PULL_SMALLER,
+        PULL_SAME,
+        PULL_LARGER
+    }
+    
 
     public enum DamageType
     {

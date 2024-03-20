@@ -85,7 +85,16 @@ public partial class ChatController : DeligateController
         Danger
     }
 
-    public static void VisibleMessage(AbstractEntity speaking_ent, string message, VisibleMessageFormatting format = VisibleMessageFormatting.Nothing)
+    public static void ActionMessage(AbstractEntity speaking_ent, string self_message, string seen_message, string heard_message, VisibleMessageFormatting format = VisibleMessageFormatting.Nothing, List<AbstractEntity> excludes = null)
+    {
+        InspectMessage(speaking_ent, self_message, format);
+        if(excludes == null) excludes = new List<AbstractEntity>();
+        excludes.Add(speaking_ent);
+        VisibleMessage(speaking_ent, seen_message, format, true, false, excludes);
+        if(heard_message != null) VisibleMessage(speaking_ent, seen_message, format, false, true, excludes);
+    }
+
+    public static void VisibleMessage(AbstractEntity speaking_ent, string message, VisibleMessageFormatting format = VisibleMessageFormatting.Nothing, bool send_to_visible = true, bool send_to_not_visible = false, List<AbstractEntity> excludes = null)
     {
         switch(format)
         {
@@ -99,11 +108,12 @@ public partial class ChatController : DeligateController
                 message = "[color=red]" + message + "[/color]";
                 break;
         }
-        SubmitMessage( null, speaking_ent, message, ChatMode.VisibleMessage);
+        SubmitMessage( null, speaking_ent, message, ChatMode.VisibleMessage, send_to_visible, send_to_not_visible, excludes);
     }
 
-    public  static void SubmitMessage(NetworkClient client, AbstractEntity speaking_ent, string message, ChatMode mode)
+    public  static void SubmitMessage(NetworkClient client, AbstractEntity speaking_ent, string message, ChatMode mode, bool send_to_visible = true, bool send_to_not_visible = false, List<AbstractEntity> excludes = null)
     {
+        if(excludes == null) excludes = new List<AbstractEntity>();
         // SANITIZE
 
         // Assemble message
@@ -184,6 +194,10 @@ public partial class ChatController : DeligateController
                 // TODO Proper map adjacency, client visual distance, and any other status for sending messages to clients in visible range!
                 if(speaking_ent != null && scan_cli.focused_map_id == speaking_ent.map_id_string)
                 {
+                    if(scan_cli.GetFocusedEntity() != null && excludes.Contains(scan_cli.GetFocusedEntity())) continue; // IGNORE!
+
+                    // check visibility, and perform if send_to_visible or send_to_not_visible. this lets us do audio only versions of a message if you can't see the action!
+
                     bool in_small_range_limit = TOOLS.Adjacent( speaking_ent.GridPos.WorldPos(), scan_cli.focused_position,true);
                     switch(mode)
                     {
