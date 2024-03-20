@@ -10,7 +10,7 @@ namespace Behaviors_BASE
         {
             inventory_slots = new AbstractEntity[ Enum.GetNames(typeof(DAT.InventorySlot)).Length ];
         }
-        private MobAI ai_holder;
+        private AIHolder ai_holder;
 
         public override void TemplateRead(PackData data)
         {
@@ -198,13 +198,11 @@ namespace Behaviors_BASE
         }
 
         /*
-            run_armor_check(a,b)
-            args
-            a:def_zone		- What part is getting hit, if null will check entire body
-            b:attack_flag	- What type of attack, bullet, laser, energy, melee
-            c:armour_pen	- How much armor to ignore.
-            d:absorb_text	- Custom text to send to the player when the armor fully absorbs an attack.
-            e:soften_text	- Similar to absorb_text, custom text to send to the player when some damage is reduced.
+            target_zone	- What part is getting hit, if null will check entire body
+            attack_flag	- What type of attack, bullet, laser, energy, melee
+            armour_pen	- How much armor to ignore.
+            absorb_text	- Custom text to send to the player when the armor fully absorbs an attack.
+            soften_text	- Similar to absorb_text, custom text to send to the player when some damage is reduced.
 
             Returns
             A number between 0 and 100, with higher numbers resulting in less damage taken.
@@ -601,13 +599,7 @@ namespace Behaviors_BASE
         public float HitByWeapon(AbstractEntity used_item, AbstractEntity user, float effective_force, DAT.ZoneSelection target_zone)
         {
             ChatController.VisibleMessage(this,this.display_name + " has been attacked with " + used_item?.display_name + " by " + user?.display_name + "!", ChatController.VisibleMessageFormatting.Danger);
-
-            /* // TODO Mob AI ================================================================================================================
-            if(ai_holder)
-            {
-                ai_holder.react_to_attack(user)
-            }
-            */
+            ai_holder?.ReactToAttack(user);
 
             float soaked = GetArmorSoak(target_zone, DAT.ArmorType.Melee);
             float blocked = RunArmorCheck(target_zone, DAT.ArmorType.Melee);
@@ -729,14 +721,10 @@ namespace Behaviors_BASE
         public override bool AttackedGeneric(AbstractEntity user, int damage, string attack_message)
         {
             if(damage <= 0) return false;
-
             BruteLoss = damage;
             
             ChatController.LogAttack(user?.display_name + " Generic attacked (probably animal) " + display_name); //Usually due to simple_mob attacks
-            if(ai_holder != null)
-            { 
-                //ai_holder.react_to_attack(user) // TODO AI reaction to attacks ===============================================================================
-            }
+            ai_holder?.ReactToAttack(user);
             
             ChatController.VisibleMessage(this,"The " + user?.display_name + " has " + attack_message + " the " + display_name + "!", ChatController.VisibleMessageFormatting.Danger);
             // user.do_attack_animation(src) // TODO attack animations ===============================================================================
@@ -773,22 +761,10 @@ namespace Behaviors_BASE
             if(stat != DAT.LifeState.Dead)
             {
                 // Trigger mob actions
-                if(client_input_data["resist"].AsBool())
-                {
-
-                }
-                if(client_input_data["rest"].AsBool())
-                {
-                    
-                }
-                if(client_input_data["equip"].AsBool())
-                {
-                    EquipActiveHand(null);
-                }
-                if(client_input_data["useheld"].AsBool())
-                {
-                    UseActiveHand(null);
-                }
+                if(client_input_data["resist"].AsBool());
+                if(client_input_data["rest"].AsBool());
+                if(client_input_data["equip"].AsBool()) EquipActiveHand(null);
+                if(client_input_data["useheld"].AsBool()) UseActiveHand(null);
 
                 // Move based on mob speed
                 MapController.GridPos new_pos = GridPos;
@@ -833,22 +809,10 @@ namespace Behaviors_BASE
             }
 
             // Respond in any state, as they are mostly just input states for actions!
-            if(client_input_data["intentswap"].AsBool())
-            {
-                IntentSwap();
-            }
-            if(client_input_data["swap"].AsBool())
-            {
-                SwapHands();
-            }
-            if(client_input_data["throw"].AsBool())
-            {
-                
-            }
-            if(client_input_data["drop"].AsBool())
-            {
-                DropActiveHand();
-            }
+            if(client_input_data["intentswap"].AsBool()) IntentSwap();
+            if(client_input_data["swap"].AsBool()) SwapHands();
+            if(client_input_data["throw"].AsBool());
+            if(client_input_data["drop"].AsBool()) DropActiveHand();
         }
         public override void Tick()
         {

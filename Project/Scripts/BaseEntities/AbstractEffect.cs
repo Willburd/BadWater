@@ -14,10 +14,10 @@ public class AbstractEffect : AbstractEntity
              * EFFECT BEHAVIORS (Stuff like reagent smears being stepped through)
              ****************************************************************/
             case "EFFECT_MESS": // makes nearby turfs dirty when crossed
-                //new_effect = new BehaviorEvents.OnStepped(); // Performs behaviors when crossed
+                new_effect = new Behaviors_BASE.AbstractOnStep(); // Performs behaviors when crossed
             break;
             case "EFFECT_MESS_STEPS": // leaves a trail of steps after you walk in it
-                //new_effect = new BehaviorEvents.OnStepped(); // Performs behaviors when crossed
+                new_effect = new Behaviors_BASE.AbstractOnStep(); // Performs behaviors when crossed
             break;
 
             /*****************************************************************
