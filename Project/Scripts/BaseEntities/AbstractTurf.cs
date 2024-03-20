@@ -98,24 +98,15 @@ public partial class AbstractTurf : AbstractEntity
         AudioController.PlayAt(step_sound, map_id_string ,grid_pos.WorldPos() + new Vector3(MapController.tile_size/2,0,MapController.tile_size/2), AudioController.screen_range, quiet ? -10 : 0);
     }
 
-    public override bool InteractionSpecial(AbstractEntity user, AbstractEntity target, Dictionary click_parameters)
+    // Override this for turf interactions. Construction, deconstruction, maybe even rotation! Who knows what magic sins are ahead in our codebase.
+    public virtual bool InteractTurf(AbstractEntity used_item, AbstractEntity user)
     {
-        if(user == null) return false;
-        if(user is AbstractMob user_mob)
-        {
-            if(user_mob.SelectingIntent != DAT.Intent.Help)
-            {
-                AttackTile( this, user_mob); // Be on help intent if you want to decon something.
-                return true;
-            }
-        }
-        return base.InteractionSpecial(user, target, click_parameters);
+        return false;
     }
-
-    // Hits a mob on the tile.
-    private bool AttackTile(AbstractEntity used_item, AbstractEntity user)
+    public virtual bool AttackTurf(AbstractEntity used_item, AbstractEntity user)
     {
-        if(used_item == null) return false;
+        // Hits a mob on the turf. Walls should override this to attack the wall!
+        if(used_item == null) return false; // Ignore unarmed strikes over turfs.
 
         List<AbstractMob> viable_targets = new List<AbstractMob>();
         bool success = false; // Hitting something makes this true. If its still false, the miss sound is played.

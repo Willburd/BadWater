@@ -325,7 +325,7 @@ namespace Behaviors_BASE
                 if(hand_item != null)
                 {
                     bool resolved = hand_item._Interact( this, target, 1, click_params);
-                    if(!resolved && target != null && hand_item != null) hand_item.InteractionAfter( this, target, true, click_params);
+                    if(!resolved && target != null && hand_item != null) hand_item.InteractionUnresolved( this, target, true, click_params);
                 }
                 else
                 {
@@ -348,7 +348,7 @@ namespace Behaviors_BASE
                     if(hand_item != null)
                     {
                         // Return 1 in AttackedBy() to prevent AfterInteraction() effects (when safely moving items for example)
-                        if(!hand_item._Interact( target, this, 1f, click_params) && target != null && hand_item != null) hand_item.InteractionAfter(target, this, true, click_params);
+                        if(!hand_item._Interact( target, this, 1f, click_params) && target != null && hand_item != null) hand_item.InteractionUnresolved(target, this, true, click_params);
                     }
                     else
                     {
@@ -361,7 +361,7 @@ namespace Behaviors_BASE
                 {
                     if(hand_item != null)
                     {
-                        hand_item.InteractionAfter(target, this, false, click_params);
+                        hand_item.InteractionUnresolved(target, this, false, click_params);
                     }
                     else
                     {
@@ -383,7 +383,7 @@ namespace Behaviors_BASE
             AbstractEntity gloves = SlotGloves; // not typecast specifically enough in defines
             //if(gloves != null && gloves.Touch(target,true)) return;
 
-            if( flags.HASHANDS && ( target is AbstractStructure || target is AbstractMachine ) && SelectingIntent != DAT.Intent.Hurt)
+            if( flags.HASHANDS && (target is AbstractTurf ||  target is AbstractStructure || target is AbstractMachine ) && SelectingIntent != DAT.Intent.Hurt)
             {
                 target.InteractionTouched(this);
                 return;
@@ -530,7 +530,12 @@ namespace Behaviors_BASE
         {
             direction = TOOLS.RotateTowardEntity(this,target);
             bool missed = false;
-            if(target is not AbstractTurf && !turf.Contents.Contains(target) ) // Turfs don't contain themselves so checking contents is pointless if we're targeting a turf.
+            if(target is AbstractTurf target_turf)
+            {
+                target_turf.AttackTurf(null,this);
+                return;
+            }
+            if(!turf.Contents.Contains(target) ) // Turfs don't contain themselves so checking contents is pointless if we're targeting a turf.
             {
                 missed = true;
             }

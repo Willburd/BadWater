@@ -347,12 +347,33 @@ public partial class AbstractEntity
 
     public bool _Interact( AbstractEntity user, AbstractEntity target, float attack_modifier, Godot.Collections.Dictionary click_parameters)
     {
-        if(InteractionSpecial( user, target,click_parameters)) return true; // SpecialInteraction returns true if it performs a unique action that does not call RespondToInteraction()
-        if(this is AbstractItem used_item && this is AbstractMob this_complexmob)
+        // Attempt surgery!
+        if(this is AbstractItem used_item && target is AbstractMob target_complexmob)
         {
             /*if(can_operate(this_complexmob, user) && used_item.do_surgery(this_complexmob,user,user.SelectingZone))
                 return TRUE*/  // TODO - Surgery hook! =================================================================================================================================
         }
+        // Turf interactions!
+        if(this is AbstractTurf this_turf) 
+        {
+            if(user == null) return false;
+            if(user is AbstractMob user_mob)
+            {
+                if(user_mob.SelectingIntent == DAT.Intent.Help)
+                {
+                    // Be on help intent if you want to click a turf with an item. Construction etc.
+                    if(this_turf.InteractTurf( this, user_mob)) return true;
+                }
+                else
+                {
+                    // In most cases you'll swing a weapon over a turf, otherwise handle harm intent actions on a turf...
+                    if(this_turf.AttackTurf( this, user_mob)) return true;
+                }
+            }
+        }
+        // SpecialInteraction returns true if it performs a unique action that does not call RespondToInteraction() on the entity being targeted!
+        if(InteractionSpecial( user, target,click_parameters)) return true; 
+        // If no overridden actions, perform an  attack!
         return target._RespondToInteraction( user, this, attack_modifier, click_parameters);
     }
 
@@ -376,7 +397,7 @@ public partial class AbstractEntity
         return false; //return TRUE to skip calling InteractBy() on target after this proc does stuff, and go straight to AfterAttack()
     }
 
-    public virtual void InteractionAfter( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
+    public virtual void InteractionUnresolved( AbstractEntity user, AbstractEntity target, bool proximity, Godot.Collections.Dictionary click_parameters)
     {
         // What happens after an attack that misses, or for which InteractionSpecial returned true
     }
