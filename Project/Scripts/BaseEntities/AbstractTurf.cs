@@ -68,10 +68,6 @@ public partial class AbstractTurf : AbstractEntity
         map_id_string = new_mapID;
         grid_pos = new_pos;
     }
-    public new void Move(string new_mapID, Vector3 new_pos, bool perform_turf_actions = true)
-    {
-        Move(new_mapID, new MapController.GridPos(new_pos), perform_turf_actions);
-    }
     public new void Move(AbstractEntity new_container, bool perform_turf_actions = true)
     {
         GD.PrintErr("Attempted to move turf into AbstractEntity...");
@@ -129,7 +125,7 @@ public partial class AbstractTurf : AbstractEntity
         if(user is AbstractMob user_mob)
         {
             user_mob.SetClickCooldown(user_mob.GetAttackCooldown(used_item));
-            // user_mob.do_attack_animation(src, no_attack_icons = TRUE);  // TODO Attack animations =================================================================================================
+            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(user.GridPos.WorldPos(),GridPos.WorldPos()) );
         }
         if(!success) // Nothing got hit.
         {

@@ -70,6 +70,7 @@ public partial class MeshUpdater : Node3D
             mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[cached_current_texdata.tex_page]);
             mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)cached_current_texdata.u / AssetLoader.tex_page_size,(float)cached_current_texdata.v / AssetLoader.tex_page_size) );
             mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
+            mesh.SetInstanceShaderParameter( "_AA", draw_alpha);
         }
         else
         {
@@ -113,6 +114,7 @@ public partial class MeshUpdater : Node3D
         mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[cached_current_texdata.tex_page]);
         mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)cached_current_texdata.u / AssetLoader.tex_page_size,(float)cached_current_texdata.v / AssetLoader.tex_page_size) );
         mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
+        mesh.SetInstanceShaderParameter( "_AA", draw_alpha);
     }
     
     public override void _PhysicsProcess(double delta)
@@ -175,5 +177,14 @@ public partial class MeshUpdater : Node3D
         float vy = tex_data.v + (tex_data.height * meshv);
         Color col = AssetLoader.texture_pages[tex_data.tex_page].GetPixel(Mathf.FloorToInt(ux),Mathf.FloorToInt(vy));
         return col.A > 0.01f;
+    }
+
+    /*****************************************************************
+     * Movement animation handler
+     ****************************************************************/
+    float draw_alpha = 1f;
+    public void SetAnimationVars( float alpha)
+    {
+        draw_alpha = alpha;
     }
 }

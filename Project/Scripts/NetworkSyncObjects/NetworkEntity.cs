@@ -53,15 +53,21 @@ public partial class NetworkEntity : Node3D
     public Vector3 velocity = Vector3.Zero;
     [Export]
     public DAT.Dir direction = DAT.Dir.South;
-
     public void DeleteEntity()
     {
         QueueFree();
     }
-    
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(1); // Server
+    }
+
+
+    /*****************************************************************
+     * Drawn mesh handler
+     ****************************************************************/
     [Export]
     public MeshUpdater mesh_updater;
-
     public virtual void MeshUpdate()
     {
         // Normally just directly updated it, but some objects are multimeshes...
@@ -69,30 +75,13 @@ public partial class NetworkEntity : Node3D
     }
     protected virtual void Internal_MeshUpdate()
     {
-        // Override for mesh behaviors... Then call a unique RPC to that network entity type.
-    }
-
-    public override void _EnterTree()
-    {
-        SetMultiplayerAuthority(1); // Server
-    }
-
-    public void ClickPressed(Vector3 pos)
-    {
-        if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
-        Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
-        Rpc(nameof(ClientUpdateClickedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
-    }
-
-    public void ClickReleased(Vector3 pos)
-    {
-        if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
-        Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
-        Rpc(nameof(ClientUpdateReleasedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
+        // Override for mesh behaviors... Then call a unique RPC to that network entity type on the client's end.
     }
 
 
-    // Interpolated movement solver
+    /*****************************************************************
+     * Movement and interpolation handling
+     ****************************************************************/
     struct MoveStep
     {
         public MoveStep(Vector3 getpos, ulong getstep)
@@ -131,18 +120,81 @@ public partial class NetworkEntity : Node3D
         ulong render_time = Time.GetTicksUsec();
         if(movement_steps.Count > 1)
         {
+            if(IsAnimationPlaying)
+            {
+                // Process returns true if finished
+                if(animation_loaded.Process(delta)) ResetAnimationVars();
+                mesh_updater.SetAnimationVars(animation_alpha);
+            }
             while(movement_steps.Count > 2 && render_time > movement_steps[1].step) movement_steps.RemoveAt(0);
             if( movement_steps[0].pos == movement_steps[1].pos)
             {
-                Position = movement_steps[0].pos; // Already there!
-                return;
+                Position = movement_steps[0].pos + animation_offset; // Already there!
             }
-            // Interpolate!
-            float interpo = (render_time - movement_steps[0].step) / (movement_steps[1].step - movement_steps[0].step);
-            Position = movement_steps[0].pos.Lerp(movement_steps[1].pos,Mathf.Min(interpo,1f));
+            else
+            {
+                // Interpolate!
+                float interpo = (render_time - movement_steps[0].step) / (movement_steps[1].step - movement_steps[0].step);
+                Position = movement_steps[0].pos.Lerp(movement_steps[1].pos,Mathf.Min(interpo,1f)) + animation_offset;
+            }
         }
+        
     }
 
+
+    /*****************************************************************
+     * Animation handling
+     ****************************************************************/
+    private NetwornAnimations.Animation animation_loaded;
+    public bool IsAnimationPlaying
+    {
+        get {return animation_loaded != null;}
+    }
+    public void AnimationRequest(NetwornAnimations.Animation.ID anim, Vector3 dir_vec)
+    {
+        abstract_owner.SetAnimationLock( NetwornAnimations.Animation.LookupAnimationLock(anim), NetwornAnimations.Animation.LookupAnimationLength(anim));
+        Rpc(nameof(AnimationHandle),(int)anim,dir_vec);
+    }
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
+    public void AnimationHandle(int anim_in, Vector3 dir_vec)
+    {
+        if(Multiplayer.IsServer()) return; // Client only
+        if(IsAnimationPlaying) animation_loaded = null; // Force cleanout, and apply new animation, for stuff like pounces that windup and let rip from their current offset!
+        animation_loaded = NetwornAnimations.Animation.PlayAnimation(this,(NetwornAnimations.Animation.ID)anim_in,animation_offset,animation_alpha,dir_vec);
+    }
+
+    // animator!
+    float animation_alpha = 1f;
+    Vector3 animation_offset = Vector3.Zero;
+    private void ResetAnimationVars()
+    {
+        animation_offset = Vector3.Zero;
+        animation_alpha = 1f;
+        animation_loaded = null;
+    }
+    public void SetAnimationVars(Vector3 offset, float alpha)
+    {
+        if(animation_loaded == null) return;
+        animation_offset = offset;
+        animation_alpha = alpha;
+    }
+
+    /*****************************************************************
+     * Click handling
+     ****************************************************************/
+    public void ClickPressed(Vector3 pos)
+    {
+        if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
+        Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
+        Rpc(nameof(ClientUpdateClickedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
+    }
+
+    public void ClickReleased(Vector3 pos)
+    {
+        if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
+        Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
+        Rpc(nameof(ClientUpdateReleasedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
+    }
 
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]

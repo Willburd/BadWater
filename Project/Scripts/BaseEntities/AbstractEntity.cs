@@ -193,10 +193,10 @@ public partial class AbstractEntity
     /*****************************************************************
      * Behavior hooks
      ****************************************************************/
-    private NetworkEntity loaded_entity;    // Puppet this
+    private NetworkEntity internal_loaded_network_entity;    // Puppet this
     public NetworkEntity LoadedNetworkEntity
     {
-        get {return loaded_entity;}
+        get {return internal_loaded_network_entity;}
     }
     public virtual void Init() {} // Called upon creation to set variables or state, usually detected by map information.
     public void LateInit() { } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
@@ -276,8 +276,8 @@ public partial class AbstractEntity
     }
     public void UnloadNetworkEntity()
     {
-        loaded_entity?.DeleteEntity();
-        loaded_entity = null;
+        LoadedNetworkEntity?.DeleteEntity();
+        internal_loaded_network_entity = null;
     }
 
     /*****************************************************************
@@ -425,6 +425,25 @@ public partial class AbstractEntity
 
 
     /*****************************************************************
+     * Animation delay handler
+     ****************************************************************/
+    private bool animation_locked;
+    private double animation_lock_time; // time when animation will be unlocked
+    public void SetAnimationLock(bool set_lock, double set_animation_delay)
+    {
+        animation_locked = set_lock;
+        float ticks = (float)set_animation_delay * MainController.tick_rate;
+        animation_lock_time = MainController.WorldTicks + ticks;
+        GD.Print("Lock time " + ticks);
+    }
+    public bool GetAnimationLock()
+    {
+        if(animation_locked) return MainController.WorldTicks < animation_lock_time;
+        return false;
+    }
+
+
+    /*****************************************************************
      * Attack handling, we've got past just interacting, we're now doing harm!
      ****************************************************************/
     protected virtual bool UsedAsWeapon( AbstractEntity user, AbstractSimpleMob target, DAT.ZoneSelection target_zone, float attack_modifier)
@@ -439,7 +458,7 @@ public partial class AbstractEntity
             ChatController.LogAttack(user?.display_name + "attacked" + target?.display_name + " with " + this.display_name + " (INTENT: " + user?.SelectingIntent + ") (DAMTYE: [" + this.damtype + "])");
             /////////////////////////
             user_mob.SetClickCooldown( user_mob.GetAttackCooldown(this) );
-            // user_mob.DoAttackAnimation( target); // TODO - attack animation for items ======================================================================================
+            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(user.GridPos.WorldPos(),target.GridPos.WorldPos()) );
         }
         var hit_zone = target.ResolveWeaponHit(this, user, target_zone);
         if(hit_zone != DAT.ZoneSelection.Miss) WeaponHitMobEffect( user, target, hit_zone, attack_modifier);
@@ -773,18 +792,18 @@ public partial class AbstractEntity
             if(location == null) return; // nullspace vanish
             // Otherwise, what does our behavior say?
             bool is_vis = IsNetworkVisible();
-            if(is_vis && loaded_entity == null)
+            if(is_vis && LoadedNetworkEntity == null)
             {
-                loaded_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
+                internal_loaded_network_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
                 SyncPositionRotation(true,true);
                 return;
             }
-            if(!is_vis && loaded_entity != null)
+            if(!is_vis && LoadedNetworkEntity != null)
             {
                 UnloadNetworkEntity();
                 return;
             }
-            if(is_vis && loaded_entity != null)
+            if(is_vis && LoadedNetworkEntity != null)
             {
                 SyncPositionRotation(mesh_update,force);
                 return;
@@ -793,7 +812,7 @@ public partial class AbstractEntity
         else
         {
             // Entity loaded in an unloaded chunk?
-            if(loaded_entity != null)
+            if(LoadedNetworkEntity != null)
             {
                 UnloadNetworkEntity();
                 return;
@@ -802,10 +821,10 @@ public partial class AbstractEntity
     }
     private void SyncPositionRotation(bool mesh_update, bool force) // Updates position and rotation of currently loaded entity
     {
-        if(loaded_entity == null) return;
-        loaded_entity.SetUpdatedPosition(grid_pos.WorldPos(),force);
-        loaded_entity.direction = direction;
-        if(mesh_update) loaded_entity.MeshUpdate();
+        if(LoadedNetworkEntity == null) return;
+        LoadedNetworkEntity.SetUpdatedPosition(grid_pos.WorldPos(),force);
+        LoadedNetworkEntity.direction = direction;
+        if(mesh_update) LoadedNetworkEntity.MeshUpdate();
     }
 
 

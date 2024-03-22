@@ -293,6 +293,9 @@ namespace Behaviors_BASE
                 return;
             }
 
+            // prevent animation cancel
+            if(GetAnimationLock()) return;
+
             // Check status effects
             if(stat != DAT.LifeState.Alive)
             {
@@ -561,6 +564,7 @@ namespace Behaviors_BASE
             if(missed) // Most likely we have a slow attack and they dodged it or we somehow got moved.
             {
                 ChatController.LogAttack(display_name + " Animal-attacked (dodged) " + target?.display_name);
+                LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(GridPos.WorldPos(),turf.GridPos.WorldPos()) );
                 AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
                 ChatController.VisibleMessage(this,"The " + display_name + " misses their attack.", ChatController.VisibleMessageFormatting.Warning);
                 return;
@@ -574,7 +578,7 @@ namespace Behaviors_BASE
                 if(TOOLS.Prob(attacks.melee_miss_chance))
                 {
                     ChatController.LogAttack(display_name + " Animal-attacked (miss) " + mob_target?.display_name);
-                    //do_attack_animation(src) // TODO attack animations ========================================================================================================================
+                    LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(GridPos.WorldPos(),mob_target.GridPos.WorldPos()) );
                     AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
                     return; // We missed.
                 }
@@ -744,7 +748,7 @@ namespace Behaviors_BASE
             ai_holder?.ReactToAttack(user);
             
             ChatController.VisibleMessage(this,"The " + user?.display_name + " has " + attack_message + " the " + display_name + "!", ChatController.VisibleMessageFormatting.Danger);
-            // user.do_attack_animation(src) // TODO attack animations ===============================================================================
+            user?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(user.GridPos.WorldPos(),GridPos.WorldPos()) );
             UpdateHealth();
             return true;
         }
@@ -770,25 +774,29 @@ namespace Behaviors_BASE
          ****************************************************************/
         public override AbstractEntity Move(string new_mapID, MapController.GridPos new_grid, bool perform_turf_actions = true)
         {
-            if(GridPos.WorldPos() != new_grid.WorldPos())
-            {
-                // Prior to our move it's already too far away
-                AbstractEntity pull_ent = I_Pulling as AbstractEntity;
-                if(pull_ent != null && TOOLS.VecDist(this.GridPos.WorldPos(),pull_ent.GridPos.WorldPos()) > 1.3f) I_StopPulling();
-                // Shenanigans! Pullee closed into locker for eg.
-                if(pull_ent != null && pull_ent.GetLocation() is not AbstractTurf && pull_ent.map_id_string != map_id_string) I_StopPulling();
-                // Can't pull with no hands
-                if(pull_ent != null && IsRestrained()) I_StopPulling();
+            // Prior to our move it's already too far away
+            AbstractEntity pull_ent = I_Pulling as AbstractEntity;
+            if(pull_ent != null && TOOLS.VecDist(this.GridPos.WorldPos(),pull_ent.GridPos.WorldPos()) > 1.3f) I_StopPulling();
+            // Shenanigans! Pullee closed into locker for eg.
+            if(pull_ent != null && pull_ent.GetLocation() is not AbstractTurf && pull_ent.map_id_string != map_id_string) I_StopPulling();
+            // Can't pull with no hands
+            if(pull_ent != null && IsRestrained()) I_StopPulling();
 
+            if(map_id_string != new_mapID)
+            {
+                // warp to same location if jumped maps
+                pull_ent?.Move(new_mapID, new MapController.GridPos( GridPos.WorldPos()), perform_turf_actions);
+            }
+            else if(GridPos.WorldPos() != new_grid.WorldPos())
+            {
                 // Pulling logic
                 if(I_Pulling != null && I_Pulledby is AbstractEntity pullerEnt)
                 {
                     // Don't allow us to go far from what's pulling us! Use resist for that!
-                    if(TOOLS.VecDist(new_grid.WorldPos(),pullerEnt.GridPos.WorldPos()) > 1.1f) return GetLocation(); // Only move toward!
+                    if(TOOLS.VecDist(new_grid.WorldPos(),pullerEnt.GridPos.WorldPos()) > 1.1f) return GetLocation(); // Only move toward puller!
                 }
                 pull_ent?.Move(new_mapID, new MapController.GridPos( pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
             }
-            
             return base.Move(new_mapID, new_grid, perform_turf_actions);
         }
 
@@ -803,14 +811,22 @@ namespace Behaviors_BASE
             double dat_x = Mathf.Clamp(client_input_data["x"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
             double dat_y = Mathf.Clamp(client_input_data["y"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
             bool walking = client_input_data["walk"].AsBool();
+            
+            // prevent animation canceling
+            bool locked_anim = GetAnimationLock();
+            if(locked_anim)
+            {
+                dat_x = 0f;
+                dat_y = 0f;
+            }
 
             if(stat != DAT.LifeState.Dead)
             {
                 // Trigger mob actions
-                if(client_input_data["resist"].AsBool());
-                if(client_input_data["rest"].AsBool());
-                if(client_input_data["equip"].AsBool()) EquipActiveHand(null);
-                if(client_input_data["useheld"].AsBool()) UseActiveHand(null);
+                if(!locked_anim && client_input_data["resist"].AsBool());
+                if(!locked_anim && client_input_data["rest"].AsBool());
+                if(!locked_anim && client_input_data["equip"].AsBool()) EquipActiveHand(null);
+                if(!locked_anim && client_input_data["useheld"].AsBool()) UseActiveHand(null);
 
                 // Move based on mob speed
                 MapController.GridPos new_pos = GridPos;
@@ -856,10 +872,10 @@ namespace Behaviors_BASE
             }
 
             // Respond in any state, as they are mostly just input states for actions!
-            if(client_input_data["intentswap"].AsBool()) IntentSwap();
-            if(client_input_data["swap"].AsBool()) SwapHands();
-            if(client_input_data["throw"].AsBool());
-            if(client_input_data["drop"].AsBool()) DropActiveHand();
+            if(!locked_anim && client_input_data["intentswap"].AsBool()) IntentSwap();
+            if(!locked_anim && client_input_data["swap"].AsBool()) SwapHands();
+            if(!locked_anim && client_input_data["throw"].AsBool());
+            if(!locked_anim && client_input_data["drop"].AsBool()) DropActiveHand();
         }
         public override void Tick()
         {
