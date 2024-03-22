@@ -15,6 +15,21 @@ public interface ICanPull
         // Start new pull
         pulled.I_Pulledby = puller;
         puller.I_Pulling = pulled;
+        // Recursive pull search to avoid crashes
+        IPullable check_pulling = pulled;
+        while(check_pulling != null)
+        {
+            if(check_pulling is ICanPull recursive_puller)
+            {
+                if(recursive_puller.I_Pulling == null) break;
+                if(recursive_puller.I_Pulling == puller)
+                {
+                    recursive_puller.I_StopPulling();
+                    break;
+                }
+                check_pulling = recursive_puller.I_Pulling;
+            }
+        }
     }
     protected static void Internal_EndPull(ICanPull puller)
     {
