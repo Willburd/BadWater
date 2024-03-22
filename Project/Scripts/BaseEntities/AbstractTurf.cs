@@ -63,9 +63,8 @@ public partial class AbstractTurf : AbstractEntity
     AtmoController.AtmoCell air_mix = null;
     private AbstractArea area = null;
 
-    public new void Move(string new_mapID, MapController.GridPos new_pos, bool perform_turf_actions = true)
+    public new void Move(MapController.GridPos new_pos, bool perform_turf_actions = true)
     {
-        map_id_string = new_mapID;
         grid_pos = new_pos;
     }
     public new void Move(AbstractEntity new_container, bool perform_turf_actions = true)
@@ -91,7 +90,7 @@ public partial class AbstractTurf : AbstractEntity
 
     public void PlayStepSound(bool quiet)
     {
-        AudioController.PlayAt(step_sound, map_id_string ,grid_pos.WorldPos() + new Vector3(MapController.tile_size/2,0,MapController.tile_size/2), AudioController.screen_range, quiet ? -10 : 0);
+        AudioController.PlayAt(step_sound, grid_pos, AudioController.screen_range, quiet ? -10 : 0);
     }
 
     // Override this for turf interactions. Construction, deconstruction, maybe even rotation! Who knows what magic sins are ahead in our codebase.
@@ -130,7 +129,7 @@ public partial class AbstractTurf : AbstractEntity
         if(!success) // Nothing got hit.
         {
             ChatController.VisibleMessage(user,"The " + user?.display_name + " swipes the " + used_item?.display_name + " over the " + this.display_name + ".", ChatController.VisibleMessageFormatting.Warning);
-            AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+            AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
         }
         return success;
     }

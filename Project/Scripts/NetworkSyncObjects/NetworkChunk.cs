@@ -32,7 +32,7 @@ public partial class NetworkChunk : NetworkEntity
     {
         Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
         int steps = 0;
-        MapController.GridPos pos = new MapController.GridPos(ChunkController.GetAlignedPos(Position));
+        MapController.GridPos pos = new MapController.GridPos(map_id_string,ChunkController.GetAlignedPos(Position));
         for(int v = 0; v < ChunkController.chunk_size; v++) 
         {
             for(int u = 0; u < ChunkController.chunk_size; u++) 
@@ -40,7 +40,7 @@ public partial class NetworkChunk : NetworkEntity
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
                 Godot.Collections.Dictionary turf_data;
-                AbstractTurf turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(hor,ver,pos.dep),true);
+                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(map_id_string,hor,ver,pos.dep),true);
                 if(turf == null) 
                 {
                     turf_data = new Godot.Collections.Dictionary 

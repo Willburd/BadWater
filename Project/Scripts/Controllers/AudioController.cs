@@ -35,7 +35,7 @@ public partial class AudioController : DeligateController
     }
 
 
-    public static void PlayAt(string soundpack_id, string map_id, Vector3 pos, float range, float volume_mod, NetworkClient for_client = null)
+    public static void PlayAt(string soundpack_id, MapController.GridPos pos, float range, float volume_mod, NetworkClient for_client = null)
     {
         if(soundpack_id == "") return;
         string soundpack = "res://Library/Sounds/" + soundpack_id;
@@ -48,8 +48,8 @@ public partial class AudioController : DeligateController
             if(for_client != null)
             {
                 // Directly send to client
-                float zlevel_dist = Mathf.Abs(pos.Z - for_client.focused_position.Z) * -5; // -5 per Z level!
-                for_client.PlaySoundAt(soundpack + "/" + path,pos,range,volume_mod + zlevel_dist);
+                float zlevel_dist = Mathf.Abs(pos.WorldPos().Z - for_client.focused_position.Z) * -5; // -5 per Z level!
+                for_client.PlaySoundAt(soundpack + "/" + path,pos.WorldPos(),range,volume_mod + zlevel_dist);
             }
             else
             {
@@ -57,10 +57,10 @@ public partial class AudioController : DeligateController
                 for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
                 {
                     NetworkClient client = (NetworkClient)MainController.controller.client_container.GetChild(i);
-                    if(MapController.OnSameMap(client.focused_map_id,map_id) && MapController.GetMapDistance(pos, client.focused_position) < range)
+                    if(MapController.OnSameMap(client.focused_map_id,pos.GetMapID()) && MapController.GetMapDistance(pos.WorldPos(), client.focused_position) < range)
                     {
-                        float zlevel_dist = Mathf.Abs(pos.Z - client.focused_position.Z) * -5; // -5 per Z level!
-                        client.PlaySoundAt(soundpack + "/" + path,pos,range,volume_mod + zlevel_dist);
+                        float zlevel_dist = Mathf.Abs(pos.WorldPos().Z - client.focused_position.Z) * -5; // -5 per Z level!
+                        client.PlaySoundAt(soundpack + "/" + path,pos.WorldPos(),range,volume_mod + zlevel_dist);
                     }
                 }
             }

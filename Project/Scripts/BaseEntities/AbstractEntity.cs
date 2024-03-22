@@ -136,7 +136,7 @@ public partial class AbstractEntity
     protected MainController.DataType entity_type;
     // end state data
 
-    public static AbstractEntity CreateEntity(string mapID, string type_ID, MainController.DataType type)
+    public static AbstractEntity CreateEntity(string type_ID, MainController.DataType type)
     {
         PackData typeData = null;
         AbstractEntity newEnt = null;
@@ -184,7 +184,7 @@ public partial class AbstractEntity
                 break;
         }
         // NetworkEntity init
-        newEnt.map_id_string = mapID;
+        newEnt.grid_pos = new MapController.GridPos("NULL",0,0,0); // nullspace till placed
         newEnt.TemplateRead(typeData);
         return newEnt;
     }
@@ -237,7 +237,7 @@ public partial class AbstractEntity
         if(velocity.Length() < 0.01) velocity *= 0;
         if(velocity != Vector3.Zero)
         {
-            Move(map_id_string, new MapController.GridPos(TOOLS.GridToPosWithOffset(grid_pos) + velocity));
+            Move(new MapController.GridPos(grid_pos.GetMapID(),TOOLS.GridToPosWithOffset(grid_pos) + velocity));
         }
     }
     public void DeleteEntity()
@@ -305,7 +305,7 @@ public partial class AbstractEntity
         double dat_y = client_input_data["y"].AsDouble() * MainController.controller.config.input_factor;
         new_pos.hor += (float)dat_x;
         new_pos.ver += (float)dat_y;
-        Move(map_id_string, new_pos);
+        Move(new_pos);
     }
     // Clicking other entities
     public virtual void Clicked( AbstractEntity used_entity, AbstractEntity target, Godot.Collections.Dictionary click_params) 
@@ -465,7 +465,7 @@ public partial class AbstractEntity
     protected float WeaponHitMobEffect( AbstractEntity user, AbstractSimpleMob target, DAT.ZoneSelection target_zone, float attack_modifier)
     {
         //user.break_cloak() // TODO Cloaking devices ================================================================================================================================
-        AudioController.PlayAt(hit_sound, target.map_id_string ,target.grid_pos.WorldPos(), AudioController.screen_range, 5);
+        AudioController.PlayAt(hit_sound, target.grid_pos, AudioController.screen_range, 5);
 
         float power = attack_force;
         /*
@@ -489,10 +489,9 @@ public partial class AbstractEntity
     /*****************************************************************
      * Movement and storage
      ****************************************************************/
-    public string map_id_string;
     public AbstractTurf GetTurf()
     {
-        return MapController.GetTurfAtPosition(map_id_string,grid_pos,true);
+        return MapController.GetTurfAtPosition(grid_pos,true);
     }
     public AbstractEntity GetLocation()
     {
@@ -527,16 +526,16 @@ public partial class AbstractEntity
         }
     }
 
-    public virtual AbstractEntity Move(string new_mapID, MapController.GridPos new_grid, bool perform_turf_actions = true)
+    public virtual AbstractEntity Move(MapController.GridPos new_grid, bool perform_turf_actions = true)
     {
         // Is new location valid?
         Vector2 dir_vec = TOOLS.DirVec( grid_pos.hor, grid_pos.ver, new_grid.hor, new_grid.ver);
         
-        if(MapController.OnSameMap(map_id_string,new_mapID))
+        if(MapController.OnSameMap(grid_pos.GetMapID(),new_grid.GetMapID()))
         {
             // EDGE LOCK
             float threshold = (float)0.01;
-            if(!MapController.IsTurfValid(new_mapID,new MapController.GridPos(new_grid.hor,grid_pos.ver,grid_pos.dep)))
+            if(!MapController.IsTurfValid(new MapController.GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep)))
             {
                 if(dir_vec.X < 0)
                 {   
@@ -547,7 +546,7 @@ public partial class AbstractEntity
                     new_grid.hor = Mathf.Floor(grid_pos.hor) + 1 - threshold;
                 }
             }
-            if(!MapController.IsTurfValid(new_mapID,new MapController.GridPos(grid_pos.hor,new_grid.ver,grid_pos.dep)))
+            if(!MapController.IsTurfValid(new MapController.GridPos(new_grid.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep)))
             {
                 if(dir_vec.Y < 0)
                 {
@@ -563,7 +562,7 @@ public partial class AbstractEntity
             {
                 // Check to see on each axis if we bump... This allows sliding!
                 bool bump_h = false;
-                AbstractTurf hor_turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(new_grid.hor,grid_pos.ver,grid_pos.dep),true);
+                AbstractTurf hor_turf = MapController.GetTurfAtPosition(new MapController.GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep),true);
                 if(hor_turf != null && hor_turf != GetTurf() && hor_turf.density)
                 {
                     bump_h = true;
@@ -577,7 +576,7 @@ public partial class AbstractEntity
                     }
                 }
                 bool bump_v = false;
-                AbstractTurf ver_turf = MapController.GetTurfAtPosition(map_id_string,new MapController.GridPos(grid_pos.hor,new_grid.ver,grid_pos.dep),true);
+                AbstractTurf ver_turf = MapController.GetTurfAtPosition(new MapController.GridPos(grid_pos.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep),true);
                 if(ver_turf != null && ver_turf != GetTurf() && ver_turf.density)
                 {
                     bump_v = true;
@@ -591,7 +590,7 @@ public partial class AbstractEntity
                     }
                 }
                 // Bump solids!
-                AbstractTurf corner_turf = MapController.GetTurfAtPosition(map_id_string,new_grid,true);
+                AbstractTurf corner_turf = MapController.GetTurfAtPosition(new_grid,true);
                 if(corner_turf != null && corner_turf.density)
                 {
                     // Corner bonking is silly... Needs a unique case when you run into a corner exactly head on!
@@ -642,10 +641,9 @@ public partial class AbstractEntity
         } 
         
         // At same location still, don't bother with much else...
-        if(location is AbstractTurf && grid_pos.Equals(new_grid) && MapController.OnSameMap(new_mapID,map_id_string)) 
+        if(location is AbstractTurf && grid_pos.Equals(new_grid)) 
         {
             // Move around in current turf
-            map_id_string = new_mapID;
             grid_pos = new_grid;
             SyncPositionRotation(false,false);
             return location;
@@ -653,10 +651,9 @@ public partial class AbstractEntity
 
         // Leave old location, perform uncrossing events! Enter new turf...
         LeaveOldLoc(perform_turf_actions);
-        map_id_string = new_mapID;
         grid_pos = new_grid;
         // Enter new location!
-        AbstractTurf new_turf = MapController.GetTurfAtPosition(map_id_string,grid_pos,true);
+        AbstractTurf new_turf = MapController.GetTurfAtPosition(grid_pos,true);
         new_turf?.EntityEntered(this,perform_turf_actions);
         UpdateNetwork(false,false);
         return location;
@@ -668,12 +665,12 @@ public partial class AbstractEntity
         if(new_destination is AbstractTurf)
         {
             // It's a turf! move normally!
-            return Move(new_destination.map_id_string, new_destination.GridPos, perform_turf_actions);
+            return Move(new_destination.GridPos, perform_turf_actions);
         }
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
-        map_id_string = "BAG";
+        grid_pos = new MapController.GridPos("BAG",Vector3.Zero);
         new_destination.EntityEntered(this,perform_turf_actions);
         UpdateNetwork(false,false);
         return location;
@@ -683,7 +680,7 @@ public partial class AbstractEntity
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
-        map_id_string = "NULL";
+        grid_pos = new MapController.GridPos("NULL",Vector3.Zero);
         UpdateNetwork(false,false);
         return location;
     }
@@ -777,12 +774,12 @@ public partial class AbstractEntity
     }
     public void UpdateNetwork(bool mesh_update, bool force) // Spawns and despawns currently loaded entity. While calling SyncPositionRotation(bool mesh_update) is cheaper... Calling this is safer.
     {
-        if(MapController.IsChunkLoaded(map_id_string,grid_pos.ChunkPos())) 
+        if(MapController.IsChunkLoaded(grid_pos.GetMapID(),grid_pos.ChunkPos())) 
         {
             if(this is AbstractTurf) 
             {
                 // If turf, update mesh...
-                MapController.GetChunk(map_id_string,grid_pos.ChunkPos()).MeshUpdate();
+                MapController.GetChunk(grid_pos.GetMapID(),grid_pos.ChunkPos()).MeshUpdate();
                 return;
             }
             if(location == null) return; // nullspace vanish
@@ -790,7 +787,7 @@ public partial class AbstractEntity
             bool is_vis = IsNetworkVisible();
             if(is_vis && LoadedNetworkEntity == null)
             {
-                internal_loaded_network_entity = NetworkEntity.CreateEntity( this, map_id_string, entity_type);
+                internal_loaded_network_entity = NetworkEntity.CreateEntity( this, grid_pos.GetMapID(), entity_type);
                 SyncPositionRotation(true,true);
                 return;
             }

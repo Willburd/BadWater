@@ -90,14 +90,14 @@ public partial class ChunkController : DeligateController
 
     public static void SetupChunk(NetworkChunk chunk)
     {
-        MapController.GridPos pos = new MapController.GridPos(GetAlignedPos(chunk.Position));
+        MapController.GridPos pos = new MapController.GridPos(chunk.map_id_string,GetAlignedPos(chunk.Position));
         for(int u = 0; u < ChunkController.chunk_size; u++) 
         {
             for(int v = 0; v < ChunkController.chunk_size; v++) 
             {
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
-                AbstractTurf turf = MapController.GetTurfAtPosition(chunk.map_id_string,new MapController.GridPos(hor,ver,pos.dep),true);
+                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(chunk.map_id_string,hor,ver,pos.dep),true);
                 turf.UpdateIcon();  // Build mesh!
                 foreach(AbstractEntity ent in turf.Contents)
                 {
@@ -112,14 +112,14 @@ public partial class ChunkController : DeligateController
 
     public static void CleanChunk(NetworkChunk chunk)
     {
-        MapController.GridPos pos = new MapController.GridPos(GetAlignedPos(chunk.Position));
+        MapController.GridPos pos = new MapController.GridPos(chunk.map_id_string,GetAlignedPos(chunk.Position));
         for(int u = 0; u < ChunkController.chunk_size; u++) 
         {
             for(int v = 0; v < ChunkController.chunk_size; v++) 
             {
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
-                AbstractTurf turf = MapController.GetTurfAtPosition(chunk.map_id_string,new MapController.GridPos(hor,ver,pos.dep),true);
+                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(chunk.map_id_string,hor,ver,pos.dep),true);
                 foreach(AbstractEntity ent in turf.Contents)
                 {
                     ent.UnloadNetworkEntity();

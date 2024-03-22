@@ -141,7 +141,7 @@ public partial class MapController : DeligateController
         // Create all areas from resources
         foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
-            AbstractArea area = AbstractEntity.CreateEntity("_",entry.Value.GetUniqueModID,MainController.DataType.Area) as AbstractArea;
+            AbstractArea area = AbstractEntity.CreateEntity(entry.Value.GetUniqueModID,MainController.DataType.Area) as AbstractArea;
             areas[entry.Value.GetUniqueModID] = area;
             area.Init();
         }
@@ -260,9 +260,9 @@ public partial class MapController : DeligateController
     /*****************************************************************
      * TURF MANAGEMENT
      ****************************************************************/
-    public static bool IsTurfValid(string mapID, GridPos chunk_pos)
+    public static bool IsTurfValid(GridPos grid_pos)
     {
-        return active_maps[mapID].IsTurfValid(chunk_pos);
+        return active_maps[grid_pos.GetMapID()].IsTurfValid(grid_pos);
     }
     public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, AbstractArea area, bool replace, bool submaps)
     {
@@ -274,31 +274,31 @@ public partial class MapController : DeligateController
     }
     public static void SwapTurfs(AbstractTurf old_turf, AbstractTurf new_turf, bool submaps)
     {
-        string old_map = old_turf.map_id_string;
+        string old_map = old_turf.GridPos.GetMapID();
         GridPos old_pos = old_turf.GridPos;
-        AbstractTurf buffer = active_maps[new_turf.map_id_string].SwapTurf(old_turf,new_turf.GridPos,submaps);
+        AbstractTurf buffer = active_maps[new_turf.GridPos.GetMapID()].SwapTurf(old_turf,new_turf.GridPos,submaps);
         active_maps[old_map].SwapTurf(buffer,old_pos,submaps);
     }
-    public static AbstractTurf GetTurfAtPosition(string mapID, GridPos grid_pos, bool submaps)
+    public static AbstractTurf GetTurfAtPosition(GridPos grid_pos, bool submaps)
     {
-        return active_maps[mapID].GetTurfAtPosition(grid_pos,submaps);
+        return active_maps[grid_pos.GetMapID()].GetTurfAtPosition(grid_pos,submaps);
     }
 
     
     /*****************************************************************
      * AREA MANAGEMENT
      ****************************************************************/
-    public static AbstractArea GetAreaAtPosition(string mapID, GridPos grid_pos, bool submaps)
+    public static AbstractArea GetAreaAtPosition(GridPos grid_pos, bool submaps)
     {
-        return active_maps[mapID].GetAreaAtPosition(grid_pos,submaps);
+        return active_maps[grid_pos.GetMapID()].GetAreaAtPosition(grid_pos,submaps);
     }
     public static AbstractTurf GetTurfAtPosition(string mapID, Vector3 pos, bool submaps)
     {
-        return active_maps[mapID].GetTurfAtPosition(new GridPos(pos),submaps);
+        return active_maps[mapID].GetTurfAtPosition(new GridPos(mapID,pos),submaps);
     }
     public static AbstractArea GetAreaAtPosition(string mapID, Vector3 pos, bool submaps)
     {
-        return active_maps[mapID].GetAreaAtPosition(new GridPos(pos),submaps);
+        return active_maps[mapID].GetAreaAtPosition(new GridPos(mapID,pos),submaps);
     }
 
 
@@ -364,7 +364,7 @@ public partial class MapController : DeligateController
     public static bool OnSameMap(AbstractEntity A,AbstractEntity B)
     {
         if(A.GetLocation() is not AbstractTurf || B.GetLocation() is not AbstractTurf) return false; // in bag
-        return OnSameMap(A.map_id_string,B.map_id_string);
+        return OnSameMap(A.GridPos.GetMapID(),B.GridPos.GetMapID());
     }
     
     public static bool OnSameMap(string A,string B)
@@ -415,7 +415,7 @@ public partial class MapController : DeligateController
 
     public static float GetMapDistance(AbstractEntity A,AbstractEntity B)
     {
-        if(!OnSameMap(A.map_id_string,B.map_id_string)) return Mathf.Inf;  // returns infinity if not on same map
+        if(!OnSameMap(A.GridPos.GetMapID(),B.GridPos.GetMapID())) return Mathf.Inf;  // returns infinity if not on same map
         return GetMapDistance(A.GridPos.WorldPos(),B.GridPos.WorldPos());
     }
     public static float GetMapDistance(Vector3 A_pos,Vector3 B_pos)
@@ -448,14 +448,16 @@ public partial class MapController : DeligateController
      ****************************************************************/
     public struct GridPos
     {
-        public GridPos(float set_hor, float set_ver, float set_dep)
+        public GridPos(string map_id, float set_hor, float set_ver, float set_dep)
         {
+            mapid = map_id;
             hor = set_hor;
             ver = set_ver;
             dep = set_dep;
         }
-        public GridPos(Vector3 worldPos)
+        public GridPos(string map_id, Vector3 worldPos)
         {
+            mapid = map_id;
             hor = (float)(worldPos.X / MapController.tile_size);
             ver = (float)(worldPos.Z / MapController.tile_size);
             dep = (float)(worldPos.Y / MapController.tile_size);
@@ -463,11 +465,13 @@ public partial class MapController : DeligateController
 
         public readonly Vector3 WorldPos()
         {
+            //MapController.active_maps[mapid].submap_pos.
             return new Vector3(hor * MapController.tile_size,dep * MapController.tile_size,ver * MapController.tile_size);
         }
 
         public readonly bool Equals(GridPos other)
         {
+            if(!MapController.OnSameMap(GetMapID(),other.GetMapID())) return false;
             return Mathf.FloorToInt(hor) == Mathf.FloorToInt(other.hor) && Mathf.FloorToInt(ver) == Mathf.FloorToInt(other.ver) && Mathf.FloorToInt(dep) == Mathf.FloorToInt(other.dep);
         }
 
@@ -475,6 +479,12 @@ public partial class MapController : DeligateController
         {
             return new ChunkPos(WorldPos());
         }
+        
+        public readonly string GetMapID()
+        {
+            return mapid;
+        }
+        string mapid;
         public float hor;
         public float ver;
         public float dep;
@@ -515,7 +525,7 @@ public partial class MapController : DeligateController
 
         // XY location map is at, when submapped into another map!
         private List<string> loaded_submaps = new List<string>();
-        public GridPos submap_pos = new GridPos(0,0,0);
+        public GridPos submap_pos = new GridPos("NULL",0,0,0);
 
         private List<NetworkChunk> loaded_chunks = new List<NetworkChunk>();
         private NetworkChunk[,,] chunk_grid;
@@ -564,7 +574,7 @@ public partial class MapController : DeligateController
                 }
             }
             // Spawn new turf
-            AbstractTurf turf = AbstractEntity.CreateEntity(map_id, turfID, MainController.DataType.Turf) as AbstractTurf;
+            AbstractTurf turf = AbstractEntity.CreateEntity(turfID, MainController.DataType.Turf) as AbstractTurf;
             SetTurfPosition(turf,grid_pos,submaps);
             area.AddTurf(turf);
             return turf;
@@ -580,7 +590,6 @@ public partial class MapController : DeligateController
                 Internal_SetTurf(old_pos, null, submaps);
             }
             // Move new turf
-            turf.map_id_string = map_id;
             SetTurfPosition(turf,grid_pos,submaps);
             return check_turf;
         }
@@ -588,7 +597,7 @@ public partial class MapController : DeligateController
         private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos, bool submaps)
         {
             // Very dangerous function... Lets keep this internal, and only accessed by safe public calls!
-            turf.Move( turf.map_id_string, grid_pos, false);
+            turf.Move( grid_pos, false);
             Internal_SetTurf(grid_pos, turf, submaps);
         }
 
@@ -636,7 +645,7 @@ public partial class MapController : DeligateController
                     && grid_pos.ver >= map.submap_pos.ver && grid_pos.ver < map.submap_pos.ver + map.Height
                     && grid_pos.dep >= map.submap_pos.dep && grid_pos.dep < map.submap_pos.dep + map.Depth)
                     {
-                        return map.Internal_GetTurf(new GridPos(grid_pos.hor-map.submap_pos.hor,grid_pos.ver-map.submap_pos.ver,grid_pos.dep-map.submap_pos.dep),true);
+                        return map.Internal_GetTurf(new GridPos(map_id,grid_pos.hor-map.submap_pos.hor,grid_pos.ver-map.submap_pos.ver,grid_pos.dep-map.submap_pos.dep),true);
                     }
                 }
             }
@@ -658,7 +667,7 @@ public partial class MapController : DeligateController
                     && grid_pos.ver >= map.submap_pos.ver && grid_pos.ver < map.submap_pos.ver + map.Height
                     && grid_pos.dep >= map.submap_pos.dep && grid_pos.dep < map.submap_pos.dep + map.Depth)
                     {
-                        map.Internal_SetTurf(new GridPos(grid_pos.hor-map.submap_pos.hor,grid_pos.ver-map.submap_pos.ver,grid_pos.dep-map.submap_pos.dep),set,true);
+                        map.Internal_SetTurf(new GridPos(map_id,grid_pos.hor-map.submap_pos.hor,grid_pos.ver-map.submap_pos.ver,grid_pos.dep-map.submap_pos.dep),set,true);
                         return;
                     }
                 }
@@ -683,7 +692,7 @@ public partial class MapController : DeligateController
                 int randx = TOOLS.RandI(width);
                 int randy = TOOLS.RandI(height);
                 int randz = TOOLS.RandI(depth);
-                AbstractTurf turf = GetTurfAtPosition(new GridPos(randx,randy,randz),false);
+                AbstractTurf turf = GetTurfAtPosition(new GridPos(map_id,randx,randy,randz),false);
                 turf.RandomTick();
                 turf.AtmosphericsCheck();
             }
@@ -873,7 +882,7 @@ public partial class MapController : DeligateController
                 }
 
                 // It's turfin time... How awful.
-                AbstractTurf turf = output_map.AddTurf(make_turf_id, new GridPos(current_x,current_y,current_z), areas[make_area_id], false, false);
+                AbstractTurf turf = output_map.AddTurf(make_turf_id, new GridPos(map_id,current_x,current_y,current_z), areas[make_area_id], false, false);
                 if(turf_json.Length > 0) turf.ApplyMapCustomData(TOOLS.ParseJson(turf_json)); // Set this object's flags using an embedded string of json!
                 HandleLoop();
             }
@@ -895,14 +904,14 @@ public partial class MapController : DeligateController
             int repeats = 200;
             while(repeats-- > 0 && !finished)
             {
-                GetTurfAtPosition(current_x, current_y, current_z).Init();
+                GetTurfAtPosition(map_id,current_x, current_y, current_z).Init();
                 HandleLoop();
             }
         }
 
-        public AbstractTurf GetTurfAtPosition(int x, int y, int z)
+        public AbstractTurf GetTurfAtPosition(string mapid, int x, int y, int z)
         {
-            return output_map.GetTurfAtPosition(new GridPos(x,y,z),false);
+            return output_map.GetTurfAtPosition(new GridPos(mapid,x,y,z),false);
         }
     }
 
@@ -921,16 +930,16 @@ public partial class MapController : DeligateController
             int repeats = 100;
             while(repeats-- > 0 && !finished)
             {
-                AbstractTurf turf = GetTurfAtPosition(current_x, current_y, current_z);
+                AbstractTurf turf = GetTurfAtPosition(map_id,current_x, current_y, current_z);
                 turf.LateInit();
                 turf.UpdateIcon();
                 HandleLoop();
             }
         }
 
-        public AbstractTurf GetTurfAtPosition(int x, int y, int z)
+        public AbstractTurf GetTurfAtPosition(string mapid,int x, int y, int z)
         {
-            return output_map.GetTurfAtPosition(new GridPos(x,y,z),false);
+            return output_map.GetTurfAtPosition(new GridPos(mapid,x,y,z),false);
         }
     }
 
@@ -981,7 +990,7 @@ public partial class MapController : DeligateController
                         if(item_data.Count > 0)
                         {
                             entity_pack = item_data[current_x];
-                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Item);
+                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Item);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -989,7 +998,7 @@ public partial class MapController : DeligateController
                         if(effect_data.Count > 0)
                         {
                             entity_pack = effect_data[current_x];
-                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Effect);
+                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Effect);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -997,7 +1006,7 @@ public partial class MapController : DeligateController
                         if(structure_data.Count > 0)
                         {
                             entity_pack = structure_data[current_x];
-                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Structure);
+                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Structure);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -1005,7 +1014,7 @@ public partial class MapController : DeligateController
                         if(machine_data.Count > 0)
                         {
                             entity_pack = machine_data[current_x];
-                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Machine);
+                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Machine);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -1013,16 +1022,13 @@ public partial class MapController : DeligateController
                         if(mob_data.Count > 0)
                         {
                             entity_pack = mob_data[current_x];
-                            ent = AbstractEntity.CreateEntity(map_id,entity_pack[0],MainController.DataType.Mob);
+                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Mob);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                 }
                 // Set location
-                if(ent != null) 
-                {
-                    ent.Move( ent.map_id_string, new GridPos(float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), false);
-                }
+                ent?.Move(new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), false);
                 // LOOP!
                 HandleLoop();
             }

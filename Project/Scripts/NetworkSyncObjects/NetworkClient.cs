@@ -112,7 +112,7 @@ public partial class NetworkClient : Node3D
             {
                 ChatController.DebugLog("Client RESPAWN: " + Name);
                 int rand = TOOLS.RandI(spawners.Count);
-                SpawnHostEntity(spawners[rand].map_id_string,spawners[rand].GridPos);
+                SpawnHostEntity(spawners[rand].GridPos);
                 return;
             }
             else
@@ -122,21 +122,21 @@ public partial class NetworkClient : Node3D
         }
         // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
         ChatController.DebugLog("Client FALLBACK RESPAWN: " + Name);
-        SpawnHostEntity(MapController.FallbackMap(),new MapController.GridPos((float)0.5,(float)0.5,0));
+        SpawnHostEntity(new MapController.GridPos(MapController.FallbackMap(),(float)0.5,(float)0.5,0));
     }
-    private void SpawnHostEntity(string new_map, MapController.GridPos new_pos)
+    private void SpawnHostEntity(MapController.GridPos new_pos)
     {
         // SPAWN HOST OBJECT
         if(focused_entity == null) 
         {
-            AbstractEntity new_ent = AbstractEffect.CreateEntity(new_map,"BASE:TEST",MainController.DataType.Mob);
+            AbstractEntity new_ent = AbstractEffect.CreateEntity("BASE:TEST",MainController.DataType.Mob);
             new_ent.SetClientOwner(this);
             SetFocusedEntity(new_ent);
-            new_ent.Move(new_map,new_pos,false);
+            new_ent.Move(new_pos,false);
             new_ent.UpdateNetwork(false,true);
         }
         // Inform client of movment from server
-        if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),new_map,TOOLS.GridToPosWithOffset(new_pos));
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),new_pos.GetMapID(),TOOLS.GridToPosWithOffset(new_pos));
     }
 
 
@@ -154,7 +154,7 @@ public partial class NetworkClient : Node3D
     {
         GD.Print("Client " + Name + " focused entity updated to " + ent);
         focused_entity = ent;
-        focused_map_id = focused_entity.map_id_string;
+        focused_map_id = focused_entity.GridPos.GetMapID();
         focused_position = focused_entity.GridPos.WorldPos();
         AccountController.UpdateAccount(this,ent);
         if(TOOLS.PeerConnected(this)) Rpc(nameof(UpdateClientFocusedPos),focused_map_id,focused_position);
@@ -220,7 +220,7 @@ public partial class NetworkClient : Node3D
         if(focused_entity != null)
         {
             // handle camera movement
-            focused_map_id = focused_entity.map_id_string;
+            focused_map_id = focused_entity.GridPos.GetMapID();
             focused_position = focused_entity.GridPos.WorldPos();
             if(sync_map_id != focused_map_id || sync_position != focused_position)
             {
@@ -410,7 +410,7 @@ public partial class NetworkClient : Node3D
         {
             if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
             {
-                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
                 if(current_click_held_entity != null)
                 {
                     current_click_held_entity.Dragged( focused_entity, turf, client_click_data);
@@ -430,7 +430,7 @@ public partial class NetworkClient : Node3D
         {
             if(client_click_data["state"].AsBool()) // Creates a menu, so do this instantly!
             {
-                AbstractTurf turf = MapController.GetTurfAtPosition(focused_map_id,new MapController.GridPos((float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
                 // Create a list of entities on the tile that we can click, including the turf!
                 if(turf == null) return;
                 foreach(AbstractEntity ent in turf.Contents)

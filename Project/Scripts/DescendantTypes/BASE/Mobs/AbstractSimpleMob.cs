@@ -560,7 +560,7 @@ namespace Behaviors_BASE
             {
                 ChatController.LogAttack(display_name + " Animal-attacked (dodged) " + target?.display_name);
                 LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(GridPos.WorldPos(),turf.GridPos.WorldPos()) );
-                AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+                AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
                 ChatController.VisibleMessage(this,"The " + display_name + " misses their attack.", ChatController.VisibleMessageFormatting.Warning);
                 return;
             }
@@ -574,7 +574,7 @@ namespace Behaviors_BASE
                 {
                     ChatController.LogAttack(display_name + " Animal-attacked (miss) " + mob_target?.display_name);
                     LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(GridPos.WorldPos(),mob_target.GridPos.WorldPos()) );
-                    AudioController.PlayAt("BASE/Attacks/Punch/Miss", map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+                    AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
                     return; // We missed.
                 }
                 // TODO shields ==================================================================================================================================
@@ -584,7 +584,7 @@ namespace Behaviors_BASE
             if(ApplyAttack( target, damage_to_do))
             {
                 ApplyMeleeEffects(target);
-                AudioController.PlayAt(attacks.attack_sound, map_id_string ,grid_pos.WorldPos(), AudioController.screen_range, 0);
+                AudioController.PlayAt(attacks.attack_sound, grid_pos, AudioController.screen_range, 0);
             }
         }
 
@@ -809,20 +809,20 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Movement and storage
          ****************************************************************/
-        public override AbstractEntity Move(string new_mapID, MapController.GridPos new_grid, bool perform_turf_actions = true)
+        public override AbstractEntity Move(MapController.GridPos new_grid, bool perform_turf_actions = true)
         {
             // Prior to our move it's already too far away
             AbstractEntity pull_ent = I_Pulling as AbstractEntity;
             if(pull_ent != null && MapController.GetMapDistance(this,pull_ent) > 1.3f) I_StopPulling();
             // Shenanigans! Pullee closed into locker for eg.
-            if(pull_ent != null && (!MapController.OnSameMap(pull_ent.map_id_string,map_id_string))) I_StopPulling();
+            if(pull_ent != null && (!MapController.OnSameMap(pull_ent.GridPos.GetMapID(),GridPos.GetMapID()))) I_StopPulling();
             // Can't pull with no hands
             if(pull_ent != null && IsRestrained()) I_StopPulling();
 
-            if(!MapController.OnSameMap(map_id_string,new_mapID))
+            if(!MapController.OnSameMap(GridPos.GetMapID(),new_grid.GetMapID()))
             {
                 // warp to same location if jumped maps
-                pull_ent?.Move(new_mapID, new MapController.GridPos( GridPos.WorldPos()), perform_turf_actions);
+                pull_ent?.Move(new MapController.GridPos(new_grid.GetMapID(), GridPos.WorldPos()), perform_turf_actions);
             }
             else if(GridPos.WorldPos() != new_grid.WorldPos())
             {
@@ -832,9 +832,9 @@ namespace Behaviors_BASE
                     // Don't allow us to go far from what's pulling us! Use resist for that!
                     if(MapController.GetMapDistance(this,puller_ent) > 1.1f) return GetLocation(); // Only move toward puller!
                 }
-                pull_ent?.Move(new_mapID, new MapController.GridPos( pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
+                pull_ent?.Move(new MapController.GridPos(new_grid.GetMapID(), pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
             }
-            return base.Move(new_mapID, new_grid, perform_turf_actions);
+            return base.Move(new_grid, perform_turf_actions);
         }
 
 
@@ -892,7 +892,7 @@ namespace Behaviors_BASE
                 }
                 // math for feet speed
                 if(dat_x != 0 || dat_y != 0) footstep_timer += Mathf.Lerp(0.075f,0.10f, Mathf.Clamp(speed,0,1.5f));
-                AbstractEntity newloc = Move(map_id_string, new_pos);
+                AbstractEntity newloc = Move(new_pos);
                 if(footstep_timer > 1)
                 {
                     footstep_timer = 0;

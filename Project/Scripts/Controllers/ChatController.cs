@@ -204,7 +204,7 @@ public static class ChatController
             else
             {
                 // TODO Proper map adjacency, client visual distance, and any other status for sending messages to clients in visible range!
-                if(speaking_ent != null && MapController.OnSameMap(scan_cli.focused_map_id,speaking_ent.map_id_string))
+                if(speaking_ent != null && MapController.OnSameMap(scan_cli.focused_map_id,speaking_ent.GridPos.GetMapID()))
                 {
                     if(scan_cli.GetFocusedEntity() != null && excludes.Contains(scan_cli.GetFocusedEntity())) continue; // IGNORE!
 
@@ -218,24 +218,24 @@ public static class ChatController
                     switch(mode)
                     {
                         case ChatMode.Speak:
-                            AudioController.PlayAt("BASE/Talksounds/Speak", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.screen_range, -10, scan_cli);
+                            AudioController.PlayAt("BASE/Talksounds/Speak", speaking_ent.GridPos, AudioController.screen_range, -10, scan_cli);
                             scan_cli.BroadcastChatMessage(output);
                         break;
                         case ChatMode.Whisper:
                             if(in_small_range_limit) 
                             {
-                                AudioController.PlayAt("BASE/Talksounds/Speak", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.short_range, -20, scan_cli);
+                                AudioController.PlayAt("BASE/Talksounds/Speak", speaking_ent.GridPos, AudioController.short_range, -20, scan_cli);
                                 scan_cli.BroadcastChatMessage(output);
                             }
                         break;
                         case ChatMode.Emote:
-                            AudioController.PlayAt("BASE/Talksounds/Emote", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.screen_range, -10, scan_cli);
+                            AudioController.PlayAt("BASE/Talksounds/Emote", speaking_ent.GridPos, AudioController.screen_range, -10, scan_cli);
                             scan_cli.BroadcastChatMessage(output);
                         break;
                         case ChatMode.Subtle:
                             if(in_small_range_limit) 
                             {
-                                AudioController.PlayAt("BASE/Talksounds/Subtle", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.short_range, -20, scan_cli);
+                                AudioController.PlayAt("BASE/Talksounds/Subtle", speaking_ent.GridPos, AudioController.short_range, -20, scan_cli);
                                 scan_cli.BroadcastChatMessage(output);
                             }
                         break;
