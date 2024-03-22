@@ -90,7 +90,7 @@ public partial class AbstractTurf : AbstractEntity
 
     public void PlayStepSound(bool quiet)
     {
-        AudioController.PlayAt(step_sound, grid_pos, AudioController.screen_range, quiet ? -10 : 0);
+        AudioController.PlayAt(step_sound, GridPos.GetCentered(), AudioController.screen_range, quiet ? -10 : 0);
     }
 
     // Override this for turf interactions. Construction, deconstruction, maybe even rotation! Who knows what magic sins are ahead in our codebase.
@@ -124,7 +124,7 @@ public partial class AbstractTurf : AbstractEntity
         if(user is AbstractMob user_mob)
         {
             user_mob.SetClickCooldown(user_mob.GetAttackCooldown(used_item));
-            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(user.GridPos.WorldPos(),GridPos.WorldPos()) );
+            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,this) );
         }
         if(!success) // Nothing got hit.
         {

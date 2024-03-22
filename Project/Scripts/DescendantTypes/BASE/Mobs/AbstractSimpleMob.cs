@@ -559,7 +559,7 @@ namespace Behaviors_BASE
             if(missed) // Most likely we have a slow attack and they dodged it or we somehow got moved.
             {
                 ChatController.LogAttack(display_name + " Animal-attacked (dodged) " + target?.display_name);
-                LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(GridPos.WorldPos(),turf.GridPos.WorldPos()) );
+                LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(this,turf));
                 AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
                 ChatController.VisibleMessage(this,"The " + display_name + " misses their attack.", ChatController.VisibleMessageFormatting.Warning);
                 return;
@@ -573,7 +573,7 @@ namespace Behaviors_BASE
                 if(TOOLS.Prob(attacks.melee_miss_chance))
                 {
                     ChatController.LogAttack(display_name + " Animal-attacked (miss) " + mob_target?.display_name);
-                    LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(GridPos.WorldPos(),mob_target.GridPos.WorldPos()) );
+                    LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(this,mob_target) );
                     AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
                     return; // We missed.
                 }
@@ -785,7 +785,7 @@ namespace Behaviors_BASE
             ai_holder?.ReactToAttack(user);
             
             ChatController.VisibleMessage(this,"The " + user?.display_name + " has " + attack_message + " the " + display_name + "!", ChatController.VisibleMessageFormatting.Danger);
-            user?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(user.GridPos.WorldPos(),GridPos.WorldPos()) );
+            user?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,this) );
             UpdateHealth();
             return true;
         }

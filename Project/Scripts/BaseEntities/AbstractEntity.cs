@@ -456,7 +456,7 @@ public partial class AbstractEntity
             ChatController.LogAttack(user?.display_name + "attacked" + target?.display_name + " with " + this.display_name + " (INTENT: " + user?.SelectingIntent + ") (DAMTYE: [" + this.damtype + "])");
             /////////////////////////
             user_mob.SetClickCooldown( user_mob.GetAttackCooldown(this) );
-            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, TOOLS.DirVec(user.GridPos.WorldPos(),target.GridPos.WorldPos()) );
+            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,target) );
         }
         var hit_zone = target.ResolveWeaponHit(this, user, target_zone);
         if(hit_zone != DAT.ZoneSelection.Miss) WeaponHitMobEffect( user, target, hit_zone, attack_modifier);
@@ -529,7 +529,7 @@ public partial class AbstractEntity
     public virtual AbstractEntity Move(MapController.GridPos new_grid, bool perform_turf_actions = true)
     {
         // Is new location valid?
-        Vector2 dir_vec = TOOLS.DirVec( grid_pos.hor, grid_pos.ver, new_grid.hor, new_grid.ver);
+        Vector3 dir_vec = MapController.GetMapDirection(grid_pos.WorldPos(),new_grid.WorldPos());
         
         if(MapController.OnSameMap(grid_pos.GetMapID(),new_grid.GetMapID()))
         {
@@ -548,11 +548,11 @@ public partial class AbstractEntity
             }
             if(!MapController.IsTurfValid(new MapController.GridPos(new_grid.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep)))
             {
-                if(dir_vec.Y < 0)
+                if(dir_vec.Z < 0)
                 {
                     new_grid.ver = Mathf.Floor(grid_pos.ver) + threshold;
                 }
-                else if(dir_vec.Y > 0)
+                else if(dir_vec.Z > 0)
                 {
                     new_grid.ver = Mathf.Floor(grid_pos.ver) + 1 - threshold;
                 }
@@ -580,11 +580,11 @@ public partial class AbstractEntity
                 if(ver_turf != null && ver_turf != GetTurf() && ver_turf.density)
                 {
                     bump_v = true;
-                    if(dir_vec.Y < 0)
+                    if(dir_vec.Z < 0)
                     {
                         new_grid.ver = Mathf.Floor(grid_pos.ver) + threshold;
                     }
-                    else if(dir_vec.Y > 0)
+                    else if(dir_vec.Z > 0)
                     {
                         new_grid.ver = Mathf.Floor(grid_pos.ver) + 1 - threshold;
                     }
@@ -603,11 +603,11 @@ public partial class AbstractEntity
                     {
                         new_grid.hor = Mathf.Floor(grid_pos.hor) + 1 - threshold;
                     }
-                    if(dir_vec.Y < 0)
+                    if(dir_vec.Z < 0)
                     {
                         new_grid.ver = Mathf.Floor(grid_pos.ver) + threshold;
                     }
-                    else if(dir_vec.Y > 0)
+                    else if(dir_vec.Z > 0)
                     {
                         new_grid.ver = Mathf.Floor(grid_pos.ver) + 1 - threshold;
                     }

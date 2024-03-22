@@ -380,16 +380,15 @@ public partial class MapController : DeligateController
     {
         // different maps, and depth doesn't count
         if(!OnSameMap(A,B) || A.GridPos.dep != B.GridPos.dep) return false;
+        // Turf pos are centered on the turf
         MapController.GridPos A_pos = A.GridPos;
         MapController.GridPos B_pos = B.GridPos;
+        if(A is AbstractTurf) A_pos = A.GridPos.GetCentered();
+        if(B is AbstractTurf) B_pos = B.GridPos.GetCentered(); 
         // center of turfs
         if(A is AbstractTurf || B is AbstractTurf)
         {
-            A_pos.hor = Mathf.Floor(A_pos.hor) + 0.5f; 
-            A_pos.ver = Mathf.Floor(A_pos.ver) + 0.5f; 
-            B_pos.hor = Mathf.Floor(B_pos.hor) + 0.5f; 
-            B_pos.ver = Mathf.Floor(B_pos.ver) + 0.5f; 
-            Vector3 dir_vec = TOOLS.DirVec(A_pos.WorldPos(),B_pos.WorldPos());
+            Vector3 dir_vec = GetMapDirection(A,B);
             if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
             {
                 // Check corner blockages
@@ -403,33 +402,51 @@ public partial class MapController : DeligateController
     {
         // Entity checking
         if(Mathf.Floor(A_pos.Y) != Mathf.Floor(B_pos.Y)) return false;
-        Vector3 dir_vec = TOOLS.DirVec(A_pos,B_pos);
+        Vector3 dir_vec = GetMapDirection(A_pos,B_pos);
         if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
         {
             // Check corner blockages
 
         }
-        return TOOLS.VecDist(A_pos,B_pos) <= DAT.ADJACENT_DISTANCE;
+        return GetMapDistance(A_pos,B_pos) <= DAT.ADJACENT_DISTANCE;
     }
 
 
     public static float GetMapDistance(AbstractEntity A,AbstractEntity B)
     {
         if(!OnSameMap(A.GridPos.GetMapID(),B.GridPos.GetMapID())) return Mathf.Inf;  // returns infinity if not on same map
-        return GetMapDistance(A.GridPos.WorldPos(),B.GridPos.WorldPos());
+        GridPos A_align = A.GridPos;
+        GridPos B_align = B.GridPos;
+        if(A is AbstractTurf) A_align = A.GridPos.GetCentered();
+        if(B is AbstractTurf) B_align = B.GridPos.GetCentered();
+        return GetMapDistance(A_align.WorldPos(),B_align.WorldPos());
     }
     public static float GetMapDistance(Vector3 A_pos,Vector3 B_pos)
     {
+        // Flatten
+        A_pos.Y *= 0f;
+        B_pos.Y *= 0f;
         // Check if on same map beforehand!
         return TOOLS.VecDist(A_pos,B_pos); // should just be world position checks if already on same map. World pos are prealigned
     }
 
     public static Vector3 GetMapDirection(AbstractEntity A,AbstractEntity B)
     {
+        // turf align
+        GridPos A_align = A.GridPos;
+        GridPos B_align = B.GridPos;
+        if(A is AbstractTurf) A_align = A.GridPos.GetCentered();
+        if(B is AbstractTurf) B_align = B.GridPos.GetCentered();
         // Check if on same map beforehand!
-        return TOOLS.DirVec(A.GridPos.WorldPos(),B.GridPos.WorldPos()); // should just be world position checks if already on same map. World pos are prealigned
+        return GetMapDirection(A_align.WorldPos(),B_align.WorldPos());
     }
-
+    public static Vector3 GetMapDirection(Vector3 A_pos,Vector3 B_pos)
+    {
+        // Flatten
+        A_pos.Y *= 0;
+        B_pos.Y *= 0;
+        return TOOLS.DirVec(A_pos,B_pos); // should just be world position checks if already on same map. World pos are prealigned
+    }
     
     public static bool GetMapVisibility(AbstractEntity A,AbstractEntity B)  // if A can see B
     {
@@ -467,6 +484,18 @@ public partial class MapController : DeligateController
         {
             //MapController.active_maps[mapid].submap_pos.
             return new Vector3(hor * MapController.tile_size,dep * MapController.tile_size,ver * MapController.tile_size);
+        }
+        
+        public readonly GridPos GetCentered()
+        {
+            //MapController.active_maps[mapid].submap_pos.
+            return new GridPos(mapid,Mathf.Floor(hor) + 0.5f,Mathf.Floor(ver) + 0.5f,dep);
+        }
+
+        public readonly Vector3 WorldPosCentered()
+        {
+            //MapController.active_maps[mapid].submap_pos.
+            return GetCentered().WorldPosCentered();
         }
 
         public readonly bool Equals(GridPos other)

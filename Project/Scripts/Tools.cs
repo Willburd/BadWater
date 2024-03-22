@@ -202,14 +202,9 @@ public static class TOOLS
             // ignore...
             return A.direction;
         }
-        Vector3 offsetA = Vector3.Zero;
-        Vector3 offsetB = Vector3.Zero;
-        if(A is AbstractTurf) offsetA = new Vector3(0.5f,0,0.5f);
-        if(B is AbstractTurf) offsetB = new Vector3(0.5f,0,0.5f);
-        Vector3 dirvec = TOOLS.DirVec(A.GridPos.WorldPos() + offsetA,B.GridPos.WorldPos() + offsetB);
-        // Final sanity check
-        DAT.Dir ret = DAT.VectorToCardinalDir(dirvec.X,dirvec.Z);
-        if(ret == DAT.Dir.None) return A.direction;
+        Vector3 dir_vec = MapController.GetMapDirection(A,B);
+        DAT.Dir ret = DAT.VectorToCardinalDir(dir_vec.X,dir_vec.Z);
+        if(ret == DAT.Dir.None) return A.direction; // Final sanity check...
         return ret;
     }
 }
