@@ -482,20 +482,25 @@ public partial class MapController : DeligateController
 
         public readonly Vector3 WorldPos()
         {
-            //MapController.active_maps[mapid].submap_pos.
-            return new Vector3(hor * MapController.tile_size,dep * MapController.tile_size,ver * MapController.tile_size);
+            GridPos align_pos = MapController.active_maps[mapid].submap_pos;
+            float align_hor = Mathf.Floor(align_pos.hor);
+            float align_ver = Mathf.Floor(align_pos.ver);
+            float align_dep = Mathf.Floor(align_pos.dep);
+            return new Vector3((hor+align_hor) * MapController.tile_size, (dep+align_dep) * MapController.tile_size,(ver+align_ver) * MapController.tile_size);
         }
         
         public readonly GridPos GetCentered()
         {
-            //MapController.active_maps[mapid].submap_pos.
-            return new GridPos(mapid,Mathf.Floor(hor) + 0.5f,Mathf.Floor(ver) + 0.5f,dep);
+            GridPos align_pos = MapController.active_maps[mapid].submap_pos;
+            float align_hor = Mathf.Floor(align_pos.hor);
+            float align_ver = Mathf.Floor(align_pos.ver);
+            float align_dep = Mathf.Floor(align_pos.dep);
+            return new GridPos(mapid,Mathf.Floor(align_hor) + 0.5f,Mathf.Floor(align_ver) + 0.5f,align_dep);
         }
 
         public readonly Vector3 WorldPosCentered()
         {
-            //MapController.active_maps[mapid].submap_pos.
-            return GetCentered().WorldPosCentered();
+            return GetCentered().WorldPos();
         }
 
         public readonly bool Equals(GridPos other)
