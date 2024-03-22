@@ -9,6 +9,15 @@ public partial class LoggingWindow : GameWindows
     [Export]
     public LineEdit chat_entry;
 
+    public void ReloadLog()
+    {
+        chat_history.Text = "";
+        foreach(string tx in ChatController.chat_log)
+        {
+            chat_history.Text += tx + "\n"; 
+        }
+    }
+
     public override void _Ready()
     {
         chat_entry.MaxLength = ChatController.chatmessage_max_length; // ensure max

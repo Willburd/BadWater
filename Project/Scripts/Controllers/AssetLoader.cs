@@ -39,7 +39,7 @@ public partial class AssetLoader : Node
 
     public void Load()
     {
-        GD.Print("LOADING ASSETS");
+        ChatController.AssetLog("LOADING ASSETS");
         string sound_path = "res://Library/Sounds";
         string model_path = "res://Library/Models";
         string texture_path = "res://Library/Textures";
@@ -51,7 +51,7 @@ public partial class AssetLoader : Node
         string effect_path = "res://Library/Effects";
         string mob_path = "res://Library/Mobs";
 
-        GD.Print("-SOUND");
+        ChatController.AssetLog("-SOUND");
         DirAccess dir;
         Stack<string> scan_dirs = new Stack<string>();
         scan_dirs.Push(sound_path);
@@ -85,14 +85,14 @@ public partial class AssetLoader : Node
                     fileName = dir.GetNext();
                 }
 
-                GD.Print("--AUDIOPACK: " + dir.GetCurrentDir() + " : " + found_sounds);
+                if(found_sounds > 0) ChatController.AssetLog("--AUDIOPACK: " + dir.GetCurrentDir() + " : " + found_sounds);
             }
         }
         scan_dirs.Clear();
 
 
 
-        GD.Print("-MODELS");
+        ChatController.AssetLog("-MODELS");
         scan_dirs = new Stack<string>();
         scan_dirs.Push(model_path);
         while(scan_dirs.Count > 0)
@@ -111,7 +111,7 @@ public partial class AssetLoader : Node
                         if(fileName.EndsWith("tscn") || fileName.EndsWith("tscn.remap"))
                         {   
                             string path = dir.GetCurrentDir() + "/" + fileName.Replace("tscn.remap", "tscn");
-                            GD.Print("--MODEL: " + path);
+                            ChatController.AssetLog("--MODEL: " + path);
                             loaded_models.Add(path, (PackedScene)GD.Load(path));
                         }
                     }
@@ -127,7 +127,7 @@ public partial class AssetLoader : Node
 
 
 
-        GD.Print("-TEXTURES");
+        ChatController.AssetLog("-TEXTURES");
         scan_dirs = new Stack<string>();
         scan_dirs.Push(texture_path);
         while(scan_dirs.Count > 0)
@@ -159,7 +159,7 @@ public partial class AssetLoader : Node
         ConstructTextureAtlas();
         scan_dirs.Clear();
 
-        GD.Print("-MAPS");
+        ChatController.AssetLog("-MAPS");
         dir = DirAccess.Open(map_path);
         if (dir != null)
         {
@@ -175,7 +175,7 @@ public partial class AssetLoader : Node
             }
         }
 
-        GD.Print("-AREAS");
+        ChatController.AssetLog("-AREAS");
         dir = DirAccess.Open(area_path);
         if (dir != null)
         {
@@ -191,7 +191,7 @@ public partial class AssetLoader : Node
             }
         }
 
-        GD.Print("-TURFS");
+        ChatController.AssetLog("-TURFS");
         dir = DirAccess.Open(turf_path);
         if (dir != null)
         {
@@ -207,7 +207,7 @@ public partial class AssetLoader : Node
             }
         }
 
-        GD.Print("-STRUCTURES");
+        ChatController.AssetLog("-STRUCTURES");
         dir = DirAccess.Open(struct_path);
         if (dir != null)
         {
@@ -223,7 +223,7 @@ public partial class AssetLoader : Node
             }
         }
 
-        GD.Print("-ITEMS");
+        ChatController.AssetLog("-ITEMS");
         dir = DirAccess.Open(item_path);
         if (dir != null)
         {
@@ -239,7 +239,7 @@ public partial class AssetLoader : Node
             }
         }
 
-        GD.Print("-EFFECTS");
+        ChatController.AssetLog("-EFFECTS");
         dir = DirAccess.Open(effect_path);
         if (dir != null)
         {
@@ -255,7 +255,7 @@ public partial class AssetLoader : Node
             }
         }
 
-        GD.Print("-MOBS");
+        ChatController.AssetLog("-MOBS");
         dir = DirAccess.Open(mob_path);
         if (dir != null)
         {
@@ -271,7 +271,7 @@ public partial class AssetLoader : Node
             }
         }
 
-        GD.Print("-PREFABS");
+        ChatController.AssetLog("-PREFABS");
         {   // Base area
             AreaData area = new AreaData();
             Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
@@ -293,7 +293,7 @@ public partial class AssetLoader : Node
             all_packs[AssetLoader.AllPackID(turf.GetUniqueModID, MainController.DataType.Turf)] = turf;
         }
         
-        GD.Print("BUILDING INHERITANCE");
+        ChatController.AssetLog("BUILDING INHERITANCE");
         BuildInheritance(loaded_maps.Values.ToList<PackData>()); // Could be possible, but why would you?
         BuildInheritance(loaded_areas.Values.ToList<PackData>());
         BuildInheritance(loaded_turfs.Values.ToList<PackData>());
@@ -303,7 +303,7 @@ public partial class AssetLoader : Node
         BuildInheritance(loaded_machines.Values.ToList<PackData>());
         BuildInheritance(loaded_mobs.Values.ToList<PackData>());
 
-        GD.Print("CLEANUP");
+        ChatController.AssetLog("CLEANUP");
         foreach( PackData data in all_packs.Values )
         {
             data.ClearTempData();
@@ -363,7 +363,7 @@ public partial class AssetLoader : Node
     {
         Godot.Collections.Dictionary data = TOOLS.ParseJsonFile(file_path);
         string prefix = Path.GetFileNameWithoutExtension(file_path);
-        GD.Print("--PARSING: " + file_path + " " + prefix);
+        ChatController.AssetLog("--PARSING: " + file_path + " " + prefix);
         foreach( string key in data.Keys )
         {
             Godot.Collections.Dictionary dict_data = (Godot.Collections.Dictionary)data[key];
@@ -446,7 +446,7 @@ public partial class AssetLoader : Node
 
     private void ParseMob(string file_path)
     {
-        GD.Print(file_path);
+        ChatController.AssetLog(file_path);
     }
 
     
@@ -491,7 +491,7 @@ public partial class AssetLoader : Node
     
     private void LoadTextureAtlas(string path)
     {
-        GD.Print("--TEXTURE: " + path);
+        ChatController.AssetLog("--TEXTURE: " + path);
         Texture2D tex = (Texture2D)ResourceLoader.Load(path);
         int size = tex.GetWidth() * tex.GetHeight();
         prepare_textures.Add(size + tex_offset_stacker,new PreparingTexture(path,tex.GetWidth(),tex.GetHeight()));
@@ -545,7 +545,7 @@ public partial class AssetLoader : Node
                     Image tex_page = texture_pages[tex_page_ind];
                     // Blit image to page
                     LoadedTexture loaded_tex_data = new LoadedTexture(prep_tex.Value.path,tex_page_ind,place_pos.X,place_pos.Y,prep_tex.Value.width,prep_tex.Value.height); 
-                    GD.Print("-" + tex_page_ind + ">" + loaded_tex_data.u + "-" + loaded_tex_data.v + "(" + loaded_tex_data.width + "-" + loaded_tex_data.height + "): " + loaded_tex_data.path);
+                    ChatController.AssetLog("-" + tex_page_ind + ">" + loaded_tex_data.u + "-" + loaded_tex_data.v + "(" + loaded_tex_data.width + "-" + loaded_tex_data.height + "): " + loaded_tex_data.path);
                     // Handle formatting
                     Image blit_img = ((Texture2D)ResourceLoader.Load(loaded_tex_data.path)).GetImage();
                     blit_img.Decompress(); // If format was compressed, decompress it...
@@ -561,7 +561,7 @@ public partial class AssetLoader : Node
         }
         if(texture_pages.Count > 0)
         {
-            GD.Print("-Creating texture pages. Count: " + texture_pages.Count);
+            ChatController.AssetLog("-Creating texture pages. Count: " + texture_pages.Count);
             // Create material cache for each page!
             material_cache = new ShaderMaterial[tex_page_ind+1];
             for(int i = 0; i < texture_pages.Count; i++) 
@@ -573,7 +573,7 @@ public partial class AssetLoader : Node
         }
         else
         {
-            GD.Print("============TEXTURE PAGE ERROR, NO PAGES============");
+            ChatController.AssetLog("============TEXTURE PAGE ERROR, NO PAGES============");
         }
     }
 

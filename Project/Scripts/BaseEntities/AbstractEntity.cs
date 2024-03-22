@@ -128,7 +128,6 @@ public partial class AbstractEntity
         {
             internal_selecting_intent = DAT.Intent.Help;
         }
-        GD.Print("Intent swapped to " + internal_selecting_intent);
     }
     public virtual DAT.SizeCategory SizeCategory
     {

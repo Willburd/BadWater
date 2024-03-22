@@ -3,7 +3,7 @@ using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
 
-public partial class ChatController : DeligateController
+public static class ChatController
 {
     public const int chatmessage_max_length = 1024;
 
@@ -20,7 +20,8 @@ public partial class ChatController : DeligateController
         Admin,
         VisibleMessage,
         AttackLog,
-        Debug
+        Debug,
+        Asset
     }
     public static string ModePrefix(ChatMode mode)
     {
@@ -46,12 +47,14 @@ public partial class ChatController : DeligateController
                 return "ATTACK";
             case ChatMode.Debug:
                 return "DEBUG";
+            case ChatMode.Asset:
+                return "ASSET";
         }
         return "SPEAK";
     }
 
 
-    public  static void ServerCommand(string message)
+    public static void ServerCommand(string message)
     {
         // Perform commands
         if(message.Substr(0,1) == "/")
@@ -67,12 +70,17 @@ public partial class ChatController : DeligateController
         }
     }
 
-    public  static void DebugLog(string message)
+    public static void AssetLog(string message)
+    {
+        SubmitMessage( null, null, message, ChatMode.Asset);
+    }
+
+    public static void DebugLog(string message)
     {
         SubmitMessage( null, null, message, ChatMode.Debug);
     }
 
-    public  static void LogAttack(string message)
+    public static void LogAttack(string message)
     {
         SubmitMessage( null, null, message, ChatMode.AttackLog);
     }
@@ -111,14 +119,18 @@ public partial class ChatController : DeligateController
         SubmitMessage( null, speaking_ent, message, ChatMode.VisibleMessage, send_to_visible, send_to_not_visible, excludes);
     }
 
-    public  static void SubmitMessage(NetworkClient client, AbstractEntity speaking_ent, string message, ChatMode mode, bool send_to_visible = true, bool send_to_not_visible = false, List<AbstractEntity> excludes = null)
+    public static void SubmitMessage(NetworkClient client, AbstractEntity speaking_ent, string message, ChatMode mode, bool send_to_visible = true, bool send_to_not_visible = false, List<AbstractEntity> excludes = null)
     {
         if(excludes == null) excludes = new List<AbstractEntity>();
         // SANITIZE
 
         // Assemble message
         string output = "";
-        if(mode == ChatMode.Debug || mode == ChatMode.AttackLog)
+        if(mode == ChatMode.Asset)
+        {
+            output += "[b][color=cyan]ASSET[/color][/b] " + message;
+        }
+        else if(mode == ChatMode.Debug || mode == ChatMode.AttackLog)
         {
             output += "[b][color=orange]LOG[/color][/b] " + message;
         }
@@ -179,7 +191,7 @@ public partial class ChatController : DeligateController
         {
             WindowManager.controller.logging_window.RecieveLogMessage(output);
         }
-        if(mode == ChatMode.Debug || mode == ChatMode.AttackLog) return;
+        if(mode == ChatMode.Asset || mode == ChatMode.Debug || mode == ChatMode.AttackLog) return;
 
         // Determine the clients that recieve the message!
         for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
@@ -267,34 +279,5 @@ public partial class ChatController : DeligateController
     public static void DirectMessage(NetworkClient to_client, string message)
     {
         to_client.BroadcastChatMessage(message);
-    }
-
-
-
-    public override bool CanInit()
-    {
-        return true;
-    }
-
-    public override bool Init()
-    {
-        tick_rate = -1; // NO TICK
-        controller = this;
-        return true;
-    }
-
-    public override void SetupTick()
-    {
-        FinishInit();
-    }
-
-    public override void Fire()
-    {
-        //GD.Print(Name + " Fired");
-    }
-
-    public override void Shutdown()
-    {
-        
     }
 }

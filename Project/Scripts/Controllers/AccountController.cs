@@ -84,13 +84,13 @@ public partial class AccountController : DeligateController
             Account acc = loaded_accounts[i];
             if(acc.active_client == client)
             {
-                GD.Print("Account " + acc.id_name + " reserved entity updated to " + focusedEnt);
+                ChatController.DebugLog("Account " + acc.id_name + " reserved entity updated to " + focusedEnt);
                 acc.registered_entity = focusedEnt;
                 return;
             }
         }
         // How did you get on the server without an account?
-        GD.Print("Client had no account to update... Disconnecting " + client.Name);
+        ChatController.DebugLog("Client had no account to update... Disconnecting " + client.Name);
         client.DisconnectClient();
     }
 
@@ -106,7 +106,7 @@ public partial class AccountController : DeligateController
             }
         }
         // How did you get on the server without an account?
-        GD.Print("Client had no account... Disconnecting " + client.Name);
+        ChatController.DebugLog("Client had no account... Disconnecting " + client.Name);
         ClientLeave(client);
         return null;
     }

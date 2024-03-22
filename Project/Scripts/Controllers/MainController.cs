@@ -94,7 +94,6 @@ public partial class MainController : Node
 				subcontrollers.Add(new MachineController());
 				subcontrollers.Add(new MobController());
 				subcontrollers.Add(new ChunkController());
-				subcontrollers.Add(new ChatController());
 			break;
 
 			case ServerConfig.Editor:
@@ -102,7 +101,6 @@ public partial class MainController : Node
 				subcontrollers.Add(new MapController());
 				subcontrollers.Add(new EditorController());
 				subcontrollers.Add(new ChunkController());
-				subcontrollers.Add(new ChatController());
 			break;
 		}
 	}

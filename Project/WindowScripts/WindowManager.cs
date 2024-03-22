@@ -48,6 +48,7 @@ public partial class WindowManager : Node
                 join_window.Hide();
                 main_window.Hide();
                 chat_window.Hide();
+                logging_window.ReloadLog();
                 logging_window.Show();
             break;
         }
