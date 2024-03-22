@@ -8,6 +8,8 @@ using System.Reflection.Metadata;
 
 public partial class MapController : DeligateController
 {
+    public const float screen_visible_range = 9; // max range for chat and entity vision checks
+
     public static int tile_size = 1; // size in 3D units that world tiles are
 
     /*****************************************************************
@@ -367,12 +369,12 @@ public partial class MapController : DeligateController
     
     public static bool OnSameMap(string A,string B)
     {
+        if(A == "BAG" || B == "BAG" || A == "NULL" || B == "NULL") return false; // catch some hardcoded specials for bags and nullspace. Should use the entity version of this to check beforehand, but best to be safe.
+        // alright lets do the rest of this proper
         if(A == B) return true;
-        // TODO = check submaps
-
+        if(MapController.active_maps[A].HasSubmap(B) || MapController.active_maps[B].HasSubmap(A)) return true;
         return false;
     }
-
 
     public static bool Adjacent(AbstractEntity A,AbstractEntity B, bool ignore_corner_density)
     {
@@ -413,25 +415,31 @@ public partial class MapController : DeligateController
 
     public static float GetMapDistance(AbstractEntity A,AbstractEntity B)
     {
-        if(!MapController.OnSameMap(A.map_id_string,B.map_id_string)) return Mathf.Inf;  // returns infinity if not on same map
+        if(!OnSameMap(A.map_id_string,B.map_id_string)) return Mathf.Inf;  // returns infinity if not on same map
         return GetMapDistance(A.GridPos.WorldPos(),B.GridPos.WorldPos());
     }
     public static float GetMapDistance(Vector3 A_pos,Vector3 B_pos)
     {
+        // Check if on same map beforehand!
         return TOOLS.VecDist(A_pos,B_pos); // should just be world position checks if already on same map. World pos are prealigned
     }
 
     public static Vector3 GetMapDirection(AbstractEntity A,AbstractEntity B)
     {
+        // Check if on same map beforehand!
         return TOOLS.DirVec(A.GridPos.WorldPos(),B.GridPos.WorldPos()); // should just be world position checks if already on same map. World pos are prealigned
     }
 
-
     
-    public static bool GetMapVisible()
+    public static bool GetMapVisibility(AbstractEntity A,AbstractEntity B)  // if A can see B
     {
-
-        return true;
+        if(!OnSameMap(A,B)) return false;
+        return GetMapVisibility(A.GridPos.WorldPos(),B.GridPos.WorldPos());
+    }
+    public static bool GetMapVisibility(Vector3 A_pos,Vector3 B_pos)  // if A can see B
+    {
+        // Check if on same map beforehand!
+        return TOOLS.VecDist(A_pos,B_pos) < screen_visible_range;
     }
 
     
@@ -731,6 +739,16 @@ public partial class MapController : DeligateController
         public NetworkChunk[,,] GetLoadedChunkGrid()
         {
             return chunk_grid;
+        }
+
+        public bool HasSubmap(string checkmap)
+        {
+            return loaded_submaps.Contains(checkmap);
+        }
+
+        public List<string> GetSubmapList()
+        {
+            return loaded_submaps;
         }
     }
 

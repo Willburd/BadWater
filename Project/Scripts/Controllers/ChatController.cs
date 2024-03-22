@@ -102,7 +102,7 @@ public static class ChatController
         if(heard_message != null) VisibleMessage(speaking_ent, seen_message, format, false, true, excludes);
     }
 
-    public static void VisibleMessage(AbstractEntity speaking_ent, string message, VisibleMessageFormatting format = VisibleMessageFormatting.Nothing, bool send_to_visible = true, bool send_to_not_visible = false, List<AbstractEntity> excludes = null)
+    public static void VisibleMessage(AbstractEntity speaking_ent, string message, VisibleMessageFormatting format = VisibleMessageFormatting.Nothing, bool send_to_visible = true, bool send_to_hidden = false, List<AbstractEntity> excludes = null)
     {
         switch(format)
         {
@@ -116,10 +116,10 @@ public static class ChatController
                 message = "[color=red]" + message + "[/color]";
                 break;
         }
-        SubmitMessage( null, speaking_ent, message, ChatMode.VisibleMessage, send_to_visible, send_to_not_visible, excludes);
+        SubmitMessage( null, speaking_ent, message, ChatMode.VisibleMessage, send_to_visible, send_to_hidden, excludes);
     }
 
-    public static void SubmitMessage(NetworkClient client, AbstractEntity speaking_ent, string message, ChatMode mode, bool send_to_visible = true, bool send_to_not_visible = false, List<AbstractEntity> excludes = null)
+    public static void SubmitMessage(NetworkClient client, AbstractEntity speaking_ent, string message, ChatMode mode, bool send_to_visible = true, bool send_to_hidden = false, List<AbstractEntity> excludes = null)
     {
         if(excludes == null) excludes = new List<AbstractEntity>();
         // SANITIZE
@@ -208,8 +208,12 @@ public static class ChatController
                 {
                     if(scan_cli.GetFocusedEntity() != null && excludes.Contains(scan_cli.GetFocusedEntity())) continue; // IGNORE!
 
-                    // check visibility, and perform if send_to_visible or send_to_not_visible. this lets us do audio only versions of a message if you can't see the action!
+                    // Check visibility for send_to_visible and send_to_hidden (so sound only visiblemessages proc!)
+                    bool is_visible = MapController.GetMapVisibility(speaking_ent.GridPos.WorldPos(),scan_cli.focused_position);
+                    if(is_visible && !send_to_visible) continue;
+                    if(!is_visible && !send_to_hidden) continue;
 
+                    // Handle whisper range
                     bool in_small_range_limit = MapController.Adjacent( speaking_ent.GridPos.WorldPos(), scan_cli.focused_position,true);
                     switch(mode)
                     {
@@ -220,7 +224,7 @@ public static class ChatController
                         case ChatMode.Whisper:
                             if(in_small_range_limit) 
                             {
-                                AudioController.PlayAt("BASE/Talksounds/Speak", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.short_range, -15, scan_cli);
+                                AudioController.PlayAt("BASE/Talksounds/Speak", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.short_range, -20, scan_cli);
                                 scan_cli.BroadcastChatMessage(output);
                             }
                         break;
@@ -231,7 +235,7 @@ public static class ChatController
                         case ChatMode.Subtle:
                             if(in_small_range_limit) 
                             {
-                                AudioController.PlayAt("BASE/Talksounds/Subtle", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.short_range, -10, scan_cli);
+                                AudioController.PlayAt("BASE/Talksounds/Subtle", speaking_ent.map_id_string, speaking_ent.GridPos.WorldPos(), AudioController.short_range, -20, scan_cli);
                                 scan_cli.BroadcastChatMessage(output);
                             }
                         break;
