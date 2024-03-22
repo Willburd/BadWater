@@ -340,7 +340,7 @@ public partial class AbstractEntity
      ****************************************************************/
     public virtual bool InteractCanReach(AbstractMob user, AbstractEntity target, int range)
     {
-        if(TOOLS.Adjacent(user,target,false)) return true; // Already adjacent.
+        if(MapController.Adjacent(user,target,false)) return true; // Already adjacent.
         return false;
     }
 
@@ -532,7 +532,7 @@ public partial class AbstractEntity
         // Is new location valid?
         Vector2 dir_vec = TOOLS.DirVec( grid_pos.hor, grid_pos.ver, new_grid.hor, new_grid.ver);
         
-        if(map_id_string == new_mapID)
+        if(MapController.OnSameMap(map_id_string,new_mapID))
         {
             // EDGE LOCK
             float threshold = (float)0.01;
@@ -627,8 +627,6 @@ public partial class AbstractEntity
                 }
                 else
                 {
-                    // check if the bonk is significant enough!
-                    Vector3 distVec = new_grid.WorldPos() - grid_pos.WorldPos();
                     if(bump_h) // bonk horizontal.
                     {
                         Bump(hor_turf);
@@ -644,7 +642,7 @@ public partial class AbstractEntity
         } 
         
         // At same location still, don't bother with much else...
-        if(location is AbstractTurf && grid_pos.Equals(new_grid) && new_mapID == map_id_string) 
+        if(location is AbstractTurf && grid_pos.Equals(new_grid) && MapController.OnSameMap(new_mapID,map_id_string)) 
         {
             // Move around in current turf
             map_id_string = new_mapID;

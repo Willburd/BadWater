@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Transactions;
 
 namespace Behaviors_BASE
 {
@@ -91,8 +92,8 @@ namespace Behaviors_BASE
             public int special_attack_delay = 0;
 
             //Special attacks
-            public int special_attack_min_range = 0;		// The minimum distance required for an attempt to be made.
-            public int special_attack_max_range = 0;		// The maximum for an attempt.
+            public int? special_attack_min_range = 0;		// The minimum distance required for an attempt to be made.
+            public int? special_attack_max_range = 0;		// The maximum for an attempt.
             public int? special_attack_charges = null;		// If set, special attacks will work off of a charge system, and won't be usable if all charges are expended. Good for grenades.
             public int? special_attack_cooldown = null;    // If set, special attacks will have a cooldown between uses.
         }
@@ -309,7 +310,7 @@ namespace Behaviors_BASE
             }
             if(click_params["mod_control"].AsBool())
             {
-                if(TOOLS.Adjacent(this,target,false))
+                if(MapController.Adjacent(this,target,false))
                 {
                     if(target is AbstractTurf) I_StopPulling();
                     if(target is IPullable target_pull) I_TryStartPulling(target_pull);
@@ -361,7 +362,7 @@ namespace Behaviors_BASE
             storage_depth = target.StorageDepth(this);
             if(target is AbstractTurf || target.GetLocation() is AbstractTurf  || (storage_depth != -1 && storage_depth <= 1))
             {
-                if(TOOLS.Adjacent(this,target,false) || (hand_item != null && hand_item.InteractCanReach(this, target, hand_item.attack_range)) )
+                if(MapController.Adjacent(this,target,false) || (hand_item != null && hand_item.InteractCanReach(this, target, hand_item.attack_range)) )
                 {
                     if(hand_item != null)
                     {
@@ -418,7 +419,8 @@ namespace Behaviors_BASE
 
                 
                 case DAT.Intent.Hurt:
-                    /*if(can_special_attack(A) && special_attack_target(A))
+                    /*  TODO ==========================================
+                    if(CanSpecialAttack(target) && SpecialAttackTarget(target))
                     {
                         return;
                     }
@@ -443,7 +445,7 @@ namespace Behaviors_BASE
         {
             if(HasTelegrip())
             {
-                if(TOOLS.VecDist(GridPos.WorldPos(), target.GridPos.WorldPos()) > DAT.TK_MAXRANGE) return;
+                if(MapController.GetMapDistance(this,target) > DAT.TK_MAXRANGE) return;
                 target.InteractWithTK(this);
             }
         }
@@ -518,17 +520,15 @@ namespace Behaviors_BASE
 
         public void UnarmedAttackTarget(AbstractEntity target)
         {
-            if(!TOOLS.Adjacent( this, target, false)) return;
+            if(!MapController.Adjacent( this, target, false)) return;
             AbstractTurf turf = target.GetTurf();
 
             direction = TOOLS.RotateTowardEntity(this,target);
 
             if(attacks.melee_attack_delay != null && attacks.melee_attack_delay.Value > 0)
             {
-                // TODO =======================================================================================================================
-                //melee_pre_animation(target)
-                //. = ATTACK_SUCCESSFUL //Shoving this in here as a 'best guess' since this proc is about to sleep and return and we won't be able to know the real value
-                //handle_attack_delay(target, melee_attack_delay) // This will sleep this proc for a bit, which is why waitfor is false.
+                MeleePreAnimation(target);
+                //handle_attack_delay(target, attacks.melee_attack_delay); // This will sleep this proc for a bit, which is why waitfor is false. TODO ==========================================
             }
 
             // Cooldown testing is done at click code (for players) and interface code (for AI).
@@ -536,12 +536,7 @@ namespace Behaviors_BASE
 
             // Returns a value, but will be lost if 
             DoUnarmedAttack( target, turf);
-
-            if(attacks.melee_attack_delay != null && attacks.melee_attack_delay.Value > 0)
-            {
-                // TODO =======================================================================================================================
-                //melee_post_animation(target);
-            }
+            if(attacks.melee_attack_delay != null && attacks.melee_attack_delay.Value > 0) MeleePostAnimation(target);
         }
 
         public void DoUnarmedAttack(AbstractEntity target, AbstractTurf turf)
@@ -557,7 +552,7 @@ namespace Behaviors_BASE
             {
                 missed = true;
             }
-            else if(!TOOLS.Adjacent(this,turf,false))
+            else if(!MapController.Adjacent(this,turf,false))
             {
                 missed = true;
             }
@@ -613,6 +608,48 @@ namespace Behaviors_BASE
         {
             return target.AttackedGeneric( this, damage_to_do, TOOLS.Pick(attacks.attacktext));
         }
+
+        /* // TODO special attacks ===========================================================================================================================
+        // Can we currently do a special attack?
+        public bool CanSpecialAttack(AbstractEntity target)
+        {
+            // Validity check.
+            if(target != null) return false;
+            // Ability check.
+            if(attacks.special_attack_min_range == null || attacks.special_attack_max_range == null) return false;
+
+            // Distance check.
+            if(MapController.GetMapDistance(this,target) < attacks.special_attack_min_range || MapController.GetMapDistance(this,target) > attacks.special_attack_max_range)
+                return false;
+
+            // Cooldown check.
+            if(attacks.special_attack_cooldown != null && last_special_attack + attacks.special_attack_cooldown > MainController.WorldTicks)
+                return false;
+
+            // Charge check.
+            if(attacks.special_attack_charges != null && attacks.special_attack_charges <= 0)
+                return false;
+
+            return true;
+        }
+        */
+
+        // Override these four for special custom animations (like the GOLEM).
+        public virtual void MeleePreAnimation(AbstractEntity target)
+        {
+            //do_windup_animation(A, attacks.melee_attack_delay); TODO ==========================================
+        }
+        public virtual void MeleePostAnimation(AbstractEntity target) { }
+        public virtual void ranged_pre_animation(AbstractEntity target)
+        {
+            //do_windup_animation(A, attacks.ranged_attack_delay); TODO ==========================================
+        }
+        public virtual void RangedPostAnimation(AbstractEntity target) { }
+        public virtual void SpecialPreAnimation(AbstractEntity target)
+        {
+            //do_windup_animation(A, attacks.special_attack_delay); TODO ==========================================
+        }
+        public virtual void SpecialPostAnimation(AbstractEntity target) { }
 
         /*****************************************************************
          * Damage handling
@@ -776,13 +813,13 @@ namespace Behaviors_BASE
         {
             // Prior to our move it's already too far away
             AbstractEntity pull_ent = I_Pulling as AbstractEntity;
-            if(pull_ent != null && TOOLS.VecDist(this.GridPos.WorldPos(),pull_ent.GridPos.WorldPos()) > 1.3f) I_StopPulling();
+            if(pull_ent != null && MapController.GetMapDistance(this,pull_ent) > 1.3f) I_StopPulling();
             // Shenanigans! Pullee closed into locker for eg.
-            if(pull_ent != null && pull_ent.GetLocation() is not AbstractTurf && pull_ent.map_id_string != map_id_string) I_StopPulling();
+            if(pull_ent != null && (!MapController.OnSameMap(pull_ent.map_id_string,map_id_string))) I_StopPulling();
             // Can't pull with no hands
             if(pull_ent != null && IsRestrained()) I_StopPulling();
 
-            if(map_id_string != new_mapID)
+            if(!MapController.OnSameMap(map_id_string,new_mapID))
             {
                 // warp to same location if jumped maps
                 pull_ent?.Move(new_mapID, new MapController.GridPos( GridPos.WorldPos()), perform_turf_actions);
@@ -790,10 +827,10 @@ namespace Behaviors_BASE
             else if(GridPos.WorldPos() != new_grid.WorldPos())
             {
                 // Pulling logic
-                if(I_Pulling != null && I_Pulledby is AbstractEntity pullerEnt)
+                if(I_Pulling != null && I_Pulledby is AbstractEntity puller_ent)
                 {
                     // Don't allow us to go far from what's pulling us! Use resist for that!
-                    if(TOOLS.VecDist(new_grid.WorldPos(),pullerEnt.GridPos.WorldPos()) > 1.1f) return GetLocation(); // Only move toward puller!
+                    if(MapController.GetMapDistance(this,puller_ent) > 1.1f) return GetLocation(); // Only move toward puller!
                 }
                 pull_ent?.Move(new_mapID, new MapController.GridPos( pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
             }

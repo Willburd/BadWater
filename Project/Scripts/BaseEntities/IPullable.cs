@@ -43,10 +43,11 @@ public interface ICanPull
     {
         if(puller.I_Pulling == null) return Vector3.Zero; // Not pulling so don't bother
 
+        // NOTE : Inherently unsafe, check that it's on the same map before hand... or you will get infinity ranges!
         AbstractEntity pulling_ent = puller as AbstractEntity;
         AbstractEntity pulled_ent = puller.I_Pulling as AbstractEntity;
         // Get pulling intensity
-        float dist = TOOLS.VecDist(pulled_ent.GridPos.WorldPos(),pulling_ent.GridPos.WorldPos());
+        float dist = MapController.GetMapDistance(pulled_ent,pulling_ent);
         if(dist < 0.35f) return Vector3.Zero;
         float pullspeed = Mathf.InverseLerp(0.25f,2f,dist);
         // Tug entity to new world pos!

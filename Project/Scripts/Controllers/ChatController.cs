@@ -204,13 +204,13 @@ public static class ChatController
             else
             {
                 // TODO Proper map adjacency, client visual distance, and any other status for sending messages to clients in visible range!
-                if(speaking_ent != null && scan_cli.focused_map_id == speaking_ent.map_id_string)
+                if(speaking_ent != null && MapController.OnSameMap(scan_cli.focused_map_id,speaking_ent.map_id_string))
                 {
                     if(scan_cli.GetFocusedEntity() != null && excludes.Contains(scan_cli.GetFocusedEntity())) continue; // IGNORE!
 
                     // check visibility, and perform if send_to_visible or send_to_not_visible. this lets us do audio only versions of a message if you can't see the action!
 
-                    bool in_small_range_limit = TOOLS.Adjacent( speaking_ent.GridPos.WorldPos(), scan_cli.focused_position,true);
+                    bool in_small_range_limit = MapController.Adjacent( speaking_ent.GridPos.WorldPos(), scan_cli.focused_position,true);
                     switch(mode)
                     {
                         case ChatMode.Speak:

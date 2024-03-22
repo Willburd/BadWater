@@ -355,6 +355,85 @@ public partial class MapController : DeligateController
         
     }
 
+
+    /*****************************************************************
+     * Adjacency and map distance calls
+     ****************************************************************/
+    public static bool OnSameMap(AbstractEntity A,AbstractEntity B)
+    {
+        if(A.GetLocation() is not AbstractTurf || B.GetLocation() is not AbstractTurf) return false; // in bag
+        return OnSameMap(A.map_id_string,B.map_id_string);
+    }
+    
+    public static bool OnSameMap(string A,string B)
+    {
+        if(A == B) return true;
+        // TODO = check submaps
+
+        return false;
+    }
+
+
+    public static bool Adjacent(AbstractEntity A,AbstractEntity B, bool ignore_corner_density)
+    {
+        // different maps, and depth doesn't count
+        if(!OnSameMap(A,B) || A.GridPos.dep != B.GridPos.dep) return false;
+        MapController.GridPos A_pos = A.GridPos;
+        MapController.GridPos B_pos = B.GridPos;
+        // center of turfs
+        if(A is AbstractTurf || B is AbstractTurf)
+        {
+            A_pos.hor = Mathf.Floor(A_pos.hor) + 0.5f; 
+            A_pos.ver = Mathf.Floor(A_pos.ver) + 0.5f; 
+            B_pos.hor = Mathf.Floor(B_pos.hor) + 0.5f; 
+            B_pos.ver = Mathf.Floor(B_pos.ver) + 0.5f; 
+            Vector3 dir_vec = TOOLS.DirVec(A_pos.WorldPos(),B_pos.WorldPos());
+            if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
+            {
+                // Check corner blockages
+
+            }
+            return Mathf.Abs(A.GridPos.hor - B_pos.hor) < 1 || Mathf.Abs(A.GridPos.ver - B_pos.ver) < 1;
+        }
+        return Adjacent(A_pos.WorldPos(),B_pos.WorldPos(), ignore_corner_density);
+    }
+    public static bool Adjacent(Vector3 A_pos,Vector3 B_pos, bool ignore_corner_density) // Assumes OnSameMap(A,B) already passed!
+    {
+        // Entity checking
+        if(Mathf.Floor(A_pos.Y) != Mathf.Floor(B_pos.Y)) return false;
+        Vector3 dir_vec = TOOLS.DirVec(A_pos,B_pos);
+        if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
+        {
+            // Check corner blockages
+
+        }
+        return TOOLS.VecDist(A_pos,B_pos) <= DAT.ADJACENT_DISTANCE;
+    }
+
+
+    public static float GetMapDistance(AbstractEntity A,AbstractEntity B)
+    {
+        if(!MapController.OnSameMap(A.map_id_string,B.map_id_string)) return Mathf.Inf;  // returns infinity if not on same map
+        return GetMapDistance(A.GridPos.WorldPos(),B.GridPos.WorldPos());
+    }
+    public static float GetMapDistance(Vector3 A_pos,Vector3 B_pos)
+    {
+        return TOOLS.VecDist(A_pos,B_pos); // should just be world position checks if already on same map. World pos are prealigned
+    }
+
+    public static Vector3 GetMapDirection(AbstractEntity A,AbstractEntity B)
+    {
+        return TOOLS.DirVec(A.GridPos.WorldPos(),B.GridPos.WorldPos()); // should just be world position checks if already on same map. World pos are prealigned
+    }
+
+
+    
+    public static bool GetMapVisible()
+    {
+
+        return true;
+    }
+
     
     /*****************************************************************
      * SUPPORT OBJECTS

@@ -453,7 +453,7 @@ public partial class NetworkClient : Node3D
         Vector3 release_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
         if(current_click_held_entity != null && ent != null) // Catching entity drags!
         {
-            if(TOOLS.VecDist(release_pos, current_click_start_pos) > 0.1f || current_click_held_entity != ent)
+            if(MapController.GetMapDistance(release_pos,current_click_start_pos) > 0.5f || current_click_held_entity != ent)
             {
                 // Dragged onto another entity!
                 current_click_held_entity.Dragged(focused_entity,ent,TOOLS.ParseJson(parameters_json));

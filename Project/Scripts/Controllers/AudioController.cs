@@ -57,7 +57,7 @@ public partial class AudioController : DeligateController
                 for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
                 {
                     NetworkClient client = (NetworkClient)MainController.controller.client_container.GetChild(i);
-                    if(client.focused_map_id == map_id && TOOLS.VecDist(pos, client.focused_position) < range)
+                    if(MapController.OnSameMap(client.focused_map_id,map_id) && MapController.GetMapDistance(pos, client.focused_position) < range)
                     {
                         float zlevel_dist = Mathf.Abs(pos.Z - client.focused_position.Z) * -5; // -5 per Z level!
                         client.PlaySoundAt(soundpack + "/" + path,pos,range,volume_mod + zlevel_dist);
