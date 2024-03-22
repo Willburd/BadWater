@@ -434,7 +434,6 @@ public partial class AbstractEntity
         animation_locked = set_lock;
         float ticks = (float)set_animation_delay * MainController.tick_rate;
         animation_lock_time = MainController.WorldTicks + ticks;
-        GD.Print("Lock time " + ticks);
     }
     public bool GetAnimationLock()
     {
