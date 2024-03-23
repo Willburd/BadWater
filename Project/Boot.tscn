@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dfd237ybvqioj"]
+[gd_scene load_steps=13 format=3 uid="uid://dfd237ybvqioj"]
 
 [ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
@@ -8,15 +8,9 @@
 [ext_resource type="Script" path="res://WindowScripts/MainWindow.cs" id="4_w1nj2"]
 [ext_resource type="Texture2D" uid="uid://bq77px6p5wx4x" path="res://Materials/ClientBackground/BgTile.png" id="5_x7gbt"]
 [ext_resource type="PackedScene" uid="uid://cwhio5wmd2p5p" path="res://WindowScripts/Prefabs/JoinWindow.tscn" id="6_3dkhe"]
+[ext_resource type="Theme" uid="uid://bhltvqg4jt2ie" path="res://Themes/Mechtronic.tres" id="6_5vcwn"]
 [ext_resource type="PackedScene" uid="uid://nqucwtphnshe" path="res://WindowScripts/Prefabs/LoggingWindow.tscn" id="6_foubn"]
 [ext_resource type="PackedScene" uid="uid://biqov4ddbg4pb" path="res://WindowScripts/Prefabs/ChatWindow.tscn" id="7_fsgwk"]
-
-[sub_resource type="Gradient" id="Gradient_fv2ux"]
-colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_fatin"]
-gradient = SubResource("Gradient_fv2ux")
-width = 512
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_dtkm3"]
 
@@ -52,47 +46,16 @@ position = Vector2i(20, 36)
 size = Vector2i(512, 512)
 min_size = Vector2i(128, 128)
 keep_title_visible = true
+theme = ExtResource("6_5vcwn")
 script = ExtResource("4_w1nj2")
 lock_aspect = true
 
-[node name="BackBG" type="TextureRect" parent="WindowManager/MainWindow"]
+[node name="Panel" type="Panel" parent="WindowManager/MainWindow"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-texture = SubResource("GradientTexture1D_fatin")
-
-[node name="RichTextLabel" type="RichTextLabel" parent="WindowManager/MainWindow/BackBG"]
-clip_contents = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -64.0
-offset_top = -32.0
-offset_right = 64.0
-offset_bottom = 32.0
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(3, 3)
-pivot_offset = Vector2(64, 8)
-auto_translate = false
-localize_numeral_system = false
-mouse_filter = 2
-mouse_force_pass_scroll_events = false
-bbcode_enabled = true
-text = "[center]ESHUI[/center]"
-scroll_active = false
-shortcut_keys_enabled = false
-meta_underlined = false
-hint_underlined = false
-deselect_on_focus_loss_enabled = false
-drag_and_drop_selection_enabled = false
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="WindowManager/MainWindow"]
 anchors_preset = 15
@@ -136,12 +99,15 @@ script = ExtResource("3_jstcs")
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
 
 [node name="LoggingWindow" parent="WindowManager" instance=ExtResource("6_foubn")]
-position = Vector2i(400, 103)
+position = Vector2i(365, 42)
+theme = ExtResource("6_5vcwn")
 
 [node name="ChatWindow" parent="WindowManager" instance=ExtResource("7_fsgwk")]
-position = Vector2i(550, 303)
+position = Vector2i(485, 242)
+theme = ExtResource("6_5vcwn")
 
 [node name="JoinWindow" parent="WindowManager" instance=ExtResource("6_3dkhe")]
-position = Vector2i(80, 300)
+position = Vector2i(80, 270)
+theme = ExtResource("6_5vcwn")
 
 [connection signal="input_event" from="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" to="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" method="_on_input_event"]

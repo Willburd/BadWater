@@ -4,6 +4,7 @@
 
 [node name="JoinWindow" type="Window" node_paths=PackedStringArray("button_client", "button_server", "button_edit", "ip_entry", "port_entry", "pass_entry", "account_entry", "accpass_entry")]
 title = "Login"
+position = Vector2i(0, 36)
 size = Vector2i(965, 150)
 unresizable = true
 always_on_top = true
@@ -16,6 +17,13 @@ port_entry = NodePath("PortEntry")
 pass_entry = NodePath("PasswordEntry")
 account_entry = NodePath("AccountEntry")
 accpass_entry = NodePath("AccountPass")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Client" type="Button" parent="."]
 offset_left = 5.0
