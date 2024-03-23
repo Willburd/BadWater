@@ -9,10 +9,8 @@ namespace Behaviors_BASE
         int lifetime = 3; // seconds
         public override void Init()
         {
-            GD.Print("INIT");
             Task.Delay(new TimeSpan(0, 0, lifetime)).ContinueWith(o => 
             { 
-                GD.Print("END");
                 DeleteEntity();
             });
         }

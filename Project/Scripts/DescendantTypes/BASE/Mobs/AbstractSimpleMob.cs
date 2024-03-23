@@ -456,10 +456,10 @@ namespace Behaviors_BASE
             base.Examinate(target);
         }
 
-        public override void PointAt(AbstractEntity target)
+        public override void PointAt(AbstractEntity target, Vector3 pos)
         {
             if(stat != DAT.LifeState.Alive) return; // no pointing for you
-            base.PointAt(target);
+            base.PointAt(target,pos);
         }
 
         /*****************************************************************

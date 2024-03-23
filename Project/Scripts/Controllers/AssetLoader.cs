@@ -487,7 +487,7 @@ public partial class AssetLoader : Node
 
     public static List<Image> texture_pages = new List<Image>();
     private double tex_offset_stacker = 0;
-    private SortedList<double,PreparingTexture> prepare_textures = new SortedList<double,PreparingTexture>();
+    private TOOLS.TupleList<double,PreparingTexture> prepare_textures = new TOOLS.TupleList<double,PreparingTexture>();
     
     private void LoadTextureAtlas(string path)
     {
@@ -495,18 +495,18 @@ public partial class AssetLoader : Node
         Texture2D tex = (Texture2D)ResourceLoader.Load(path);
         int size = tex.GetWidth() * tex.GetHeight();
         prepare_textures.Add(size + tex_offset_stacker,new PreparingTexture(path,tex.GetWidth(),tex.GetHeight()));
-        tex_offset_stacker += 0.0000001; // TODO - figure out a better way
     }
     private void ConstructTextureAtlas()
     {
         int tex_page_ind = 0; // incriments when we max out a page!
         List<LoadedTexture> placed_on_page = new List<LoadedTexture>();
-        foreach(var prep_tex in prepare_textures.Reverse())
+        prepare_textures.ReverseSort();
+        foreach(var prep_tex in prepare_textures)
         {
             // Check each location 32x32 as a base block... Attempt to place the texture!
             Vector2I place_pos = Vector2I.Zero;
             bool placeable = false;
-            int place_size = Mathf.FloorToInt(Mathf.Min(prep_tex.Value.width,prep_tex.Value.height));
+            int place_size = Mathf.FloorToInt(Mathf.Min(prep_tex.Item2.width,prep_tex.Item2.height));
             while(!placeable)
             {
                 if(texture_pages.Count <= tex_page_ind) 
@@ -517,17 +517,17 @@ public partial class AssetLoader : Node
                 placeable = true;
                 foreach(LoadedTexture check_tex in placed_on_page)
                 {
-                    Rect2I new_rect = new Rect2I(place_pos.X,place_pos.Y,prep_tex.Value.width,prep_tex.Value.height);
+                    Rect2I new_rect = new Rect2I(place_pos.X,place_pos.Y,prep_tex.Item2.width,prep_tex.Item2.height);
                     Rect2I check_rect = new Rect2I(check_tex.u,check_tex.v,check_tex.width,check_tex.height);
                     if(new_rect.Intersects(check_rect))
                     {
                         placeable = false;
                         place_pos.X += place_size;
-                        if(place_pos.X + prep_tex.Value.width > tex_page_size)
+                        if(place_pos.X + prep_tex.Item2.width > tex_page_size)
                         {
                             place_pos.X = 0;
                             place_pos.Y += place_size;
-                            if(place_pos.Y + prep_tex.Value.height > tex_page_size)
+                            if(place_pos.Y + prep_tex.Item2.height > tex_page_size)
                             {
                                 // Failover to next page!
                                 place_pos.X = 0;
@@ -544,7 +544,7 @@ public partial class AssetLoader : Node
                 {
                     Image tex_page = texture_pages[tex_page_ind];
                     // Blit image to page
-                    LoadedTexture loaded_tex_data = new LoadedTexture(prep_tex.Value.path,tex_page_ind,place_pos.X,place_pos.Y,prep_tex.Value.width,prep_tex.Value.height); 
+                    LoadedTexture loaded_tex_data = new LoadedTexture(prep_tex.Item2.path,tex_page_ind,place_pos.X,place_pos.Y,prep_tex.Item2.width,prep_tex.Item2.height); 
                     ChatController.AssetLog("-" + tex_page_ind + ">" + loaded_tex_data.u + "-" + loaded_tex_data.v + "(" + loaded_tex_data.width + "-" + loaded_tex_data.height + "): " + loaded_tex_data.path);
                     // Handle formatting
                     Image blit_img = ((Texture2D)ResourceLoader.Load(loaded_tex_data.path)).GetImage();
@@ -552,7 +552,7 @@ public partial class AssetLoader : Node
                     blit_img.Convert(Image.Format.Rgba8);
                     // Blit image
                     tex_page.BlitRect(blit_img, new Rect2I(0,0,loaded_tex_data.width,loaded_tex_data.height), new Vector2I(loaded_tex_data.u,loaded_tex_data.v));
-                    loaded_textures[prep_tex.Value.path] = loaded_tex_data;
+                    loaded_textures[prep_tex.Item2.path] = loaded_tex_data;
                     placed_on_page.Add(loaded_tex_data);
                     texture_pages[tex_page_ind] = tex_page;
                     break;

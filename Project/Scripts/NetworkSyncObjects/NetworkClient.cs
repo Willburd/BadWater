@@ -358,7 +358,7 @@ public partial class NetworkClient : Node3D
             Vector3 raynormal = current_camera.ProjectRayNormal(mouse_button.Position);
             Vector3 to = from + (raynormal * dist);
             // Scan all colliding bodies on a raycast!
-            SortedList<float,StaticBody3D> dist_list = new SortedList<float, StaticBody3D>();
+            TOOLS.TupleList<float,StaticBody3D> dist_list = new TOOLS.TupleList<float, StaticBody3D>();
             Godot.Collections.Array<Rid> already_processed = new Godot.Collections.Array<Rid>();
             Godot.Collections.Dictionary raycast_hit = GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create(from, to));
             while(raycast_hit.Count > 0)
@@ -371,19 +371,20 @@ public partial class NetworkClient : Node3D
                 raycast_hit = GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create( from, to, exclude:already_processed));
             }
             // Now that they're sorted by distance, attempt from nearest to furthest to interact!
+            dist_list.Sort();
             foreach(var dat in dist_list)
             {
                 if(mouse_button.ButtonIndex == MouseButton.Left)
                 {
-                    if(dat.Value.GetParent().GetParent() is MeshUpdater mesh_handler)
+                    if(dat.Item2.GetParent().GetParent() is MeshUpdater mesh_handler)
                     {
-                        if(mesh_handler.ClickInput(current_camera, @event,from + (raynormal * dat.Key),dat.Value)) break;
+                        if(mesh_handler.Entity.clickable && mesh_handler.ClickInput(current_camera, @event,from + (raynormal * dat.Item1),dat.Item2)) break;
                     }
                 }
                 // Make rightclicking always get the TURF's content list!
-                if(dat.Value.GetParent() is TurfClickHandler turf_handler)
+                if(dat.Item2.GetParent() is TurfClickHandler turf_handler)
                 {
-                    if(turf_handler.ClickInput(current_camera, @event,from + (raynormal * dat.Key),dat.Value)) break;
+                    if(turf_handler.ClickInput(current_camera, @event,from + (raynormal * dat.Item1),dat.Item2)) break;
                 }
             }
         }
@@ -407,8 +408,9 @@ public partial class NetworkClient : Node3D
             case MouseButton.Middle:
                 if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
                 {
-                    AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
-                    if(client_click_data["mod_shift"].AsBool()) focused_entity?.PointAt(turf);
+                    Vector3 click_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
+                    AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,click_pos),true);
+                    if(client_click_data["mod_shift"].AsBool()) focused_entity?.PointAt(turf,click_pos);
                 }
             break;
 
@@ -464,7 +466,7 @@ public partial class NetworkClient : Node3D
         {
             case MouseButton.Middle:
                 // Directly handle middle clicks
-                if(client_click_data["mod_shift"].AsBool()) focused_entity?.PointAt(ent);
+                if(client_click_data["mod_shift"].AsBool()) focused_entity?.PointAt(ent,ent.GridPos.WorldPos());
             break;
 
             case MouseButton.Left:

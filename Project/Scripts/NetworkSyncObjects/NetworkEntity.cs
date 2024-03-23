@@ -39,6 +39,10 @@ public partial class NetworkEntity : Node3D
         // NetworkEntity init
         newEnt.abstract_owner = abs;
         newEnt.map_id_string = map_id;
+        if(type != MainController.DataType.Chunk)
+        {
+            newEnt.clickable = abs.display_name.Length > 0; // If no name, no click
+        }
         // Add to active network entities list
         MainController.controller.entity_container.AddChild(newEnt,true);
         return newEnt;
@@ -53,6 +57,8 @@ public partial class NetworkEntity : Node3D
     public Vector3 velocity = Vector3.Zero;
     [Export]
     public DAT.Dir direction = DAT.Dir.South;
+    [Export]
+    public bool clickable = false;
     public void DeleteEntity()
     {
         QueueFree();
@@ -185,6 +191,7 @@ public partial class NetworkEntity : Node3D
     public void ClickPressed(Vector3 pos, MouseButton button)
     {
         if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
+        if(!clickable) return;
         Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
         new_inputs["button"] = (int)button;
         new_inputs["state"] = true;
@@ -194,6 +201,7 @@ public partial class NetworkEntity : Node3D
     public void ClickReleased(Vector3 pos, MouseButton button)
     {
         if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
+        if(!clickable) return;
         Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
         new_inputs["button"] = (int)button;
         new_inputs["state"] = false;

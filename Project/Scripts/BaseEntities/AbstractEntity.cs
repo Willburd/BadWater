@@ -88,8 +88,8 @@ public partial class AbstractEntity
     public string icon_state = "Idle";
     
     public DAT.Dir direction = DAT.Dir.South;
-    public string display_name;
-    public string description;
+    public string display_name = "";
+    public string description = "";
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
     public string step_sound = "";              // Sound pack ID for steps
@@ -352,15 +352,10 @@ public partial class AbstractEntity
         */
         return "[b]That's " + f_name + suffix + ".[/b] " + description;
     }
-    public virtual void PointAt(AbstractEntity target)
+    public virtual void PointAt(AbstractEntity target, Vector3 pos)
     {
         if(target == null) return;
-        if(target is AbstractTurf)
-        {
-            AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:POINT_AT",target.GridPos.GetCentered());
-            return;
-        }
-        AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:POINT_AT",target.GridPos);
+        AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:POINT_AT",new MapController.GridPos(target.GridPos.GetMapID(),pos));
     }
 
     /*****************************************************************
