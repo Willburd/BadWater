@@ -302,12 +302,8 @@ namespace Behaviors_BASE
             {
                 return;
             }
-            // Handle special clicks that require you to be concious
-            if(click_params["mod_shift"].AsBool() && click_params["button"].AsInt32() == (int)MouseButton.Middle)
-            {
-                // Point to object TODO ==========================================================================================================================
-                return;
-            }
+
+            // Pulling
             if(click_params["mod_control"].AsBool())
             {
                 if(MapController.Adjacent(this,target,false))
@@ -458,6 +454,12 @@ namespace Behaviors_BASE
                 return;
             }
             base.Examinate(target);
+        }
+
+        public override void PointAt(AbstractEntity target)
+        {
+            if(stat != DAT.LifeState.Alive) return; // no pointing for you
+            base.PointAt(target);
         }
 
         /*****************************************************************

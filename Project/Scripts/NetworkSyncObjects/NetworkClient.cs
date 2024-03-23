@@ -129,10 +129,9 @@ public partial class NetworkClient : Node3D
         // SPAWN HOST OBJECT
         if(focused_entity == null) 
         {
-            AbstractEntity new_ent = AbstractEffect.CreateEntity("BASE:TEST",MainController.DataType.Mob);
+            AbstractEntity new_ent = AbstractEffect.CreateEntity(MainController.DataType.Mob,"BASE:TEST",new_pos);
             new_ent.SetClientOwner(this);
             SetFocusedEntity(new_ent);
-            new_ent.Move(new_pos,false);
             new_ent.UpdateNetwork(false,true);
         }
         // Inform client of movment from server
@@ -342,7 +341,7 @@ public partial class NetworkClient : Node3D
         {
             if(mouse_move.Velocity.Length() > 0)
             {
-                if(Input.IsActionPressed("game_camcontrol"))
+                if(Input.IsActionPressed("mod_shift") == false && Input.IsActionPressed("game_camcontrol")) // shift + middlemouse is inspect
                 {
                     float velocity = mouse_move.Velocity.X / 15000f;
                     view_rotation -= velocity;
@@ -352,9 +351,6 @@ public partial class NetworkClient : Node3D
         }
         if(@event is InputEventMouseButton mouse_button)
         {
-            // Only handle LR presses
-            if(mouse_button.ButtonIndex != MouseButton.Left && mouse_button.ButtonIndex != MouseButton.Right) return;
-
             // Raycasting time! We want to handle a raycast all on our own, because godot has some brain damage in its input system, and this is too hard for it.
             Camera3D current_camera = GetViewport().GetCamera3D();
             Vector3 from = current_camera.ProjectRayOrigin(mouse_button.Position);
@@ -406,71 +402,95 @@ public partial class NetworkClient : Node3D
         Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
         if(client_click_data.Keys.Count == 0) return;
 
-        if(client_click_data["button"].AsInt32() == (int)MouseButton.Left)
+        switch((MouseButton)client_click_data["button"].AsInt32())
         {
-            if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
-            {
-                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
-                if(current_click_held_entity != null)
+            case MouseButton.Middle:
+                if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
                 {
-                    current_click_held_entity.Dragged( focused_entity, turf, client_click_data);
-                    current_click_held_entity = null;
-                    current_click_start_pos = Vector3.Zero;
+                    AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                    if(client_click_data["mod_shift"].AsBool()) focused_entity?.PointAt(turf);
                 }
-                else if(turf != null && focused_entity != null)
-                {
-                    DAT.Dir old_dir = focused_entity.direction;
-                    focused_entity?.Clicked( focused_entity?.ActiveHand, turf,client_click_data);
-                    focused_entity.UpdateNetworkDirection(old_dir);
-                }
-            }
-        }
+            break;
 
-        if(client_click_data["button"].AsInt32() == (int)MouseButton.Right)
-        {
-            if(client_click_data["state"].AsBool()) // Creates a menu, so do this instantly!
-            {
-                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
-                // Create a list of entities on the tile that we can click, including the turf!
-                if(turf == null) return;
-                foreach(AbstractEntity ent in turf.Contents)
+            case MouseButton.Left:
+                if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
                 {
-                    GD.Print(ent.display_name);
+                    AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                    if(current_click_held_entity != null)
+                    {
+                        current_click_held_entity.Dragged( focused_entity, turf, client_click_data);
+                        current_click_held_entity = null;
+                        current_click_start_pos = Vector3.Zero;
+                    }
+                    else if(turf != null && focused_entity != null)
+                    {
+                        DAT.Dir old_dir = focused_entity.direction;
+                        focused_entity?.Clicked( focused_entity?.ActiveHand, turf,client_click_data);
+                        focused_entity.UpdateNetworkDirection(old_dir);
+                    }
                 }
-                GD.Print(turf.display_name);
-            }
+            break;
+
+            case MouseButton.Right:
+                if(client_click_data["state"].AsBool()) // Creates a menu, so do this instantly!
+                {
+                    AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                    // Create a list of entities on the tile that we can click, including the turf!
+                    if(turf == null) return;
+                    foreach(AbstractEntity ent in turf.Contents)
+                    {
+                        GD.Print(ent.display_name);
+                    }
+                    GD.Print(turf.display_name);
+                }
+            break;
         }
     }
     public void ClickEntityStart(AbstractEntity ent,string parameters_json)
     {
         Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
-        current_click_held_entity = ent;
-        current_click_start_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
+        switch((MouseButton)client_click_data["button"].AsInt32())
+        {
+            case MouseButton.Left:
+                current_click_held_entity = ent;
+                current_click_start_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
+            break;
+        }
     }
     public void ClickEntityEnd(AbstractEntity ent,string parameters_json)
     {
         Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
-        Vector3 release_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
-        if(current_click_held_entity != null && ent != null) // Catching entity drags!
+        switch((MouseButton)client_click_data["button"].AsInt32())
         {
-            if(MapController.GetMapDistance(release_pos,current_click_start_pos) > 0.5f || current_click_held_entity != ent)
-            {
-                // Dragged onto another entity!
-                current_click_held_entity.Dragged(focused_entity,ent,TOOLS.ParseJson(parameters_json));
-            }
-            else
-            {
-                // Click on same entity!
-                if(focused_entity != null)
+            case MouseButton.Middle:
+                // Directly handle middle clicks
+                if(client_click_data["mod_shift"].AsBool()) focused_entity?.PointAt(ent);
+            break;
+
+            case MouseButton.Left:
+                Vector3 release_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
+                if(current_click_held_entity != null && ent != null) // Catching entity drags!
                 {
-                    DAT.Dir old_dir = focused_entity.direction;
-                    focused_entity.Clicked(focused_entity?.ActiveHand,ent,TOOLS.ParseJson(parameters_json));
-                    focused_entity.UpdateNetworkDirection(old_dir);
+                    if(MapController.GetMapDistance(release_pos,current_click_start_pos) > 0.5f || current_click_held_entity != ent)
+                    {
+                        // Dragged onto another entity!
+                        current_click_held_entity.Dragged(focused_entity,ent,TOOLS.ParseJson(parameters_json));
+                    }
+                    else
+                    {
+                        // Click on same entity!
+                        if(focused_entity != null)
+                        {
+                            DAT.Dir old_dir = focused_entity.direction;
+                            focused_entity.Clicked(focused_entity?.ActiveHand,ent,TOOLS.ParseJson(parameters_json));
+                            focused_entity.UpdateNetworkDirection(old_dir);
+                        }
+                    }
+                    // Cleanup
+                    current_click_start_pos = Vector3.Zero;
+                    current_click_held_entity = null;
                 }
-            }
-            // Cleanup
-            current_click_start_pos = Vector3.Zero;
-            current_click_held_entity = null;
+            break;
         }
     }
 

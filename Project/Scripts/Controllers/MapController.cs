@@ -141,7 +141,7 @@ public partial class MapController : DeligateController
         // Create all areas from resources
         foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
-            AbstractArea area = AbstractEntity.CreateEntity(entry.Value.GetUniqueModID,MainController.DataType.Area) as AbstractArea;
+            AbstractArea area = AbstractEntity.CreateEntity(MainController.DataType.Area,entry.Value.GetUniqueModID,null, true) as AbstractArea;
             areas[entry.Value.GetUniqueModID] = area;
             area.Init();
         }
@@ -482,6 +482,7 @@ public partial class MapController : DeligateController
 
         public readonly Vector3 WorldPos()
         {
+            if(mapid == "NULL" || mapid == "BAG") return Vector3.Zero;
             GridPos align_pos = MapController.active_maps[mapid].submap_pos;
             float align_hor = Mathf.Floor(align_pos.hor);
             float align_ver = Mathf.Floor(align_pos.ver);
@@ -495,7 +496,7 @@ public partial class MapController : DeligateController
             float align_hor = Mathf.Floor(align_pos.hor);
             float align_ver = Mathf.Floor(align_pos.ver);
             float align_dep = Mathf.Floor(align_pos.dep);
-            return new GridPos(mapid,Mathf.Floor(align_hor) + 0.5f,Mathf.Floor(align_ver) + 0.5f,align_dep);
+            return new GridPos( mapid, hor+align_hor+0.5f, ver+align_ver+0.5f, dep+align_dep);
         }
 
         public readonly Vector3 WorldPosCentered()
@@ -608,7 +609,7 @@ public partial class MapController : DeligateController
                 }
             }
             // Spawn new turf
-            AbstractTurf turf = AbstractEntity.CreateEntity(turfID, MainController.DataType.Turf) as AbstractTurf;
+            AbstractTurf turf = AbstractEntity.CreateEntity(MainController.DataType.Turf,turfID,null, true) as AbstractTurf;
             SetTurfPosition(turf,grid_pos,submaps);
             area.AddTurf(turf);
             return turf;
@@ -759,7 +760,7 @@ public partial class MapController : DeligateController
             NetworkChunk chunk = chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep];
             if(chunk != null) return chunk;
             // Loader...
-            NetworkChunk new_chunk = NetworkEntity.CreateEntity(null, map_id, MainController.DataType.Chunk) as NetworkChunk;
+            NetworkChunk new_chunk = NetworkEntity.CreateEntity(null, MainController.DataType.Chunk, map_id) as NetworkChunk;
             new_chunk.Position = TOOLS.ChunkGridToPos(grid_pos);
             chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] = new_chunk;
             loaded_chunks.Add(new_chunk);
@@ -1024,7 +1025,7 @@ public partial class MapController : DeligateController
                         if(item_data.Count > 0)
                         {
                             entity_pack = item_data[current_x];
-                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Item);
+                            ent = AbstractEntity.CreateEntity(MainController.DataType.Item,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -1032,7 +1033,7 @@ public partial class MapController : DeligateController
                         if(effect_data.Count > 0)
                         {
                             entity_pack = effect_data[current_x];
-                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Effect);
+                            ent = AbstractEntity.CreateEntity(MainController.DataType.Effect,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -1040,7 +1041,7 @@ public partial class MapController : DeligateController
                         if(structure_data.Count > 0)
                         {
                             entity_pack = structure_data[current_x];
-                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Structure);
+                            ent = AbstractEntity.CreateEntity(MainController.DataType.Structure,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -1048,7 +1049,7 @@ public partial class MapController : DeligateController
                         if(machine_data.Count > 0)
                         {
                             entity_pack = machine_data[current_x];
-                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Machine);
+                            ent = AbstractEntity.CreateEntity(MainController.DataType.Machine,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -1056,13 +1057,11 @@ public partial class MapController : DeligateController
                         if(mob_data.Count > 0)
                         {
                             entity_pack = mob_data[current_x];
-                            ent = AbstractEntity.CreateEntity(entity_pack[0],MainController.DataType.Mob);
+                            ent = AbstractEntity.CreateEntity(MainController.DataType.Mob,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(TOOLS.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                 }
-                // Set location
-                ent?.Move(new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), false);
                 // LOOP!
                 HandleLoop();
             }

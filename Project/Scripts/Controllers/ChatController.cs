@@ -270,15 +270,7 @@ public static class ChatController
     public static void DirectMessage(AbstractEntity to_entity, string message)
     {
         // Determine the clients that recieve the message!
-        for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
-        {
-            NetworkClient scan_cli = (NetworkClient)MainController.controller.client_container.GetChild(i);
-            if(scan_cli.GetFocusedEntity() == to_entity)
-            {
-                DirectMessage(scan_cli, message);
-                break;
-            }
-        }
+        if(to_entity.GetClientOwner() != null) DirectMessage(to_entity.GetClientOwner(), message);
     }
     public static void DirectMessage(NetworkClient to_client, string message)
     {

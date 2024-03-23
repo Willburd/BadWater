@@ -136,7 +136,12 @@ public partial class AbstractEntity
     protected MainController.DataType entity_type;
     // end state data
 
-    public static AbstractEntity CreateEntity(string type_ID, MainController.DataType type)
+    public static AbstractEntity CreateEntity( MainController.DataType type, string type_ID, string map_id, Vector3 pos,bool suppress_init = false)
+    {
+        MapController.GridPos? grid = new MapController.GridPos(map_id,pos);
+        return CreateEntity( type, type_ID, grid, suppress_init);
+    }
+    public static AbstractEntity CreateEntity( MainController.DataType type, string type_ID, MapController.GridPos? pos,bool suppress_init = false)
     {
         PackData typeData = null;
         AbstractEntity newEnt = null;
@@ -154,7 +159,7 @@ public partial class AbstractEntity
                 break;
             case MainController.DataType.Effect:
                 typeData = AssetLoader.loaded_effects[type_ID];
-                newEnt = new AbstractEffect();
+                newEnt = AbstractEffect.CreateEffect(typeData);
                 newEnt.entity_type = type;
                 MapController.effects.Add(newEnt as AbstractEffect);
                 break;
@@ -186,6 +191,15 @@ public partial class AbstractEntity
         // NetworkEntity init
         newEnt.grid_pos = new MapController.GridPos("NULL",0,0,0); // nullspace till placed
         newEnt.TemplateRead(typeData);
+        // Automove to location
+        if(pos != null) newEnt.Move(pos.Value,false);
+        // Init, handles basic object spawning!
+        if(!suppress_init)
+        {
+            newEnt.Init();
+            newEnt.LateInit();
+            newEnt.UpdateIcon();
+        }
         return newEnt;
     }
 
@@ -198,7 +212,7 @@ public partial class AbstractEntity
         get {return internal_loaded_network_entity;}
     }
     public virtual void Init() {} // Called upon creation to set variables or state, usually detected by map information.
-    public void LateInit() { } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
+    public virtual void LateInit() { } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
     public virtual void Tick() { } // Called every process tick on the Fire() tick of the subcontroller that owns them
     public virtual void Crossed(AbstractEntity crosser) { }
     public virtual void UnCrossed(AbstractEntity crosser) { }
@@ -292,6 +306,10 @@ public partial class AbstractEntity
         Debug.Assert(client != null);
         owner_client = client;
     }
+    public NetworkClient GetClientOwner()
+    {
+        return owner_client;
+    }
     public void ClearClientOwner()
     {
         owner_client = null;
@@ -333,6 +351,16 @@ public partial class AbstractEntity
                 f_name += "oil-stained [name][infix]."
         */
         return "[b]That's " + f_name + suffix + ".[/b] " + description;
+    }
+    public virtual void PointAt(AbstractEntity target)
+    {
+        if(target == null) return;
+        if(target is AbstractTurf)
+        {
+            AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:POINT_AT",target.GridPos.GetCentered());
+            return;
+        }
+        AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:POINT_AT",target.GridPos);
     }
 
     /*****************************************************************
@@ -787,7 +815,7 @@ public partial class AbstractEntity
             bool is_vis = IsNetworkVisible();
             if(is_vis && LoadedNetworkEntity == null)
             {
-                internal_loaded_network_entity = NetworkEntity.CreateEntity( this, grid_pos.GetMapID(), entity_type);
+                internal_loaded_network_entity = NetworkEntity.CreateEntity( this, entity_type, grid_pos.GetMapID());
                 SyncPositionRotation(true,true);
                 return;
             }

@@ -4,7 +4,7 @@
 		"name": "Jil",
 		"desc": "Someone testing something.",
 		"behavior": "MOB_SIMPLE",
-		"model": "BASE/Entities/Small.tscn",
+		"model": "BASE/Entities/SmallDirectional.tscn",
 		"texture": "BASE/Mobs/Jil",
 		"intangible": 0,
 

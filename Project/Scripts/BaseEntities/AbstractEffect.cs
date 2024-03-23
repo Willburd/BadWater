@@ -28,6 +28,13 @@ public class AbstractEffect : AbstractEntity
             break;
 
             /*****************************************************************
+             * Animated effects
+             ****************************************************************/
+            case "POINT_AT":
+                new_effect = new Behaviors_BASE.PointAt(); // Performs behaviors when crossed
+            break;
+
+            /*****************************************************************
              * Debugging purposes only.
              ****************************************************************/
             default:

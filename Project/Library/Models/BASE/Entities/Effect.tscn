@@ -22,5 +22,3 @@ collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Effect/StaticBody3D"]
 shape = SubResource("ConvexPolygonShape3D_apvic")
-
-[connection signal="input_event" from="Effect/StaticBody3D" to="Effect/StaticBody3D" method="_on_input_event"]

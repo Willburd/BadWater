@@ -32,7 +32,7 @@ public partial class PackData : Resource
         tag             = TOOLS.ApplyExistingTag(data,"tag",tag);
         model           = TOOLS.ApplyExistingTag(data,"model",model);
         texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
-        anim_speed      = TOOLS.ApplyExistingTag(data,"anim_speed",(double)0);
+        anim_speed      = TOOLS.ApplyExistingTag(data,"anim_speed",anim_speed);
         // Sounds
         hit_sound       = TOOLS.ApplyExistingTag(data,"hit_sound",hit_sound);
         // When used as a weapon

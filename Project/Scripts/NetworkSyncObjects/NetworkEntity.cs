@@ -12,7 +12,7 @@ public partial class NetworkEntity : Node3D
     protected AbstractEntity abstract_owner;
     public const bool debug_visual = false; // if server gets visual updates
 
-    public static NetworkEntity CreateEntity(AbstractEntity abs, string map_id, MainController.DataType type)
+    public static NetworkEntity CreateEntity(AbstractEntity abs, MainController.DataType type, string map_id)
     {
         NetworkEntity newEnt = null;
         switch(type)
@@ -182,17 +182,21 @@ public partial class NetworkEntity : Node3D
     /*****************************************************************
      * Click handling
      ****************************************************************/
-    public void ClickPressed(Vector3 pos)
+    public void ClickPressed(Vector3 pos, MouseButton button)
     {
         if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
         Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
+        new_inputs["button"] = (int)button;
+        new_inputs["state"] = true;
         Rpc(nameof(ClientUpdateClickedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
     }
 
-    public void ClickReleased(Vector3 pos)
+    public void ClickReleased(Vector3 pos, MouseButton button)
     {
         if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
         Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
+        new_inputs["button"] = (int)button;
+        new_inputs["state"] = false;
         Rpc(nameof(ClientUpdateReleasedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
     }
 

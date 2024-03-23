@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://vytqv2y40k7a"]
+[gd_scene load_steps=4 format=3 uid="uid://qv2fb37isrd6"]
 
-[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_xtx3w"]
+[ext_resource type="Script" path="res://Scripts/MeshHandlers/MeshUpdater.cs" id="1_kuamq"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_4wiiq"]
 
@@ -9,16 +9,17 @@ points = PackedVector3Array(-1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1)
 
 [node name="Constraint" type="Node3D" node_paths=PackedStringArray("mesh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-script = ExtResource("1_xtx3w")
-mesh = NodePath("Small")
+script = ExtResource("1_kuamq")
+mesh = NodePath("SmallDirectional")
 face_camera = true
+is_directional = true
 
-[node name="Small" type="MeshInstance3D" parent="."]
+[node name="SmallDirectional" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, -2.18557e-08, -0.5, 0, 0.5, -2.18557e-08, 0, 0, 0)
 mesh = SubResource("PlaneMesh_4wiiq")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Small"]
+[node name="StaticBody3D" type="StaticBody3D" parent="SmallDirectional"]
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Small/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SmallDirectional/StaticBody3D"]
 shape = SubResource("ConvexPolygonShape3D_rsnbt")

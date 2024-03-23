@@ -6,7 +6,19 @@
 		"behavior": "",
 		"model": "BASE/Entities/Effect.tscn",
 		"texture": "BASE/Effects/XGreen.png",
+		"anim_speed": 0,
 		"is_spawner": 1,
+		"cleanable": 0
+	},
+	"POINT_AT": {
+		"parent": "",
+		"name": "",
+		"desc": "It's an arrow hanging in mid-air. There may be a wizard about.",
+		"behavior": "POINT_AT",
+		"model": "BASE/Entities/Small.tscn",
+		"texture": "BASE/Effects/Point/Point.png",
+		"anim_speed": 10,
+		"is_spawner": 0,
 		"cleanable": 0
 	}
 }
