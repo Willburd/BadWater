@@ -93,6 +93,26 @@ public static class ChatController
         Danger
     }
 
+    public static void RuneMessage(AbstractEntity origin_entity, string runemessage = "👁", float range = MapController.screen_visible_range)
+    {
+        // Show visible text above characters
+        bool makeEffect = false;
+        for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
+        {
+            NetworkClient client = MainController.controller.client_container.GetChild(i) as NetworkClient;
+            if(MapController.OnSameMap(client.focused_map_id,origin_entity.GridPos.GetMapID()) && MapController.GetMapDistance(client.focused_position,origin_entity.GridPos.WorldPos()) <= range )
+            {
+                // Create network effect entity for the text, don't worry about doing this for all clients, the effect does that itself. We're just checking if any client is in range!
+                makeEffect = true;
+                break;
+            }
+        }
+        // Drop out if not in range of any clients...
+        if(!makeEffect) return;
+        // Make effect!
+        AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:POINT_AT",origin_entity.GridPos);
+    }
+
     public static void ActionMessage(AbstractEntity speaking_ent, string self_message, string seen_message, string heard_message, VisibleMessageFormatting format = VisibleMessageFormatting.Nothing, List<AbstractEntity> excludes = null)
     {
         InspectMessage(speaking_ent, self_message, format);
@@ -116,6 +136,7 @@ public static class ChatController
                 message = "[color=red]" + message + "[/color]";
                 break;
         }
+        RuneMessage(speaking_ent);
         SubmitMessage( null, speaking_ent, message, ChatMode.VisibleMessage, send_to_visible, send_to_hidden, excludes);
     }
 
@@ -160,15 +181,19 @@ public static class ChatController
                 {
                     case ChatMode.Speak:
                         output += "[b][color=green]" + speaking_ent.display_name + "[/color][/b] says : " + message;
+                        RuneMessage(speaking_ent,message);
                     break;
                     case ChatMode.Whisper:
                         output += "[b][color=green]" + speaking_ent.display_name + "[/color][/b] whispers : " + message;
+                        RuneMessage(speaking_ent,message,2);
                     break;
                     case ChatMode.Emote:
                         output += "[b][color=green]" + speaking_ent.display_name + "[/color][/b] " + message;
+                        RuneMessage(speaking_ent,message);
                     break;
                     case ChatMode.Subtle:
                         output += "[b][color=green]" + speaking_ent.display_name + "[/color][/b] " + message;
+                        RuneMessage(speaking_ent,message,2);
                     break;
                     // DIRECT
                     case ChatMode.VisibleMessage:

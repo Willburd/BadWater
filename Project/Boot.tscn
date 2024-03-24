@@ -42,7 +42,7 @@ stretch_mode = 1
 
 [node name="MainWindow" type="Window" parent="WindowManager"]
 title = "Main"
-position = Vector2i(20, 36)
+position = Vector2i(20, 60)
 size = Vector2i(512, 512)
 min_size = Vector2i(128, 128)
 keep_title_visible = true
@@ -99,11 +99,11 @@ script = ExtResource("3_jstcs")
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
 
 [node name="LoggingWindow" parent="WindowManager" instance=ExtResource("6_foubn")]
-position = Vector2i(365, 42)
+position = Vector2i(365, 150)
 theme = ExtResource("6_5vcwn")
 
 [node name="ChatWindow" parent="WindowManager" instance=ExtResource("7_fsgwk")]
-position = Vector2i(485, 242)
+position = Vector2i(510, 300)
 theme = ExtResource("6_5vcwn")
 
 [node name="JoinWindow" parent="WindowManager" instance=ExtResource("6_3dkhe")]
