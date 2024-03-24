@@ -4,6 +4,12 @@ using System.Collections.Generic;
 
 public partial class AccountController : DeligateController
 {
+    public static AccountController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
+    public AccountController()
+    {
+        controller = this;
+    }
+
     public class Account
     {
         public string id_name;
@@ -151,8 +157,8 @@ public partial class AccountController : DeligateController
 
     public override bool Init()
     {
+        display_name = "Accounts";
         tick_rate = -1; // NO TICK
-        controller = this;
         return true;
     }
 

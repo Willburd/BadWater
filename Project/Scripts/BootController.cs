@@ -5,7 +5,7 @@ using System;
 public partial class BootController : Node
 {
     public static BootController controller;
-    public override void _EnterTree()
+    public BootController()
     {
         controller = this;
     }

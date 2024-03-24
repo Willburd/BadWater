@@ -5,10 +5,11 @@ using System;
 public partial class WindowManager : Node
 {
     public static WindowManager controller;
-    public override void _EnterTree()
+	public WindowManager()
     {
         controller = this;
     }
+
 
     [Export]
     public Window main_window;
@@ -18,6 +19,8 @@ public partial class WindowManager : Node
     public ChatWindow chat_window;
     [Export]
     public LoggingWindow logging_window;
+    [Export]
+    public ServerLoadWindow server_load_window;
 
     public enum WindowStates
     {
@@ -35,6 +38,7 @@ public partial class WindowManager : Node
                 main_window.Hide();
                 chat_window.Hide();
                 logging_window.Hide();
+                server_load_window.Hide();
             break;
 
             case WindowStates.MainGame:
@@ -42,6 +46,7 @@ public partial class WindowManager : Node
                 main_window.Show();
                 chat_window.Show();
                 logging_window.Hide();
+                server_load_window.Hide();
             break;
 
             case WindowStates.ServerConfig:
@@ -50,6 +55,7 @@ public partial class WindowManager : Node
                 chat_window.Hide();
                 logging_window.ReloadLog();
                 logging_window.Show();
+                server_load_window.Show();
             break;
         }
     }

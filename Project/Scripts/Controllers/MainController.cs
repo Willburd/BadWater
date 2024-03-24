@@ -5,7 +5,14 @@ using System.Reflection.Metadata;
 
 [GlobalClass] 
 public partial class MainController : Node
-{
+{    
+	public static MainController controller;
+	public MainController()
+    {
+        controller = this;
+    }
+
+
     public enum DataType
     {
         Map,
@@ -30,12 +37,18 @@ public partial class MainController : Node
 		Sound
     }
 
-	public static MainController controller;
-
 	[Export]
 	public ConfigData config;
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
+	public static int GetSubControllerCount()
+	{
+		return subcontrollers.Count;
+	}
+	public static DeligateController GetSubControllerAtIndex(int i) // Debugging only please.
+	{
+		return subcontrollers[i];
+	}
 
 	public enum ServerConfig
 	{
@@ -81,7 +94,6 @@ public partial class MainController : Node
 		// self singleton for all the others.
 		GD.Print("Starting Server in state: " + state);
 		server_state = state;
-		controller = this;
 
 		// Create subcontrollers!
 		switch(server_state)
@@ -169,7 +181,15 @@ public partial class MainController : Node
 		// Update all deligate controllers
 		for(int i = 0; i < subcontrollers.Count; i++) 
 		{
-			subcontrollers[i].Tick();
+			DeligateController con = subcontrollers[i];
+			// Process controllers
+			ulong start_time = Time.GetTicksUsec();
+			con.did_tick = subcontrollers[i].Tick();
+			ulong end_time = Time.GetTicksUsec();
+			if(!con.did_tick) continue;
+			// debug logging
+			if(con.logged_times.Count > 10) con.logged_times.RemoveAt(0);
+			con.logged_times.Add(end_time - start_time);
 		}
 		for(int i = 0; i < client_container.GetChildCount(); i++) 
 		{

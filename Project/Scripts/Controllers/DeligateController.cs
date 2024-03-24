@@ -11,14 +11,20 @@ public class DeligateController
         ready       // All setup finished
     }
 
-    public static List<AbstractEntity> entities = new List<AbstractEntity>();
+    public string display_name = "";
+    public List<ulong> logged_times = new List<ulong>();
 
-    public static DeligateController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
+    public List<AbstractEntity> entities = new List<AbstractEntity>();
 
     private State current_state = State.not_init;
     protected int tick_rate = 1;                    // Ticks needed to Fire()
+    public int GetTickRate()
+    {
+        return tick_rate;
+    }
     private int ticks = 0;                          // Resets to 0 when it hits the tick_rate.
     private int pause_ticks = 0;
+    public bool did_tick = false;
 
     public string Name               // Used by main controller during setup, to prevent double init
     {
@@ -38,7 +44,6 @@ public class DeligateController
 
     public virtual bool Init()          // Called when setting up, if returns true, calls Started() to prevent multiple inits
     {
-        controller = this;
         return true;
     }
 
@@ -109,6 +114,11 @@ public class DeligateController
     {
         pause_ticks = ticks;
         ticks = 0;
+    }
+
+    public bool IsPaused
+    {
+        get {return pause_ticks > 0;}
     }
     
     public virtual void Shutdown() {}

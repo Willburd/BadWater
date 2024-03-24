@@ -8,6 +8,12 @@ using System.Reflection.Metadata;
 
 public partial class MapController : DeligateController
 {
+    public static MapController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
+	public MapController()
+    {
+        controller = this;
+    }
+
     public const float screen_visible_range = 9; // max range for chat and entity vision checks
 
     public static int tile_size = 1; // size in 3D units that world tiles are
@@ -25,9 +31,9 @@ public partial class MapController : DeligateController
     /*****************************************************************
      * CONTROLLER SETUP
      ****************************************************************/
-    public static Dictionary<string,AbstractArea> areas = new Dictionary<string,AbstractArea>();
-    public static List<AbstractEffect> effects = new List<AbstractEffect>();
-    public static Dictionary<string,List<AbstractEffect>> spawners = new Dictionary<string,List<AbstractEffect>>();
+    public Dictionary<string,AbstractArea> areas = new Dictionary<string,AbstractArea>();
+    public List<AbstractEffect> effects = new List<AbstractEffect>();
+    public Dictionary<string,List<AbstractEffect>> spawners = new Dictionary<string,List<AbstractEffect>>();
 
     private static Dictionary<string,MapContainer> active_maps = new Dictionary<string,MapContainer>();
 
@@ -38,8 +44,8 @@ public partial class MapController : DeligateController
 
     public override bool Init()
     {
+        display_name = "Map";
         tick_rate = 3;
-        controller = this;
         InitAreas();
         // For each map loaded, init them!
         string[] loaded = MainController.controller.config.loaded_maps;
@@ -49,7 +55,7 @@ public partial class MapController : DeligateController
             if(!AssetLoader.loaded_maps.ContainsKey(map_id)) continue;
             MapData map_data = AssetLoader.loaded_maps[map_id];
             ChatController.DebugLog("-Loading map: " + map_data.display_name);
-            loading.Add(new MapLoader(map_id,map_data.width,map_data.height,map_data.depth));
+            loading.Add(new MapLoader(this,map_id,map_data.width,map_data.height,map_data.depth));
         }
         return true;
     }
@@ -72,7 +78,7 @@ public partial class MapController : DeligateController
             foreach(MapOperator loader in loading)
             {
                 active_maps[loader.GetMapID()] = loader.GetMap();
-                initing.Add(new MapInitilizer(active_maps[loader.GetMapID()]));
+                initing.Add(new MapInitilizer(this,active_maps[loader.GetMapID()]));
             }
             loading.Clear();
             return;
@@ -91,7 +97,7 @@ public partial class MapController : DeligateController
             if(!finished) return;
             foreach(MapOperator loader in initing)
             {
-                iconupdating.Add(new MapLateInitilizer(active_maps[loader.GetMapID()]));
+                iconupdating.Add(new MapLateInitilizer(this,active_maps[loader.GetMapID()]));
             }
             initing.Clear();
             return;
@@ -110,7 +116,7 @@ public partial class MapController : DeligateController
             if(!finished) return;
             foreach(MapOperator loader in iconupdating)
             {
-                entitycreating.Add(new MapEntityCreator(active_maps[loader.GetMapID()]));
+                entitycreating.Add(new MapEntityCreator(this,active_maps[loader.GetMapID()]));
             }
             iconupdating.Clear();
             return;
@@ -176,9 +182,9 @@ public partial class MapController : DeligateController
     {
         // Map controller handles the other controllers entity lists for this too, instead of spagetti. So those controllers can assume the Init() work has been done!
         List<AbstractEntity> all_entities = new List<AbstractEntity>();
-        all_entities.AddRange(MapController.entities);
-        all_entities.AddRange(MachineController.entities);
-        all_entities.AddRange(MobController.entities);
+        all_entities.AddRange(MapController.controller.entities);
+        all_entities.AddRange(MachineController.controller.entities);
+        all_entities.AddRange(MobController.controller.entities);
         ChatController.DebugLog("INIT ENTITIES " + all_entities.Count + " ------------------------------------------------");
         for(int i = 0; i < all_entities.Count; i++) 
         {
@@ -799,6 +805,7 @@ public partial class MapController : DeligateController
 
     private class MapOperator
     {
+        protected MapController controller;
         protected MapContainer output_map;
         public int max_steps
         {
@@ -861,8 +868,9 @@ public partial class MapController : DeligateController
         Godot.Collections.Dictionary area_data;
         Godot.Collections.Dictionary turf_data;
 
-        public MapLoader(string set_map_id,int set_width, int set_height,int set_depth)
+        public MapLoader(MapController owner, string set_map_id,int set_width, int set_height,int set_depth)
         {
+            controller = owner;
             map_id = set_map_id;
             MapData map_data = AssetLoader.loaded_maps[set_map_id];
             output_map = new MapContainer(set_map_id,set_width, set_height,set_depth);
@@ -917,7 +925,7 @@ public partial class MapController : DeligateController
                 }
 
                 // It's turfin time... How awful.
-                AbstractTurf turf = output_map.AddTurf(make_turf_id, new GridPos(map_id,current_x,current_y,current_z), areas[make_area_id], false, false);
+                AbstractTurf turf = output_map.AddTurf(make_turf_id, new GridPos(map_id,current_x,current_y,current_z), controller.areas[make_area_id], false, false);
                 if(turf_json.Length > 0) turf.ApplyMapCustomData(TOOLS.ParseJson(turf_json)); // Set this object's flags using an embedded string of json!
                 HandleLoop();
             }
@@ -927,8 +935,9 @@ public partial class MapController : DeligateController
 
     private class MapInitilizer : MapOperator
     {
-        public MapInitilizer(MapContainer input_map)
+        public MapInitilizer(MapController owner, MapContainer input_map)
         {
+            controller = owner;
             map_id = input_map.MapID;
             output_map = input_map;
             ChatController.DebugLog("INITING MAP" + map_id + " =========================");
@@ -953,8 +962,9 @@ public partial class MapController : DeligateController
 
     private class MapLateInitilizer : MapOperator
     {
-        public MapLateInitilizer(MapContainer input_map)
+        public MapLateInitilizer(MapController owner, MapContainer input_map)
         {
+            controller = owner;
             map_id = input_map.MapID;
             output_map = input_map;
             ChatController.DebugLog("UPDATING MAP" + map_id + " =========================");
@@ -995,8 +1005,9 @@ public partial class MapController : DeligateController
 
 
         int phase = 0;
-        public MapEntityCreator(MapContainer input_map)
+        public MapEntityCreator(MapController owner, MapContainer input_map)
         {
+            controller = owner;
             map_id = input_map.MapID;
             output_map = input_map;
 

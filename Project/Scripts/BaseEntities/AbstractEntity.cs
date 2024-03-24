@@ -161,31 +161,31 @@ public partial class AbstractEntity
                 typeData = AssetLoader.loaded_effects[type_ID];
                 newEnt = AbstractEffect.CreateEffect(typeData);
                 newEnt.entity_type = type;
-                MapController.effects.Add(newEnt as AbstractEffect);
+                MapController.controller.effects.Add(newEnt as AbstractEffect);
                 break;
             case MainController.DataType.Item:
                 typeData = AssetLoader.loaded_items[type_ID];
                 newEnt = AbstractItem.CreateItem(typeData);
                 newEnt.entity_type = type;
-                MapController.entities.Add(newEnt);
+                MapController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Structure:
                 typeData = AssetLoader.loaded_structures[type_ID];
                 newEnt = AbstractStructure.CreateStructure(typeData);
                 newEnt.entity_type = type;
-                MapController.entities.Add(newEnt);
+                MapController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Machine:
                 typeData = AssetLoader.loaded_machines[type_ID];
                 newEnt = AbstractMachine.CreateMachine(typeData);
                 newEnt.entity_type = type;
-                MachineController.entities.Add(newEnt);
+                MachineController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Mob:
                 typeData = AssetLoader.loaded_mobs[type_ID];
                 newEnt = AbstractMob.CreateMob(typeData);
                 newEnt.entity_type = type;
-                MobController.entities.Add(newEnt);
+                MobController.controller.entities.Add(newEnt);
                 break;
         }
         // NetworkEntity init
@@ -260,28 +260,28 @@ public partial class AbstractEntity
         switch(entity_type)
         {
             case MainController.DataType.Area:
-                MapController.areas.Remove(this.GetUniqueID);
+                MapController.controller.areas.Remove(this.GetUniqueID);
                 break;
             case MainController.DataType.Turf:
                 break;
             case MainController.DataType.Effect:
-                MapController.effects.Remove(this as AbstractEffect);
+                MapController.controller.effects.Remove(this as AbstractEffect);
                 if((this as AbstractEffect).is_spawner)
                 {
-                    MapController.spawners[(this as AbstractEffect).GetTag()].Remove(this as AbstractEffect);
+                    MapController.controller.spawners[(this as AbstractEffect).GetTag()].Remove(this as AbstractEffect);
                 }
                 break;
             case MainController.DataType.Item:
-                MapController.entities.Remove(this);
+                MapController.controller.entities.Remove(this);
                 break;
             case MainController.DataType.Structure:
-                MapController.entities.Remove(this);
+                MapController.controller.entities.Remove(this);
                 break;
             case MainController.DataType.Machine:
-                MachineController.entities.Remove(this);
+                MachineController.controller.entities.Remove(this);
                 break;
             case MainController.DataType.Mob:
-                MobController.entities.Remove(this);
+                MobController.controller.entities.Remove(this);
                 break;
         }
         owner_client?.ClearFocusedEntity();

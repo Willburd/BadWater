@@ -4,6 +4,12 @@ using System.Collections.Generic;
 
 public partial class AudioController : DeligateController
 {
+    public static AudioController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
+    public AudioController()
+    {
+        controller = this;
+    }
+
     public const float screen_range = 6;
     public const float short_range = 3;
 
@@ -14,8 +20,8 @@ public partial class AudioController : DeligateController
 
     public override bool Init()
     {
+        display_name = "Audio";
         tick_rate = -1; // NO TICK
-        controller = this;
         return true;
     }
 

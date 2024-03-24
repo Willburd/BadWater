@@ -4,6 +4,12 @@ using System.Collections.Generic;
 
 public partial class AtmoController : DeligateController
 {
+    public static AtmoController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
+    public AtmoController()
+    {
+        controller = this;
+    }
+
     public const double MINIMUMPRESSUMEDELTA = 0.01;    // difference in pressure where updates are triggered
     public const int MOLEDELTATRIGGER = 10;             // difference in moles where updates are triggered
     public static List<AbstractTurf> pending_turfs = new List<AbstractTurf>();
@@ -15,8 +21,8 @@ public partial class AtmoController : DeligateController
 
     public override bool Init()
     {
+        display_name = "Atmos";
         tick_rate = 5;
-        controller = this;
         return true;
     }
 

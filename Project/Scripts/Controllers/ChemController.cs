@@ -3,6 +3,12 @@ using System;
 
 public partial class ChemController : DeligateController
 {
+    public static ChemController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
+    public ChemController()
+    {
+        controller = this;
+    }
+
     public override bool CanInit()
     {
         return true;
@@ -10,8 +16,8 @@ public partial class ChemController : DeligateController
 
     public override bool Init()
     {
+        display_name = "Chem";
         tick_rate = -1; // NO TICK
-        controller = this;
         return true;
     }
 

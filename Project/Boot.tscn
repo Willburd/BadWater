@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://dfd237ybvqioj"]
+[gd_scene load_steps=14 format=3 uid="uid://dfd237ybvqioj"]
 
 [ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
@@ -11,6 +11,7 @@
 [ext_resource type="Theme" uid="uid://bhltvqg4jt2ie" path="res://Themes/Mechtronic.tres" id="6_5vcwn"]
 [ext_resource type="PackedScene" uid="uid://nqucwtphnshe" path="res://WindowScripts/Prefabs/LoggingWindow.tscn" id="6_foubn"]
 [ext_resource type="PackedScene" uid="uid://biqov4ddbg4pb" path="res://WindowScripts/Prefabs/ChatWindow.tscn" id="7_fsgwk"]
+[ext_resource type="PackedScene" uid="uid://c57jnf24l8ao4" path="res://WindowScripts/Prefabs/ServerLoadWindow.tscn" id="12_fv8qr"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_dtkm3"]
 
@@ -23,12 +24,13 @@ client_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubView
 entity_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/EntitySpawner")
 chunk_spawner = NodePath("WindowManager/MainWindow/SubViewportContainer/SubViewport/ChunkSpawner")
 
-[node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window", "chat_window", "logging_window")]
+[node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window", "chat_window", "logging_window", "server_load_window")]
 script = ExtResource("3_tp275")
 main_window = NodePath("MainWindow")
 join_window = NodePath("JoinWindow")
 chat_window = NodePath("ChatWindow")
 logging_window = NodePath("LoggingWindow")
+server_load_window = NodePath("ServerLoadWindow")
 
 [node name="BackBlack" type="TextureRect" parent="WindowManager"]
 material = ExtResource("4_bousx")
@@ -108,6 +110,10 @@ theme = ExtResource("6_5vcwn")
 
 [node name="JoinWindow" parent="WindowManager" instance=ExtResource("6_3dkhe")]
 position = Vector2i(80, 270)
+theme = ExtResource("6_5vcwn")
+
+[node name="ServerLoadWindow" parent="WindowManager" instance=ExtResource("12_fv8qr")]
+position = Vector2i(40, 100)
 theme = ExtResource("6_5vcwn")
 
 [connection signal="input_event" from="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" to="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" method="_on_input_event"]

@@ -104,10 +104,10 @@ public partial class NetworkClient : Node3D
     {
         camera.Current = false;
         // Check for a spawner!
-        if(MapController.spawners.ContainsKey("PLAYER"))
+        if((MapController.controller as MapController).spawners.ContainsKey("PLAYER"))
         {
             // TEMP, pick random instead?
-            List<AbstractEffect> spawners = MapController.spawners["PLAYER"];
+            List<AbstractEffect> spawners = (MapController.controller as MapController).spawners["PLAYER"];
             if(spawners.Count > 0)
             {
                 ChatController.DebugLog("Client RESPAWN: " + Name);

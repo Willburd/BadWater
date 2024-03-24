@@ -1,9 +1,16 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public partial class ChunkController : DeligateController
 {
+    public static ChunkController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
+    public ChunkController()
+    {
+        controller = this;
+    }
+
     public static int chunk_load_range = 5;
 
     public static int chunk_size = 5; // Size in turfs that chunks are
@@ -16,8 +23,8 @@ public partial class ChunkController : DeligateController
 
     public override bool Init()
     {
-        tick_rate = 2;
-        controller = this;
+        display_name = "Chunk";
+        tick_rate = 10;
         return true;
     }
 
@@ -38,6 +45,7 @@ public partial class ChunkController : DeligateController
                 chunk.Tick();
             }
         }
+
         // Handle unloading!
         List<NetworkChunk> in_vis_range = new List<NetworkChunk>();
         List<NetworkClient> client_list = MainController.ClientList;
@@ -45,6 +53,8 @@ public partial class ChunkController : DeligateController
 		{
 			NetworkClient client = client_list[i];
             if(!client.has_logged_in) continue; // Skip!
+            
+            // Run thread
             if(!MapController.IsMapLoaded(client.focused_map_id))
             {
                 GD.PrintErr("CLIENT " + client.Name + " ON UNLOADED MAP " + client.focused_map_id);
@@ -77,9 +87,11 @@ public partial class ChunkController : DeligateController
 
         // Unload others
         List<NetworkChunk> loaded_chunks = MapController.GetAllLoadedChunks();
-        foreach(NetworkChunk chunk in loaded_chunks)
+        int unload_count = 20;
+        while(unload_count-- > 0 && loaded_chunks.Count > 0)
         {
             // chunk loaded, handle if it should unload
+            NetworkChunk chunk = TOOLS.Pick(loaded_chunks);
             if(chunk.timer % 10 == 0 && !in_vis_range.Contains(chunk))
             {
                 MapController.ChunkUnload(chunk);
