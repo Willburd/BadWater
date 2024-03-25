@@ -12,7 +12,6 @@ namespace Behaviors_BASE
         {
             inventory_slots = new AbstractEntity[ Enum.GetNames(typeof(DAT.InventorySlot)).Length ];
         }
-        private AIHolder ai_holder;
 
         public override void TemplateRead(PackData data)
         {
@@ -666,13 +665,13 @@ namespace Behaviors_BASE
 
         public void HandleAttackDelay(AbstractEntity target, int delay_amount)
         {
-            // SetAIBusy(true);  // TODO Ai busy flag ================================================================================
+            AIBusy = true; 
             
             SetClickCooldown(delay_amount); // Insurance against a really long attack being longer than default click delay.
             //1000ms in a second, delay is in gameticks
             Task.Delay( 1000 * (delay_amount / MainController.tick_rate)).ContinueWith(o => 
             { 
-                //SetAIBusy(false) // TODO Ai busy flag ================================================================================
+                AIBusy = false;
                 return;
             });
         }
@@ -858,6 +857,59 @@ namespace Behaviors_BASE
             used_item.Move(this,false);
             embedded_objects.Add(used_item);
         }
+
+
+        /*****************************************************************
+         * AI control
+         ****************************************************************/
+        private AIHolder ai_holder;
+        
+        // Similar to above but only returns 1 or 0.
+        public bool HasAI
+        {
+            get
+            {
+                return GetAIStance != -1;
+            }
+        }
+
+        public bool AIBusy
+        {
+            get 
+            {
+                if(ai_holder == null) return false;
+                return ai_holder.IsBusy;
+            }
+            set
+            {
+                if(ai_holder == null) return;
+                ai_holder.IsBusy = value;
+            }
+        }
+
+        // Helper proc to check for the AI's stance.
+        // Returns null if there's no AI holder, or the mob has a player and autopilot is not on.
+        // Otherwise returns the stance.
+        public int GetAIStance
+        {
+            get
+            {
+                if(ai_holder == null)
+                {
+                    return -1;
+                }
+                if(owner_client != null && !ai_holder.Autopilot)
+                    return -1;
+                return ai_holder.GetStance;
+            }
+        }
+
+        // 'Taunts' the AI into attacking the taunter.
+        public void Taunt(AbstractEntity taunter, bool force_target_switch = false)
+        {
+            ai_holder.ReceiveRaunt(taunter, force_target_switch);
+        }
+
         
         /*****************************************************************
          * Movement and storage
