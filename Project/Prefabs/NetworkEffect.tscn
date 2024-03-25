@@ -21,6 +21,9 @@ properties/4/replication_mode = 2
 properties/5/path = NodePath(".:clickable")
 properties/5/spawn = true
 properties/5/replication_mode = 2
+properties/6/path = NodePath(".:synced_text")
+properties/6/spawn = true
+properties/6/replication_mode = 2
 
 [node name="NetworkEffect" type="Node3D"]
 script = ExtResource("1_xwij3")

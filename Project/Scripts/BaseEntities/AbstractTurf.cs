@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 
 public partial class AbstractTurf : AbstractEntity
 {
-    public static AbstractTurf CreateTurf(PackData data)
+    public static AbstractTurf CreateTurf(PackData data, string data_string = "")
     {
         AbstractTurf new_turf = null;
         switch(data.behaviorID)

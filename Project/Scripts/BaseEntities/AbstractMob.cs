@@ -5,7 +5,7 @@ using System.Collections.Generic;
 // Mob entities are objects on a map perform regular life updates, have special inventory slots to wear things, and recieve inputs from clients that they decide how to interpret.
 public partial class AbstractMob : AbstractEntity
 { // Returns subtypes of behavior object
-    public static AbstractMob CreateMob(PackData data)
+    public static AbstractMob CreateMob(PackData data, string data_string = "")
     {
         AbstractMob new_mob = null;
         switch(data.behaviorID)

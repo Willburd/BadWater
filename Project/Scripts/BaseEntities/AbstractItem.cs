@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public partial class AbstractItem : AbstractEntity
 {
-    public static AbstractItem CreateItem(PackData data)
+    public static AbstractItem CreateItem(PackData data, string data_string = "")
     {
         AbstractItem new_item = null;
         switch(data.behaviorID)

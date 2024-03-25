@@ -5,7 +5,7 @@ using System.Collections.Generic;
 // Effect entities are map flags for spawners, synced decals, or other turf effects that can be interacted with, but not picked up, they do not update unless interacted with.
 public class AbstractEffect : AbstractEntity
 {
-    public static AbstractEffect CreateEffect(PackData data)
+    public static AbstractEffect CreateEffect(PackData data, string data_string = "")
     {
         AbstractEffect new_effect = null;
         switch(data.behaviorID)
@@ -28,10 +28,14 @@ public class AbstractEffect : AbstractEntity
             break;
 
             /*****************************************************************
-             * Animated effects
+             * Special effects
              ****************************************************************/
             case "POINT_AT":
-                new_effect = new Behaviors_BASE.PointAt(); // Performs behaviors when crossed
+                new_effect = new Behaviors_BASE.PointAt(); // Hovers above a point and vanishes
+            break;
+
+            case "RUNE_TEXT":
+                new_effect = new Behaviors_BASE.RuneText(data_string); // Hovers above a point showing text, and then vanishes
             break;
 
             /*****************************************************************

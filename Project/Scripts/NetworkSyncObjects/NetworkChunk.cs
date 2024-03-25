@@ -66,11 +66,11 @@ public partial class NetworkChunk : NetworkEntity
             }
         }
         // Update json on other end.
-        Rpc(nameof(ClientMeshUpdate) ,Position, Json.Stringify(data));
+        Rpc(nameof(ClientChunkMeshUpdate) ,Position, Json.Stringify(data));
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = debug_visual, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
-    private void ClientMeshUpdate(Vector3 pos, string mesh_json)
+    protected void ClientChunkMeshUpdate(Vector3 pos, string mesh_json)
     {
         Position = pos;
         Godot.Collections.Dictionary chunk_data = TOOLS.ParseJson(mesh_json);

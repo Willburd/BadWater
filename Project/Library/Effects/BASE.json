@@ -20,5 +20,16 @@
 		"anim_speed": 10,
 		"is_spawner": 0,
 		"cleanable": 0
+	},
+	"RUNE_TEXT": {
+		"parent": "",
+		"name": "",
+		"desc": "It's text, wow!",
+		"behavior": "RUNE_TEXT",
+		"model": "BASE/Entities/SmallAboveAll.tscn",
+		"texture": "BASE/Effects/Point/Point.png",
+		"anim_speed": 10,
+		"is_spawner": 0,
+		"cleanable": 0
 	}
 }

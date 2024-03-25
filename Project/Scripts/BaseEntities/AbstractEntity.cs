@@ -141,7 +141,7 @@ public partial class AbstractEntity
         MapController.GridPos? grid = new MapController.GridPos(map_id,pos);
         return CreateEntity( type, type_ID, grid, suppress_init);
     }
-    public static AbstractEntity CreateEntity( MainController.DataType type, string type_ID, MapController.GridPos? pos,bool suppress_init = false)
+    public static AbstractEntity CreateEntity( MainController.DataType type, string type_ID, MapController.GridPos? pos,bool suppress_init = false, string data_string = "")
     {
         PackData typeData = null;
         AbstractEntity newEnt = null;
@@ -154,36 +154,36 @@ public partial class AbstractEntity
                 break;
             case MainController.DataType.Turf:
                 typeData = AssetLoader.loaded_turfs[type_ID];
-                newEnt = AbstractTurf.CreateTurf(typeData);
+                newEnt = AbstractTurf.CreateTurf(typeData, data_string);
                 newEnt.entity_type = type;
                 break;
             case MainController.DataType.Effect:
                 typeData = AssetLoader.loaded_effects[type_ID];
-                newEnt = AbstractEffect.CreateEffect(typeData);
+                newEnt = AbstractEffect.CreateEffect(typeData, data_string);
                 newEnt.entity_type = type;
                 MapController.controller.effects.Add(newEnt as AbstractEffect);
                 break;
             case MainController.DataType.Item:
                 typeData = AssetLoader.loaded_items[type_ID];
-                newEnt = AbstractItem.CreateItem(typeData);
+                newEnt = AbstractItem.CreateItem(typeData, data_string);
                 newEnt.entity_type = type;
                 MapController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Structure:
                 typeData = AssetLoader.loaded_structures[type_ID];
-                newEnt = AbstractStructure.CreateStructure(typeData);
+                newEnt = AbstractStructure.CreateStructure(typeData, data_string);
                 newEnt.entity_type = type;
                 MapController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Machine:
                 typeData = AssetLoader.loaded_machines[type_ID];
-                newEnt = AbstractMachine.CreateMachine(typeData);
+                newEnt = AbstractMachine.CreateMachine(typeData, data_string);
                 newEnt.entity_type = type;
                 MachineController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Mob:
                 typeData = AssetLoader.loaded_mobs[type_ID];
-                newEnt = AbstractMob.CreateMob(typeData);
+                newEnt = AbstractMob.CreateMob(typeData, data_string);
                 newEnt.entity_type = type;
                 MobController.controller.entities.Add(newEnt);
                 break;
@@ -226,7 +226,8 @@ public partial class AbstractEntity
         if(MainController.WorldTicks <= last_bump_time + bump_reset_time) return;
         last_bump_time = MainController.WorldTicks;
     }
-
+    public virtual void UpdateCustomNetworkData() { } // overload for custom data to be set on the network entity, rarely used
+    
     /*****************************************************************
      * Processing
      ****************************************************************/
@@ -799,6 +800,7 @@ public partial class AbstractEntity
             {
                 internal_loaded_network_entity = NetworkEntity.CreateEntity( this, entity_type, grid_pos.GetMapID());
                 SyncPositionRotation(true,true);
+                UpdateCustomNetworkData();
                 return;
             }
             if(!is_vis && LoadedNetworkEntity != null)
@@ -829,7 +831,6 @@ public partial class AbstractEntity
         LoadedNetworkEntity.direction = direction;
         if(mesh_update) LoadedNetworkEntity.MeshUpdate();
     }
-
 
     /*****************************************************************
      * Conditions

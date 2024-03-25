@@ -17,27 +17,30 @@ public partial class MeshUpdater : Node3D
     public bool is_directional = false;
     [Export]
     public bool render_above;
+
+
+    /*****************************************************************
+     * Rendering
+     ****************************************************************/
+    private Godot.Collections.Dictionary current_data;
+    private float animator_value = 0f;
+    public NetworkEntity Entity
+    {
+        get {return GetParent() as NetworkEntity;}
+    }
+    public string GetDisplayText
+    {
+        get {if(Entity is NetworkEffect net_effect) return net_effect.synced_text; else return "";}
+    }
     public string GetShaderMaterial
     {
         get {return render_above ? ShaderConfig.above_all : ShaderConfig.main;}
     }
-
-
-    private Godot.Collections.Dictionary current_data;
-
-    private float animator_value = 0f;
-
-    private Vector3 camera_relational_vector;
-
     public void TextureUpdated(string json)
     {
         TextureUpdated(TOOLS.ParseJson(json));
     }
     
-    public NetworkEntity Entity
-    {
-        get {return GetParent() as NetworkEntity;}
-    }
 
     public static MeshUpdater GetModelScene(Godot.Collections.Dictionary data)
     {
@@ -45,7 +48,6 @@ public partial class MeshUpdater : Node3D
         if(!AssetLoader.loaded_models.ContainsKey(path)) return null;
         return (MeshUpdater)AssetLoader.loaded_models[path].Instantiate();
     }
-
     public void TextureUpdated(Godot.Collections.Dictionary data)
     {
         // Check for new animations
@@ -64,7 +66,6 @@ public partial class MeshUpdater : Node3D
         // Assign model,tex, and animation speed to the entity!
         TextureDataUpdate(texture,state,anim_speed > 0);
     }
-
     public void TextureDataUpdate(string texture_path, string icon_state, bool animating)
     {
         if(!is_directional)
@@ -111,8 +112,10 @@ public partial class MeshUpdater : Node3D
         }
     }
 
-    
-    // These are used for internal rotations, has to be done regularly...
+    /*****************************************************************
+     * These are used for internal rotations, has to be done regularly...
+     ****************************************************************/
+    private Vector3 camera_relational_vector;
     private string cached_texpath;
     public string CachedTexturePath
     {
@@ -167,6 +170,9 @@ public partial class MeshUpdater : Node3D
     }
 
 
+    /*****************************************************************
+     * Texture clicking
+     ****************************************************************/
     public bool ClickInput(Camera3D camera, InputEvent evnt, Vector3 position, StaticBody3D collider)
     {
         if(evnt is InputEventMouseButton button)

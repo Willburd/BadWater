@@ -81,7 +81,35 @@ public partial class NetworkEntity : Node3D
     }
     protected virtual void Internal_MeshUpdate()
     {
-        // Override for mesh behaviors... Then call a unique RPC to that network entity type on the client's end.
+        // Override for mesh behaviors...
+        Godot.Collections.Dictionary entity_data = new Godot.Collections.Dictionary
+        {
+            { "model", abstract_owner.model },
+            { "texture", abstract_owner.texture },
+            { "anim_speed", abstract_owner.anim_speed },
+            { "state", abstract_owner.icon_state }
+        };
+        // Update json on other end.
+        Rpc(nameof(ClientMeshUpdate), Json.Stringify(entity_data));
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = debug_visual, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
+    protected virtual void ClientMeshUpdate( string mesh_json)
+    {
+        Godot.Collections.Dictionary data = TOOLS.ParseJson(mesh_json);
+        // Get new model
+        if(mesh_updater != null) mesh_updater.QueueFree();
+        mesh_updater = MeshUpdater.GetModelScene(data);
+        mesh_updater.Visible = false;
+        AddChild(mesh_updater);
+        // Init model textures
+        if(mesh_updater == null) 
+        {
+            GD.Print("No model for " + data["model"]);
+            return;
+        }
+        mesh_updater.TextureUpdated(mesh_json);
+        mesh_updater.Visible = true;
     }
 
 
@@ -118,6 +146,7 @@ public partial class NetworkEntity : Node3D
             movement_steps.Clear();
             movement_steps.Add(new MoveStep(new_pos,Time.GetTicksUsec()));
             movement_steps.Add(new MoveStep(new_pos,Time.GetTicksUsec()));
+            Position = movement_steps[0].pos + animation_offset;
         }
         movement_steps.Add(new MoveStep(new_pos,Time.GetTicksUsec()));
     }
