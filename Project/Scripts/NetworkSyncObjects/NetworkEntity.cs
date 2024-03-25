@@ -185,9 +185,9 @@ public partial class NetworkEntity : Node3D
     {
         get {return animation_loaded != null;}
     }
-    public void AnimationRequest(NetwornAnimations.Animation.ID anim, Vector3 dir_vec)
+    public void AnimationRequest(NetwornAnimations.Animation.ID anim, Vector3 dir_vec, int length = 0)
     {
-        abstract_owner.SetAnimationLock( NetwornAnimations.Animation.LookupAnimationLock(anim), NetwornAnimations.Animation.LookupAnimationLength(anim));
+        abstract_owner.SetAnimationLock( NetwornAnimations.Animation.LookupAnimationLock(anim), length > 0 ? length : NetwornAnimations.Animation.LookupAnimationLength(anim));
         Rpc(nameof(AnimationHandle),(int)anim,dir_vec);
     }
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]

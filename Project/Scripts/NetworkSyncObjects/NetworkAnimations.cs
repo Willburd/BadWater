@@ -21,6 +21,8 @@ namespace NetwornAnimations
                     return 0;
                 case ID.Attack:
                     return 0.5;
+                case ID.Windup:
+                    return 0.5;
             }
         }
         public static bool LookupAnimationLock(ID id) // If animation disables inputs
@@ -30,6 +32,8 @@ namespace NetwornAnimations
                 default:
                     return false;
                 case ID.Attack:
+                    return true;
+                case ID.Windup:
                     return true;
             }
         }
@@ -93,6 +97,24 @@ namespace NetwornAnimations
             double sin = Mathf.Sin( percent * Mathf.Pi );
 
             host_entity.SetAnimationVars( start_offset.Lerp(end_offset,(float)sin), 1f);
+
+            // progress
+            base.Process(delta);
+            return time_step > GetAnimationLength(); // doesn't just return base.Process, because static news don't override if you call the base function, they are only relevant in the child class.
+        }
+    }
+
+    
+    public class Windup : Animation
+    {
+        public override bool Process(double delta)
+        {
+            // Animate an attack swing
+            Vector3 end_offset = direction * -0.25f;
+            float percent = (float)(time_step / GetAnimationLength());
+            double curve = percent - ((Mathf.Pow(percent,3) - Mathf.Pow(percent,1)) * 0.5f);
+
+            host_entity.SetAnimationVars( start_offset.Lerp(end_offset,(float)curve), 1f);
 
             // progress
             base.Process(delta);

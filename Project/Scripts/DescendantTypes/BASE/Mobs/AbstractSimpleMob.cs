@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Transactions;
+using System.Threading.Tasks;
 
 namespace Behaviors_BASE
 {
@@ -96,6 +97,8 @@ namespace Behaviors_BASE
             public int? special_attack_max_range = 0;		// The maximum for an attempt.
             public int? special_attack_charges = null;		// If set, special attacks will work off of a charge system, and won't be usable if all charges are expended. Good for grenades.
             public int? special_attack_cooldown = null;    // If set, special attacks will have a cooldown between uses.
+
+            public int last_special_attack = 0;             // Last gametick where a special attack occured
         }
         public AttackData attacks = new AttackData();    // Size of item in world and bags
         public Flags flags;
@@ -415,12 +418,11 @@ namespace Behaviors_BASE
 
                 
                 case DAT.Intent.Hurt:
-                    /*  TODO ==========================================
                     if(CanSpecialAttack(target) && SpecialAttackTarget(target))
                     {
                         return;
                     }
-                    else*/ if(attacks.melee_damage_upper == 0 && target is AbstractMob)
+                    else if(attacks.melee_damage_upper == 0 && target is AbstractMob)
                     {
                         ChatController.VisibleMessage( this, this.display_name.The(true) + " " + TOOLS.Pick(attacks.friendly) + " " + target.display_name.The() + "!");
                     }
@@ -530,7 +532,7 @@ namespace Behaviors_BASE
             if(attacks.melee_attack_delay != null && attacks.melee_attack_delay.Value > 0)
             {
                 MeleePreAnimation(target);
-                //handle_attack_delay(target, attacks.melee_attack_delay); // This will sleep this proc for a bit, which is why waitfor is false. TODO ==========================================
+                HandleAttackDelay(target, attacks.melee_attack_delay.Value); // This will sleep this proc for a bit, which is why waitfor is false.
             }
 
             // Cooldown testing is done at click code (for players) and interface code (for AI).
@@ -575,7 +577,6 @@ namespace Behaviors_BASE
                 if(TOOLS.Prob(attacks.melee_miss_chance))
                 {
                     ChatController.LogAttack(display_name.The(true) + " Animal-attacked (miss) " + mob_target?.display_name.The());
-                    LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(this,mob_target) );
                     AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
                     return; // We missed.
                 }
@@ -611,7 +612,6 @@ namespace Behaviors_BASE
             return target.AttackedGeneric( this, damage_to_do, TOOLS.Pick(attacks.attacktext));
         }
 
-        /* // TODO special attacks ===========================================================================================================================
         // Can we currently do a special attack?
         public bool CanSpecialAttack(AbstractEntity target)
         {
@@ -625,7 +625,7 @@ namespace Behaviors_BASE
                 return false;
 
             // Cooldown check.
-            if(attacks.special_attack_cooldown != null && last_special_attack + attacks.special_attack_cooldown > MainController.WorldTicks)
+            if(attacks.special_attack_cooldown != null && attacks.last_special_attack + attacks.special_attack_cooldown > MainController.WorldTicks)
                 return false;
 
             // Charge check.
@@ -634,22 +634,73 @@ namespace Behaviors_BASE
 
             return true;
         }
-        */
 
+        public bool SpecialAttackTarget(AbstractEntity target)
+        {
+            direction = TOOLS.RotateTowardEntity(this,target);
+
+            if(attacks.special_attack_delay > 0)
+            {
+                SpecialPreAnimation(target);
+                HandleAttackDelay(target, attacks.special_attack_delay);
+            }
+
+            bool success = false;
+            attacks.last_special_attack = MainController.WorldTicks;
+            if(DoSpecialAttack(target))
+            {
+                if(attacks.special_attack_charges != null)
+                {
+                    attacks.special_attack_charges -= 1;
+                }
+                success = true;
+            }
+
+            if(attacks.special_attack_delay > 0)
+            {
+                SpecialPostAnimation(target);
+            }
+
+            return success;
+        }
+
+        public void HandleAttackDelay(AbstractEntity target, int delay_amount)
+        {
+            // SetAIBusy(true);  // TODO Ai busy flag ================================================================================
+            
+            SetClickCooldown(delay_amount); // Insurance against a really long attack being longer than default click delay.
+            //1000ms in a second, delay is in gameticks
+            Task.Delay( 1000 * (delay_amount / MainController.tick_rate)).ContinueWith(o => 
+            { 
+                //SetAIBusy(false) // TODO Ai busy flag ================================================================================
+                return;
+            });
+        }
+
+        public void DoWindupAnimation(AbstractEntity target, int delay_amount)
+        {
+            LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Windup, MapController.GetMapDirection(this,target), delay_amount);
+        }
+
+        // Override this for the actual special attack.
+        public virtual bool DoSpecialAttack(AbstractEntity target)
+        {
+            return false;
+        }
         // Override these four for special custom animations (like the GOLEM).
         public virtual void MeleePreAnimation(AbstractEntity target)
         {
-            //do_windup_animation(A, attacks.melee_attack_delay); TODO ==========================================
+            DoWindupAnimation(target, attacks.melee_attack_delay.Value);
         }
         public virtual void MeleePostAnimation(AbstractEntity target) { }
         public virtual void ranged_pre_animation(AbstractEntity target)
         {
-            //do_windup_animation(A, attacks.ranged_attack_delay); TODO ==========================================
+            DoWindupAnimation(target, attacks.ranged_attack_delay);
         }
         public virtual void RangedPostAnimation(AbstractEntity target) { }
         public virtual void SpecialPreAnimation(AbstractEntity target)
         {
-            //do_windup_animation(A, attacks.special_attack_delay); TODO ==========================================
+            DoWindupAnimation(target, attacks.special_attack_delay);
         }
         public virtual void SpecialPostAnimation(AbstractEntity target) { }
 

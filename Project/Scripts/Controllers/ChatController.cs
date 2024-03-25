@@ -229,7 +229,6 @@ public static class ChatController
             }
             else
             {
-                // TODO Proper map adjacency, client visual distance, and any other status for sending messages to clients in visible range!
                 if(speaking_ent != null && MapController.OnSameMap(scan_cli.focused_map_id,speaking_ent.GridPos.GetMapID()))
                 {
                     if(scan_cli.GetFocusedEntity() != null && excludes.Contains(scan_cli.GetFocusedEntity())) continue; // IGNORE!

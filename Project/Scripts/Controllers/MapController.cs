@@ -396,7 +396,7 @@ public partial class MapController : DeligateController
             if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
             {
                 // Check corner blockages
-
+                // TODO ==================================================================================================
             }
             return Mathf.Abs(A.GridPos.hor - B_pos.hor) < 1 || Mathf.Abs(A.GridPos.ver - B_pos.ver) < 1;
         }
@@ -410,7 +410,7 @@ public partial class MapController : DeligateController
         if(!ignore_corner_density && DAT.DirIsDiagonal( DAT.VectorToDir(dir_vec.X,dir_vec.Y)))
         {
             // Check corner blockages
-
+            // TODO ==================================================================================================
         }
         return GetMapDistance(A_pos,B_pos) <= DAT.ADJACENT_DISTANCE;
     }
@@ -454,6 +454,7 @@ public partial class MapController : DeligateController
     
     public static bool GetMapVisibility(AbstractEntity A,AbstractEntity B)  // if A can see B
     {
+        // TODO - Check if mob A can see mob B ==================================================================================================
         if(!OnSameMap(A,B)) return false;
         return GetMapVisibility(A.GridPos.WorldPos(),B.GridPos.WorldPos());
     }
