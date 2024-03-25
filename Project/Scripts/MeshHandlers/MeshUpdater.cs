@@ -15,6 +15,12 @@ public partial class MeshUpdater : Node3D
     public bool is_sprite = false;
     [Export]
     public bool is_directional = false;
+    [Export]
+    public bool render_above;
+    public string GetShaderMaterial
+    {
+        get {return render_above ? ShaderConfig.above_all : ShaderConfig.main;}
+    }
 
 
     private Godot.Collections.Dictionary current_data;
@@ -85,8 +91,9 @@ public partial class MeshUpdater : Node3D
             if(!AssetLoader.loaded_textures.ContainsKey(texture_path)) texture_path = "res://Library/Textures/Error.png";
             cached_texpath = texture_path;
             cached_current_texdata = AssetLoader.loaded_textures[cached_texpath];
+            // Get shader to use
             // Load from assetloader's material cache. Get the page the texture is on, and set it's offset from the atlas we built on launch!
-            mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[cached_current_texdata.tex_page]);
+            mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[GetShaderMaterial][cached_current_texdata.tex_page]);
             mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)cached_current_texdata.u / AssetLoader.tex_page_size,(float)cached_current_texdata.v / AssetLoader.tex_page_size) );
             mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
             mesh.SetInstanceShaderParameter( "_AA", draw_alpha);
@@ -130,7 +137,7 @@ public partial class MeshUpdater : Node3D
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/Error.png";
         cached_current_texdata = AssetLoader.loaded_textures[direction_tex];
         // Load from assetloader's material cache. Get the page the texture is on, and set it's offset from the atlas we built on launch!
-        mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[cached_current_texdata.tex_page]);
+        mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[GetShaderMaterial][cached_current_texdata.tex_page]);
         mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)cached_current_texdata.u / AssetLoader.tex_page_size,(float)cached_current_texdata.v / AssetLoader.tex_page_size) );
         mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
         mesh.SetInstanceShaderParameter( "_AA", draw_alpha);
