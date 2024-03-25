@@ -321,10 +321,9 @@ public partial class AbstractEntity
         if(client_input_data.Keys.Count == 0) return;
         // Got an actual control update!
         MapController.GridPos new_pos = grid_pos;
-        double dat_x = client_input_data["x"].AsDouble() * MainController.controller.config.input_factor;
-        double dat_y = client_input_data["y"].AsDouble() * MainController.controller.config.input_factor;
-        new_pos.hor += (float)dat_x;
-        new_pos.ver += (float)dat_y;
+        Vector2 mover = new Vector2((float)client_input_data["x"].AsDouble(),(float)client_input_data["y"].AsDouble()).Normalized() * MainController.controller.config.input_factor;
+        new_pos.hor += mover.X;
+        new_pos.ver += mover.Y;
         Move(new_pos);
     }
     // Clicking other entities

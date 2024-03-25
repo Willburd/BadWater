@@ -100,6 +100,12 @@ script = ExtResource("3_jstcs")
 [node name="TurfPlane" type="CollisionShape3D" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody"]
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
 
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WindowManager/MainWindow/SubViewportContainer/SubViewport"]
+transform = Transform3D(0.881312, -0.0486797, 0.470021, -0.451342, -0.381268, 0.806799, 0.139929, -0.923182, -0.357988, 0, 3.40002, 0)
+light_color = Color(1, 0.913725, 0.839216, 1)
+light_energy = 0.131
+directional_shadow_mode = 0
+
 [node name="LoggingWindow" parent="WindowManager" instance=ExtResource("6_foubn")]
 position = Vector2i(400, 146)
 theme = ExtResource("6_5vcwn")

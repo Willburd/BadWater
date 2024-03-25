@@ -950,8 +950,8 @@ namespace Behaviors_BASE
         public override void ControlUpdate(Godot.Collections.Dictionary client_input_data)
         {
             // Got an actual control update!
-            double dat_x = Mathf.Clamp(client_input_data["x"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
-            double dat_y = Mathf.Clamp(client_input_data["y"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
+            double dat_x = Mathf.Clamp(client_input_data["x"].AsDouble(),-1,1);
+            double dat_y = Mathf.Clamp(client_input_data["y"].AsDouble(),-1,1);
             bool walking = client_input_data["walk"].AsBool();
             
             // prevent animation canceling
@@ -982,16 +982,18 @@ namespace Behaviors_BASE
                 else if(walking)
                 {
                     // slower safer movement
-                    new_pos.hor += (float)dat_x * walk_speed;
-                    new_pos.ver += (float)dat_y * walk_speed;
+                    Vector2 mover = new Vector2((float)dat_x,(float)dat_y).Normalized() * walk_speed * MainController.controller.config.input_factor;
+                    new_pos.hor += mover.X;
+                    new_pos.ver += mover.Y;
                     if(!client_input_data["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) direction = DAT.VectorToCardinalDir((float)dat_x,(float)dat_y);
                     speed = walk_speed;
                 }
                 else
                 {
                     // zoomies as normal
-                    new_pos.hor += (float)dat_x * run_speed;
-                    new_pos.ver += (float)dat_y * run_speed;
+                    Vector2 mover = new Vector2((float)dat_x,(float)dat_y).Normalized() * run_speed * MainController.controller.config.input_factor;
+                    new_pos.hor += mover.X;
+                    new_pos.ver += mover.Y;
                     if(!client_input_data["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) direction = DAT.VectorToCardinalDir((float)dat_x,(float)dat_y);
                     speed = run_speed;
                 }

@@ -35,5 +35,5 @@ public partial class ConfigData : Resource
     [Export]
     public bool allow_new_accounts;
     [Export]
-    public double input_factor = 0.1; // Divide 0 to 1 inputs from game input by this. Makes mobs not move lightning fast
+    public float input_factor = 0.1f; // Divide 0 to 1 inputs from game input by this. Makes mobs not move lightning fast
 }

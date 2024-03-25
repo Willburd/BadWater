@@ -503,6 +503,7 @@ public partial class NetworkClient : Node3D
     [Export]
     public Camera3D camera;
     private float zoom_level = 1f;
+    private float internal_rotation = 0f;
     private float view_rotation = 0f;
     private AudioListener3D listener;
     public Vector3 CamRotationVector3()
@@ -512,15 +513,15 @@ public partial class NetworkClient : Node3D
     }
     public Vector2 CamRotationVector2()
     {
-        return new Vector2(Mathf.Sin(view_rotation),Mathf.Cos(view_rotation)).Normalized();
+        return new Vector2(Mathf.Sin(internal_rotation),Mathf.Cos(internal_rotation)).Normalized();
     }
     public override void _PhysicsProcess(double delta)
     {
         // Client only camera update
-        UpdateClientCamera();
+        UpdateClientCamera(delta);
     }
 
-    private void UpdateClientCamera()
+    private void UpdateClientCamera(double delta)
     {
         // Client only camera update
         if(!IsMultiplayerAuthority()) return;
@@ -533,6 +534,20 @@ public partial class NetworkClient : Node3D
             listener = new AudioListener3D();
             AddChild(listener);
         }
+        // update view angle
+        float turnspeed = 5f * (float)delta;
+        float diff = Mathf.AngleDifference(view_rotation, internal_rotation);
+        if(diff < 0)
+        {
+            internal_rotation += turnspeed;
+            if(Mathf.AngleDifference(view_rotation, internal_rotation) >= 0) internal_rotation = view_rotation;
+        }
+        else if(diff > 0)
+        {
+            internal_rotation -= turnspeed;
+            if(Mathf.AngleDifference(view_rotation, internal_rotation) <= 0) internal_rotation = view_rotation;
+        }
+        // update location
         Vector3 stored_pos = focused_position;
         camera.Position = stored_pos + CamRotationVector3() + new Vector3(0f,Mathf.Lerp(MainController.min_zoom,MainController.max_zoom,zoom_level),0);
         camera.LookAt(stored_pos + new Vector3(0,0.1f,0));
