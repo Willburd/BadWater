@@ -1,3 +1,4 @@
+using Behaviors_BASE;
 using Godot;
 using GodotPlugins.Game;
 using System;
@@ -86,9 +87,16 @@ public partial class NetworkEntity : Node3D
         {
             { "model", abstract_owner.model },
             { "texture", abstract_owner.texture },
-            { "anim_speed", abstract_owner.anim_speed },
-            { "state", abstract_owner.icon_state }
+            { "anim_speed", abstract_owner.anim_speed }
         };
+        if(abstract_owner is AbstractSimpleMob abs_mob)
+        {
+            entity_data["state"] = abstract_owner.icon_state == "" ? abs_mob.Stat.ToString() : abstract_owner.icon_state;
+        }
+        else
+        {
+            entity_data["state"] = abstract_owner.icon_state == "" ? "Idle" : abstract_owner.icon_state;
+        }
         // Update json on other end.
         Rpc(nameof(ClientMeshUpdate), Json.Stringify(entity_data));
     }

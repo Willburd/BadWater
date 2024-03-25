@@ -1076,6 +1076,7 @@ namespace Behaviors_BASE
         {
             I_StopPulling();
             stat = DAT.LifeState.Dead;
+            UpdateIcon();
         }
 
 

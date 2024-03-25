@@ -47,7 +47,8 @@ public partial class NetworkChunk : NetworkEntity
                     {
                         { "model", ""},
                         { "texture", ""},
-                        { "anim_speed", ""}
+                        { "anim_speed", ""},
+                        { "state", ""}
                     };
                 }
                 else
@@ -57,7 +58,8 @@ public partial class NetworkChunk : NetworkEntity
                     {
                         { "model", turf.model },
                         { "texture", turf.texture },
-                        { "anim_speed", turf.anim_speed }
+                        { "anim_speed", turf.anim_speed },
+                        { "state", ""}
                     };
                 }
                 // append

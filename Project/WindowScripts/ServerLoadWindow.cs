@@ -9,6 +9,7 @@ public partial class ServerLoadWindow : GameWindows
 
     public override void _Process(double delta)
     {
+        if(MainController.controller == null) return; // Not server
         base._Process(delta);
         status.Text = "";
         if(MainController.WorldTicks < 4) 

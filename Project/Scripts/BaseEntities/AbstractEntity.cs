@@ -85,7 +85,8 @@ public partial class AbstractEntity
     public string model = "BASE/Turf/Plane.tscn";
     public string texture = "";
     public double anim_speed = 0;
-    public string icon_state = "Idle";
+
+    public string icon_state = "";
     
     public DAT.Dir direction = DAT.Dir.South;
     public DisplayName display_name = new DisplayName("");

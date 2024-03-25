@@ -20,12 +20,12 @@ public partial class SpriteUpdater : Node3D
         return (SpriteUpdater)AssetLoader.loaded_models[path].Instantiate();
     }
     
-    public void TextureUpdated(Godot.Collections.Dictionary turf_data)
+    public void TextureUpdated(Godot.Collections.Dictionary data)
     {
-        string texture = turf_data["texture"].AsString();
-        string icon_state = turf_data["state"].AsString();
-        DAT.Dir direction = (DAT.Dir)turf_data["direction"].AsUInt32();
-        double anim_speed = turf_data["anim_speed"].AsDouble();
+        string texture = data["texture"].AsString();
+        string icon_state = data["state"].AsString();
+        DAT.Dir direction = (DAT.Dir)data["direction"].AsUInt32();
+        double anim_speed = data["anim_speed"].AsDouble();
         // Assign model,tex, and animation speed to the entity!
         TextureDataUpdate(mesh,texture, icon_state, anim_speed > 0,0,direction);
     }

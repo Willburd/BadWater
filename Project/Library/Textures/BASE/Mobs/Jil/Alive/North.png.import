@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dshj0tx7vxgc3"
-path="res://.godot/imported/West.png-e7fca52e6776deaa24a57a7d2035c1d4.ctex"
+uid="uid://b3umq7ufb3wqw"
+path="res://.godot/imported/North.png-66d2e06cf7360007f772c15be5b1094d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Library/Textures/BASE/Mobs/Jil/Idle/West.png"
-dest_files=["res://.godot/imported/West.png-e7fca52e6776deaa24a57a7d2035c1d4.ctex"]
+source_file="res://Library/Textures/BASE/Mobs/Jil/Alive/North.png"
+dest_files=["res://.godot/imported/North.png-66d2e06cf7360007f772c15be5b1094d.ctex"]
 
 [params]
 

@@ -169,7 +169,7 @@ public partial class MainController : Node
 		
 		// server ticker
 		tick_internal += delta;
-		if(tick_internal > delta_rate)
+		while(tick_internal > delta_rate)
 		{	
 			ServerTick();
 			tick_internal -= delta_rate;

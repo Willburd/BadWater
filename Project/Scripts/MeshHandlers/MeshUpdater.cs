@@ -59,13 +59,12 @@ public partial class MeshUpdater : Node3D
         current_data = data;
         string texture      = current_data["texture"].AsString();
         double anim_speed   = current_data["anim_speed"].AsDouble();
-        string state        = "Idle";
-        if(is_directional) state = current_data["state"].AsString();
+        string icon_state   = current_data["state"].AsString();
 
         // new animations reset to 0!
         if(old_tex != texture) animator_value = 0;
         // Assign model,tex, and animation speed to the entity!
-        TextureDataUpdate(texture,state,anim_speed > 0);
+        TextureDataUpdate(texture,icon_state,anim_speed > 0);
     }
     public void TextureDataUpdate(string texture_path, string icon_state, bool animating)
     {
@@ -137,7 +136,7 @@ public partial class MeshUpdater : Node3D
         dir_steps *= Mathf.Sign(solve_step);
         string direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/" + DAT.RotateCardinal(Entity.direction, Mathf.RoundToInt(dir_steps)) + cached_animation_suffix + ".png";
         // Check if asset exists as directional, and fallback otherwise
-        if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + cached_animation_suffix + "/Base.png";
+        if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/Base" + cached_animation_suffix + ".png";
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/" + cached_texpath + "/" + cached_icon_state + "/Base.png";
         if(!AssetLoader.loaded_textures.ContainsKey(direction_tex)) direction_tex = "res://Library/Textures/Error.png";
         cached_current_texdata = AssetLoader.loaded_textures[direction_tex];
