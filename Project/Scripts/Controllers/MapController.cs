@@ -158,7 +158,6 @@ public partial class MapController : DeligateController
         for(int i = 0; i < effects.Count; i++) 
         {
             AbstractTurf turf = effects[i].GetTurf();
-            turf.EntityEntered(effects[i],false);
             effects[i].Init();
         }
         // Time for their graphical update too!
@@ -190,7 +189,6 @@ public partial class MapController : DeligateController
         {
             // Directly add to turf's contents, we're still initting, no need to call Crossed() or Entered()
             AbstractTurf turf = all_entities[i].GetTurf();
-            turf.EntityEntered(all_entities[i],false);
             turf.Init();
         }
         // Time for their graphical update too!
