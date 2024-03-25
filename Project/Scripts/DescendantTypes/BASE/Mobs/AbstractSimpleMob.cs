@@ -965,8 +965,8 @@ namespace Behaviors_BASE
             if(stat != DAT.LifeState.Dead)
             {
                 // Trigger mob actions
-                if(!locked_anim && client_input_data["resist"].AsBool());
-                if(!locked_anim && client_input_data["rest"].AsBool());
+                if(!locked_anim && client_input_data["resist"].AsBool()) GD.Print("resist"); // TODO resist ===============================================================
+                if(!locked_anim && client_input_data["rest"].AsBool()) GD.Print("rest"); // TODO rest ===============================================================
                 if(!locked_anim && client_input_data["equip"].AsBool()) EquipActiveHand(null);
                 if(!locked_anim && client_input_data["useheld"].AsBool()) UseActiveHand(null);
 
@@ -1016,7 +1016,7 @@ namespace Behaviors_BASE
             // Respond in any state, as they are mostly just input states for actions!
             if(!locked_anim && client_input_data["intentswap"].AsBool()) IntentSwap();
             if(!locked_anim && client_input_data["swap"].AsBool()) SwapHands();
-            if(!locked_anim && client_input_data["throw"].AsBool());
+            if(!locked_anim && client_input_data["throw"].AsBool()) GD.Print("throw"); // TODO throw ===============================================================
             if(!locked_anim && client_input_data["drop"].AsBool()) DropActiveHand();
         }
         public override void Tick()
