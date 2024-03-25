@@ -50,6 +50,7 @@ public partial class MeshUpdater : Node3D
     }
     public void TextureUpdated(Godot.Collections.Dictionary data)
     {
+        if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return;
         // Check for new animations
         string old_tex = "";
         if(current_data != null) old_tex = current_data["texture"].AsString();
@@ -127,6 +128,7 @@ public partial class MeshUpdater : Node3D
     public void RotateDirectionInRelationToCamera()
     {
         // Solve rotation steps from camera rotation
+        if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return;
         float solve_step = Mathf.Round(new Vector2(camera_relational_vector.X,camera_relational_vector.Z).Angle() / (Mathf.Pi * 2) * 100);
         int dir_steps;
         if(Mathf.Abs(solve_step) < 4.5) dir_steps = 0;
@@ -145,8 +147,25 @@ public partial class MeshUpdater : Node3D
         mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
         mesh.SetInstanceShaderParameter( "_AA", draw_alpha);
     }
-    
+
+    public override void _Ready()
+    {
+        BillboardFaceCamera();
+    }
+
     public override void _PhysicsProcess(double delta)
+    {
+        BillboardFaceCamera();
+        // New animation frame!
+        if(current_data != null)
+        {
+            int old_anim_frame = Mathf.FloorToInt(animator_value);
+            animator_value += (float)(current_data["anim_speed"].AsDouble() * delta);
+            if(old_anim_frame != Mathf.FloorToInt(animator_value)) TextureUpdated(current_data);
+        }
+    }
+
+    public void BillboardFaceCamera()
     {
         if(!face_camera) return;
         // Use constraint to look at camera.
@@ -159,13 +178,6 @@ public partial class MeshUpdater : Node3D
             camera_relational_vector.Y = 0;
             camera_relational_vector = camera_relational_vector.Normalized();
             if(is_directional) RotateDirectionInRelationToCamera();
-        }
-        // New animation frame!
-        if(current_data != null)
-        {
-            int old_anim_frame = Mathf.FloorToInt(animator_value);
-            animator_value += (float)(current_data["anim_speed"].AsDouble() * delta);
-            if(old_anim_frame != Mathf.FloorToInt(animator_value)) TextureUpdated(current_data);
         }
     }
 

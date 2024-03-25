@@ -10,6 +10,11 @@ namespace Behaviors_BASE
         public RuneText(string message)
         {
             runemessage = message;
+            if(runemessage.Length > 200)
+            {
+                runemessage = runemessage.Substr(0,100);
+                runemessage += "...";
+            }
         }
         int lifetime = 4; // seconds
         private string runemessage = "";
