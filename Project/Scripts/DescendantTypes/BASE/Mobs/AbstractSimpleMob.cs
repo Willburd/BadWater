@@ -786,7 +786,7 @@ namespace Behaviors_BASE
             ChatController.LogAttack(user?.display_name.The(true) + " Generic attacked (probably animal) " + display_name.The()); //Usually due to simple_mob attacks
             ai_holder?.ReactToAttack(user);
             
-            ChatController.VisibleMessage(this,user?.display_name.The(true) + " has " + attack_message + " " + display_name.The() + "!", ChatController.VisibleMessageFormatting.Danger);
+            ChatController.VisibleMessage(user,user?.display_name.The(true) + " has " + attack_message + " " + display_name.The() + "!", ChatController.VisibleMessageFormatting.Danger);
             user?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,this) );
             UpdateHealth();
             return true;
