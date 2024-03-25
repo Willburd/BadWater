@@ -44,7 +44,7 @@ stretch_mode = 1
 
 [node name="MainWindow" type="Window" parent="WindowManager"]
 title = "Main"
-position = Vector2i(20, 60)
+position = Vector2i(15, 36)
 size = Vector2i(512, 512)
 min_size = Vector2i(128, 128)
 keep_title_visible = true
@@ -101,19 +101,19 @@ script = ExtResource("3_jstcs")
 shape = SubResource("WorldBoundaryShape3D_dtkm3")
 
 [node name="LoggingWindow" parent="WindowManager" instance=ExtResource("6_foubn")]
-position = Vector2i(365, 150)
+position = Vector2i(400, 146)
 theme = ExtResource("6_5vcwn")
 
 [node name="ChatWindow" parent="WindowManager" instance=ExtResource("7_fsgwk")]
-position = Vector2i(510, 300)
+position = Vector2i(550, 300)
 theme = ExtResource("6_5vcwn")
 
 [node name="JoinWindow" parent="WindowManager" instance=ExtResource("6_3dkhe")]
-position = Vector2i(80, 270)
+position = Vector2i(100, 250)
 theme = ExtResource("6_5vcwn")
 
 [node name="ServerLoadWindow" parent="WindowManager" instance=ExtResource("12_fv8qr")]
-position = Vector2i(40, 100)
+position = Vector2i(40, 36)
 theme = ExtResource("6_5vcwn")
 
 [connection signal="input_event" from="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" to="WindowManager/MainWindow/SubViewportContainer/SubViewport/TurfClickHandler/TurfStaticBody" method="_on_input_event"]

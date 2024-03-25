@@ -35,7 +35,7 @@ public partial class AbstractEntity
     {
         PackRef = new PackRef( data, entity_type);
         SetTag(data.tag);
-        display_name    = data.display_name;
+        display_name    = new DisplayName(data.display_name);
         description     = data.description;
         model           = data.model;
         texture         = data.texture;
@@ -88,7 +88,7 @@ public partial class AbstractEntity
     public string icon_state = "Idle";
     
     public DAT.Dir direction = DAT.Dir.South;
-    public string display_name = "";
+    public DisplayName display_name = new DisplayName("");
     public string description = "";
     public bool density = false;              // blocks movement
     public bool opaque = false;               // blocks vision
@@ -328,29 +328,16 @@ public partial class AbstractEntity
     // Clicking other entities
     public virtual void Clicked( AbstractEntity used_entity, AbstractEntity target, Godot.Collections.Dictionary click_params) 
     {
-        GD.Print(display_name + " CLICKED " + target?.display_name + " USING " + used_entity?.display_name); // REPLACE ME!!!
+        GD.Print(display_name.The(true) + " CLICKED " + target?.display_name.The() + " USING " + used_entity?.display_name.The()); // REPLACE ME!!!
     }
     // Being dragged by other entities to somewhere else
     public virtual void Dragged( AbstractEntity user, AbstractEntity target,Godot.Collections.Dictionary click_params) 
     { 
-        GD.Print(user?.display_name + " DRAGGED " + display_name + " TO " + target?.display_name); // REPLACE ME!!!
+        GD.Print(user?.display_name.The(true) + " DRAGGED " + display_name.The() + " TO " + target?.display_name.The()); // REPLACE ME!!!
     }
     public virtual string Examine( AbstractEntity user, string infix = "", string suffix = "")
     {
-        //This reformat names to get a/an properly working on item descriptions when they are bloody
-        string f_name = "a " + display_name + infix;
-        /* // TODO Plurality forms ==================================================================================================
-        if(src.blood_DNA && !istype(src, /obj/effect/decal))
-            if(gender == PLURAL)
-                f_name = "some "
-            else
-                f_name = "a "
-            if(blood_color != SYNTH_BLOOD_COLOUR)
-                f_name += "<span class='danger'>blood-stained</span> [name][infix]!"
-            else
-                f_name += "oil-stained [name][infix]."
-        */
-        return "[b]That's " + f_name + suffix + ".[/b] " + description;
+        return "[b]That's " + display_name.AutoPlural() + infix + suffix + ".[/b] " + description;
     }
     public virtual void PointAt(AbstractEntity target, Vector3 pos)
     {
@@ -426,7 +413,7 @@ public partial class AbstractEntity
 
     public virtual void InteractionTouched( AbstractEntity user)
     {
-        GD.Print(display_name + " was touched by " + user.display_name);
+        GD.Print(display_name.The(true) + " was touched by " + user.display_name.The());
     }
 
     // TK interaction...
@@ -476,7 +463,7 @@ public partial class AbstractEntity
             /////////////////////////
             user_mob.lastattacked = target;
             target.lastattacker = user;
-            ChatController.LogAttack(user?.display_name + "attacked" + target?.display_name + " with " + this.display_name + " (INTENT: " + user?.SelectingIntent + ") (DAMTYE: [" + this.damtype + "])");
+            ChatController.LogAttack(user?.display_name.The(true) + "attacked" + target?.display_name.The() + " with " + this.display_name.The() + " (INTENT: " + user?.SelectingIntent + ") (DAMTYE: [" + this.damtype + "])");
             /////////////////////////
             user_mob.SetClickCooldown( user_mob.GetAttackCooldown(this) );
             user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,target) );

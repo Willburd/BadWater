@@ -441,9 +441,9 @@ public partial class NetworkClient : Node3D
                     if(turf == null) return;
                     foreach(AbstractEntity ent in turf.Contents)
                     {
-                        GD.Print(ent.display_name);
+                        GD.Print(ent.display_name.A(true));
                     }
-                    GD.Print(turf.display_name);
+                    GD.Print(turf.display_name.A(true));
                 }
             break;
         }

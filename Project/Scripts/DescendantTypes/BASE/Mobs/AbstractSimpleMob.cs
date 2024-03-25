@@ -409,7 +409,7 @@ namespace Behaviors_BASE
                 case DAT.Intent.Help:
                     if(target is AbstractMob target_mob)
                     {
-                        ChatController.VisibleMessage( this, this.display_name + " " + TOOLS.Pick(attacks.friendly) + " the " + target_mob.display_name + ".");
+                        ChatController.VisibleMessage( this, this.display_name.The(true) + " " + TOOLS.Pick(attacks.friendly) + " " + target_mob.display_name.The() + ".");
                     }
                     break;
 
@@ -422,7 +422,7 @@ namespace Behaviors_BASE
                     }
                     else*/ if(attacks.melee_damage_upper == 0 && target is AbstractMob)
                     {
-                        ChatController.VisibleMessage( this, this.display_name + " " + TOOLS.Pick(attacks.friendly) + " the " + target.display_name + "!");
+                        ChatController.VisibleMessage( this, this.display_name.The(true) + " " + TOOLS.Pick(attacks.friendly) + " " + target.display_name.The() + "!");
                     }
                     else
                     {
@@ -434,7 +434,7 @@ namespace Behaviors_BASE
 
         protected virtual void RestrainedClick(AbstractEntity target)
         {
-            GD.Print(display_name + " CLICKED " + target.display_name + " WHILE RESTRAINED"); // REPLACE ME!!!
+            GD.Print(display_name.The(true) + " CLICKED " + target.display_name.The() + " WHILE RESTRAINED"); // REPLACE ME!!!
         }
 
         protected virtual void RangedInteraction(AbstractEntity target, Godot.Collections.Dictionary click_parameters)
@@ -560,10 +560,10 @@ namespace Behaviors_BASE
             }
             if(missed) // Most likely we have a slow attack and they dodged it or we somehow got moved.
             {
-                ChatController.LogAttack(display_name + " Animal-attacked (dodged) " + target?.display_name);
+                ChatController.LogAttack(display_name.The(true) + " Animal-attacked (dodged) " + target?.display_name.The());
                 LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(this,turf));
                 AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
-                ChatController.VisibleMessage(this,"The " + display_name + " misses their attack.", ChatController.VisibleMessageFormatting.Warning);
+                ChatController.VisibleMessage(this,display_name.The(true) + " misses their attack.", ChatController.VisibleMessageFormatting.Warning);
                 return;
             }
 
@@ -574,7 +574,7 @@ namespace Behaviors_BASE
             {
                 if(TOOLS.Prob(attacks.melee_miss_chance))
                 {
-                    ChatController.LogAttack(display_name + " Animal-attacked (miss) " + mob_target?.display_name);
+                    ChatController.LogAttack(display_name.The(true) + " Animal-attacked (miss) " + mob_target?.display_name.The());
                     LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(this,mob_target) );
                     AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
                     return; // We missed.
@@ -658,7 +658,7 @@ namespace Behaviors_BASE
          ****************************************************************/
         public float HitByWeapon(AbstractEntity used_item, AbstractEntity user, float effective_force, DAT.ZoneSelection target_zone)
         {
-            ChatController.VisibleMessage(this,this.display_name + " has been attacked with " + used_item?.display_name + " by " + user?.display_name + "!", ChatController.VisibleMessageFormatting.Danger);
+            ChatController.VisibleMessage(this,this.display_name.The(true) + " has been attacked with " + used_item?.display_name.The() + " by " + user?.display_name.The() + "!", ChatController.VisibleMessageFormatting.Danger);
             ai_holder?.ReactToAttack(user);
 
             float soaked = GetArmorSoak(target_zone, DAT.ArmorType.Melee);
@@ -783,10 +783,10 @@ namespace Behaviors_BASE
             if(damage <= 0) return false;
             BruteLoss = damage;
             
-            ChatController.LogAttack(user?.display_name + " Generic attacked (probably animal) " + display_name); //Usually due to simple_mob attacks
+            ChatController.LogAttack(user?.display_name.The(true) + " Generic attacked (probably animal) " + display_name.The()); //Usually due to simple_mob attacks
             ai_holder?.ReactToAttack(user);
             
-            ChatController.VisibleMessage(this,"The " + user?.display_name + " has " + attack_message + " the " + display_name + "!", ChatController.VisibleMessageFormatting.Danger);
+            ChatController.VisibleMessage(this,user?.display_name.The(true) + " has " + attack_message + " " + display_name.The() + "!", ChatController.VisibleMessageFormatting.Danger);
             user?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,this) );
             UpdateHealth();
             return true;
@@ -1044,12 +1044,12 @@ namespace Behaviors_BASE
                 }
                 if((mob_size < target_mob.mob_size) && (pull_type != DAT.CanPullType.PULL_LARGER))
                 {
-                    ChatController.InspectMessage( this, target_ent.display_name + " is too large for you to move!", ChatController.VisibleMessageFormatting.Warning);
+                    ChatController.InspectMessage( this, target_ent.display_name.The(true) + " is too large for you to move!", ChatController.VisibleMessageFormatting.Warning);
                     return;
                 }
                 if((mob_size == target_mob.mob_size) && (pull_type == DAT.CanPullType.PULL_SMALLER))
                 {
-                    ChatController.InspectMessage( this, target_ent.display_name + " is too heavy for you to move!", ChatController.VisibleMessageFormatting.Warning);
+                    ChatController.InspectMessage( this, target_ent.display_name.The(true) + " is too heavy for you to move!", ChatController.VisibleMessageFormatting.Warning);
                     return;
                 }
 
@@ -1063,7 +1063,7 @@ namespace Behaviors_BASE
                     AbstractEntity pull_ent = target.I_Pulledby as AbstractEntity;
                     if(pull_ent != this)
                     {
-                        ChatController.VisibleMessage( target_ent, target_ent.display_name + " is pulled free from " + pull_ent?.display_name + "'s grip by the " + this.display_name + "!");
+                        ChatController.VisibleMessage( target_ent, target_ent.display_name.The(true) + " is pulled free from " + pull_ent?.display_name.The() + "'s grip by " + this.display_name.The() + "!");
                         ICanPull.Internal_EndPull(target.I_Pulledby);
                     }
                 }
@@ -1112,8 +1112,8 @@ namespace Behaviors_BASE
             AbstractEntity pulling_ent = I_Pulling as AbstractEntity;
             
             // Send message and release
-            ChatController.ActionMessage( this, "You release your grasp on the " + pulling_ent?.display_name,"The " + display_name + " lets go of the " + pulling_ent.display_name, null, ChatController.VisibleMessageFormatting.Warning);
-            ChatController.InspectMessage( pulling_ent, "The " + display_name + " lets go of you.");
+            ChatController.ActionMessage( this, "You release your grasp on " + pulling_ent?.display_name.The(),display_name.The(true) + " lets go of " + pulling_ent.display_name.The(), null, ChatController.VisibleMessageFormatting.Warning);
+            ChatController.InspectMessage( pulling_ent, display_name.The(true) + " lets go of you.");
             ICanPull.Internal_EndPull(this);
         }
     }

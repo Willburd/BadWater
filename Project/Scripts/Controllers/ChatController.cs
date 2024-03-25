@@ -180,19 +180,19 @@ public static class ChatController
                 switch(mode)
                 {
                     case ChatMode.Speak:
-                        output += "[b][color=green]" + speaking_ent.display_name + "[/color][/b] says : " + message;
+                        output += "[b][color=green]" + speaking_ent.display_name.ToString() + "[/color][/b] says : " + message;
                         RuneMessage(speaking_ent,message);
                     break;
                     case ChatMode.Whisper:
-                        output += "[b][color=green]" + speaking_ent.display_name + "[/color][/b] whispers : " + message;
+                        output += "[b][color=green]" + speaking_ent.display_name.ToString() + "[/color][/b] whispers : " + message;
                         RuneMessage(speaking_ent,message,2);
                     break;
                     case ChatMode.Emote:
-                        output += "[b][color=green]" + speaking_ent.display_name + "[/color][/b] " + message;
+                        output += "[b][color=green]" + speaking_ent.display_name.ToString() + "[/color][/b] " + message;
                         RuneMessage(speaking_ent,message);
                     break;
                     case ChatMode.Subtle:
-                        output += "[b][color=green]" + speaking_ent.display_name + "[/color][/b] " + message;
+                        output += "[b][color=green]" + speaking_ent.display_name.ToString() + "[/color][/b] " + message;
                         RuneMessage(speaking_ent,message,2);
                     break;
                     // DIRECT

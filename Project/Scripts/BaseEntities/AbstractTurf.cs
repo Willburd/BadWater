@@ -128,7 +128,7 @@ public partial class AbstractTurf : AbstractEntity
         }
         if(!success) // Nothing got hit.
         {
-            ChatController.VisibleMessage(user,"The " + user?.display_name + " swipes the " + used_item?.display_name + " over the " + this.display_name + ".", ChatController.VisibleMessageFormatting.Warning);
+            ChatController.VisibleMessage(user,user?.display_name.The(true) + " swipes the " + used_item?.display_name.The() + " over the " + this.display_name.The() + ".", ChatController.VisibleMessageFormatting.Warning);
             AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
         }
         return success;

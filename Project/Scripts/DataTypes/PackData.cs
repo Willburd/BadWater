@@ -133,7 +133,7 @@ public partial class PackData : Resource
         set { loaded_parent = value; }
     }
     public MainController.DataType entity_type;
-    public string display_name = "Pack";
+    public string display_name = "";
     public string description = "";
     public string behaviorID = "";
     public string tag = "";
