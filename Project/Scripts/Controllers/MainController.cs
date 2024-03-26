@@ -40,6 +40,7 @@ public partial class MainController : Node
 	[Export]
 	public ConfigData config;
     public List<ulong> logged_times = new List<ulong>();
+	public List<ulong> tick_gap_times = new List<ulong>();
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
 	public static int GetSubControllerCount()
@@ -64,7 +65,7 @@ public partial class MainController : Node
 	public const int max_zoom = 9;
 	public const int tick_rate = 25; // Match ss13
 	
-	private static double tick_internal;	// delta_time counter for tick_rate calculation
+	private static ulong next_tick_time;
 	private static bool setup_phase = true;
 	private static int ticks = 0;
 
@@ -120,9 +121,6 @@ public partial class MainController : Node
 
 	public override void _Process(double delta)
 	{	
-		// delta threshold for ticks
-		double delta_rate = 1.0 / (double)tick_rate;
-
 		// setup runs as fast as possible
 		if(setup_phase)
 		{
@@ -153,7 +151,6 @@ public partial class MainController : Node
 			{
 				GD.Print("Setup Finished");
 				GD.Print("Tick rate: " + tick_rate);
-				GD.Print("Delta Threshold " + delta_rate);
 				// Remove notickers
 				for(int i = 0; i < subcontrollers.Count; i++) 
 				{
@@ -169,25 +166,31 @@ public partial class MainController : Node
 		}
 		
 		// server ticker
-		tick_internal += delta;
-		while(tick_internal > delta_rate)
+		ulong current_tick = Time.GetTicksMsec();
+		ulong started_tick = current_tick;
+		while(current_tick >= next_tick_time)
 		{	
 			ServerTick();
-			tick_internal -= delta_rate;
+			next_tick_time = current_tick + (ulong)(1000f / tick_rate);
+			// debug logging
+			if(tick_gap_times.Count > 10) tick_gap_times.RemoveAt(0);
+			tick_gap_times.Add(next_tick_time - started_tick);
+			// next
+			current_tick = Time.GetTicksMsec();
 		}
 	}
 
 	private void ServerTick()
 	{
 		// Update all deligate controllers
-		ulong server_start_time = Time.GetTicksUsec();
+		ulong server_start_time = Time.GetTicksMsec();
 		for(int i = 0; i < subcontrollers.Count; i++) 
 		{
 			DeligateController con = subcontrollers[i];
 			// Process controllers
-			ulong start_time = Time.GetTicksUsec();
+			ulong start_time = Time.GetTicksMsec();
 			con.did_tick = subcontrollers[i].Tick();
-			ulong end_time = Time.GetTicksUsec();
+			ulong end_time = Time.GetTicksMsec();
 			if(!con.did_tick) continue;
 			// debug logging
 			if(con.logged_times.Count > 10) con.logged_times.RemoveAt(0);
@@ -199,7 +202,7 @@ public partial class MainController : Node
 			client.Tick();
 		}
 		ticks += 1;
-		ulong server_end_time = Time.GetTicksUsec();
+		ulong server_end_time = Time.GetTicksMsec();
 		// debug logging
 		if(logged_times.Count > 10) logged_times.RemoveAt(0);
 		logged_times.Add(server_end_time - server_start_time);

@@ -71,7 +71,7 @@ public partial class NetworkChunk : NetworkEntity
         Rpc(nameof(ClientChunkMeshUpdate) ,Position, Json.Stringify(data));
     }
 
-    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = debug_visual, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
     protected void ClientChunkMeshUpdate(Vector3 pos, string mesh_json)
     {
         Position = pos;

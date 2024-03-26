@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 public partial class NetworkEntity : Node3D
 {
     protected AbstractEntity abstract_owner;
-    public const bool debug_visual = false; // if server gets visual updates
+    public static bool debug_visual = false; // if server gets visual updates
 
     public static NetworkEntity CreateEntity(AbstractEntity abs, MainController.DataType type, string map_id)
     {
@@ -106,7 +106,7 @@ public partial class NetworkEntity : Node3D
         Rpc(nameof(ClientMeshUpdate), Json.Stringify(entity_data));
     }
 
-    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = debug_visual, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
     protected virtual void ClientMeshUpdate( string mesh_json)
     {
         Godot.Collections.Dictionary data = TOOLS.ParseJson(mesh_json);
@@ -165,6 +165,7 @@ public partial class NetworkEntity : Node3D
     }
     public override void _PhysicsProcess(double delta)
     {
+        if(Multiplayer.IsServer()) return; // Client only
         ulong render_time = Time.GetTicksUsec();
         if(movement_steps.Count > 1)
         {
@@ -186,7 +187,6 @@ public partial class NetworkEntity : Node3D
                 Position = movement_steps[0].pos.Lerp(movement_steps[1].pos,Mathf.Min(interpo,1f)) + animation_offset;
             }
         }
-        
     }
 
 
@@ -232,6 +232,7 @@ public partial class NetworkEntity : Node3D
      ****************************************************************/
     public void ClickPressed(Vector3 pos, MouseButton button)
     {
+        if(Multiplayer.IsServer()) return; // Client only
         if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
         if(!clickable) return;
         Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
@@ -242,6 +243,7 @@ public partial class NetworkEntity : Node3D
 
     public void ClickReleased(Vector3 pos, MouseButton button)
     {
+        if(Multiplayer.IsServer()) return; // Client only
         if(!TOOLS.PeerConnected(NetworkClient.peer_active_client)) return;
         if(!clickable) return;
         Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
