@@ -25,6 +25,3 @@ script = ExtResource("1_ycko5")
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25
 replication_config = SubResource("SceneReplicationConfig_bnqg0")
-
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
