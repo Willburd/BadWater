@@ -85,17 +85,15 @@ public partial class ChunkController : DeligateController
             }
 		}
 
-        // Unload others
+        // Unload chunks out of range, randomly pick candidates every frame and unload them
         List<NetworkChunk> loaded_chunks = MapController.GetAllLoadedChunks();
-        int unload_count = 20;
+        int unload_count = Math.Min(loaded_chunks.Count, 20);
         while(unload_count-- > 0 && loaded_chunks.Count > 0)
         {
-            // chunk loaded, handle if it should unload
             NetworkChunk chunk = TOOLS.Pick(loaded_chunks);
-            if(chunk.timer % 10 == 0 && !in_vis_range.Contains(chunk))
+            if(!in_vis_range.Contains(chunk))
             {
                 MapController.ChunkUnload(chunk);
-                break; // limit unloads...
             }
         }
     }
