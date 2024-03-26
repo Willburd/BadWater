@@ -65,6 +65,7 @@ public partial class NetworkEntity : Node3D
     public void DeleteEntity()
     {
         abstract_owner = null;
+        mesh_updater?.QueueFree();
         QueueFree();
     }
 
@@ -110,7 +111,7 @@ public partial class NetworkEntity : Node3D
     {
         Godot.Collections.Dictionary data = TOOLS.ParseJson(mesh_json);
         // Get new model
-        if(mesh_updater != null) mesh_updater.Free();
+        mesh_updater?.Free();
         mesh_updater = MeshUpdater.GetModelScene(data);
         mesh_updater.Visible = false;
         AddChild(mesh_updater);

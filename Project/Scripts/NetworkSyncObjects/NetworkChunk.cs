@@ -80,7 +80,7 @@ public partial class NetworkChunk : NetworkEntity
         {
             Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)chunk_data["turf_" + i];
             // Get new model
-            if(mesh_array[i] != null) mesh_array[i].Free();
+            mesh_array[i]?.Free();
             mesh_array[i] = MeshUpdater.GetModelScene(turf_data);
             mesh_array[i].Visible = false;
             AddChild(mesh_array[i]);
