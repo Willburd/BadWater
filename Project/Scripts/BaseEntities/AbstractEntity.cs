@@ -258,7 +258,6 @@ public partial class AbstractEntity
     }
     public void DeleteEntity()
     {
-        UnloadNetworkEntity();
         switch(entity_type)
         {
             case MainController.DataType.Area:
@@ -268,10 +267,7 @@ public partial class AbstractEntity
                 break;
             case MainController.DataType.Effect:
                 MapController.controller.effects.Remove(this as AbstractEffect);
-                if((this as AbstractEffect).is_spawner)
-                {
-                    MapController.controller.spawners[(this as AbstractEffect).GetTag()].Remove(this as AbstractEffect);
-                }
+                if((this as AbstractEffect).is_spawner) MapController.controller.spawners[(this as AbstractEffect).GetTag()].Remove(this as AbstractEffect);
                 break;
             case MainController.DataType.Item:
                 MapController.controller.entities.Remove(this);
@@ -286,8 +282,13 @@ public partial class AbstractEntity
                 MobController.controller.entities.Remove(this);
                 break;
         }
-        owner_client?.ClearFocusedEntity();
-        ClearClientOwner();
+        if(owner_client != null)
+        {
+            owner_client.ClearFocusedEntity();
+            ClearClientOwner();
+        }
+        UnloadNetworkEntity();
+        if(this is not AbstractTurf) Move();
     }
     public void UnloadNetworkEntity()
     {
@@ -686,10 +687,10 @@ public partial class AbstractEntity
         UpdateNetwork(false,false);
         return location;
     }
-    public AbstractEntity Move(bool perform_turf_actions = true) // Move to nullspace
+    public AbstractEntity Move() // Move to nullspace
     {
         // Leave old location, perform uncrossing events!
-        LeaveOldLoc(perform_turf_actions);
+        LeaveOldLoc(false);
         // Enter new location
         grid_pos = new MapController.GridPos("NULL",Vector3.Zero);
         UpdateNetwork(false,false);

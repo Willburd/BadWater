@@ -774,11 +774,12 @@ public partial class MapController : DeligateController
         public void UnloadChunk(NetworkChunk chunk)
         {
             ChunkPos chunk_pos = new ChunkPos(chunk.Position);
-            if(chunk.Unload()) // Safer than just calling DeleteEntity() lets chunks decide some stuff if they should unload...
+            if(chunk.CanUnload()) // Safer than just calling DeleteEntity() lets chunks decide some stuff if they should unload...
             {
                 ChunkController.CleanChunk(chunk);
                 chunk_grid[chunk_pos.hor,chunk_pos.ver,chunk_pos.dep] = null;
                 loaded_chunks.Remove(chunk);
+                chunk.DeleteEntity();
             }
         }
         public List<NetworkChunk> GetLoadedChunks()

@@ -60,10 +60,14 @@ public partial class NetworkEntity : Node3D
     public DAT.Dir direction = DAT.Dir.South;
     [Export]
     public bool clickable = false;
+
+    // delete needs to be handled remotely
     public void DeleteEntity()
     {
+        abstract_owner = null;
         QueueFree();
     }
+
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(1); // Server
@@ -106,7 +110,7 @@ public partial class NetworkEntity : Node3D
     {
         Godot.Collections.Dictionary data = TOOLS.ParseJson(mesh_json);
         // Get new model
-        if(mesh_updater != null) mesh_updater.QueueFree();
+        if(mesh_updater != null) mesh_updater.Free();
         mesh_updater = MeshUpdater.GetModelScene(data);
         mesh_updater.Visible = false;
         AddChild(mesh_updater);

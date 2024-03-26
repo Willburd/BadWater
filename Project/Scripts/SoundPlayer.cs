@@ -37,7 +37,7 @@ public partial class SoundPlayer : Node3D
                 if(!player_global.Playing)
                 {
                     emergency_ticker -= (float)delta;
-                    if(emergency_ticker < 0) QueueFree();
+                    if(emergency_ticker < 0) Free();
                 }
             }
             else
@@ -45,7 +45,7 @@ public partial class SoundPlayer : Node3D
                 if(!player_pos.Playing)
                 {
                     emergency_ticker -= (float)delta;
-                    if(emergency_ticker < 0) QueueFree();
+                    if(emergency_ticker < 0) Free();
                 }
             }
         }

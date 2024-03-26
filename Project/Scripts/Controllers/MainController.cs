@@ -39,6 +39,7 @@ public partial class MainController : Node
 
 	[Export]
 	public ConfigData config;
+    public List<ulong> logged_times = new List<ulong>();
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
 	public static int GetSubControllerCount()
@@ -179,6 +180,7 @@ public partial class MainController : Node
 	private void ServerTick()
 	{
 		// Update all deligate controllers
+		ulong server_start_time = Time.GetTicksUsec();
 		for(int i = 0; i < subcontrollers.Count; i++) 
 		{
 			DeligateController con = subcontrollers[i];
@@ -197,6 +199,10 @@ public partial class MainController : Node
 			client.Tick();
 		}
 		ticks += 1;
+		ulong server_end_time = Time.GetTicksUsec();
+		// debug logging
+		if(logged_times.Count > 10) logged_times.RemoveAt(0);
+		logged_times.Add(server_end_time - server_start_time);
 	}
 
 	private void EditorTick()

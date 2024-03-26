@@ -18,6 +18,16 @@ public partial class ServerLoadWindow : GameWindows
             return;
         }
         // Setup server hud
+        ulong accume_serv = 0;
+        for(int q = 0; q < MainController.controller.logged_times.Count; q++) 
+        {
+            accume_serv += MainController.controller.logged_times[q];
+        }
+        double avrg_serv = (double)accume_serv / (double)MainController.controller.logged_times.Count;
+        status.Text += "Process time: " + Mathf.Floor(avrg_serv) + "ms \n";
+        float tick_serv_percent = (float)avrg_serv / (MainController.tick_rate * 1000f);
+        status.Text += "Tick used: " + Mathf.Floor(tick_serv_percent * 100f) + "% \n";
+        status.Text += "============" + "\n";
         status.Text += "Network Clients : " + MainController.controller.client_container.GetChildCount() + "\n";
         status.Text += "Network Entities: " + MainController.controller.entity_container.GetChildCount() + "\n";
         for(int i = 0; i < MainController.GetSubControllerCount(); i++) 
