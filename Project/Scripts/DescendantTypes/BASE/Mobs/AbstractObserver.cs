@@ -24,8 +24,8 @@ namespace Behaviors_BASE
         public override void ControlUpdate(Godot.Collections.Dictionary client_input_data)
         {
             // Got an actual control update!
-            double dat_x = Mathf.Clamp(client_input_data["x"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
-            double dat_y = Mathf.Clamp(client_input_data["y"].AsDouble(),-1,1) * MainController.controller.config.input_factor;
+            double dat_x = Mathf.Clamp(client_input_data["x"].AsDouble(),-1,1);
+            double dat_y = Mathf.Clamp(client_input_data["y"].AsDouble(),-1,1);
             bool walking = client_input_data["walk"].AsBool();
 
             // Move based on mob speed
