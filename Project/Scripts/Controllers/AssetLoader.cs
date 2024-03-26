@@ -18,10 +18,19 @@ public struct PackRef
     public MainController.DataType data_type;
 }
 
-public struct ShaderConfig
+public static class ShaderConfig
 {
-    public const string main = "res://Materials/Main.tres";
-    public const string above_all = "res://Materials/NoticeEffects.tres";
+    public enum Library
+    {
+        Main,
+        AboveAll,
+        Last
+    }
+    public static string[] lib = new string[(int)Library.Last]
+    {
+        "res://Materials/Main.tres",
+        "res://Materials/NoticeEffects.tres"
+    };
 }
 
 [GlobalClass] 
@@ -30,7 +39,7 @@ public partial class AssetLoader : Node
     public const int tex_page_size = 2048;
     // Assets
     public static Dictionary<string,AssetLoader.LoadedTexture> loaded_textures = new Dictionary<string,AssetLoader.LoadedTexture>();
-    public static Dictionary<string,ShaderMaterial[]> material_cache = new Dictionary<string,ShaderMaterial[]>(); // dictionary of shader IDs, with shadermaterials stored inside, each entry is a texture page assigned to that material.
+    public static ShaderMaterial[][] material_cache = new ShaderMaterial[(int)ShaderConfig.Library.Last][]; // dictionary of shader IDs, with shadermaterials stored inside, each entry is a texture page assigned to that material.
     public static Dictionary<string,List<string>> loaded_sounds = new Dictionary<string,List<string>>();
     public static Dictionary<string,PackedScene> loaded_models = new Dictionary<string,PackedScene>();
     public static Dictionary<string,MapData> loaded_maps = new Dictionary<string,MapData>();
@@ -569,15 +578,14 @@ public partial class AssetLoader : Node
         {
             ChatController.AssetLog("-Creating texture pages. Count: " + texture_pages.Count);
             // Create an entry for each sahder path
-            List<string> shader_list = new List<string>{ShaderConfig.main,ShaderConfig.above_all};
-            foreach(string shader_path in shader_list)
+            for(int s = 0; s < (int)ShaderConfig.Library.Last; s++) 
             {
                 // Create material cache for each page!
-                material_cache[shader_path] = new ShaderMaterial[tex_page_ind+1];
+                material_cache[s] = new ShaderMaterial[tex_page_ind+1];
                 for(int i = 0; i < texture_pages.Count; i++) 
                 {
-                    material_cache[shader_path][i] = (ShaderMaterial)ResourceLoader.Load(shader_path).Duplicate(true);
-                    material_cache[shader_path][i].SetShaderParameter( "_MainTexture", ImageTexture.CreateFromImage(AssetLoader.texture_pages[i]));
+                    material_cache[s][i] = (ShaderMaterial)ResourceLoader.Load(ShaderConfig.lib[s]).Duplicate(true);
+                    material_cache[s][i].SetShaderParameter( "_MainTexture", ImageTexture.CreateFromImage(AssetLoader.texture_pages[i]));
                 }
             }
             if(OS.HasFeature("editor")) 
