@@ -203,6 +203,7 @@ public partial class MainController : Node
 		}
 		ticks += 1;
 		ulong server_end_time = Time.GetTicksMsec();
+
 		// debug logging
 		if(logged_times.Count > 10) logged_times.RemoveAt(0);
 		logged_times.Add(server_end_time - server_start_time);

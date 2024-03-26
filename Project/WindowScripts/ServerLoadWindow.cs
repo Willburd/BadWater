@@ -17,14 +17,14 @@ public partial class ServerLoadWindow : GameWindows
             status.Text = "Setup...";
             return;
         }
-        // Setup server hud
+        // Time it took to solve server tick
         ulong accume_serv = 0;
         for(int q = 0; q < MainController.controller.logged_times.Count; q++) 
         {
             accume_serv += MainController.controller.logged_times[q];
         }
         double avrg_serv = (double)accume_serv / (double)MainController.controller.logged_times.Count;
-        status.Text += "Process time: " + Mathf.Round(avrg_serv) + "ms / " + (1000f * (1f / MainController.tick_rate)) + "ms )\n";
+        status.Text += "Tick time: " + Mathf.Round(avrg_serv) + "ms / " + (1000f * (1f / MainController.tick_rate)) + "ms )\n";
         float tick_serv_percent = (float)avrg_serv / (1000f * (1f / MainController.tick_rate));
         status.Text += "Tick used: " + Mathf.Round(tick_serv_percent) + "% \n";
         // Time between ticks
@@ -35,9 +35,11 @@ public partial class ServerLoadWindow : GameWindows
         }
         double avrg_ticker = (double)accume_ticker / (double)MainController.controller.tick_gap_times.Count;
         status.Text += "Tick time: " + Mathf.Floor(avrg_ticker) + "ms \n";
+        // Stats
         status.Text += "============" + "\n";
         status.Text += "Network Clients : " + MainController.controller.client_container.GetChildCount() + "\n";
         status.Text += "Network Entities: " + MainController.controller.entity_container.GetChildCount() + "\n";
+        // Sub controller info
         for(int i = 0; i < MainController.GetSubControllerCount(); i++) 
 		{
             DeligateController con = MainController.GetSubControllerAtIndex(i);
