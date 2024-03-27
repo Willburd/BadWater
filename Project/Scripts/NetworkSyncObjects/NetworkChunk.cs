@@ -82,15 +82,13 @@ public partial class NetworkChunk : NetworkEntity
             {
                 Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)chunk_data["turf_" + i];
                 // Get new model
-                mesh_array[i]?.Free();
+                mesh_array[i]?.QueueFree();
                 mesh_array[i] = MeshUpdater.GetModelScene(turf_data);
-                mesh_array[i].Visible = false;
                 CallDeferred("add_child", new Variant[]{mesh_array[i]});
                 // Init model textures
                 if(mesh_array[i] == null) GD.Print("No model for " + turf_data["model"]);
                 mesh_array[i].Position = new Vector3(Mathf.Floor(i % ChunkController.chunk_size) * MapController.tile_size,0,Mathf.Floor(i / ChunkController.chunk_size) * MapController.tile_size);
                 mesh_array[i].TextureUpdated(turf_data);
-                mesh_array[i].Visible = true;
             }
         });
     }
