@@ -39,7 +39,7 @@ public partial class MeshUpdater : Node3D
     }
     public void TextureUpdated(string json)
     {
-        TextureUpdated(TOOLS.ParseJson(json));
+        Task.Run(() => TextureUpdated(TOOLS.ParseJson(json)));
     }
     
 
@@ -156,13 +156,15 @@ public partial class MeshUpdater : Node3D
     public override void _PhysicsProcess(double delta)
     {
         BillboardFaceCamera();
-        // New animation frame!
-        if(current_data != null)
-        {
-            int old_anim_frame = Mathf.FloorToInt(animator_value);
-            animator_value += (float)(current_data["anim_speed"].AsDouble() * delta);
-            if(old_anim_frame != Mathf.FloorToInt(animator_value)) TextureUpdated(current_data);
-        }
+        Task.Run(() => {
+            // New animation frame!
+            if(current_data != null)
+            {
+                int old_anim_frame = Mathf.FloorToInt(animator_value);
+                animator_value += (float)(current_data["anim_speed"].AsDouble() * delta);
+                if(old_anim_frame != Mathf.FloorToInt(animator_value)) TextureUpdated(current_data);
+            }
+        });
     }
 
     public void BillboardFaceCamera()

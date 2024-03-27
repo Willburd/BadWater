@@ -76,19 +76,21 @@ public partial class NetworkChunk : NetworkEntity
     protected void ClientChunkMeshUpdate(Vector3 pos, string mesh_json)
     {
         Position = pos;
-        Godot.Collections.Dictionary chunk_data = TOOLS.ParseJson(mesh_json);
-        for(int i = 0; i < mesh_array.Length; i++) 
-        {
-            Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)chunk_data["turf_" + i];
-            // Get new model
-            mesh_array[i]?.QueueFree();
-            mesh_array[i] = MeshUpdater.GetModelScene(turf_data);
-            CallDeferred("add_child", new Variant[]{mesh_array[i]});
-            // Init model textures
-            if(mesh_array[i] == null) GD.Print("No model for " + turf_data["model"]);
-            mesh_array[i].Position = new Vector3(Mathf.Floor(i % ChunkController.chunk_size) * MapController.tile_size,0,Mathf.Floor(i / ChunkController.chunk_size) * MapController.tile_size);
-            mesh_array[i].TextureUpdated(turf_data);
-        }
+        Task.Run(() => {
+            Godot.Collections.Dictionary chunk_data = TOOLS.ParseJson(mesh_json);
+            for(int i = 0; i < mesh_array.Length; i++) 
+            {
+                Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)chunk_data["turf_" + i];
+                // Get new model
+                mesh_array[i]?.QueueFree();
+                mesh_array[i] = MeshUpdater.GetModelScene(turf_data);
+                CallDeferred("add_child", new Variant[]{mesh_array[i]});
+                // Init model textures
+                if(mesh_array[i] == null) GD.Print("No model for " + turf_data["model"]);
+                mesh_array[i].Position = new Vector3(Mathf.Floor(i % ChunkController.chunk_size) * MapController.tile_size,0,Mathf.Floor(i / ChunkController.chunk_size) * MapController.tile_size);
+                mesh_array[i].TextureUpdated(turf_data);
+            }
+        });
     }
 
     public bool CanUnload()
