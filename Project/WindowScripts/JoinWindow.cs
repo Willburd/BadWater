@@ -40,17 +40,20 @@ public partial class JoinWindow : GameWindows
         WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.MainGame);
         WindowManager.controller.main_window.GrabFocus(); // demand attention
         BootController.controller.StartNetwork(false,false);
+        DisplayServer.WindowSetTitle("Badwater - Client");
     }
 
     public void _on_server_pressed()
     {
         WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.ServerConfig);
         BootController.controller.StartNetwork(true,false);
+        DisplayServer.WindowSetTitle("Badwater - Server");
     }
         
     public void _on_editor_pressed()
     {
         WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.ServerConfig);
         BootController.controller.StartNetwork(true,true);
+        DisplayServer.WindowSetTitle("Badwater - Editing");
     }
 }

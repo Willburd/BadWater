@@ -740,7 +740,8 @@ public partial class MapController : DeligateController
         
         public bool IsTurfValid(GridPos grid_pos)
         {
-            // Assuming the chunk is already loaded is faster then trying to load nothing1
+            // Assuming the chunk is already loaded is faster then trying to load nothing!
+            if(grid_pos.GetMapID() == "NULL" || grid_pos.GetMapID() == "BAG") return false;
             if(grid_pos.hor < 0 || grid_pos.hor >= turfs.GetLength(0)) return false;
             if(grid_pos.ver < 0 || grid_pos.ver >= turfs.GetLength(1)) return false;
             if(grid_pos.dep < 0 || grid_pos.dep >= turfs.GetLength(2)) return false;
@@ -749,7 +750,7 @@ public partial class MapController : DeligateController
 
         public bool IsChunkValid(ChunkPos grid_pos)
         {
-            // Assuming the chunk is already loaded is faster then trying to load nothing1
+            // Assuming the chunk is already loaded is faster then trying to load nothing!
             if(grid_pos.hor < 0 || grid_pos.hor >= chunk_grid.GetLength(0)) return false;
             if(grid_pos.ver < 0 || grid_pos.ver >= chunk_grid.GetLength(1)) return false;
             if(grid_pos.dep < 0 || grid_pos.dep >= chunk_grid.GetLength(2)) return false;
