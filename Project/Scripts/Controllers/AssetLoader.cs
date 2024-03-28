@@ -502,7 +502,7 @@ public partial class AssetLoader : Node
 
     public static List<Image> texture_pages = new List<Image>();
     private double tex_offset_stacker = 0;
-    private TOOLS.TupleList<double,PreparingTexture> prepare_textures = new TOOLS.TupleList<double,PreparingTexture>();
+    private TupleList<double,PreparingTexture> prepare_textures = new TupleList<double,PreparingTexture>();
     
     private void LoadTextureAtlas(string path)
     {

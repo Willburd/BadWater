@@ -68,7 +68,7 @@ public partial class ChunkController : DeligateController
                 for(int v = 0; v < loadborder_h * 2; v++) 
                 {
                     // Load our chunks
-                    MapController.ChunkPos pos = new MapController.ChunkPos(client.focused_position - new Vector3((loadborder_w/4) * MapController.tile_size * ChunkController.chunk_size,0,(loadborder_h/4) * MapController.tile_size * ChunkController.chunk_size));
+                    ChunkPos pos = new ChunkPos(client.focused_position - new Vector3((loadborder_w/4) * MapController.tile_size * ChunkController.chunk_size,0,(loadborder_h/4) * MapController.tile_size * ChunkController.chunk_size));
                     pos.hor -= Mathf.FloorToInt(loadborder_w/2);
                     pos.ver -= Mathf.FloorToInt(loadborder_h/2);
                     pos.hor += u;
@@ -117,14 +117,14 @@ public partial class ChunkController : DeligateController
 
     public static void SetupChunk(NetworkChunk chunk)
     {
-        MapController.GridPos pos = new MapController.GridPos(chunk.map_id_string,GetAlignedPos(chunk.Position));
+        GridPos pos = new GridPos(chunk.map_id_string,GetAlignedPos(chunk.Position));
         for(int u = 0; u < ChunkController.chunk_size; u++) 
         {
             for(int v = 0; v < ChunkController.chunk_size; v++) 
             {
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
-                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(chunk.map_id_string,hor,ver,pos.dep),true);
+                AbstractTurf turf = MapController.GetTurfAtPosition(new GridPos(chunk.map_id_string,hor,ver,pos.dep),true);
                 turf.UpdateIcon();  // Build mesh!
                 foreach(AbstractEntity ent in turf.Contents)
                 {
@@ -139,14 +139,14 @@ public partial class ChunkController : DeligateController
 
     public static void CleanChunk(NetworkChunk chunk)
     {
-        MapController.GridPos pos = new MapController.GridPos(chunk.map_id_string,GetAlignedPos(chunk.Position));
+        GridPos pos = new GridPos(chunk.map_id_string,GetAlignedPos(chunk.Position));
         for(int u = 0; u < ChunkController.chunk_size; u++) 
         {
             for(int v = 0; v < ChunkController.chunk_size; v++) 
             {
                 float hor = pos.hor + u;
                 float ver = pos.ver + v;
-                AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(chunk.map_id_string,hor,ver,pos.dep),true);
+                AbstractTurf turf = MapController.GetTurfAtPosition(new GridPos(chunk.map_id_string,hor,ver,pos.dep),true);
                 foreach(AbstractEntity ent in turf.Contents)
                 {
                     ent.UnloadNetworkEntity();

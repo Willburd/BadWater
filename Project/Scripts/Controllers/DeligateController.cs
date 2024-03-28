@@ -12,7 +12,7 @@ public class DeligateController
     }
 
     public string display_name = "";
-    public TOOLS.TickRecord logged_times = new TOOLS.TickRecord();
+    public TickRecord logged_times = new TickRecord();
 
     public List<AbstractEntity> entities = new List<AbstractEntity>();
 

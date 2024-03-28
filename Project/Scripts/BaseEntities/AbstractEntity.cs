@@ -13,9 +13,9 @@ public partial class AbstractEntity
 {
     // Beginning of template data
     protected PackRef PackRef;
-    protected MapController.GridPos grid_pos;
+    protected GridPos grid_pos;
     protected NetworkClient owner_client;
-    public MapController.GridPos GridPos
+    public GridPos GridPos
     {
         get {return grid_pos;}
     }
@@ -139,10 +139,10 @@ public partial class AbstractEntity
 
     public static AbstractEntity CreateEntity( MainController.DataType type, string type_ID, string map_id, Vector3 pos,bool suppress_init = false)
     {
-        MapController.GridPos? grid = new MapController.GridPos(map_id,pos);
+        GridPos? grid = new GridPos(map_id,pos);
         return CreateEntity( type, type_ID, grid, suppress_init);
     }
-    public static AbstractEntity CreateEntity( MainController.DataType type, string type_ID, MapController.GridPos? pos,bool suppress_init = false, string data_string = "")
+    public static AbstractEntity CreateEntity( MainController.DataType type, string type_ID, GridPos? pos,bool suppress_init = false, string data_string = "")
     {
         PackData typeData = null;
         AbstractEntity newEnt = null;
@@ -190,7 +190,7 @@ public partial class AbstractEntity
                 break;
         }
         // NetworkEntity init
-        newEnt.grid_pos = new MapController.GridPos("NULL",0,0,0); // nullspace till placed
+        newEnt.grid_pos = new GridPos("NULL",0,0,0); // nullspace till placed
         newEnt.TemplateRead(typeData);
         // Automove to location
         if(pos != null) newEnt.Move(pos.Value,false);
@@ -253,7 +253,7 @@ public partial class AbstractEntity
         if(velocity.Length() < 0.01) velocity *= 0;
         if(velocity != Vector3.Zero)
         {
-            Move(new MapController.GridPos(grid_pos.GetMapID(),TOOLS.GridToPosWithOffset(grid_pos) + velocity));
+            Move(new GridPos(grid_pos.GetMapID(),TOOLS.GridToPosWithOffset(grid_pos) + velocity));
         }
     }
     public void DeleteEntity()
@@ -321,7 +321,7 @@ public partial class AbstractEntity
     {
         if(client_input_data.Keys.Count == 0) return;
         // Got an actual control update!
-        MapController.GridPos new_pos = grid_pos;
+        GridPos new_pos = grid_pos;
         Vector2 mover = new Vector2((float)client_input_data["x"].AsDouble(),(float)client_input_data["y"].AsDouble()).Normalized() * MainController.controller.config.input_factor;
         new_pos.hor += mover.X;
         new_pos.ver += mover.Y;
@@ -344,7 +344,7 @@ public partial class AbstractEntity
     public virtual void PointAt(AbstractEntity target, Vector3 pos)
     {
         if(target == null) return;
-        AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:POINT_AT",new MapController.GridPos(target.GridPos.GetMapID(),pos));
+        AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:POINT_AT",new GridPos(target.GridPos.GetMapID(),pos));
     }
 
     /*****************************************************************
@@ -538,7 +538,7 @@ public partial class AbstractEntity
         }
     }
 
-    public virtual AbstractEntity Move(MapController.GridPos new_grid, bool perform_turf_actions = true)
+    public virtual AbstractEntity Move(GridPos new_grid, bool perform_turf_actions = true)
     {
         // Is new location valid?
         Vector3 dir_vec = MapController.GetMapDirection(grid_pos.WorldPos(),new_grid.WorldPos());
@@ -547,7 +547,7 @@ public partial class AbstractEntity
         {
             // EDGE LOCK
             float threshold = (float)0.01;
-            if(!MapController.IsTurfValid(new MapController.GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep)))
+            if(!MapController.IsTurfValid(new GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep)))
             {
                 if(dir_vec.X < 0)
                 {   
@@ -558,7 +558,7 @@ public partial class AbstractEntity
                     new_grid.hor = Mathf.Floor(grid_pos.hor) + 1 - threshold;
                 }
             }
-            if(!MapController.IsTurfValid(new MapController.GridPos(new_grid.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep)))
+            if(!MapController.IsTurfValid(new GridPos(new_grid.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep)))
             {
                 if(dir_vec.Z < 0)
                 {
@@ -574,7 +574,7 @@ public partial class AbstractEntity
             {
                 // Check to see on each axis if we bump... This allows sliding!
                 bool bump_h = false;
-                AbstractTurf hor_turf = MapController.GetTurfAtPosition(new MapController.GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep),true);
+                AbstractTurf hor_turf = MapController.GetTurfAtPosition(new GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep),true);
                 if(hor_turf != null && hor_turf != GetTurf() && hor_turf.density)
                 {
                     bump_h = true;
@@ -588,7 +588,7 @@ public partial class AbstractEntity
                     }
                 }
                 bool bump_v = false;
-                AbstractTurf ver_turf = MapController.GetTurfAtPosition(new MapController.GridPos(grid_pos.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep),true);
+                AbstractTurf ver_turf = MapController.GetTurfAtPosition(new GridPos(grid_pos.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep),true);
                 if(ver_turf != null && ver_turf != GetTurf() && ver_turf.density)
                 {
                     bump_v = true;
@@ -606,7 +606,7 @@ public partial class AbstractEntity
                 if(corner_turf != null && corner_turf.density)
                 {
                     // Corner bonking is silly... Needs a unique case when you run into a corner exactly head on!
-                    MapController.GridPos original_new = new_grid;
+                    GridPos original_new = new_grid;
                     if(dir_vec.X < 0)
                     {   
                         new_grid.hor = Mathf.Floor(grid_pos.hor) + threshold;
@@ -682,7 +682,7 @@ public partial class AbstractEntity
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(perform_turf_actions);
         // Enter new location
-        grid_pos = new MapController.GridPos("BAG",Vector3.Zero);
+        grid_pos = new GridPos("BAG",Vector3.Zero);
         new_destination.EntityEntered(this,perform_turf_actions);
         UpdateNetwork(false,false);
         return location;
@@ -692,7 +692,7 @@ public partial class AbstractEntity
         // Leave old location, perform uncrossing events!
         LeaveOldLoc(false);
         // Enter new location
-        grid_pos = new MapController.GridPos("NULL",Vector3.Zero);
+        grid_pos = new GridPos("NULL",Vector3.Zero);
         UpdateNetwork(false,false);
         return location;
     }

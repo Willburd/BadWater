@@ -41,7 +41,7 @@ public partial class AudioController : DeligateController
     }
 
 
-    public static void PlayAt(string soundpack_id, MapController.GridPos pos, float range, float volume_mod, NetworkClient for_client = null)
+    public static void PlayAt(string soundpack_id, GridPos pos, float range, float volume_mod, NetworkClient for_client = null)
     {
         if(soundpack_id == "") return;
         string soundpack = "res://Library/Sounds/" + soundpack_id;

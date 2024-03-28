@@ -1,57 +1,12 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
 
 public static class TOOLS
 {
-
-    public class TickRecord
-    {
-        const int len = 10;
-        ulong[] time_data = new ulong[len];
-        int index = 0;
-        public void Append(ulong new_time)
-        {
-            time_data[index] = new_time;
-            index += 1;
-            if(index >= len) index = 0;
-        }
-        public double GetAverage()
-        {
-            ulong acc = 0;
-            for(int q = 0; q < len; q++) acc += time_data[q];
-            return acc / len;
-        }
-    }
-
-    // Credit to https://stackoverflow.com/questions/5716423/c-sharp-sortable-collection-which-allows-duplicate-keys 
-	public class TupleList<T1, T2> : List<Tuple<T1, T2>> where T1 : IComparable
-	{
-		public void Add(T1 item, T2 item2)
-		{
-			Add(new Tuple<T1, T2>(item, item2));
-		}
-
-		public new void Sort()
-		{
-			Comparison<Tuple<T1, T2>> c = (a, b) => a.Item1.CompareTo(b.Item1);
-			base.Sort(c);
-		}
-        
-		public 
-		void ReverseSort()
-		{
-			Comparison<Tuple<T1, T2>> c = (a, b) => b.Item1.CompareTo(a.Item1);
-			base.Sort(c);
-		}
-	}
-
-    public static T Pick<T>(List<T> list)
-    {   
-        return list[RandI(list.Count)];
-    }
-
+    /*****************************************************************
+     * Mouse and clicking
+     ****************************************************************/
     public static Godot.Collections.Dictionary AssembleStandardClick(Vector3 pos)
     {
         Godot.Collections.Dictionary new_inputs = new Godot.Collections.Dictionary();
@@ -65,6 +20,11 @@ public static class TOOLS
         new_inputs["z"]             = pos.Z;
         return new_inputs;
     }
+
+
+    /*****************************************************************
+     * Connection checks
+     ****************************************************************/
     public static bool PeerDisconnected(Node node)
     {
         if(node == null) return true;
@@ -84,11 +44,18 @@ public static class TOOLS
         return node.Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connected;
     }
 
+
+    /*****************************************************************
+     * Random rolls and picks
+     ****************************************************************/
+    public static T Pick<T>(List<T> list)
+    {   
+        return list[RandI(list.Count)];
+    }
     public static bool Prob(float percentile) // Rand check that is at or under value presented, float version of Byond's Prob()!
     {
         return Mathf.Abs(GD.Randf() % 100) <= percentile;
     }
-
     public static float RandF(float max)
     {
         return GD.Randf() * max;
@@ -97,17 +64,19 @@ public static class TOOLS
     {
         return min + RandF(max - min);
     }
-
     public static int RandI(int max)
     {
         return Mathf.Abs((int)GD.Randi()) % max;
     }
-
     public static int RandI(int min, int max)
     {
         return min + RandI(max - min);
     }
 
+
+    /*****************************************************************
+     * Vector tools
+     ****************************************************************/
     static public float VecDist(float x1, float y1, float x2, float y2)
     {
         return VecDist(new Vector2(x1,y1) , new Vector2(x2,y2) );
@@ -120,7 +89,6 @@ public static class TOOLS
     {
         return (goal-start).Length();
     }
-
     static public Vector2 DirVec(float x1, float y1, float x2, float y2)
     {
         return DirVec(new Vector2(x1,y1) , new Vector2(x2,y2) );
@@ -133,14 +101,19 @@ public static class TOOLS
     {
         return (goal-start).Normalized();
     }
-    static public Vector3 GridToPosWithOffset(MapController.GridPos grid)
+    static public Vector3 GridToPosWithOffset(GridPos grid)
     {
         return new Vector3(grid.hor,grid.dep,grid.ver) * MapController.tile_size;
     }
-    static public Vector3 ChunkGridToPos(MapController.ChunkPos grid)
+    static public Vector3 ChunkGridToPos(ChunkPos grid)
     {
         return new Vector3(grid.hor,grid.dep,grid.ver) * (ChunkController.chunk_size * MapController.tile_size);
     }
+
+
+    /*****************************************************************
+     * Json handling tools
+     ****************************************************************/
     static public Godot.Collections.Dictionary ParseJsonFile(string file_path)
     {
         // Read text from file and then call parsejson.
@@ -226,14 +199,6 @@ public static class TOOLS
         return current_val;
     }
 
-    public static void PrintProgress(int steps, int max_steps)
-    {
-        for(int b = 1; b <= 10; b++) 
-        {
-            if(steps == Mathf.Floor(Mathf.Floor(max_steps / 10) * b)) ChatController.DebugLog("-" + (b * 10) + "%");
-        }
-    }
-
     /*****************************************************************
      * Entity tools
      ****************************************************************/
@@ -248,5 +213,16 @@ public static class TOOLS
         DAT.Dir ret = DAT.VectorToCardinalDir(dir_vec.X,dir_vec.Z);
         if(ret == DAT.Dir.None) return A.direction; // Final sanity check...
         return ret;
+    }
+
+    /*****************************************************************
+     * Debug tools
+     ****************************************************************/
+    public static void PrintProgress(int steps, int max_steps)
+    {
+        for(int b = 1; b <= 10; b++) 
+        {
+            if(steps == Mathf.Floor(Mathf.Floor(max_steps / 10) * b)) ChatController.DebugLog("-" + (b * 10) + "%");
+        }
     }
 }

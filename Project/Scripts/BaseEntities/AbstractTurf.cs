@@ -63,7 +63,7 @@ public partial class AbstractTurf : AbstractEntity
     AtmoController.AtmoCell air_mix = null;
     private AbstractArea area = null;
 
-    public new void Move(MapController.GridPos new_pos, bool perform_turf_actions = true)
+    public new void Move(GridPos new_pos, bool perform_turf_actions = true)
     {
         grid_pos = new_pos;
     }

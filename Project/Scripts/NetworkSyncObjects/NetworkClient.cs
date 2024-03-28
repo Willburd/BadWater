@@ -123,9 +123,9 @@ public partial class NetworkClient : Node3D
         }
         // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
         ChatController.DebugLog("Client FALLBACK RESPAWN: " + Name);
-        SpawnHostEntity(new MapController.GridPos(MapController.FallbackMap(),(float)0.5,(float)0.5,0));
+        SpawnHostEntity(new GridPos(MapController.FallbackMap(),(float)0.5,(float)0.5,0));
     }
-    private void SpawnHostEntity(MapController.GridPos new_pos)
+    private void SpawnHostEntity(GridPos new_pos)
     {
         // SPAWN HOST OBJECT
         if(focused_entity == null) 
@@ -359,7 +359,7 @@ public partial class NetworkClient : Node3D
             Vector3 raynormal = current_camera.ProjectRayNormal(mouse_button.Position);
             Vector3 to = from + (raynormal * dist);
             // Scan all colliding bodies on a raycast!
-            TOOLS.TupleList<float,StaticBody3D> dist_list = new TOOLS.TupleList<float, StaticBody3D>();
+            TupleList<float,StaticBody3D> dist_list = new TupleList<float, StaticBody3D>();
             Godot.Collections.Array<Rid> already_processed = new Godot.Collections.Array<Rid>();
             Godot.Collections.Dictionary raycast_hit = GetWorld3D().DirectSpaceState.IntersectRay(PhysicsRayQueryParameters3D.Create(from, to));
             while(raycast_hit.Count > 0)
@@ -410,7 +410,7 @@ public partial class NetworkClient : Node3D
                 if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
                 {
                     Vector3 click_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
-                    AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,click_pos),true);
+                    AbstractTurf turf = MapController.GetTurfAtPosition(new GridPos(focused_map_id,click_pos),true);
                     if(client_click_data["mod_shift"].AsBool()) focused_entity?.PointAt(turf,click_pos);
                 }
             break;
@@ -418,7 +418,7 @@ public partial class NetworkClient : Node3D
             case MouseButton.Left:
                 if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
                 {
-                    AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                    AbstractTurf turf = MapController.GetTurfAtPosition(new GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
                     if(current_click_held_entity != null)
                     {
                         current_click_held_entity.Dragged( focused_entity, turf, client_click_data);
@@ -437,7 +437,7 @@ public partial class NetworkClient : Node3D
             case MouseButton.Right:
                 if(client_click_data["state"].AsBool()) // Creates a menu, so do this instantly!
                 {
-                    AbstractTurf turf = MapController.GetTurfAtPosition(new MapController.GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                    AbstractTurf turf = MapController.GetTurfAtPosition(new GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
                     // Create a list of entities on the tile that we can click, including the turf!
                     if(turf == null) return;
                     foreach(AbstractEntity ent in turf.Contents)

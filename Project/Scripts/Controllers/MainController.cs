@@ -39,8 +39,8 @@ public partial class MainController : Node
 
 	[Export]
 	public ConfigData config;
-    public TOOLS.TickRecord logged_times = new TOOLS.TickRecord();
-	public TOOLS.TickRecord tick_gap_times = new TOOLS.TickRecord();
+    public TickRecord logged_times = new TickRecord();
+	public TickRecord tick_gap_times = new TickRecord();
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
 	public static int GetSubControllerCount()
