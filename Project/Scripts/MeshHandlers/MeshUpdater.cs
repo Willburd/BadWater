@@ -53,8 +53,8 @@ public partial class MeshUpdater : Node3D
     public void TextureUpdated(Godot.Collections.Dictionary data)
     {
         try { if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return; } 
-        catch ( System.ObjectDisposedException e ) { return; }
-        
+        catch (ObjectDisposedException) { return; }
+
         // Check for new animations
         string old_tex = "";
         if(current_data != null) old_tex = current_data["texture"].AsString();
@@ -131,7 +131,7 @@ public partial class MeshUpdater : Node3D
     public void RotateDirectionInRelationToCamera()
     {
         try { if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return; } 
-        catch ( System.ObjectDisposedException e ) { return; }
+        catch (ObjectDisposedException) { return; }
 
         // Solve rotation steps from camera rotation
         float solve_step = Mathf.Round(new Vector2(camera_relational_vector.X,camera_relational_vector.Z).Angle() / (Mathf.Pi * 2) * 100);
