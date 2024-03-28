@@ -36,20 +36,8 @@ public partial class ChunkController : DeligateController
     public override void Fire()
     {
         //GD.Print(Name + " Fired");
-        Dictionary<string,List<NetworkChunk>> map_chunks = MapController.GetAllMapChunks();
-        foreach(List<NetworkChunk> chunks in map_chunks.Values)
-        {
-            foreach(NetworkChunk chunk in chunks)
-            {
-                // Handle ticking all loaded chunks!
-                chunk.Tick();
-            }
-        }
-
-        // Handle unloading!
-        List<NetworkChunk> in_vis_range = new List<NetworkChunk>();
         List<NetworkClient> client_list = MainController.ClientList;
-        for(int i = 0; i <client_list.Count; i++) 
+        for(int i = 0; i < client_list.Count; i++) 
 		{
 			NetworkClient client = client_list[i];
             if(!client.has_logged_in) continue; // Skip!
@@ -60,6 +48,30 @@ public partial class ChunkController : DeligateController
                 GD.PrintErr("CLIENT " + client.Name + " ON UNLOADED MAP " + client.focused_map_id);
                 client.Spawn(); // EMERGENCY RESPAWN
             }
+        }
+
+        Dictionary<string,List<NetworkChunk>> map_chunks = MapController.GetAllMapChunks();
+        foreach(List<NetworkChunk> chunks in map_chunks.Values)
+        {
+            foreach(NetworkChunk chunk in chunks)
+            {
+                // Handle ticking all loaded chunks!
+                chunk.Tick();
+                // Reset chunk visibility
+                chunk.clients_visible = 0;
+                for(int i = 0; i < client_list.Count; i++) 
+                {
+                    chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client_list[i].Name), false);
+                }
+            }
+        }
+
+        // Handle loading!
+        List<NetworkChunk> in_vis_range = new List<NetworkChunk>();
+        for(int i = 0; i < client_list.Count; i++) 
+		{
+			NetworkClient client = client_list[i];
+            if(!client.has_logged_in) continue; // Skip!
 
             // hor/ver distance
             int max_chunk_loads = 6;
@@ -80,31 +92,33 @@ public partial class ChunkController : DeligateController
                         bool is_loaded = MapController.IsChunkLoaded(client.focused_map_id,pos);
                         if(is_loaded) 
                         {
-                            in_vis_range.Add( MapController.GetChunk(client.focused_map_id,pos) );
+                            NetworkChunk chunk = MapController.GetChunk(client.focused_map_id,pos);
+                            chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name), true);
+                            in_vis_range.Add( chunk );
+                            chunk.clients_visible += 1;
                             continue;
                         }
                         if(max_chunk_loads > 0) // Limit chunk loads per client to avoid hitching from getting 12+ chunks at the same time.
                         {
                             NetworkChunk chunk = MapController.GetChunk(client.focused_map_id,pos);
                             ChunkController.SetupChunk(chunk);
+                            chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name), true);
                             in_vis_range.Add(chunk);
+                            chunk.clients_visible += 1;
                             max_chunk_loads -= 1;
                         }
                     }
                 }
             }
 		}
-
+        
         // Unload chunks out of range, randomly pick candidates every frame and unload them
         List<NetworkChunk> loaded_chunks = MapController.GetAllLoadedChunks();
         int unload_count = Math.Min(loaded_chunks.Count, 20);
         while(unload_count-- > 0 && loaded_chunks.Count > 0)
         {
             NetworkChunk chunk = TOOLS.Pick(loaded_chunks);
-            if(!in_vis_range.Contains(chunk))
-            {
-                MapController.ChunkUnload(chunk);
-            }
+            if(chunk.clients_visible <= 0) MapController.ChunkUnload(chunk);
         }
     }
 

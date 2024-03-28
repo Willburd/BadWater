@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 [GlobalClass] 
 public partial class NetworkChunk : NetworkEntity
 {
+    public int clients_visible = 0;
     public int timer = 0;
     public bool do_not_unload = false;
     private MeshUpdater[] mesh_array = new MeshUpdater[ChunkController.chunk_size * ChunkController.chunk_size];

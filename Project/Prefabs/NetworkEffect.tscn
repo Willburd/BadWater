@@ -25,8 +25,9 @@ properties/6/path = NodePath(".:synced_text")
 properties/6/spawn = true
 properties/6/replication_mode = 2
 
-[node name="NetworkEffect" type="Node3D"]
+[node name="NetworkEffect" type="Node3D" node_paths=PackedStringArray("multi_syncronizer")]
 script = ExtResource("1_xwij3")
+multi_syncronizer = NodePath("MultiplayerSynchronizer")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25

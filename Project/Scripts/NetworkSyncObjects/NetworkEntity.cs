@@ -60,6 +60,8 @@ public partial class NetworkEntity : Node3D
     public DAT.Dir direction = DAT.Dir.South;
     [Export]
     public bool clickable = false;
+    [Export]
+    public MultiplayerSynchronizer multi_syncronizer;
 
     // delete needs to be handled remotely
     public void DeleteEntity()

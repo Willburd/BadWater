@@ -19,8 +19,9 @@ properties/4/path = NodePath(".:clickable")
 properties/4/spawn = true
 properties/4/replication_mode = 2
 
-[node name="NetworkMob" type="Node3D"]
+[node name="NetworkMob" type="Node3D" node_paths=PackedStringArray("multi_syncronizer")]
 script = ExtResource("1_ycko5")
+multi_syncronizer = NodePath("MultiplayerSynchronizer")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25

@@ -22,8 +22,9 @@ properties/5/path = NodePath(".:clickable")
 properties/5/spawn = true
 properties/5/replication_mode = 2
 
-[node name="NetworkEntity" type="Node3D"]
+[node name="NetworkEntity" type="Node3D" node_paths=PackedStringArray("multi_syncronizer")]
 script = ExtResource("1_vmmur")
+multi_syncronizer = NodePath("MultiplayerSynchronizer")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.25
