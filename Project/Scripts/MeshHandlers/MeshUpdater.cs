@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.Common;
 using Godot;
 using System.Threading.Tasks;
+using System;
 
 [GlobalClass]
 public partial class MeshUpdater : Node3D
@@ -51,7 +52,9 @@ public partial class MeshUpdater : Node3D
     }
     public void TextureUpdated(Godot.Collections.Dictionary data)
     {
-        if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return;
+        try { if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return; } 
+        catch ( System.ObjectDisposedException e ) { return; }
+        
         // Check for new animations
         string old_tex = "";
         if(current_data != null) old_tex = current_data["texture"].AsString();
@@ -127,8 +130,10 @@ public partial class MeshUpdater : Node3D
     private string cached_animation_suffix;
     public void RotateDirectionInRelationToCamera()
     {
+        try { if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return; } 
+        catch ( System.ObjectDisposedException e ) { return; }
+
         // Solve rotation steps from camera rotation
-        if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return;
         float solve_step = Mathf.Round(new Vector2(camera_relational_vector.X,camera_relational_vector.Z).Angle() / (Mathf.Pi * 2) * 100);
         int dir_steps;
         if(Mathf.Abs(solve_step) < 4.5) dir_steps = 0;
