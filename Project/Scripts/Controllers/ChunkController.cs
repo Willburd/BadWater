@@ -36,6 +36,8 @@ public partial class ChunkController : DeligateController
     public override void Fire()
     {
         //GD.Print(Name + " Fired");
+
+        // Emergency respawns
         List<NetworkClient> client_list = MainController.ClientList;
         for(int i = 0; i < client_list.Count; i++) 
 		{
@@ -50,28 +52,12 @@ public partial class ChunkController : DeligateController
             }
         }
 
-        Dictionary<string,List<NetworkChunk>> map_chunks = MapController.GetAllMapChunks();
-        foreach(List<NetworkChunk> chunks in map_chunks.Values)
-        {
-            foreach(NetworkChunk chunk in chunks)
-            {
-                // Handle ticking all loaded chunks!
-                chunk.Tick();
-                // Reset chunk visibility
-                chunk.clients_visible = 0;
-                for(int i = 0; i < client_list.Count; i++) 
-                {
-                    chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client_list[i].Name), false);
-                }
-            }
-        }
-
         // Handle loading!
-        List<NetworkChunk> in_vis_range = new List<NetworkChunk>();
         for(int i = 0; i < client_list.Count; i++) 
 		{
 			NetworkClient client = client_list[i];
             if(!client.has_logged_in) continue; // Skip!
+            int id = int.Parse(client.Name);
 
             // hor/ver distance
             int max_chunk_loads = 6;
@@ -93,18 +79,13 @@ public partial class ChunkController : DeligateController
                         if(is_loaded) 
                         {
                             NetworkChunk chunk = MapController.GetChunk(client.focused_map_id,pos);
-                            chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name), true);
-                            in_vis_range.Add( chunk );
-                            chunk.clients_visible += 1;
-                            continue;
+                            chunk.visible_to_peers.Add(id);
                         }
-                        if(max_chunk_loads > 0) // Limit chunk loads per client to avoid hitching from getting 12+ chunks at the same time.
+                        else if(max_chunk_loads > 0) // Limit chunk loads per client to avoid hitching from getting 12+ chunks at the same time.
                         {
                             NetworkChunk chunk = MapController.GetChunk(client.focused_map_id,pos);
                             ChunkController.SetupChunk(chunk);
-                            chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name), true);
-                            in_vis_range.Add(chunk);
-                            chunk.clients_visible += 1;
+                            chunk.visible_to_peers.Add(id);
                             max_chunk_loads -= 1;
                         }
                     }
@@ -118,7 +99,19 @@ public partial class ChunkController : DeligateController
         while(unload_count-- > 0 && loaded_chunks.Count > 0)
         {
             NetworkChunk chunk = TOOLS.Pick(loaded_chunks);
-            if(chunk.clients_visible <= 0) MapController.ChunkUnload(chunk);
+            if(chunk.visible_to_peers.Count <= 0) MapController.ChunkUnload(chunk);
+        }
+        
+        // Reset chunk visibility while ticking all active chunks!
+        Dictionary<string,List<NetworkChunk>> map_chunks = MapController.GetAllMapChunks();
+        foreach(List<NetworkChunk> chunks in map_chunks.Values)
+        {
+            foreach(NetworkChunk chunk in chunks)
+            {
+                chunk.Tick();
+                chunk.multi_syncronizer.UpdateVisibility();
+                chunk.visible_to_peers.Clear();
+            }
         }
     }
 

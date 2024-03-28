@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 [GlobalClass] 
 public partial class NetworkChunk : NetworkEntity
 {
-    public int clients_visible = 0;
+    public List<int> visible_to_peers = new List<int>();
     public int timer = 0;
     public bool do_not_unload = false;
     private MeshUpdater[] mesh_array = new MeshUpdater[ChunkController.chunk_size * ChunkController.chunk_size];
@@ -96,6 +96,11 @@ public partial class NetworkChunk : NetworkEntity
             mesh_array[i].TextureUpdated(turf_data);
             mesh_array[i].Visible = true;
         }
+    }
+
+    public bool CheckVisible(int peer)
+    {
+        return visible_to_peers.Contains(peer);
     }
 
     public bool CanUnload()
