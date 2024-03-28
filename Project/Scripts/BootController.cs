@@ -124,13 +124,7 @@ public partial class BootController : Node
     {
         GD.Print("Peer Leave: " + id);
         NetworkClient c = (NetworkClient)client_container.GetNode(id.ToString());
-        if(c != null && c.Multiplayer.MultiplayerPeer != null && IsMultiplayerAuthority()) c.DisconnectClient();
-        //Removal of the client is done in the NetworkClient it self!
-        if(IsMultiplayerAuthority()) return; //Only run on DC client
-        //Reset the client...
-        while(entity_container.GetChildCount() > 0) entity_container.GetChild(0).Free();
-        while(client_container.GetChildCount() > 0)client_container.GetChild(0).Free();
-        GD.Print("LEFT GAME");
-        WindowManager.controller.SetGameWindowConfig(WindowManager.WindowStates.JoinMenu);
+        c.SetMultiplayerAuthority(1); // Reset to server ownership for clearing
+        c.DisconnectClient();
     }
 }

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Common;
 using System.Diagnostics;
 
@@ -642,6 +643,7 @@ public partial class NetworkClient : Node3D
         // Server handling client DC
         AccountController.ClientLeave(this);
         focused_entity?.ClearClientOwner();
-        MainController.controller.Multiplayer.MultiplayerPeer.DisconnectPeer(int.Parse(Name)); // Calls DeleteEntity() remotely
+        GetParent().RemoveChild(this);
+        Free();
     }
 }
