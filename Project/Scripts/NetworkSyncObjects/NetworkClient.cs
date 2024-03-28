@@ -410,7 +410,7 @@ public partial class NetworkClient : Node3D
                 if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
                 {
                     Vector3 click_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
-                    AbstractTurf turf = MapController.GetTurfAtPosition(new GridPos(focused_map_id,click_pos),true);
+                    AbstractTurf turf = AbstractTurf.GetTurfAtPosition(new GridPos(focused_map_id,click_pos),true);
                     if(client_click_data["mod_shift"].AsBool()) focused_entity?.PointAt(turf,click_pos);
                 }
             break;
@@ -418,7 +418,7 @@ public partial class NetworkClient : Node3D
             case MouseButton.Left:
                 if(!client_click_data["state"].AsBool()) // Only handle turfclick on release of the button to CONFIRM it...
                 {
-                    AbstractTurf turf = MapController.GetTurfAtPosition(new GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                    AbstractTurf turf = AbstractTurf.GetTurfAtPosition(new GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
                     if(current_click_held_entity != null)
                     {
                         current_click_held_entity.Dragged( focused_entity, turf, client_click_data);
@@ -437,7 +437,7 @@ public partial class NetworkClient : Node3D
             case MouseButton.Right:
                 if(client_click_data["state"].AsBool()) // Creates a menu, so do this instantly!
                 {
-                    AbstractTurf turf = MapController.GetTurfAtPosition(new GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
+                    AbstractTurf turf = AbstractTurf.GetTurfAtPosition(new GridPos(focused_map_id,(float)client_click_data["x"].AsDouble(),(float)client_click_data["z"].AsDouble(),(float)client_click_data["y"].AsDouble()),true);
                     // Create a list of entities on the tile that we can click, including the turf!
                     if(turf == null) return;
                     foreach(AbstractEntity ent in turf.Contents)
@@ -474,7 +474,7 @@ public partial class NetworkClient : Node3D
                 Vector3 release_pos = new Vector3((float)client_click_data["x"].AsDouble(),(float)client_click_data["y"].AsDouble(),(float)client_click_data["z"].AsDouble());
                 if(current_click_held_entity != null && ent != null) // Catching entity drags!
                 {
-                    if(MapController.GetMapDistance(release_pos,current_click_start_pos) > 0.5f || current_click_held_entity != ent)
+                    if(MapTools.GetMapDistance(release_pos,current_click_start_pos) > 0.5f || current_click_held_entity != ent)
                     {
                         // Dragged onto another entity!
                         current_click_held_entity.Dragged(focused_entity,ent,TOOLS.ParseJson(parameters_json));

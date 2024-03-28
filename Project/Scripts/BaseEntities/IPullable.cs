@@ -47,11 +47,11 @@ public interface ICanPull
         AbstractEntity pulling_ent = puller as AbstractEntity;
         AbstractEntity pulled_ent = puller.I_Pulling as AbstractEntity;
         // Get pulling intensity
-        float dist = MapController.GetMapDistance(pulled_ent,pulling_ent);
+        float dist = MapTools.GetMapDistance(pulled_ent,pulling_ent);
         if(dist < 0.35f) return Vector3.Zero;
         float pullspeed = Mathf.InverseLerp(0.25f,2f,dist);
         // Tug entity to new world pos!
-        return MapController.GetMapDirection( pulled_ent.GridPos.WorldPos(), pulling_ent.GridPos.WorldPos()) * Mathf.Clamp(pullspeed,0f,1f);
+        return MapTools.GetMapDirection( pulled_ent.GridPos.WorldPos(), pulling_ent.GridPos.WorldPos()) * Mathf.Clamp(pullspeed,0f,1f);
     }
 
     public void I_TryStartPulling(IPullable pulling);

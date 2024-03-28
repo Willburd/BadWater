@@ -55,10 +55,7 @@ public class MapContainer
         if(replace)
         {
             AbstractTurf check_turf = GetTurfAtPosition(grid_pos,true);
-            if(check_turf != null)
-            {
-                RemoveTurf(check_turf, false, submaps);
-            }
+            if(check_turf != null) RemoveTurf(check_turf, false, submaps);
         }
         // Spawn new turf
         AbstractTurf turf = AbstractEntity.CreateEntity(MainController.DataType.Turf,turfID,null, true) as AbstractTurf;

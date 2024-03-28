@@ -98,24 +98,22 @@ public partial class MainController : Node
 		server_state = state;
 
 		// Create subcontrollers!
-		switch(server_state)
+		if(server_state == ServerConfig.Standard)
 		{
-			case ServerConfig.Standard:
-				subcontrollers.Add(new AccountController());
-				subcontrollers.Add(new MapController());
-				subcontrollers.Add(new ChemController());
-				subcontrollers.Add(new AtmoController());
-				subcontrollers.Add(new MachineController());
-				subcontrollers.Add(new MobController());
-				subcontrollers.Add(new ChunkController());
-			break;
-
-			case ServerConfig.Editor:
-				subcontrollers.Add(new AccountController());
-				subcontrollers.Add(new MapController());
-				subcontrollers.Add(new EditorController());
-				subcontrollers.Add(new ChunkController());
-			break;
+			subcontrollers.Add(new AccountController());
+			subcontrollers.Add(new MapController());
+			subcontrollers.Add(new ChemController());
+			subcontrollers.Add(new AtmoController());
+			subcontrollers.Add(new MachineController());
+			subcontrollers.Add(new MobController());
+			subcontrollers.Add(new ChunkController());
+		}
+		else if(server_state == ServerConfig.Editor)
+		{
+			subcontrollers.Add(new AccountController());
+			subcontrollers.Add(new MapController());
+			subcontrollers.Add(new EditorController());
+			subcontrollers.Add(new ChunkController());
 		}
 	}
 

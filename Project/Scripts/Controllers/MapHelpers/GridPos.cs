@@ -44,7 +44,7 @@ public struct GridPos
 
     public readonly bool Equals(GridPos other)
     {
-        if(!MapController.OnSameMap(GetMapID(),other.GetMapID())) return false;
+        if(!MapTools.OnSameMap(GetMapID(),other.GetMapID())) return false;
         return Mathf.FloorToInt(hor) == Mathf.FloorToInt(other.hor) && Mathf.FloorToInt(ver) == Mathf.FloorToInt(other.ver) && Mathf.FloorToInt(dep) == Mathf.FloorToInt(other.dep);
     }
 

@@ -124,7 +124,7 @@ public partial class AbstractTurf : AbstractEntity
         if(user is AbstractMob user_mob)
         {
             user_mob.SetClickCooldown(user_mob.GetAttackCooldown(used_item));
-            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,this) );
+            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapTools.GetMapDirection(user,this) );
         }
         if(!success) // Nothing got hit.
         {
@@ -132,5 +132,33 @@ public partial class AbstractTurf : AbstractEntity
             AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
         }
         return success;
+    }
+    
+
+    /*****************************************************************
+     * TURF MANAGEMENT
+     ****************************************************************/
+    public static bool IsTurfValid(GridPos grid_pos)
+    {
+        return MapController.GetMap(grid_pos.GetMapID()).IsTurfValid(grid_pos);
+    }
+    public static AbstractTurf AddTurf(string turfID, string mapID, GridPos grid_pos, AbstractArea area, bool replace, bool submaps)
+    {
+        return MapController.GetMap(mapID).AddTurf(turfID, grid_pos, area, replace, submaps);
+    }
+    public static void RemoveTurf(AbstractTurf turf, string mapID, bool make_area_baseturf, bool submaps)
+    {
+        MapController.GetMap(mapID).RemoveTurf(turf, make_area_baseturf, submaps);
+    }
+    public static void SwapTurfs(AbstractTurf old_turf, AbstractTurf new_turf, bool submaps)
+    {
+        string old_map = old_turf.GridPos.GetMapID();
+        GridPos old_pos = old_turf.GridPos;
+        AbstractTurf buffer = MapController.GetMap(new_turf.GridPos.GetMapID()).SwapTurf(old_turf,new_turf.GridPos,submaps);
+        MapController.GetMap(old_map).SwapTurf(buffer,old_pos,submaps);
+    }
+    public static AbstractTurf GetTurfAtPosition(GridPos grid_pos, bool submaps)
+    {
+        return MapController.GetMap(grid_pos.GetMapID()).GetTurfAtPosition(grid_pos,submaps);
     }
 }

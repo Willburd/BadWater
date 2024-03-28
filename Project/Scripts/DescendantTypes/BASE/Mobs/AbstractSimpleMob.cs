@@ -308,7 +308,7 @@ namespace Behaviors_BASE
             // Pulling
             if(click_params["mod_control"].AsBool())
             {
-                if(MapController.Adjacent(this,target,false))
+                if(MapTools.Adjacent(this,target,false))
                 {
                     if(target is AbstractTurf) I_StopPulling();
                     if(target is IPullable target_pull) I_TryStartPulling(target_pull);
@@ -360,7 +360,7 @@ namespace Behaviors_BASE
             storage_depth = target.StorageDepth(this);
             if(target is AbstractTurf || target.GetLocation() is AbstractTurf  || (storage_depth != -1 && storage_depth <= 1))
             {
-                if(MapController.Adjacent(this,target,false) || (hand_item != null && hand_item.InteractCanReach(this, target, hand_item.attack_range)) )
+                if(MapTools.Adjacent(this,target,false) || (hand_item != null && hand_item.InteractCanReach(this, target, hand_item.attack_range)) )
                 {
                     if(hand_item != null)
                     {
@@ -406,30 +406,28 @@ namespace Behaviors_BASE
                 return;
             }
 
-            switch(SelectingIntent)
+            // Help vs Harm intent
+            if(SelectingIntent == DAT.Intent.Help)
             {
-                case DAT.Intent.Help:
-                    if(target is AbstractMob target_mob)
-                    {
-                        ChatController.VisibleMessage( this, this.display_name.The(true) + " " + TOOLS.Pick(attacks.friendly) + " " + target_mob.display_name.The() + ".");
-                    }
-                    break;
-
-                
-                case DAT.Intent.Hurt:
-                    if(CanSpecialAttack(target) && SpecialAttackTarget(target))
-                    {
-                        return;
-                    }
-                    else if(attacks.melee_damage_upper == 0 && target is AbstractMob)
-                    {
-                        ChatController.VisibleMessage( this, this.display_name.The(true) + " " + TOOLS.Pick(attacks.friendly) + " " + target.display_name.The() + "!");
-                    }
-                    else
-                    {
-                        UnarmedAttackTarget(target);
-                    }
-                    break;
+                if(target is AbstractMob target_mob)
+                {
+                    ChatController.VisibleMessage( this, this.display_name.The(true) + " " + TOOLS.Pick(attacks.friendly) + " " + target_mob.display_name.The() + ".");
+                }
+            }
+            else
+            {
+                if(CanSpecialAttack(target) && SpecialAttackTarget(target))
+                {
+                    return;
+                }
+                else if(attacks.melee_damage_upper == 0 && target is AbstractMob)
+                {
+                    ChatController.VisibleMessage( this, this.display_name.The(true) + " " + TOOLS.Pick(attacks.friendly) + " " + target.display_name.The() + "!");
+                }
+                else
+                {
+                    UnarmedAttackTarget(target);
+                }
             }
         }
 
@@ -442,7 +440,7 @@ namespace Behaviors_BASE
         {
             if(HasTelegrip())
             {
-                if(MapController.GetMapDistance(this,target) > DAT.TK_MAXRANGE) return;
+                if(MapTools.GetMapDistance(this,target) > DAT.TK_MAXRANGE) return;
                 target.InteractWithTK(this);
             }
         }
@@ -523,7 +521,7 @@ namespace Behaviors_BASE
 
         public void UnarmedAttackTarget(AbstractEntity target)
         {
-            if(!MapController.Adjacent( this, target, false)) return;
+            if(!MapTools.Adjacent( this, target, false)) return;
             AbstractTurf turf = target.GetTurf();
 
             direction = TOOLS.RotateTowardEntity(this,target);
@@ -555,14 +553,14 @@ namespace Behaviors_BASE
             {
                 missed = true;
             }
-            else if(!MapController.Adjacent(this,turf,false))
+            else if(!MapTools.Adjacent(this,turf,false))
             {
                 missed = true;
             }
             if(missed) // Most likely we have a slow attack and they dodged it or we somehow got moved.
             {
                 ChatController.LogAttack(display_name.The(true) + " Animal-attacked (dodged) " + target?.display_name.The());
-                LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(this,turf));
+                LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapTools.GetMapDirection(this,turf));
                 AudioController.PlayAt("BASE/Attacks/Punch/Miss", grid_pos, AudioController.screen_range, 0);
                 ChatController.VisibleMessage(this,display_name.The(true) + " misses their attack.", ChatController.VisibleMessageFormatting.Warning);
                 return;
@@ -620,7 +618,7 @@ namespace Behaviors_BASE
             if(attacks.special_attack_min_range == null || attacks.special_attack_max_range == null) return false;
 
             // Distance check.
-            if(MapController.GetMapDistance(this,target) < attacks.special_attack_min_range || MapController.GetMapDistance(this,target) > attacks.special_attack_max_range)
+            if(MapTools.GetMapDistance(this,target) < attacks.special_attack_min_range || MapTools.GetMapDistance(this,target) > attacks.special_attack_max_range)
                 return false;
 
             // Cooldown check.
@@ -678,7 +676,7 @@ namespace Behaviors_BASE
 
         public void DoWindupAnimation(AbstractEntity target, int delay_amount)
         {
-            LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Windup, MapController.GetMapDirection(this,target), delay_amount);
+            LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Windup, MapTools.GetMapDirection(this,target), delay_amount);
         }
 
         // Override this for the actual special attack.
@@ -837,7 +835,7 @@ namespace Behaviors_BASE
             ai_holder?.ReactToAttack(user);
             
             ChatController.VisibleMessage(user,user?.display_name.The(true) + " has " + attack_message + " " + display_name.The() + "!", ChatController.VisibleMessageFormatting.Danger);
-            user?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,this) );
+            user?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapTools.GetMapDirection(user,this) );
             UpdateHealth();
             return true;
         }
@@ -914,20 +912,20 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Movement and storage
          ****************************************************************/
-        public override AbstractEntity Move(MapController.GridPos new_grid, bool perform_turf_actions = true)
+        public override AbstractEntity Move(GridPos new_grid, bool perform_turf_actions = true)
         {
             // Prior to our move it's already too far away
             AbstractEntity pull_ent = I_Pulling as AbstractEntity;
-            if(pull_ent != null && MapController.GetMapDistance(this,pull_ent) > 1.3f) I_StopPulling();
+            if(pull_ent != null && MapTools.GetMapDistance(this,pull_ent) > 1.3f) I_StopPulling();
             // Shenanigans! Pullee closed into locker for eg.
-            if(pull_ent != null && (!MapController.OnSameMap(pull_ent.GridPos.GetMapID(),GridPos.GetMapID()))) I_StopPulling();
+            if(pull_ent != null && (!MapTools.OnSameMap(pull_ent.GridPos.GetMapID(),GridPos.GetMapID()))) I_StopPulling();
             // Can't pull with no hands
             if(pull_ent != null && IsRestrained()) I_StopPulling();
 
-            if(!MapController.OnSameMap(GridPos.GetMapID(),new_grid.GetMapID()))
+            if(!MapTools.OnSameMap(GridPos.GetMapID(),new_grid.GetMapID()))
             {
                 // warp to same location if jumped maps
-                pull_ent?.Move(new MapController.GridPos(new_grid.GetMapID(), GridPos.WorldPos()), perform_turf_actions);
+                pull_ent?.Move(new GridPos(new_grid.GetMapID(), GridPos.WorldPos()), perform_turf_actions);
             }
             else if(GridPos.WorldPos() != new_grid.WorldPos())
             {
@@ -935,9 +933,9 @@ namespace Behaviors_BASE
                 if(I_Pulling != null && I_Pulledby is AbstractEntity puller_ent)
                 {
                     // Don't allow us to go far from what's pulling us! Use resist for that!
-                    if(MapController.GetMapDistance(this,puller_ent) > 1.1f) return GetLocation(); // Only move toward puller!
+                    if(MapTools.GetMapDistance(this,puller_ent) > 1.1f) return GetLocation(); // Only move toward puller!
                 }
-                pull_ent?.Move(new MapController.GridPos(new_grid.GetMapID(), pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
+                pull_ent?.Move(new GridPos(new_grid.GetMapID(), pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
             }
             return base.Move(new_grid, perform_turf_actions);
         }
@@ -971,7 +969,7 @@ namespace Behaviors_BASE
                 if(!locked_anim && client_input_data["useheld"].AsBool()) UseActiveHand(null);
 
                 // Move based on mob speed
-                MapController.GridPos new_pos = GridPos;
+                GridPos new_pos = GridPos;
                 float speed = 0f;
                 if(client_input_data["mod_control"].AsBool())
                 {

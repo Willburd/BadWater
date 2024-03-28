@@ -352,7 +352,7 @@ public partial class AbstractEntity
      ****************************************************************/
     public virtual bool InteractCanReach(AbstractMob user, AbstractEntity target, int range)
     {
-        if(MapController.Adjacent(user,target,false)) return true; // Already adjacent.
+        if(MapTools.Adjacent(user,target,false)) return true; // Already adjacent.
         return false;
     }
 
@@ -468,7 +468,7 @@ public partial class AbstractEntity
             ChatController.LogAttack(user?.display_name.The(true) + "attacked" + target?.display_name.The() + " with " + this.display_name.The() + " (INTENT: " + user?.SelectingIntent + ") (DAMTYE: [" + this.damtype + "])");
             /////////////////////////
             user_mob.SetClickCooldown( user_mob.GetAttackCooldown(this) );
-            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapController.GetMapDirection(user,target) );
+            user_mob?.LoadedNetworkEntity?.AnimationRequest(NetwornAnimations.Animation.ID.Attack, MapTools.GetMapDirection(user,target) );
         }
         var hit_zone = target.ResolveWeaponHit(this, user, target_zone);
         if(hit_zone != DAT.ZoneSelection.Miss) WeaponHitMobEffect( user, target, hit_zone, attack_modifier);
@@ -503,7 +503,7 @@ public partial class AbstractEntity
      ****************************************************************/
     public AbstractTurf GetTurf()
     {
-        return MapController.GetTurfAtPosition(grid_pos,true);
+        return AbstractTurf.GetTurfAtPosition(grid_pos,true);
     }
     public AbstractEntity GetLocation()
     {
@@ -541,13 +541,13 @@ public partial class AbstractEntity
     public virtual AbstractEntity Move(GridPos new_grid, bool perform_turf_actions = true)
     {
         // Is new location valid?
-        Vector3 dir_vec = MapController.GetMapDirection(grid_pos.WorldPos(),new_grid.WorldPos());
+        Vector3 dir_vec = MapTools.GetMapDirection(grid_pos.WorldPos(),new_grid.WorldPos());
         
-        if(MapController.OnSameMap(grid_pos.GetMapID(),new_grid.GetMapID()))
+        if(MapTools.OnSameMap(grid_pos.GetMapID(),new_grid.GetMapID()))
         {
             // EDGE LOCK
             float threshold = (float)0.01;
-            if(!MapController.IsTurfValid(new GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep)))
+            if(!AbstractTurf.IsTurfValid(new GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep)))
             {
                 if(dir_vec.X < 0)
                 {   
@@ -558,7 +558,7 @@ public partial class AbstractEntity
                     new_grid.hor = Mathf.Floor(grid_pos.hor) + 1 - threshold;
                 }
             }
-            if(!MapController.IsTurfValid(new GridPos(new_grid.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep)))
+            if(!AbstractTurf.IsTurfValid(new GridPos(new_grid.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep)))
             {
                 if(dir_vec.Z < 0)
                 {
@@ -574,7 +574,7 @@ public partial class AbstractEntity
             {
                 // Check to see on each axis if we bump... This allows sliding!
                 bool bump_h = false;
-                AbstractTurf hor_turf = MapController.GetTurfAtPosition(new GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep),true);
+                AbstractTurf hor_turf = AbstractTurf.GetTurfAtPosition(new GridPos(new_grid.GetMapID(),new_grid.hor,grid_pos.ver,grid_pos.dep),true);
                 if(hor_turf != null && hor_turf != GetTurf() && hor_turf.density)
                 {
                     bump_h = true;
@@ -588,7 +588,7 @@ public partial class AbstractEntity
                     }
                 }
                 bool bump_v = false;
-                AbstractTurf ver_turf = MapController.GetTurfAtPosition(new GridPos(grid_pos.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep),true);
+                AbstractTurf ver_turf = AbstractTurf.GetTurfAtPosition(new GridPos(grid_pos.GetMapID(),grid_pos.hor,new_grid.ver,grid_pos.dep),true);
                 if(ver_turf != null && ver_turf != GetTurf() && ver_turf.density)
                 {
                     bump_v = true;
@@ -602,7 +602,7 @@ public partial class AbstractEntity
                     }
                 }
                 // Bump solids!
-                AbstractTurf corner_turf = MapController.GetTurfAtPosition(new_grid,true);
+                AbstractTurf corner_turf = AbstractTurf.GetTurfAtPosition(new_grid,true);
                 if(corner_turf != null && corner_turf.density)
                 {
                     // Corner bonking is silly... Needs a unique case when you run into a corner exactly head on!
@@ -665,7 +665,7 @@ public partial class AbstractEntity
         LeaveOldLoc(perform_turf_actions);
         grid_pos = new_grid;
         // Enter new location!
-        AbstractTurf new_turf = MapController.GetTurfAtPosition(grid_pos,true);
+        AbstractTurf new_turf = AbstractTurf.GetTurfAtPosition(grid_pos,true);
         new_turf?.EntityEntered(this,perform_turf_actions);
         UpdateNetwork(false,false);
         return location;
@@ -786,12 +786,12 @@ public partial class AbstractEntity
     }
     public void UpdateNetwork(bool mesh_update, bool force) // Spawns and despawns currently loaded entity. While calling SyncPositionRotation(bool mesh_update) is cheaper... Calling this is safer.
     {
-        if(MapController.IsChunkLoaded(grid_pos.GetMapID(),grid_pos.ChunkPos())) 
+        if(ChunkController.IsChunkLoaded(grid_pos.GetMapID(),grid_pos.ChunkPos())) 
         {
             if(this is AbstractTurf) 
             {
                 // If turf, update mesh...
-                MapController.GetChunk(grid_pos.GetMapID(),grid_pos.ChunkPos()).MeshUpdate();
+                ChunkController.GetChunk(grid_pos.GetMapID(),grid_pos.ChunkPos()).MeshUpdate();
                 return;
             }
             if(location == null) return; // nullspace vanish

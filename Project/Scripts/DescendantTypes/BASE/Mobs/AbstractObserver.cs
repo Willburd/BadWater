@@ -29,7 +29,7 @@ namespace Behaviors_BASE
             bool walking = client_input_data["walk"].AsBool();
 
             // Move based on mob speed
-            MapController.GridPos new_pos = GridPos;
+            GridPos new_pos = GridPos;
             if(client_input_data["mod_control"].AsBool())
             {
                 // Inching along with taps at a fixed rate

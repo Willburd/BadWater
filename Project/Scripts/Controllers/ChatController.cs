@@ -116,7 +116,7 @@ public static class ChatController
         for(int i = 0; i < MainController.controller.client_container.GetChildCount(); i++) 
         {
             NetworkClient client = MainController.controller.client_container.GetChild(i) as NetworkClient;
-            if(MapController.OnSameMap(client.focused_map_id,origin_entity.GridPos.GetMapID()) && MapController.GetMapDistance(client.focused_position,origin_entity.GridPos.WorldPos()) <= range )
+            if(MapTools.OnSameMap(client.focused_map_id,origin_entity.GridPos.GetMapID()) && MapTools.GetMapDistance(client.focused_position,origin_entity.GridPos.WorldPos()) <= range )
             {
                 // Create network effect entity for the text, don't worry about doing this for all clients, the effect does that itself. We're just checking if any client is in range!
                 makeEffect = true;
@@ -244,17 +244,17 @@ public static class ChatController
             }
             else
             {
-                if(speaking_ent != null && MapController.OnSameMap(scan_cli.focused_map_id,speaking_ent.GridPos.GetMapID()))
+                if(speaking_ent != null && MapTools.OnSameMap(scan_cli.focused_map_id,speaking_ent.GridPos.GetMapID()))
                 {
                     if(scan_cli.GetFocusedEntity() != null && excludes.Contains(scan_cli.GetFocusedEntity())) continue; // IGNORE!
 
                     // Check visibility for send_to_visible and send_to_hidden (so sound only visiblemessages proc!)
-                    bool is_visible = MapController.GetMapVisibility(speaking_ent.GridPos.WorldPos(),scan_cli.focused_position);
+                    bool is_visible = MapTools.GetMapVisibility(speaking_ent.GridPos.WorldPos(),scan_cli.focused_position);
                     if(is_visible && !send_to_visible) continue;
                     if(!is_visible && !send_to_hidden) continue;
 
                     // Handle whisper range
-                    bool in_small_range_limit = MapController.Adjacent( speaking_ent.GridPos.WorldPos(), scan_cli.focused_position,true);
+                    bool in_small_range_limit = MapTools.Adjacent( speaking_ent.GridPos.WorldPos(), scan_cli.focused_position,true);
                     switch(mode)
                     {
                         case ChatMode.Speak:
