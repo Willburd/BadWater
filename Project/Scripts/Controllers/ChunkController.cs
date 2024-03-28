@@ -11,7 +11,7 @@ public partial class ChunkController : DeligateController
         controller = this;
     }
 
-    public static int chunk_load_range = 4;
+    public static int chunk_load_range = 3;
 
     public static int chunk_size = 5; // Size in turfs that chunks are
 

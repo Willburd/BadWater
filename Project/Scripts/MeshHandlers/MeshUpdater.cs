@@ -7,18 +7,6 @@ using System;
 [GlobalClass]
 public partial class MeshUpdater : Node3D
 {
-    
-    MeshUpdater()
-    {
-        mesh_count += 1;
-    }
-
-    ~MeshUpdater()
-    {
-        mesh_count -= 1;
-    }
-
-    public static int mesh_count = 0;
     public const string error_path = "res://Library/Textures/Error.png";
 
     [Export]
@@ -31,6 +19,20 @@ public partial class MeshUpdater : Node3D
     public bool is_directional = false;
     [Export]
     public bool render_above;
+
+
+    
+    
+    public static int mesh_count = 0;
+    public override void _EnterTree()
+    {
+        mesh_count += 1;
+    }
+
+    public override void _ExitTree()
+    {
+        mesh_count -= 1;
+    }
 
 
     /*****************************************************************

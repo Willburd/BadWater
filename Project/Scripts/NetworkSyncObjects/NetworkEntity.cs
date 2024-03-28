@@ -111,7 +111,11 @@ public partial class NetworkEntity : Node3D
     {
         Godot.Collections.Dictionary data = TOOLS.ParseJson(mesh_json);
         // Get new model
-        mesh_updater?.Free();
+        if(mesh_updater != null)
+        {
+            RemoveChild(mesh_updater);
+            mesh_updater.Free();
+        }
         mesh_updater = MeshUpdater.GetModelScene(data);
         mesh_updater.Visible = false;
         AddChild(mesh_updater);
