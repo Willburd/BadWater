@@ -62,6 +62,7 @@ public partial class ChunkController : DeligateController
             }
 
             // hor/ver distance
+            int max_chunk_loads = 6;
             float loadborder_w = chunk_load_range;
             float loadborder_h = chunk_load_range;
             for(int u = 0; u < loadborder_w * 2; u++) 
@@ -77,9 +78,18 @@ public partial class ChunkController : DeligateController
                     if(MapController.IsChunkValid(client.focused_map_id,pos)) 
                     {
                         bool is_loaded = MapController.IsChunkLoaded(client.focused_map_id,pos);
-                        NetworkChunk chunk = MapController.GetChunk(client.focused_map_id,pos);
-                        if(!is_loaded) ChunkController.SetupChunk(chunk);
-                        in_vis_range.Add(chunk);
+                        if(is_loaded) 
+                        {
+                            in_vis_range.Add( MapController.GetChunk(client.focused_map_id,pos) );
+                            continue;
+                        }
+                        if(max_chunk_loads > 0) // Limit chunk loads per client to avoid hitching from getting 12+ chunks at the same time.
+                        {
+                            NetworkChunk chunk = MapController.GetChunk(client.focused_map_id,pos);
+                            ChunkController.SetupChunk(chunk);
+                            in_vis_range.Add(chunk);
+                            max_chunk_loads -= 1;
+                        }
                     }
                 }
             }
