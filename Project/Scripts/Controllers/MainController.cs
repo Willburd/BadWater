@@ -39,8 +39,8 @@ public partial class MainController : Node
 
 	[Export]
 	public ConfigData config;
-    public List<ulong> logged_times = new List<ulong>();
-	public List<ulong> tick_gap_times = new List<ulong>();
+    public TOOLS.TickRecord logged_times = new TOOLS.TickRecord();
+	public TOOLS.TickRecord tick_gap_times = new TOOLS.TickRecord();
 
 	private static List<DeligateController> subcontrollers = new List<DeligateController>();
 	public static int GetSubControllerCount()
@@ -136,9 +136,7 @@ public partial class MainController : Node
 			ServerTick();
 			next_tick_time = current_tick + (ulong)(1000f / tick_rate);
 			// debug logging
-			if(tick_gap_times.Count > 10) tick_gap_times.RemoveAt(0);
-			tick_gap_times.Add(next_tick_time - started_tick);
-			// next
+			tick_gap_times.Append(next_tick_time - started_tick);
 			current_tick = Time.GetTicksMsec();
 		}
 	}
@@ -195,11 +193,9 @@ public partial class MainController : Node
 			// Process controllers
 			ulong start_time = Time.GetTicksMsec();
 			con.did_tick = subcontrollers[i].Tick();
-			ulong end_time = Time.GetTicksMsec();
 			if(!con.did_tick) continue;
 			// debug logging
-			if(con.logged_times.Count > 10) con.logged_times.RemoveAt(0);
-			con.logged_times.Add(end_time - start_time);
+			con.logged_times.Append(Time.GetTicksMsec() - start_time);
 		}
 		for(int i = 0; i < client_container.GetChildCount(); i++) 
 		{
@@ -207,11 +203,8 @@ public partial class MainController : Node
 			client.Tick();
 		}
 		ticks += 1;
-		ulong server_end_time = Time.GetTicksMsec();
-
 		// debug logging
-		if(logged_times.Count > 10) logged_times.RemoveAt(0);
-		logged_times.Add(server_end_time - server_start_time);
+		logged_times.Append(Time.GetTicksMsec() - server_start_time);
 	}
 
 	private void EditorTick()

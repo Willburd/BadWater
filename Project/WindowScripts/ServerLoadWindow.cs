@@ -18,22 +18,12 @@ public partial class ServerLoadWindow : GameWindows
             return;
         }
         // Time it took to solve server tick
-        ulong accume_serv = 0;
-        for(int q = 0; q < MainController.controller.logged_times.Count; q++) 
-        {
-            accume_serv += MainController.controller.logged_times[q];
-        }
-        double avrg_serv = (double)accume_serv / (double)MainController.controller.logged_times.Count;
+        double avrg_serv = MainController.controller.logged_times.GetAverage();
         status.Text += "Tick time: " + Mathf.Round(avrg_serv) + "ms / " + (1000f * (1f / MainController.tick_rate)) + "ms )\n";
         float tick_serv_percent = (float)avrg_serv / (1000f * (1f / MainController.tick_rate));
         status.Text += "Tick used: " + Mathf.Round(tick_serv_percent) + "% \n";
         // Time between ticks
-        ulong accume_ticker = 0;
-        for(int q = 0; q < MainController.controller.tick_gap_times.Count; q++) 
-        {
-            accume_ticker += MainController.controller.tick_gap_times[q];
-        }
-        double avrg_ticker = (double)accume_ticker / (double)MainController.controller.tick_gap_times.Count;
+        double avrg_ticker = MainController.controller.tick_gap_times.GetAverage();
         status.Text += "Tick time: " + Mathf.Floor(avrg_ticker) + "ms \n";
         // Stats
         status.Text += "============" + "\n";
@@ -53,12 +43,7 @@ public partial class ServerLoadWindow : GameWindows
                 status.Text += "Effects : " + mp_con.effects.Count + "\n";
                 status.Text += "Spawners: " + mp_con.spawners.Count + "\n";
             }
-            ulong accume = 0;
-            for(int q = 0; q < con.logged_times.Count; q++) 
-            {
-                accume += con.logged_times[q];
-            }
-            double avrg = (double)accume / (double)con.logged_times.Count;
+            double avrg = con.logged_times.GetAverage();
             status.Text += "Process time: " + Mathf.Round(avrg) + "ms / " + Mathf.Round(1000f * (con.GetTickRate() * (1f / MainController.tick_rate))) + "ms \n";
             status.Text += "Tick used: " + Mathf.Round(Mathf.Round(avrg) / Mathf.Round(1000f * (con.GetTickRate() * (1f / MainController.tick_rate))) * 100f) + "% \n";
 		}

@@ -5,6 +5,26 @@ using System.Reflection.Metadata.Ecma335;
 
 public static class TOOLS
 {
+
+    public class TickRecord
+    {
+        const int len = 10;
+        ulong[] time_data = new ulong[len];
+        int index = 0;
+        public void Append(ulong new_time)
+        {
+            time_data[index] = new_time;
+            index += 1;
+            if(index >= len) index = 0;
+        }
+        public double GetAverage()
+        {
+            ulong acc = 0;
+            for(int q = 0; q < len; q++) acc += time_data[q];
+            return acc / len;
+        }
+    }
+
     // Credit to https://stackoverflow.com/questions/5716423/c-sharp-sortable-collection-which-allows-duplicate-keys 
 	public class TupleList<T1, T2> : List<Tuple<T1, T2>> where T1 : IComparable
 	{
