@@ -124,44 +124,7 @@ public partial class MainController : Node
 		// setup runs as fast as possible
 		if(setup_phase)
 		{
-			// threaded init of controllers
-			// if a controller requires another one to be init before itself, it needs to handle that by checking the subcontroller's singleton
-			// EX: if the atmosphere controller requires the map controller to be finished before it can setup!
-			// wait for all controllers...
-			bool all_ready = true;
-			for(int i = 0; i < subcontrollers.Count; i++) 
-			{
-				DeligateController con = subcontrollers[i];
-				if(!con.IsStarted && con.CanInit())
-				{
-					con.Started();
-					con.Init();
-				}
-				if(con.IsStarted && !con.IsDoneInit)
-				{
-					con.SetupTick();
-				}
-				if(!con.IsDoneInit)
-				{
-					all_ready = false;
-				}
-			}
-			// ready to begin gameticks
-			if(all_ready) 
-			{
-				GD.Print("Setup Finished");
-				GD.Print("Tick rate: " + tick_rate);
-				// Remove notickers
-				for(int i = 0; i < subcontrollers.Count; i++) 
-				{
-					if(subcontrollers[i].NoTick)
-					{
-						subcontrollers.RemoveAt(i);
-					}
-				}
-				// Done
-				setup_phase = false;
-			}
+			SetupTick();
 			return;
 		}
 		
@@ -177,6 +140,48 @@ public partial class MainController : Node
 			tick_gap_times.Add(next_tick_time - started_tick);
 			// next
 			current_tick = Time.GetTicksMsec();
+		}
+	}
+
+	private void SetupTick()
+	{
+		// threaded init of controllers
+		// if a controller requires another one to be init before itself, it needs to handle that by checking the subcontroller's singleton
+		// EX: if the atmosphere controller requires the map controller to be finished before it can setup!
+		// wait for all controllers...
+		bool all_ready = true;
+		for(int i = 0; i < subcontrollers.Count; i++) 
+		{
+			DeligateController con = subcontrollers[i];
+			if(!con.IsStarted && con.CanInit())
+			{
+				con.Started();
+				con.Init();
+			}
+			if(con.IsStarted && !con.IsDoneInit)
+			{
+				con.SetupTick();
+			}
+			if(!con.IsDoneInit)
+			{
+				all_ready = false;
+			}
+		}
+		// ready to begin gameticks
+		if(all_ready) 
+		{
+			GD.Print("Setup Finished");
+			GD.Print("Tick rate: " + tick_rate);
+			// Remove notickers
+			for(int i = 0; i < subcontrollers.Count; i++) 
+			{
+				if(subcontrollers[i].NoTick)
+				{
+					subcontrollers.RemoveAt(i);
+				}
+			}
+			// Done
+			setup_phase = false;
 		}
 	}
 
