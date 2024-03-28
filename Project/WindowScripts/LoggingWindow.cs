@@ -28,7 +28,7 @@ public partial class LoggingWindow : GameWindows
     {
         // Bwoop
         chat_entry.MaxLength = ChatController.chatmessage_max_length; // ensure max
-        if(chat_entry.Text.Length > 0) ChatController.ServerCommand(chat_entry.Text);
+        if(chat_entry.Text.Length > 0) ChatController.ProcessServerCommand(chat_entry.Text);
         // clear
         chat_entry.Text = "";
     }

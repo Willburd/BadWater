@@ -594,6 +594,7 @@ public partial class NetworkClient : Node3D
     {   
         if(send_text.Length <= 0) return;
         if(send_text.Length > ChatController.chatmessage_max_length) return;
+        if(ChatController.ProcessClientSideCommand(send_text)) return;
         Godot.Collections.Dictionary chat_data = new Godot.Collections.Dictionary();
         chat_data["id"] = Name;
         chat_data["message"] = send_text;

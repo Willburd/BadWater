@@ -54,8 +54,23 @@ public static class ChatController
         return "SPEAK";
     }
 
+    public static bool ProcessClientSideCommand(string message)
+    {
+        // Perform commands
+        if(message.Substr(0,1) == "/")
+        {
+            // Perform it!
+            switch(message.ToUpper())
+            {
+                case "/MESH":
+                    WindowManager.controller.chat_window.RecieveChatMessage("Mesh count : " + MeshUpdater.mesh_count);
+                    return true;
+            }
+        }
+        return false;
+    }
 
-    public static void ServerCommand(string message)
+    public static void ProcessServerCommand(string message)
     {
         // Perform commands
         if(message.Substr(0,1) == "/")
