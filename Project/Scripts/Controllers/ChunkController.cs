@@ -130,7 +130,6 @@ public partial class ChunkController : DeligateController
                     {
                         chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name),true);
                         SendFullChunkMeshUpdate(chunk);
-                        GD.Print("LOADED FRESH ");
                     }
                 }
             }
