@@ -9,8 +9,8 @@ public partial class EffectData : PackData
         base.SetVars(data_override);
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        is_spawner      = TOOLS.ApplyExistingTag(data,"is_spawner",is_spawner);
-        cleanable       = TOOLS.ApplyExistingTag(data,"cleanable",cleanable);
+        is_spawner      = JsonHandler.ApplyExistingTag(data,"is_spawner",is_spawner);
+        cleanable       = JsonHandler.ApplyExistingTag(data,"cleanable",cleanable);
     }
 
     protected override string GetVarString()

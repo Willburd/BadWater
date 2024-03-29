@@ -9,22 +9,22 @@ public partial class ItemData : PackData
         base.SetVars(data_override);
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        size_category           = StringToSizeCategory( TOOLS.ApplyExistingTag(data,"size_category",size_category.ToString()));
-        ISSHARP                 = TOOLS.ApplyExistingTag(data,"is_sharp",ISSHARP);
-        HASEDGE                 = TOOLS.ApplyExistingTag(data,"has_edge",HASEDGE);
-        NOBLUDGEON              = TOOLS.ApplyExistingTag(data,"no_bludgeon",NOBLUDGEON);
-        NOCONDUCT               = TOOLS.ApplyExistingTag(data,"no_conduct",NOCONDUCT);
-        ON_BORDER               = TOOLS.ApplyExistingTag(data,"on_border",ON_BORDER);
-        NOBLOODY                = TOOLS.ApplyExistingTag(data,"no_bloody",NOBLOODY);
-        CHEMCONTAINER           = TOOLS.ApplyExistingTag(data,"chem_container",CHEMCONTAINER);
-        PHORONGUARD	            = TOOLS.ApplyExistingTag(data,"phoron_guard",PHORONGUARD);
-        NOREACT	                = TOOLS.ApplyExistingTag(data,"no_react",NOREACT);
-        THICKMATERIAL           = TOOLS.ApplyExistingTag(data,"thick_material",THICKMATERIAL);
-        AIRTIGHT                = TOOLS.ApplyExistingTag(data,"air_tight",AIRTIGHT);
-        NOSLIP                  = TOOLS.ApplyExistingTag(data,"no_slip",NOSLIP);
-        BLOCK_GAS_SMOKE_EFFECT  = TOOLS.ApplyExistingTag(data,"block_smoke",BLOCK_GAS_SMOKE_EFFECT);
-        FLEXIBLEMATERIAL        = TOOLS.ApplyExistingTag(data,"flexible_material",FLEXIBLEMATERIAL);
-        ALLOW_SURVIVALFOOD      = TOOLS.ApplyExistingTag(data,"allow_survival_food",ALLOW_SURVIVALFOOD);
+        size_category           = StringToSizeCategory( JsonHandler.ApplyExistingTag(data,"size_category",size_category.ToString()));
+        ISSHARP                 = JsonHandler.ApplyExistingTag(data,"is_sharp",ISSHARP);
+        HASEDGE                 = JsonHandler.ApplyExistingTag(data,"has_edge",HASEDGE);
+        NOBLUDGEON              = JsonHandler.ApplyExistingTag(data,"no_bludgeon",NOBLUDGEON);
+        NOCONDUCT               = JsonHandler.ApplyExistingTag(data,"no_conduct",NOCONDUCT);
+        ON_BORDER               = JsonHandler.ApplyExistingTag(data,"on_border",ON_BORDER);
+        NOBLOODY                = JsonHandler.ApplyExistingTag(data,"no_bloody",NOBLOODY);
+        CHEMCONTAINER           = JsonHandler.ApplyExistingTag(data,"chem_container",CHEMCONTAINER);
+        PHORONGUARD	            = JsonHandler.ApplyExistingTag(data,"phoron_guard",PHORONGUARD);
+        NOREACT	                = JsonHandler.ApplyExistingTag(data,"no_react",NOREACT);
+        THICKMATERIAL           = JsonHandler.ApplyExistingTag(data,"thick_material",THICKMATERIAL);
+        AIRTIGHT                = JsonHandler.ApplyExistingTag(data,"air_tight",AIRTIGHT);
+        NOSLIP                  = JsonHandler.ApplyExistingTag(data,"no_slip",NOSLIP);
+        BLOCK_GAS_SMOKE_EFFECT  = JsonHandler.ApplyExistingTag(data,"block_smoke",BLOCK_GAS_SMOKE_EFFECT);
+        FLEXIBLEMATERIAL        = JsonHandler.ApplyExistingTag(data,"flexible_material",FLEXIBLEMATERIAL);
+        ALLOW_SURVIVALFOOD      = JsonHandler.ApplyExistingTag(data,"allow_survival_food",ALLOW_SURVIVALFOOD);
     }
 
     protected override string GetVarString()

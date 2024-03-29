@@ -22,7 +22,7 @@ public partial class MeshUpdater : Node3D
 
 
     
-    
+
     public static int mesh_count = 0;
     public override void _EnterTree()
     {
@@ -54,7 +54,7 @@ public partial class MeshUpdater : Node3D
     }
     public void TextureUpdated(string json)
     {
-        TextureUpdated(TOOLS.ParseJson(json));
+        TextureUpdated(JsonHandler.ParseJson(json));
     }
     
 

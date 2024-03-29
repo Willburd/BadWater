@@ -375,7 +375,7 @@ public partial class AssetLoader : Node
 
     private void ParseData(string file_path, MainController.DataType type)
     {
-        Godot.Collections.Dictionary data = TOOLS.ParseJsonFile(file_path);
+        Godot.Collections.Dictionary data = JsonHandler.ParseJsonFile(file_path);
         string prefix = Path.GetFileNameWithoutExtension(file_path);
         ChatController.AssetLog("--PARSING: " + file_path + " " + prefix);
         foreach( string key in data.Keys )

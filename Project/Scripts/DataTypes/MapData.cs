@@ -9,9 +9,9 @@ public partial class MapData : PackData
         base.SetVars(data_override);
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        width           = TOOLS.ApplyExistingTag(data,"width",width);
-        height          = TOOLS.ApplyExistingTag(data,"height",height);
-        depth           = TOOLS.ApplyExistingTag(data,"depth",depth);
+        width           = JsonHandler.ApplyExistingTag(data,"width",width);
+        height          = JsonHandler.ApplyExistingTag(data,"height",height);
+        depth           = JsonHandler.ApplyExistingTag(data,"depth",depth);
     }
     
     protected override string GetVarString()

@@ -111,7 +111,7 @@ public partial class NetworkEntity : Node3D
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.VisualUpdate)]
     protected virtual void ClientMeshUpdate( string mesh_json)
     {
-        Godot.Collections.Dictionary data = TOOLS.ParseJson(mesh_json);
+        Godot.Collections.Dictionary data = JsonHandler.ParseJson(mesh_json);
         // Get new model
         if(mesh_updater != null)
         {

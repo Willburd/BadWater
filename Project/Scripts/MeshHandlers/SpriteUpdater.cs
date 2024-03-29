@@ -10,7 +10,7 @@ public partial class SpriteUpdater : Node3D
 
     public void TextureUpdated(string json)
     {
-        TextureUpdated(TOOLS.ParseJson(json));
+        TextureUpdated(JsonHandler.ParseJson(json));
     }
 
     public static SpriteUpdater GetModelScene(Godot.Collections.Dictionary turf_data)

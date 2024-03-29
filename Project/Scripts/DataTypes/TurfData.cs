@@ -9,9 +9,9 @@ public partial class TurfData : PackData
         base.SetVars(data_override);
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        density           = TOOLS.ApplyExistingTag(data,"density",density);
-        opaque            = TOOLS.ApplyExistingTag(data,"opaque",opaque);
-        step_sound        = TOOLS.ApplyExistingTag(data,"step_sound",step_sound);
+        density           = JsonHandler.ApplyExistingTag(data,"density",density);
+        opaque            = JsonHandler.ApplyExistingTag(data,"opaque",opaque);
+        step_sound        = JsonHandler.ApplyExistingTag(data,"step_sound",step_sound);
     }
 
     protected override string GetVarString()

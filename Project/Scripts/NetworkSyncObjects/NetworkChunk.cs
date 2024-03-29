@@ -77,7 +77,7 @@ public partial class NetworkChunk : NetworkEntity
     protected void ClientChunkMeshUpdate(Vector3 pos, string mesh_json)
     {
         Position = pos;
-        Godot.Collections.Dictionary chunk_data = TOOLS.ParseJson(mesh_json);
+        Godot.Collections.Dictionary chunk_data = JsonHandler.ParseJson(mesh_json);
         for(int i = 0; i < mesh_array.Length; i++) 
         {
             Godot.Collections.Dictionary turf_data = (Godot.Collections.Dictionary)chunk_data["turf_" + i];

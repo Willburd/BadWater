@@ -190,9 +190,9 @@ public partial class NetworkClient : Node3D
     private void UpdateClientMobVisuals(string control_data)
     {
         visual_state = (Godot.Collections.Dictionary)Json.ParseString(control_data);
-        bool blind = TOOLS.ApplyExistingTag(visual_state,"blind",false);
-        float white_fade = TOOLS.ApplyExistingTag(visual_state,"white_fade",0);
-        float black_fade = TOOLS.ApplyExistingTag(visual_state,"black_fade",0);
+        bool blind = JsonHandler.ApplyExistingTag(visual_state,"blind",false);
+        float white_fade = JsonHandler.ApplyExistingTag(visual_state,"white_fade",0);
+        float black_fade = JsonHandler.ApplyExistingTag(visual_state,"black_fade",0);
     }
 
 
@@ -401,7 +401,7 @@ public partial class NetworkClient : Node3D
     private void ClickTurf(string parameters_json)
     {
         if(!Multiplayer.IsServer()) return; // Server only
-        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        Godot.Collections.Dictionary client_click_data = JsonHandler.ParseJson(parameters_json);
         if(client_click_data.Keys.Count == 0) return;
 
         switch((MouseButton)client_click_data["button"].AsInt32())
@@ -451,7 +451,7 @@ public partial class NetworkClient : Node3D
     }
     public void ClickEntityStart(AbstractEntity ent,string parameters_json)
     {
-        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        Godot.Collections.Dictionary client_click_data = JsonHandler.ParseJson(parameters_json);
         switch((MouseButton)client_click_data["button"].AsInt32())
         {
             case MouseButton.Left:
@@ -462,7 +462,7 @@ public partial class NetworkClient : Node3D
     }
     public void ClickEntityEnd(AbstractEntity ent,string parameters_json)
     {
-        Godot.Collections.Dictionary client_click_data = TOOLS.ParseJson(parameters_json);
+        Godot.Collections.Dictionary client_click_data = JsonHandler.ParseJson(parameters_json);
         switch((MouseButton)client_click_data["button"].AsInt32())
         {
             case MouseButton.Middle:
@@ -477,7 +477,7 @@ public partial class NetworkClient : Node3D
                     if(MapTools.GetMapDistance(release_pos,current_click_start_pos) > 0.5f || current_click_held_entity != ent)
                     {
                         // Dragged onto another entity!
-                        current_click_held_entity.Dragged(focused_entity,ent,TOOLS.ParseJson(parameters_json));
+                        current_click_held_entity.Dragged(focused_entity,ent,JsonHandler.ParseJson(parameters_json));
                     }
                     else
                     {
@@ -485,7 +485,7 @@ public partial class NetworkClient : Node3D
                         if(focused_entity != null)
                         {
                             DAT.Dir old_dir = focused_entity.direction;
-                            focused_entity.Clicked(focused_entity?.ActiveHand,ent,TOOLS.ParseJson(parameters_json));
+                            focused_entity.Clicked(focused_entity?.ActiveHand,ent,JsonHandler.ParseJson(parameters_json));
                             focused_entity.UpdateNetworkDirection(old_dir);
                         }
                     }
@@ -608,7 +608,7 @@ public partial class NetworkClient : Node3D
     {
         if(!Multiplayer.IsServer()) return;
         if(!has_logged_in) return;
-        Godot.Collections.Dictionary message_data = TOOLS.ParseJson(message_json);
+        Godot.Collections.Dictionary message_data = JsonHandler.ParseJson(message_json);
         if(message_data["id"].AsString() == Name)
         {
             ChatController.SubmitMessage( this, focused_entity , message_data["message"].AsString() , (ChatController.ChatMode)message_data["mode"].AsInt32() );

@@ -10,25 +10,25 @@ public partial class MobData : PackData
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
         // Gameplay
-        max_health      = TOOLS.ApplyExistingTag(data,"max_health",max_health);
-        mob_size        = StringToSizeCategory(TOOLS.ApplyExistingTag(data,"mob_size",mob_size.ToString()));
-        pull_type       = StringToPullCategory(TOOLS.ApplyExistingTag(data,"pull_type",pull_type.ToString()));
-        pull_size       = StringToSizeCategory(TOOLS.ApplyExistingTag(data,"pull_size",pull_size.ToString()));
-        walk_speed      = TOOLS.ApplyExistingTag(data,"move_speed",walk_speed);
-        run_speed       = TOOLS.ApplyExistingTag(data,"run_speed",run_speed);
-        has_hands       = TOOLS.ApplyExistingTag(data,"has_hands",has_hands);
-        extra_hands     = TOOLS.ApplyExistingTag(data,"extra_hands",extra_hands);
-        complex_tools   = TOOLS.ApplyExistingTag(data,"complex_tools",complex_tools);
+        max_health      = JsonHandler.ApplyExistingTag(data,"max_health",max_health);
+        mob_size        = StringToSizeCategory(JsonHandler.ApplyExistingTag(data,"mob_size",mob_size.ToString()));
+        pull_type       = StringToPullCategory(JsonHandler.ApplyExistingTag(data,"pull_type",pull_type.ToString()));
+        pull_size       = StringToSizeCategory(JsonHandler.ApplyExistingTag(data,"pull_size",pull_size.ToString()));
+        walk_speed      = JsonHandler.ApplyExistingTag(data,"move_speed",walk_speed);
+        run_speed       = JsonHandler.ApplyExistingTag(data,"run_speed",run_speed);
+        has_hands       = JsonHandler.ApplyExistingTag(data,"has_hands",has_hands);
+        extra_hands     = JsonHandler.ApplyExistingTag(data,"extra_hands",extra_hands);
+        complex_tools   = JsonHandler.ApplyExistingTag(data,"complex_tools",complex_tools);
         // invslots 
-        wears_hats      = TOOLS.ApplyExistingTag(data,"wears_hats",wears_hats);
-        wears_mask      = TOOLS.ApplyExistingTag(data,"wears_mask",wears_mask);
-        wears_eyes      = TOOLS.ApplyExistingTag(data,"wears_eyes",wears_eyes);
-        wears_uniform   = TOOLS.ApplyExistingTag(data,"wears_uniform",wears_uniform);
-        wears_suit      = TOOLS.ApplyExistingTag(data,"wears_suit",wears_suit);
-        wears_shoe      = TOOLS.ApplyExistingTag(data,"wears_shoe",wears_shoe);
-        wears_ears      = TOOLS.ApplyExistingTag(data,"wears_ears",wears_ears);
-        wears_glove     = TOOLS.ApplyExistingTag(data,"wears_glove",wears_glove);
-        wears_belt      = TOOLS.ApplyExistingTag(data,"wears_belt",wears_belt);
+        wears_hats      = JsonHandler.ApplyExistingTag(data,"wears_hats",wears_hats);
+        wears_mask      = JsonHandler.ApplyExistingTag(data,"wears_mask",wears_mask);
+        wears_eyes      = JsonHandler.ApplyExistingTag(data,"wears_eyes",wears_eyes);
+        wears_uniform   = JsonHandler.ApplyExistingTag(data,"wears_uniform",wears_uniform);
+        wears_suit      = JsonHandler.ApplyExistingTag(data,"wears_suit",wears_suit);
+        wears_shoe      = JsonHandler.ApplyExistingTag(data,"wears_shoe",wears_shoe);
+        wears_ears      = JsonHandler.ApplyExistingTag(data,"wears_ears",wears_ears);
+        wears_glove     = JsonHandler.ApplyExistingTag(data,"wears_glove",wears_glove);
+        wears_belt      = JsonHandler.ApplyExistingTag(data,"wears_belt",wears_belt);
     }
 
     private static DAT.SizeCategory StringToSizeCategory(string parse)

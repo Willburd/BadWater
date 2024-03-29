@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
-[ext_resource type="Script" path="res://Scripts/TurfClickHandler.cs" id="3_jstcs"]
+[ext_resource type="Script" path="res://Scripts/UtilityClasses/TurfClickHandler.cs" id="3_jstcs"]
 [ext_resource type="Script" path="res://WindowScripts/WindowManager.cs" id="3_tp275"]
 [ext_resource type="Material" uid="uid://jtpiovu64mws" path="res://Materials/BgTile.tres" id="4_bousx"]
 [ext_resource type="Script" path="res://WindowScripts/MainWindow.cs" id="4_w1nj2"]

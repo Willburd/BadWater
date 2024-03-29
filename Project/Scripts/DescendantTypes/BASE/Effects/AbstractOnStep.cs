@@ -9,7 +9,7 @@ namespace Behaviors_BASE
 
         public override void MapLoadVars(Godot.Collections.Dictionary data)
         {
-            teleport_tag = TOOLS.ApplyExistingTag(data,"teleport_tag",teleport_tag);
+            teleport_tag = JsonHandler.ApplyExistingTag(data,"teleport_tag",teleport_tag);
         }
 
         public override void Crossed(AbstractEntity crosser)

@@ -9,8 +9,8 @@ public partial class AreaData : PackData
         base.SetVars(data_override);
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        is_space        = TOOLS.ApplyExistingTag(data,"is_space",is_space);
-        always_powered  = TOOLS.ApplyExistingTag(data,"always_powered",always_powered);
+        is_space        = JsonHandler.ApplyExistingTag(data,"is_space",is_space);
+        always_powered  = JsonHandler.ApplyExistingTag(data,"always_powered",always_powered);
     }
 
     protected override string GetVarString()

@@ -17,7 +17,7 @@ public partial class PackData : Resource
 
     public void Init(string file_path, string set_prefix, string set_ID, MainController.DataType type, Godot.Collections.Dictionary data)
     {
-        SetIdentity( set_prefix, set_ID, type, file_path, TOOLS.ApplyExistingTag(data,"parent",""));
+        SetIdentity( set_prefix, set_ID, type, file_path, JsonHandler.ApplyExistingTag(data,"parent",""));
         temp_file_data = data;
         ParentFlag = data_parent == ""; // used by the inheretance setup code. If this is false, we aren't ready to be read... So we defer the parent data loading until we are! 
     }
@@ -26,23 +26,23 @@ public partial class PackData : Resource
     {
         Godot.Collections.Dictionary data = temp_file_data;
         if(data_override != null) data = data_override;
-        display_name    = TOOLS.ApplyExistingTag(data,"name",display_name);
-        description     = TOOLS.ApplyExistingTag(data,"desc",description);
-        behaviorID      = TOOLS.ApplyExistingTag(data,"behavior",behaviorID);
-        tag             = TOOLS.ApplyExistingTag(data,"tag",tag);
-        model           = TOOLS.ApplyExistingTag(data,"model",model);
-        texture         = TOOLS.ApplyExistingTag(data,"texture",texture);
-        anim_speed      = TOOLS.ApplyExistingTag(data,"anim_speed",anim_speed);
+        display_name    = JsonHandler.ApplyExistingTag(data,"name",display_name);
+        description     = JsonHandler.ApplyExistingTag(data,"desc",description);
+        behaviorID      = JsonHandler.ApplyExistingTag(data,"behavior",behaviorID);
+        tag             = JsonHandler.ApplyExistingTag(data,"tag",tag);
+        model           = JsonHandler.ApplyExistingTag(data,"model",model);
+        texture         = JsonHandler.ApplyExistingTag(data,"texture",texture);
+        anim_speed      = JsonHandler.ApplyExistingTag(data,"anim_speed",anim_speed);
         // Sounds
-        hit_sound       = TOOLS.ApplyExistingTag(data,"hit_sound",hit_sound);
+        hit_sound       = JsonHandler.ApplyExistingTag(data,"hit_sound",hit_sound);
         // When used as a weapon
-        damtype         = StringToDamageType(TOOLS.ApplyExistingTag(data,"damage_type",damtype.ToString()));
-        attack_range    = TOOLS.ApplyExistingTag(data,"attack_range",attack_range);
-        attack_force    = TOOLS.ApplyExistingTag(data,"attack_force",attack_force);
-        embed_chance    = TOOLS.ApplyExistingTag(data,"embed_chance",embed_chance);
+        damtype         = StringToDamageType(JsonHandler.ApplyExistingTag(data,"damage_type",damtype.ToString()));
+        attack_range    = JsonHandler.ApplyExistingTag(data,"attack_range",attack_range);
+        attack_force    = JsonHandler.ApplyExistingTag(data,"attack_force",attack_force);
+        embed_chance    = JsonHandler.ApplyExistingTag(data,"embed_chance",embed_chance);
         // Movement
-        intangible      = TOOLS.ApplyExistingTag(data,"intangible",intangible);
-        unstoppable     = TOOLS.ApplyExistingTag(data,"unstoppable",unstoppable);
+        intangible      = JsonHandler.ApplyExistingTag(data,"intangible",intangible);
+        unstoppable     = JsonHandler.ApplyExistingTag(data,"unstoppable",unstoppable);
     }
 
     public Godot.Collections.Dictionary GetTempData()

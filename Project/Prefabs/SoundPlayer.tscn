@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://buq20ubgjb8hv"]
 
-[ext_resource type="Script" path="res://Scripts/SoundPlayer.cs" id="1_7ckxd"]
+[ext_resource type="Script" path="res://Scripts/UtilityClasses/SoundPlayer.cs" id="1_7ckxd"]
 
 [node name="SoundPlayer" type="Node3D"]
 script = ExtResource("1_7ckxd")
