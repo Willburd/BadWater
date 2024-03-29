@@ -317,7 +317,7 @@ namespace Behaviors_BASE
             }
 
             // Turn to face it
-            direction = TOOLS.RotateTowardEntity(this,target);
+            direction = DAT.RotateTowardEntity(this,target);
             // Mecha held control
             // Check restrained
             if(IsRestrained())
@@ -524,7 +524,7 @@ namespace Behaviors_BASE
             if(!MapTools.Adjacent( this, target, false)) return;
             AbstractTurf turf = target.GetTurf();
 
-            direction = TOOLS.RotateTowardEntity(this,target);
+            direction = DAT.RotateTowardEntity(this,target);
 
             if(attacks.melee_attack_delay != null && attacks.melee_attack_delay.Value > 0)
             {
@@ -542,7 +542,7 @@ namespace Behaviors_BASE
 
         public void DoUnarmedAttack(AbstractEntity target, AbstractTurf turf)
         {
-            direction = TOOLS.RotateTowardEntity(this,target);
+            direction = DAT.RotateTowardEntity(this,target);
             bool missed = false;
             if(target is AbstractTurf target_turf)
             {
@@ -634,7 +634,7 @@ namespace Behaviors_BASE
 
         public bool SpecialAttackTarget(AbstractEntity target)
         {
-            direction = TOOLS.RotateTowardEntity(this,target);
+            direction = DAT.RotateTowardEntity(this,target);
 
             if(attacks.special_attack_delay > 0)
             {

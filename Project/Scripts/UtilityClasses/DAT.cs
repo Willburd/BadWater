@@ -148,6 +148,19 @@ public static class DAT
         return Dir.None;
     }
 
+    public static DAT.Dir RotateTowardEntity(AbstractEntity A,AbstractEntity B)
+    {
+        if(!MapTools.OnSameMap(A,B) || B.GetLocation() is not AbstractTurf)
+        {
+            // ignore...
+            return A.direction;
+        }
+        Vector3 dir_vec = MapTools.GetMapDirection(A,B);
+        DAT.Dir ret = DAT.VectorToCardinalDir(dir_vec.X,dir_vec.Z);
+        if(ret == DAT.Dir.None) return A.direction; // Final sanity check...
+        return ret;
+    }
+
     public enum LifeState
     {
         Alive,

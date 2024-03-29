@@ -109,22 +109,7 @@ public static class TOOLS
     {
         return new Vector3(grid.hor,grid.dep,grid.ver) * (ChunkController.chunk_size * MapController.tile_size);
     }
-
-    /*****************************************************************
-     * Entity tools
-     ****************************************************************/
-    public static DAT.Dir RotateTowardEntity(AbstractEntity A,AbstractEntity B)
-    {
-        if(!MapTools.OnSameMap(A,B) || B.GetLocation() is not AbstractTurf)
-        {
-            // ignore...
-            return A.direction;
-        }
-        Vector3 dir_vec = MapTools.GetMapDirection(A,B);
-        DAT.Dir ret = DAT.VectorToCardinalDir(dir_vec.X,dir_vec.Z);
-        if(ret == DAT.Dir.None) return A.direction; // Final sanity check...
-        return ret;
-    }
+    
 
     /*****************************************************************
      * Debug tools
