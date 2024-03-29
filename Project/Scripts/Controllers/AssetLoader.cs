@@ -333,14 +333,14 @@ public partial class AssetLoader : Node
         {
             foreach(PackData data in assemble)
             {
-                // Check if this is a base type. It'll already have it's parent flag set!
+                // Check if this is a base type. If so it'll already have it's parent flag set! Skip...
                 if(data.ParentFlag)
                 {
                     data.SetVars();
                     data.ShowVars();
                     continue;
                 }
-                // IT HAS A PARENT, so time for GREAT FUN.
+                // Check to see if the parent of the current data has it's parentflag set, if so it's ready for inheretance.
                 string getID = AllPackID(data.GetDataParent,data.entity_type);
                 PackData parent = all_packs[getID];
                 if(!parent.ParentFlag)
@@ -349,7 +349,7 @@ public partial class AssetLoader : Node
                     next_assemble.Add(data); // lets wait for a future loop...
                     continue;
                 }
-                // Parent's data is set, loop through parent chain, and set data repeatedly...
+                // Parent has parentflag set, so we can inheret its data, loop through parent chain, and set data repeatedly from topmost parent to us...
                 Stack<string> parent_chain = new Stack<string>();
                 string parent_search = AllPackID(data.GetUniqueModID,data.entity_type);   
                 while(true)
@@ -359,7 +359,6 @@ public partial class AssetLoader : Node
                     if(search_parent.GetDataParent == "") break;
                     parent_search = AllPackID(search_parent.GetDataParent,data.entity_type);
                 }
-                // Go through all collected parents from the lowest to ourselves, and set values!
                 while(parent_chain.Count > 0)
                 {
                     PackData parent_step = all_packs[parent_chain.Pop()];
