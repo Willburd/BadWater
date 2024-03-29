@@ -12,7 +12,7 @@ public partial class ChunkController : DeligateController
         controller = this;
     }
 
-    public static int chunk_load_range = 3;
+    public static int chunk_load_range = 4;
 
     public static int chunk_size = 5; // Size in turfs that chunks are
 
@@ -69,7 +69,7 @@ public partial class ChunkController : DeligateController
             if(!client.has_logged_in) continue; // Skip!
 
             // hor/ver distance
-            int max_chunk_loads = 6;
+            int max_chunk_loads = 10;
             float loadborder_w = chunk_load_range;
             float loadborder_h = chunk_load_range;
             for(int u = 0; u < loadborder_w * 2; u++) 
@@ -115,12 +115,12 @@ public partial class ChunkController : DeligateController
                 for(int m = 0; m < client_list.Count; m++) 
                 {
                     NetworkClient client = client_list[m];
-                    if(!client.has_logged_in) continue; // Skip!
-
+                    if(!client.has_logged_in) continue;
+                    // Setup check for visibility, and drop out if fully invisible.
                     bool was_visible = chunk.previously_visible_to_peers.Contains(client.Name);
-                    bool now_visible =  chunk.visible_to_peers.Contains(client.Name);
+                    bool now_visible = chunk.visible_to_peers.Contains(client.Name);
                     if(!was_visible && !now_visible) continue;
-
+                    // Trigger these when it changes visibility state for each client
                     if(was_visible && !now_visible)
                     {
                         // stop syncing
@@ -134,7 +134,6 @@ public partial class ChunkController : DeligateController
                 }
             }
         }
-        loaded_chunks.Clear();
     }
 
     public static Vector3 GetAlignedPos(Vector3 world_pos)
