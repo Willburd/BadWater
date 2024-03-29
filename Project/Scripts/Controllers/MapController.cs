@@ -205,7 +205,8 @@ public partial class MapController : DeligateController
      ****************************************************************/
     public static bool IsMapLoaded(string mapID)
     {
-        if(mapID == null) return false;
+        if(mapID == "BAG") return true; // Bags are not nullspace
+        if(mapID == "NULL") return false;
         return active_maps.ContainsKey(mapID);
     }
     public static string FallbackMap()

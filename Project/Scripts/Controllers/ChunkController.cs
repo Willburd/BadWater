@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 public partial class ChunkController : DeligateController
@@ -37,7 +38,7 @@ public partial class ChunkController : DeligateController
     {
         //GD.Print(Name + " Fired");
 
-        // Emergency respawns
+        // Emergency respawn for clients that become lost in impossible locations
         List<NetworkClient> client_list = MainController.ClientList;
         for(int i = 0; i < client_list.Count; i++) 
 		{
@@ -51,13 +52,21 @@ public partial class ChunkController : DeligateController
                 client.Spawn(); // EMERGENCY RESPAWN
             }
         }
-
-        // Handle loading!
+        
+        // Reset chunk visibility while ticking all active chunks!
+        List<NetworkChunk> loaded_chunks = GetAllLoadedChunks();
+        for(int i = 0; i < loaded_chunks.Count; i++) 
+		{
+            NetworkChunk chunk = loaded_chunks[i];
+            chunk.Tick();
+            chunk.previously_visible_to_peers = chunk.visible_to_peers.ToList();
+            chunk.visible_to_peers.Clear();
+        }
+        // Handle loading in a range around clients!
         for(int i = 0; i < client_list.Count; i++) 
 		{
 			NetworkClient client = client_list[i];
             if(!client.has_logged_in) continue; // Skip!
-            int id = int.Parse(client.Name);
 
             // hor/ver distance
             int max_chunk_loads = 6;
@@ -79,40 +88,54 @@ public partial class ChunkController : DeligateController
                         if(is_loaded) 
                         {
                             NetworkChunk chunk = GetChunk(client.focused_map_id,pos);
-                            chunk.visible_to_peers.Add(id);
+                            chunk.visible_to_peers.Add(client.Name);
                         }
                         else if(max_chunk_loads > 0) // Limit chunk loads per client to avoid hitching from getting 12+ chunks at the same time.
                         {
                             NetworkChunk chunk = GetChunk(client.focused_map_id,pos);
-                            ChunkController.SetupChunk(chunk);
-                            chunk.visible_to_peers.Add(id);
+                            chunk.visible_to_peers.Add(client.Name);
+                            chunk.previously_visible_to_peers.Clear(); // force load all, it's a new chunk!
                             max_chunk_loads -= 1;
                         }
                     }
                 }
             }
 		}
-        
-        // Unload chunks out of range, randomly pick candidates every frame and unload them
-        List<NetworkChunk> loaded_chunks = GetAllLoadedChunks();
-        int unload_count = Math.Min(loaded_chunks.Count, 20);
-        while(unload_count-- > 0 && loaded_chunks.Count > 0)
-        {
-            NetworkChunk chunk = TOOLS.Pick(loaded_chunks);
-            if(chunk.visible_to_peers.Count <= 0) ChunkUnload(chunk);
-        }
-        
-        // Reset chunk visibility while ticking all active chunks!
-        Dictionary<string,List<NetworkChunk>> map_chunks = GetAllMapChunks();
-        foreach(List<NetworkChunk> chunks in map_chunks.Values)
-        {
-            foreach(NetworkChunk chunk in chunks)
+        // Update all chunks with client visibility information, unload any with no visible clients
+        loaded_chunks = GetAllLoadedChunks(); // Get for new chunks!
+        for(int i = 0; i < loaded_chunks.Count; i++) 
+		{
+            NetworkChunk chunk = loaded_chunks[i];
+            if(chunk.visible_to_peers.Count <= 0) 
+            {   
+                ChunkUnload(chunk);
+            }
+            else
             {
-                chunk.Tick();
-                chunk.multi_syncronizer.UpdateVisibility();
-                chunk.visible_to_peers.Clear();
+                for(int m = 0; m < client_list.Count; m++) 
+                {
+                    NetworkClient client = client_list[m];
+                    if(!client.has_logged_in) continue; // Skip!
+
+                    bool was_visible = chunk.previously_visible_to_peers.Contains(client.Name);
+                    bool now_visible =  chunk.visible_to_peers.Contains(client.Name);
+                    if(!was_visible && !now_visible) continue;
+
+                    if(was_visible && !now_visible)
+                    {
+                        // stop syncing
+                        chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name),false);
+                    }
+                    if(!was_visible && now_visible)
+                    {
+                        chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name),true);
+                        SendFullChunkMeshUpdate(chunk);
+                        GD.Print("LOADED FRESH ");
+                    }
+                }
             }
         }
+        loaded_chunks.Clear();
     }
 
     public static Vector3 GetAlignedPos(Vector3 world_pos)
@@ -129,12 +152,7 @@ public partial class ChunkController : DeligateController
 
     public static void NewClient(NetworkClient client)
     {
-        List<NetworkChunk> loaded_chunks = GetAllLoadedChunks();
-        foreach(NetworkChunk chunk in loaded_chunks)
-        {
-            SetupChunk(chunk);
-        }
-        foreach(NetworkEntity ent in MainController.controller.entity_container.GetChildren())
+        foreach(NetworkEntity ent in MainController.controller.entity_container.GetChildren().Cast<NetworkEntity>())
         {
             if(ent is not NetworkChunk) ent.SetUpdatedPosition();
         }
@@ -144,7 +162,7 @@ public partial class ChunkController : DeligateController
     /*****************************************************************
      * CHUNK MANAGEMENT
      ****************************************************************/
-    public static void SetupChunk(NetworkChunk chunk)
+    public static void SendFullChunkMeshUpdate(NetworkChunk chunk)
     {
         GridPos pos = new GridPos(chunk.map_id_string,GetAlignedPos(chunk.Position));
         for(int u = 0; u < ChunkController.chunk_size; u++) 
@@ -163,7 +181,7 @@ public partial class ChunkController : DeligateController
         }
         // Force initial graphical state
         chunk.MeshUpdate();
-        chunk.Tick();
+        chunk.ForceMeshProcess();
     }
     public static void CleanChunk(NetworkChunk chunk)
     {

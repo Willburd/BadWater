@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 [GlobalClass] 
 public partial class NetworkChunk : NetworkEntity
 {
-    public List<int> visible_to_peers = new List<int>();
+    public List<string> previously_visible_to_peers = new List<string>();
+    public List<string> visible_to_peers = new List<string>();
     public int timer = 0;
     public bool do_not_unload = false;
     private MeshUpdater[] mesh_array = new MeshUpdater[ChunkController.chunk_size * ChunkController.chunk_size];
@@ -28,6 +29,12 @@ public partial class NetworkChunk : NetworkEntity
     public override void MeshUpdate()
     {
         mesh_dirty = true; // lets wait till all of the mesh has settled!
+    }
+
+    public void ForceMeshProcess()
+    {
+        Internal_MeshUpdate();
+        mesh_dirty = false;
     }
 
     protected override void Internal_MeshUpdate()
@@ -98,11 +105,6 @@ public partial class NetworkChunk : NetworkEntity
         }
     }
 
-    public bool CheckVisible(int peer)
-    {
-        return visible_to_peers.Contains(peer);
-    }
-
     public bool CanUnload()
     {
         // handles unique situations where a chunk shouldn't unload just yet...
@@ -112,7 +114,7 @@ public partial class NetworkChunk : NetworkEntity
         }
         return false;
     }
-    
+
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(1); // Server

@@ -211,7 +211,6 @@ public class MapContainer
         if(chunk != null) return chunk;
         // Loader...
         NetworkChunk new_chunk = NetworkEntity.CreateEntity(null, MainController.DataType.Chunk, map_id) as NetworkChunk;
-        new_chunk.multi_syncronizer.AddVisibilityFilter(new Callable(new_chunk, NetworkChunk.MethodName.CheckVisible));
         new_chunk.Position = TOOLS.ChunkGridToPos(grid_pos);
         chunk_grid[grid_pos.hor,grid_pos.ver,grid_pos.dep] = new_chunk;
         loaded_chunks.Add(new_chunk);

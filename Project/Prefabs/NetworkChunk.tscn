@@ -21,3 +21,4 @@ multi_syncronizer = NodePath("MultiplayerSynchronizer")
 replication_interval = 0.25
 replication_config = SubResource("SceneReplicationConfig_bnqg0")
 visibility_update_mode = 2
+public_visibility = false
