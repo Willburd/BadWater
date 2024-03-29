@@ -22,10 +22,10 @@ public partial class MapController : DeligateController
      * MAP LOADING PHASES
      ****************************************************************/
 
-    private List<MapHelpers.MapLoader> loading = new List<MapHelpers.MapLoader>();
-    private List<MapHelpers.MapInitilizer> initing = new List<MapHelpers.MapInitilizer>();
-    private List<MapHelpers.MapLateInitilizer> iconupdating = new List<MapHelpers.MapLateInitilizer>();
-    private List<MapHelpers.MapEntityCreator> entitycreating = new List<MapHelpers.MapEntityCreator>();
+    private List<MapLoading.MapLoader> loading = new List<MapLoading.MapLoader>();
+    private List<MapLoading.MapInitilizer> initing = new List<MapLoading.MapInitilizer>();
+    private List<MapLoading.MapLateInitilizer> iconupdating = new List<MapLoading.MapLateInitilizer>();
+    private List<MapLoading.MapEntityCreator> entitycreating = new List<MapLoading.MapEntityCreator>();
 
 
     /*****************************************************************
@@ -55,7 +55,7 @@ public partial class MapController : DeligateController
             if(!AssetLoader.loaded_maps.ContainsKey(map_id)) continue;
             MapData map_data = AssetLoader.loaded_maps[map_id];
             ChatController.DebugLog("-Loading map: " + map_data.display_name);
-            loading.Add(new MapHelpers.MapLoader(this,map_id,map_data.width,map_data.height,map_data.depth));
+            loading.Add(new MapLoading.MapLoader(this,map_id,map_data.width,map_data.height,map_data.depth));
         }
         return true;
     }
@@ -66,7 +66,7 @@ public partial class MapController : DeligateController
         bool finished = true;
         if(loading.Count > 0)
         {
-            foreach(MapHelpers.MapOperator loader in loading)
+            foreach(MapLoading.MapOperator loader in loading)
             {
                 if(!loader.Finished())
                 {
@@ -75,10 +75,10 @@ public partial class MapController : DeligateController
                 }
             }
             if(!finished) return;
-            foreach(MapHelpers.MapOperator loader in loading)
+            foreach(MapLoading.MapOperator loader in loading)
             {
                 active_maps[loader.GetMapID()] = loader.GetMap();
-                initing.Add(new MapHelpers.MapInitilizer(this,active_maps[loader.GetMapID()]));
+                initing.Add(new MapLoading.MapInitilizer(this,active_maps[loader.GetMapID()]));
             }
             loading.Clear();
             return;
@@ -86,7 +86,7 @@ public partial class MapController : DeligateController
         // Time to initilize!
         if(initing.Count > 0)
         {
-            foreach(MapHelpers.MapInitilizer init in initing)
+            foreach(MapLoading.MapInitilizer init in initing)
             {
                 if(!init.Finished())
                 {
@@ -95,9 +95,9 @@ public partial class MapController : DeligateController
                 }
             }
             if(!finished) return;
-            foreach(MapHelpers.MapOperator loader in initing)
+            foreach(MapLoading.MapOperator loader in initing)
             {
-                iconupdating.Add(new MapHelpers.MapLateInitilizer(this,active_maps[loader.GetMapID()]));
+                iconupdating.Add(new MapLoading.MapLateInitilizer(this,active_maps[loader.GetMapID()]));
             }
             initing.Clear();
             return;
@@ -105,7 +105,7 @@ public partial class MapController : DeligateController
         // Late init, and UpdateIcons();
         if(iconupdating.Count > 0)
         {
-            foreach(MapHelpers.MapLateInitilizer iconing in iconupdating)
+            foreach(MapLoading.MapLateInitilizer iconing in iconupdating)
             {
                 if(!iconing.Finished())
                 {
@@ -114,9 +114,9 @@ public partial class MapController : DeligateController
                 }
             }
             if(!finished) return;
-            foreach(MapHelpers.MapOperator loader in iconupdating)
+            foreach(MapLoading.MapOperator loader in iconupdating)
             {
-                entitycreating.Add(new MapHelpers.MapEntityCreator(this,active_maps[loader.GetMapID()]));
+                entitycreating.Add(new MapLoading.MapEntityCreator(this,active_maps[loader.GetMapID()]));
             }
             iconupdating.Clear();
             return;
@@ -124,7 +124,7 @@ public partial class MapController : DeligateController
         // Create entities!
         if(entitycreating.Count > 0)
         {
-            foreach(MapHelpers.MapEntityCreator creator in entitycreating)
+            foreach(MapLoading.MapEntityCreator creator in entitycreating)
             {
                 if(!creator.Finished())
                 {
