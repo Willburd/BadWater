@@ -7,6 +7,7 @@ namespace Behaviors_BASE
     {
         public AbstractMineableTurf()
         {
+            entity_type = MainController.DataType.Turf;
         }
 
         public override void MapLoadVars(Godot.Collections.Dictionary data)

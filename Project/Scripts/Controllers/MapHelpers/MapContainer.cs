@@ -58,7 +58,7 @@ public class MapContainer
             if(check_turf != null) RemoveTurf(check_turf, false, submaps);
         }
         // Spawn new turf
-        AbstractTurf turf = AbstractEntity.CreateEntity(MainController.DataType.Turf,turfID,null, true) as AbstractTurf;
+        AbstractTurf turf = AbstractTools.CreateEntity(MainController.DataType.Turf,turfID,null, true) as AbstractTurf;
         SetTurfPosition(turf,grid_pos,submaps);
         area.AddTurf(turf);
         return turf;
@@ -81,7 +81,7 @@ public class MapContainer
     private void SetTurfPosition(AbstractTurf turf, GridPos grid_pos, bool submaps)
     {
         // Very dangerous function... Lets keep this internal, and only accessed by safe public calls!
-        turf.Move( grid_pos, false);
+        AbstractTools.Move(turf, grid_pos, false);
         Internal_SetTurf(grid_pos, turf, submaps);
     }
 
@@ -100,7 +100,7 @@ public class MapContainer
         else
         {
             // Or void it
-            Internal_GetTurf(grid_pos, submaps).DeleteEntity();
+            AbstractTools.DeleteEntity( Internal_GetTurf(grid_pos, submaps) );
             Internal_SetTurf(grid_pos, null, submaps);
         }
     }

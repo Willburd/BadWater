@@ -5,6 +5,11 @@ using System.Collections.Generic;
 // Effect entities are map flags for spawners, synced decals, or other turf effects that can be interacted with, but not picked up, they do not update unless interacted with.
 public class AbstractEffect : AbstractEntity
 {
+    public AbstractEffect()
+    {
+        entity_type = MainController.DataType.Effect;
+    }
+
     public static AbstractEffect CreateEffect(PackData data, string data_string = "")
     {
         AbstractEffect new_effect = null;

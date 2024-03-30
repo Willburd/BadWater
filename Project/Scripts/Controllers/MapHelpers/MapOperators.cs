@@ -236,7 +236,7 @@ namespace MapLoading
                         if(item_data.Count > 0)
                         {
                             entity_pack = item_data[current_x];
-                            ent = AbstractEntity.CreateEntity(MainController.DataType.Item,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
+                            ent = AbstractTools.CreateEntity(MainController.DataType.Item,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -244,7 +244,7 @@ namespace MapLoading
                         if(effect_data.Count > 0)
                         {
                             entity_pack = effect_data[current_x];
-                            ent = AbstractEntity.CreateEntity(MainController.DataType.Effect,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
+                            ent = AbstractTools.CreateEntity(MainController.DataType.Effect,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -252,7 +252,7 @@ namespace MapLoading
                         if(structure_data.Count > 0)
                         {
                             entity_pack = structure_data[current_x];
-                            ent = AbstractEntity.CreateEntity(MainController.DataType.Structure,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
+                            ent = AbstractTools.CreateEntity(MainController.DataType.Structure,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -260,7 +260,7 @@ namespace MapLoading
                         if(machine_data.Count > 0)
                         {
                             entity_pack = machine_data[current_x];
-                            ent = AbstractEntity.CreateEntity(MainController.DataType.Machine,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
+                            ent = AbstractTools.CreateEntity(MainController.DataType.Machine,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
@@ -268,7 +268,7 @@ namespace MapLoading
                         if(mob_data.Count > 0)
                         {
                             entity_pack = mob_data[current_x];
-                            ent = AbstractEntity.CreateEntity(MainController.DataType.Mob,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
+                            ent = AbstractTools.CreateEntity(MainController.DataType.Mob,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
                             if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;

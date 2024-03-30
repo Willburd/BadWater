@@ -7,6 +7,7 @@ namespace Behaviors_BASE
     {
         public AbstractBasicTurf(int set_build_level)
         {
+            entity_type = MainController.DataType.Turf;
             build_level = set_build_level;
         }
 

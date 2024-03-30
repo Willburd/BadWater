@@ -147,7 +147,7 @@ public partial class MapController : DeligateController
         // Create all areas from resources
         foreach(KeyValuePair<string, AreaData> entry in AssetLoader.loaded_areas)
         {
-            AbstractArea area = AbstractEntity.CreateEntity(MainController.DataType.Area,entry.Value.GetUniqueModID,null, true) as AbstractArea;
+            AbstractArea area = AbstractTools.CreateEntity(MainController.DataType.Area,entry.Value.GetUniqueModID,null, true) as AbstractArea;
             areas[entry.Value.GetUniqueModID] = area;
             area.Init();
         }
@@ -219,6 +219,8 @@ public partial class MapController : DeligateController
     }
     public static MapContainer GetMap(string mapID)
     {
+        if(mapID == "BAG") return null;
+        if(mapID == "NULL") return null;
         return active_maps[mapID];
     }
     public static void SetMap(string mapID, MapContainer new_map)

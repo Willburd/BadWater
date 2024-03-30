@@ -7,6 +7,11 @@ namespace Behaviors_BASE
 {
     public partial class RuneText : AbstractEffect
     {
+        public RuneText()
+        {
+            entity_type = MainController.DataType.Effect;
+        }
+
         public RuneText(string message)
         {
             runemessage = message;
@@ -22,7 +27,7 @@ namespace Behaviors_BASE
         {
             Task.Delay(new TimeSpan(0, 0, lifetime)).ContinueWith(o => 
             { 
-                DeleteEntity();
+                AbstractTools.DeleteEntity(this);
             });
         }
         public override void UpdateCustomNetworkData()

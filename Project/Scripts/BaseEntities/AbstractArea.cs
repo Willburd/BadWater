@@ -4,6 +4,11 @@ using System.Collections.Generic;
 
 public class AbstractArea : AbstractEntity
 {
+    public AbstractArea()
+    {
+        entity_type = MainController.DataType.Area;
+    }
+
     // Beginning of template data
     public override void TemplateRead(PackData data)
     {

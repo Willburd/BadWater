@@ -6,6 +6,11 @@ using System.Net.Http.Headers;
 
 public partial class AbstractTurf : AbstractEntity
 {
+    public AbstractTurf()
+    {
+        entity_type = MainController.DataType.Turf;
+    }
+
     public static AbstractTurf CreateTurf(PackData data, string data_string = "")
     {
         AbstractTurf new_turf = null;
@@ -62,15 +67,6 @@ public partial class AbstractTurf : AbstractEntity
 
     AtmoController.AtmoCell air_mix = null;
     private AbstractArea area = null;
-
-    public new void Move(GridPos new_pos, bool perform_turf_actions = true)
-    {
-        grid_pos = new_pos;
-    }
-    public new void Move(AbstractEntity new_container, bool perform_turf_actions = true)
-    {
-        GD.PrintErr("Attempted to move turf into AbstractEntity...");
-    }   
 
     public virtual void RandomTick()                // Some turfs respond to random updates, every area will perform a number of them based on the area's size!
     {
@@ -159,6 +155,6 @@ public partial class AbstractTurf : AbstractEntity
     }
     public static AbstractTurf GetTurfAtPosition(GridPos grid_pos, bool submaps)
     {
-        return MapController.GetMap(grid_pos.GetMapID()).GetTurfAtPosition(grid_pos,submaps);
+        return MapController.GetMap(grid_pos.GetMapID())?.GetTurfAtPosition(grid_pos,submaps);
     }
 }

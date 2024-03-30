@@ -174,7 +174,7 @@ namespace Behaviors_BASE
         }
         public void Pickup(AbstractEntity collect)
         {
-            collect?.PickedUp(this,this);
+            AbstractTools.PickUp(collect,this,this);
         }
         public void DropActiveHand()
         {
@@ -185,13 +185,13 @@ namespace Behaviors_BASE
                 return;
             }
             // Dropping whatever we're holding!
-            if(ActiveHand != null) return;
-            ActiveHand?.Drop(GetTurf(),this);
+            if(ActiveHand == null) return;
+            AbstractTools.Drop(ActiveHand,GetTurf(),this);
         }
         public void DropSlot(DAT.InventorySlot slot)
         {
-            if(inventory_slots[(int)slot] != null) return;
-            inventory_slots[(int)slot]?.Drop(GetTurf(),this);
+            if(inventory_slots[(int)slot] == null) return;
+            AbstractTools.Drop(inventory_slots[(int)slot],GetTurf(),this);
         }
         public bool SlotInUse(DAT.InventorySlot slot)
         {
@@ -336,7 +336,7 @@ namespace Behaviors_BASE
                 return;
             }
             // Interacting with entities directly in your inventory
-            int storage_depth = target.StorageDepth(this);
+            int storage_depth = AbstractTools.StorageDepth(target,this);
             if((target is not AbstractTurf && target == GetLocation()) || (storage_depth != -1 && storage_depth <= 1))
             {
                 if(hand_item != null)
@@ -357,7 +357,7 @@ namespace Behaviors_BASE
                 
             //Atoms on turfs (not on your person)
             // A is a turf or is on a turf, or in something on a turf (pen in a box); but not something in something on a turf (pen in a box in a backpack)
-            storage_depth = target.StorageDepth(this);
+            storage_depth = AbstractTools.StorageDepth(target,this);
             if(target is AbstractTurf || target.GetLocation() is AbstractTurf  || (storage_depth != -1 && storage_depth <= 1))
             {
                 if(MapTools.Adjacent(this,target,false) || (hand_item != null && hand_item.InteractCanReach(this, target, hand_item.attack_range)) )
@@ -852,7 +852,7 @@ namespace Behaviors_BASE
 
         protected void Embed(AbstractEntity used_item, DAT.ZoneSelection target_zone)
         {
-            used_item.Move(this,false);
+            AbstractTools.Move(used_item,this,false);
             embedded_objects.Add(used_item);
         }
 
@@ -912,7 +912,7 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Movement and storage
          ****************************************************************/
-        public override AbstractEntity Move(GridPos new_grid, bool perform_turf_actions = true)
+        public override bool PreMove(GridPos new_grid, bool perform_turf_actions)
         {
             // Prior to our move it's already too far away
             AbstractEntity pull_ent = I_Pulling as AbstractEntity;
@@ -925,7 +925,7 @@ namespace Behaviors_BASE
             if(!MapTools.OnSameMap(GridPos.GetMapID(),new_grid.GetMapID()))
             {
                 // warp to same location if jumped maps
-                pull_ent?.Move(new GridPos(new_grid.GetMapID(), GridPos.WorldPos()), perform_turf_actions);
+                if(pull_ent != null) AbstractTools.Move(pull_ent, new GridPos(new_grid.GetMapID(), GridPos.WorldPos()), perform_turf_actions);
             }
             else if(GridPos.WorldPos() != new_grid.WorldPos())
             {
@@ -933,11 +933,11 @@ namespace Behaviors_BASE
                 if(I_Pulling != null && I_Pulledby is AbstractEntity puller_ent)
                 {
                     // Don't allow us to go far from what's pulling us! Use resist for that!
-                    if(MapTools.GetMapDistance(this,puller_ent) > 1.1f) return GetLocation(); // Only move toward puller!
+                    if(MapTools.GetMapDistance(this,puller_ent) > 1.1f) return false; // Only move toward puller!
                 }
-                pull_ent?.Move(new GridPos(new_grid.GetMapID(), pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
+                if(pull_ent != null) AbstractTools.Move(pull_ent,new GridPos(new_grid.GetMapID(), pull_ent.GridPos.WorldPos() + ICanPull.Internal_HandlePull(this)), perform_turf_actions);
             }
-            return base.Move(new_grid, perform_turf_actions);
+            return true;
         }
 
 
@@ -997,7 +997,8 @@ namespace Behaviors_BASE
                 }
                 // math for feet speed
                 if(dat_x != 0 || dat_y != 0) footstep_timer += Mathf.Lerp(0.075f,0.10f, Mathf.Clamp(speed,0,1.5f));
-                AbstractEntity newloc = Move(new_pos);
+                AbstractTools.Move(this,new_pos);
+                AbstractEntity newloc = GetLocation();
                 if(footstep_timer > 1)
                 {
                     footstep_timer = 0;

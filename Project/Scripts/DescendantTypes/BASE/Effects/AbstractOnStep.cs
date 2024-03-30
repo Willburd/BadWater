@@ -5,6 +5,11 @@ namespace Behaviors_BASE
 {
     public partial class AbstractOnStep : AbstractEffect
     {
+        public AbstractOnStep()
+        {
+            entity_type = MainController.DataType.Effect;
+        }
+        
         private string teleport_tag = "";
 
         public override void MapLoadVars(Godot.Collections.Dictionary data)

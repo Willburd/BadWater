@@ -126,7 +126,7 @@ public static class ChatController
         // Drop out if not in range of any clients...
         if(!makeEffect) return;
         // Make effect!
-        AbstractEntity.CreateEntity(MainController.DataType.Effect,"BASE:RUNE_TEXT",origin_entity.GridPos, data_string:runemessage );
+        AbstractTools.CreateEntity(MainController.DataType.Effect,"BASE:RUNE_TEXT",origin_entity.GridPos, data_string:runemessage );
     }
 
     public static void ActionMessage(AbstractEntity speaking_ent, string self_message, string seen_message, string heard_message, VisibleMessageFormatting format = VisibleMessageFormatting.Nothing, List<AbstractEntity> excludes = null)

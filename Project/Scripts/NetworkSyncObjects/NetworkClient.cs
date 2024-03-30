@@ -12,9 +12,8 @@ public partial class NetworkClient : Node3D
     public int PeerID              // Used by main controller to know that all controllers are ready for first game tick
     {
         get 
-        { 
-            int x;
-            if(Int32.TryParse(Name, out x)) return x;
+        {
+            if (Int32.TryParse(Name, out int x)) return x;
             return 1;
         }
     }
@@ -130,7 +129,7 @@ public partial class NetworkClient : Node3D
         // SPAWN HOST OBJECT
         if(focused_entity == null) 
         {
-            AbstractEntity new_ent = AbstractEffect.CreateEntity(MainController.DataType.Mob,"BASE:TEST",new_pos);
+            AbstractEntity new_ent = AbstractTools.CreateEntity(MainController.DataType.Mob,"BASE:TEST",new_pos);
             new_ent.SetClientOwner(this);
             SetFocusedEntity(new_ent);
             new_ent.UpdateNetwork(false,true);

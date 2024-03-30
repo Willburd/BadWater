@@ -59,6 +59,10 @@ grow_vertical = 2
 
 [node name="MainGameViewport" parent="WindowManager/MainWindow" instance=ExtResource("8_02qwb")]
 
+[node name="SubViewport" parent="WindowManager/MainWindow/MainGameViewport" index="0"]
+size = Vector2i(512, 512)
+render_target_update_mode = 4
+
 [node name="LoggingWindow" parent="WindowManager" instance=ExtResource("6_foubn")]
 position = Vector2i(400, 111)
 theme = ExtResource("6_5vcwn")
