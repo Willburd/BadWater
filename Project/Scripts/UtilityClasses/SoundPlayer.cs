@@ -15,6 +15,7 @@ public partial class SoundPlayer : Node3D
 
     public override void _Process(double delta)
     {
+        if(Multiplayer.IsServer()) return;
         if(!started)
         {
             if(player_global != null)

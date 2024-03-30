@@ -36,7 +36,7 @@ public static class ShaderConfig
 [GlobalClass] 
 public partial class AssetLoader : Node
 {
-    public const int tex_page_size = 2048;
+    public const int tex_page_size = 1024;
     // Assets
     public static Dictionary<string,AssetLoader.LoadedTexture> loaded_textures = new Dictionary<string,AssetLoader.LoadedTexture>();
     public static ShaderMaterial[][] material_cache = new ShaderMaterial[(int)ShaderConfig.Library.Last][]; // dictionary of shader IDs, with shadermaterials stored inside, each entry is a texture page assigned to that material.

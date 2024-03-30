@@ -244,6 +244,7 @@ public partial class NetworkClient : Node3D
     }
     public override void _Process(double delta)
     {
+        if(Multiplayer.IsServer()) return;
         if(!TOOLS.PeerConnected(this)) return;
         if(!IsMultiplayerAuthority()) return;
         if(WindowManager.controller.main_window.HasFocus())
@@ -525,6 +526,7 @@ public partial class NetworkClient : Node3D
     private void UpdateClientCamera(double delta)
     {
         // Client only camera update
+        if(Multiplayer.IsServer()) return;
         if(!IsMultiplayerAuthority()) return;
         if(camera.Current == false)
         {

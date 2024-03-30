@@ -110,6 +110,7 @@ public partial class MeshUpdater : Node3D
             if(!AssetLoader.loaded_textures.ContainsKey(texture_path)) texture_path = "res://Library/Textures/Error.png";
             cached_texpath = texture_path;
             cached_current_texdata = AssetLoader.loaded_textures[cached_texpath];
+            cached_animates = animating;
             // Get shader to use
             // Load from assetloader's material cache. Get the page the texture is on, and set it's offset from the atlas we built on launch!
             mesh.SetSurfaceOverrideMaterial(0,AssetLoader.material_cache[(int)GetShaderMaterial][cached_current_texdata.tex_page]);
@@ -126,6 +127,7 @@ public partial class MeshUpdater : Node3D
             cached_texpath = texture_path;
             cached_icon_state = icon_state;
             cached_animation_suffix = animation_suffix;
+            cached_animates = animating;
             RotateDirectionInRelationToCamera();
         }
     }
@@ -142,6 +144,7 @@ public partial class MeshUpdater : Node3D
     private AssetLoader.LoadedTexture cached_current_texdata;
     private string cached_icon_state;
     private string cached_animation_suffix;
+    private bool cached_animates = false;
     public void RotateDirectionInRelationToCamera()
     {
         try { if(mesh == null || mesh.GetSurfaceOverrideMaterialCount() == 0) return; } 
@@ -176,7 +179,7 @@ public partial class MeshUpdater : Node3D
     {
         BillboardFaceCamera();
         // New animation frame!
-        if(current_data != null)
+        if(cached_animates && current_data != null)
         {
             int old_anim_frame = Mathf.FloorToInt(animator_value);
             animator_value += (float)(current_data["anim_speed"].AsDouble() * delta);
