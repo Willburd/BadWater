@@ -621,7 +621,7 @@ public partial class NetworkClient : Node3D
     public void BroadcastChatMessage(string message)
     {
         if(!has_logged_in) return;
-        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientRecieveChatMessage), peerID, message);
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientRecieveChatMessage), PeerID, message);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
