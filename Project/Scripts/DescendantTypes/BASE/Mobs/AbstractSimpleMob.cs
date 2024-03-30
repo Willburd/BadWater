@@ -974,8 +974,8 @@ namespace Behaviors_BASE
                 if(client_input_data["mod_control"].AsBool())
                 {
                     // Inching along with taps at a fixed rate
-                    new_pos.hor += (float)dat_x * 0.5f;
-                    new_pos.ver += (float)dat_y * 0.5f;
+                    new_pos.hor += (float)dat_x * 0.5f * MainController.controller.config.input_factor;
+                    new_pos.ver += (float)dat_y * 0.5f * MainController.controller.config.input_factor;
                 }
                 else if(walking)
                 {
