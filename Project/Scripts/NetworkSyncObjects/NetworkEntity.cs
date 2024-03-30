@@ -244,7 +244,7 @@ public partial class NetworkEntity : Node3D
         Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
         new_inputs["button"] = (int)button;
         new_inputs["state"] = true;
-        Rpc(nameof(ClientUpdateClickedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
+        Rpc(nameof(ClientUpdateClickedEntity),NetworkClient.peer_active_client.PeerID,Json.Stringify(new_inputs));
     }
 
     public void ClickReleased(Vector3 pos, MouseButton button)
@@ -255,7 +255,7 @@ public partial class NetworkEntity : Node3D
         Godot.Collections.Dictionary new_inputs = TOOLS.AssembleStandardClick(pos);
         new_inputs["button"] = (int)button;
         new_inputs["state"] = false;
-        Rpc(nameof(ClientUpdateReleasedEntity),int.Parse(NetworkClient.peer_active_client.Name),Json.Stringify(new_inputs));
+        Rpc(nameof(ClientUpdateReleasedEntity),NetworkClient.peer_active_client.PeerID,Json.Stringify(new_inputs));
     }
 
 

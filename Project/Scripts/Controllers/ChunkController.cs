@@ -124,11 +124,11 @@ public partial class ChunkController : DeligateController
                     if(was_visible && !now_visible)
                     {
                         // stop syncing
-                        chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name),false);
+                        chunk.multi_syncronizer.SetVisibilityFor(client.PeerID,false);
                     }
                     if(!was_visible && now_visible)
                     {
-                        chunk.multi_syncronizer.SetVisibilityFor(int.Parse(client.Name),true);
+                        chunk.multi_syncronizer.SetVisibilityFor(client.PeerID,true);
                         SendFullChunkMeshUpdate(chunk);
                     }
                 }

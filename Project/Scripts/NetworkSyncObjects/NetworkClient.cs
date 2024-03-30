@@ -35,7 +35,7 @@ public partial class NetworkClient : Node3D
         GD.Print("Request credentials");
         login_name = "";
         login_hash = "";
-        Rpc(nameof(RespondCredentials),int.Parse(Name));
+        Rpc(nameof(RespondCredentials),PeerID);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)] // Tell the client we want to forcibly move this
@@ -621,7 +621,7 @@ public partial class NetworkClient : Node3D
     public void BroadcastChatMessage(string message)
     {
         if(!has_logged_in) return;
-        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientRecieveChatMessage), int.Parse(Name), message);
+        if(TOOLS.PeerConnected(this)) Rpc(nameof(ClientRecieveChatMessage), peerID, message);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferChannel = (int)MainController.RPCTransferChannels.ClientData)]
