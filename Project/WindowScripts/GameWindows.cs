@@ -22,6 +22,10 @@ public partial class GameWindows : Window
 
     public override void _Process(double delta)
     {
-        Position = new Vector2I( Math.Clamp(Position.X,10,(int)DisplayServer.WindowGetSize().X - ((int)GetViewport().GetVisibleRect().Size.X + 15)), Math.Clamp(Position.Y,30,(int)DisplayServer.WindowGetSize().Y - 10));
+        int bound_X = 10;
+        int bound_Y = 30;
+        int clamped_X = Math.Clamp(Position.X,bound_X,Math.Max(bound_X+1,(int)DisplayServer.WindowGetSize().X - ((int)GetViewport().GetVisibleRect().Size.X + 15)));
+        int clamped_Y = Math.Clamp(Position.Y,bound_Y,Math.Max(bound_Y+1,(int)DisplayServer.WindowGetSize().Y - 10));
+        Position = new Vector2I( clamped_X, clamped_Y);
     }
 }
