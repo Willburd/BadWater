@@ -10,6 +10,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="."]
@@ -53,99 +55,5 @@ transform = Transform3D(0.881312, -0.0486797, 0.470021, -0.451342, -0.381268, 0.
 light_color = Color(1, 0.913725, 0.839216, 1)
 light_energy = 0.2
 directional_shadow_mode = 0
-
-[node name="HudBR" type="Control" parent="SubViewport"]
-layout_mode = 3
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 0
-size_flags_horizontal = 3
-size_flags_vertical = 6
-
-[node name="GridContainer3" type="GridContainer" parent="SubViewport/HudBR"]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -170.0
-offset_top = -90.0
-offset_right = -10.0
-offset_bottom = -10.0
-grow_horizontal = 0
-grow_vertical = 0
-columns = 2
-
-[node name="UtilityLeft" type="Panel" parent="SubViewport/HudBR/GridContainer3"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="UtilityRight" type="Panel" parent="SubViewport/HudBR/GridContainer3"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HudBC" type="Control" parent="SubViewport"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="GridContainer" type="GridContainer" parent="SubViewport/HudBC"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 506.0
-offset_top = 508.0
-offset_right = 606.0
-offset_bottom = 608.0
-grow_horizontal = 2
-grow_vertical = 0
-columns = 2
-
-[node name="LeftExtra" type="Panel" parent="SubViewport/HudBC/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="RightExtra" type="Panel" parent="SubViewport/HudBC/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="GridContainer2" type="GridContainer" parent="SubViewport/HudBC"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 506.0
-offset_top = 508.0
-offset_right = 606.0
-offset_bottom = 608.0
-grow_horizontal = 2
-grow_vertical = 0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-columns = 2
-
-[node name="Left" type="Panel" parent="SubViewport/HudBC/GridContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Right" type="Panel" parent="SubViewport/HudBC/GridContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
 
 [connection signal="input_event" from="SubViewport/TurfClickHandler/TurfStaticBody" to="SubViewport/TurfClickHandler/TurfStaticBody" method="_on_input_event"]

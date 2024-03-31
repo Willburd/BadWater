@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://d2sfv8jkfx1c0"]
+
+[ext_resource type="Script" path="res://WindowScripts/InventoryWindow.cs" id="1_umwnk"]
+
+[node name="InventoryWindow" type="Window"]
+title = "Inventory"
+position = Vector2i(0, 36)
+size = Vector2i(200, 300)
+script = ExtResource("1_umwnk")
+lock_aspect = true

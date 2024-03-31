@@ -21,6 +21,8 @@ public partial class WindowManager : Node
     public LoggingWindow logging_window;
     [Export]
     public ServerLoadWindow server_load_window;
+    [Export]
+    public InventoryWindow inventory_window;
 
     public enum WindowStates
     {
@@ -39,6 +41,7 @@ public partial class WindowManager : Node
                 chat_window.Hide();
                 logging_window.Hide();
                 server_load_window.Hide();
+                inventory_window.Hide();
             break;
 
             case WindowStates.MainGame:
@@ -47,6 +50,7 @@ public partial class WindowManager : Node
                 chat_window.Show();
                 logging_window.Hide();
                 server_load_window.Hide();
+                inventory_window.Show();
             break;
 
             case WindowStates.ServerConfig:
@@ -56,6 +60,7 @@ public partial class WindowManager : Node
                 logging_window.ReloadLog();
                 logging_window.Show();
                 server_load_window.Show();
+                inventory_window.Hide();
             break;
         }
     }

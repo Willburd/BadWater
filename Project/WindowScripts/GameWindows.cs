@@ -11,6 +11,7 @@ public partial class GameWindows : Window
     public override void _Ready()
     {
         SizeChanged += OnResize;
+        laspect = (float)Size.Y / (float)Size.X;
     }
 
     public void OnResize()
