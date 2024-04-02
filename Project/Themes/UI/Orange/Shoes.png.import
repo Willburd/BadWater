@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bnrk0w2ttkgoc"
-path="res://.godot/imported/BorderInactive.png-9189401d361e4dee85a077f8215e9356.ctex"
+uid="uid://bg5sto1oe7oaw"
+path="res://.godot/imported/Shoes.png-a998b195350166881853c039e2d13694.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Themes/Mechtronic/BorderInactive.png"
-dest_files=["res://.godot/imported/BorderInactive.png-9189401d361e4dee85a077f8215e9356.ctex"]
+source_file="res://Themes/UI/Orange/Shoes.png"
+dest_files=["res://.godot/imported/Shoes.png-a998b195350166881853c039e2d13694.ctex"]
 
 [params]
 

@@ -5,6 +5,7 @@
 [node name="ChatWindow" type="Window" node_paths=PackedStringArray("chat_history", "chat_entry", "chat_marker")]
 title = "Chat"
 size = Vector2i(380, 200)
+min_size = Vector2i(100, 100)
 script = ExtResource("1_rrvgy")
 chat_history = NodePath("Control/VBoxContainer/ChatHistory")
 chat_entry = NodePath("Control/VBoxContainer/HBoxContainer/ChatLine")

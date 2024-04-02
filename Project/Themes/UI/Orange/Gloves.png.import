@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bk2bl0cddq0j8"
-path="res://.godot/imported/Border.png-722253bd398b9fd083c154ea1a8b66f0.ctex"
+uid="uid://ianldasnyo7v"
+path="res://.godot/imported/Gloves.png-efb7ee62841c1c4b74d4e91cbda86a8e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Themes/Mechtronic/Border.png"
-dest_files=["res://.godot/imported/Border.png-722253bd398b9fd083c154ea1a8b66f0.ctex"]
+source_file="res://Themes/UI/Orange/Gloves.png"
+dest_files=["res://.godot/imported/Gloves.png-efb7ee62841c1c4b74d4e91cbda86a8e.ctex"]
 
 [params]
 

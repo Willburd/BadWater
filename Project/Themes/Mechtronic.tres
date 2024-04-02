@@ -1,7 +1,7 @@
 [gd_resource type="Theme" load_steps=6 format=3 uid="uid://bhltvqg4jt2ie"]
 
-[ext_resource type="Texture2D" uid="uid://bk2bl0cddq0j8" path="res://Themes/Mechtronic/Border.png" id="1_qohp5"]
-[ext_resource type="Texture2D" uid="uid://bnrk0w2ttkgoc" path="res://Themes/Mechtronic/BorderInactive.png" id="2_xqol6"]
+[ext_resource type="Texture2D" uid="uid://bk2bl0cddq0j8" path="res://Themes/Window/Mechtronic/Border.png" id="1_qohp5"]
+[ext_resource type="Texture2D" uid="uid://bnrk0w2ttkgoc" path="res://Themes/Window/Mechtronic/BorderInactive.png" id="2_xqol6"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alw3b"]
 bg_color = Color(0.0941176, 0.129412, 0.2, 1)

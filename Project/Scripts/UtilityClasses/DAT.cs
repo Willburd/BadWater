@@ -210,7 +210,7 @@ public static class DAT
         Back,
         ID,
         Belt,
-        Bag,
+        Storage,
         Lpocket,
         Rpocket
     }

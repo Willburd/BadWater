@@ -1,10 +1,187 @@
-[gd_scene load_steps=2 format=3 uid="uid://d2sfv8jkfx1c0"]
+[gd_scene load_steps=15 format=3 uid="uid://d2sfv8jkfx1c0"]
 
 [ext_resource type="Script" path="res://WindowScripts/InventoryWindow.cs" id="1_umwnk"]
+[ext_resource type="Texture2D" uid="uid://x852y1htd745" path="res://Themes/UI/Orange/ID.png" id="2_ei5rd"]
+[ext_resource type="Texture2D" uid="uid://cd1od5401wswl" path="res://Themes/UI/Orange/Belt.png" id="2_om17v"]
+[ext_resource type="Texture2D" uid="uid://s3dtfnhfci3i" path="res://Themes/UI/Orange/Head.png" id="3_5q5fh"]
+[ext_resource type="Texture2D" uid="uid://dii4h2s3vxdr5" path="res://Themes/UI/Orange/Ears.png" id="4_k43pl"]
+[ext_resource type="Texture2D" uid="uid://cmrebcofnvjk5" path="res://Themes/UI/Orange/Glasses.png" id="5_p3a8b"]
+[ext_resource type="Texture2D" uid="uid://bl2q63dndc3my" path="res://Themes/UI/Orange/Uniform.png" id="6_iddt5"]
+[ext_resource type="Texture2D" uid="uid://oanmc0owdl3v" path="res://Themes/UI/Orange/Mask.png" id="6_yqfh0"]
+[ext_resource type="Texture2D" uid="uid://bqxoyqej7x4b6" path="res://Themes/UI/Orange/Suit.png" id="7_00ls4"]
+[ext_resource type="Texture2D" uid="uid://ianldasnyo7v" path="res://Themes/UI/Orange/Gloves.png" id="8_3pr5n"]
+[ext_resource type="Texture2D" uid="uid://bg5sto1oe7oaw" path="res://Themes/UI/Orange/Shoes.png" id="9_6s5ee"]
+[ext_resource type="Texture2D" uid="uid://qd6we0n6e7kr" path="res://Themes/UI/Orange/Back.png" id="10_yxt6f"]
+[ext_resource type="Texture2D" uid="uid://dqh42jrlvx4i5" path="res://Themes/UI/Orange/SuitStorage.png" id="13_p36pk"]
+[ext_resource type="Texture2D" uid="uid://csdsci6kbf68y" path="res://Themes/UI/Orange/Pocket.png" id="14_a06uk"]
 
 [node name="InventoryWindow" type="Window"]
 title = "Inventory"
-position = Vector2i(0, 36)
-size = Vector2i(200, 300)
+size = Vector2i(205, 340)
+min_size = Vector2i(100, 100)
 script = ExtResource("1_umwnk")
 lock_aspect = true
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopRow" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ID" type="TextureRect" parent="Control/VBoxContainer/TopRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("2_ei5rd")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="Head" type="TextureRect" parent="Control/VBoxContainer/TopRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_5q5fh")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="EarR" type="TextureRect" parent="Control/VBoxContainer/TopRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("4_k43pl")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="UpperRow" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Eyes" type="TextureRect" parent="Control/VBoxContainer/UpperRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("5_p3a8b")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="Mask" type="TextureRect" parent="Control/VBoxContainer/UpperRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("6_yqfh0")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="EarL" type="TextureRect" parent="Control/VBoxContainer/UpperRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("4_k43pl")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="MidRow" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Uniform" type="TextureRect" parent="Control/VBoxContainer/MidRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("6_iddt5")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="Suit" type="TextureRect" parent="Control/VBoxContainer/MidRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("7_00ls4")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="Gloves" type="TextureRect" parent="Control/VBoxContainer/MidRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("8_3pr5n")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="LowerRow2" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SuitStorage" type="TextureRect" parent="Control/VBoxContainer/LowerRow2"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("13_p36pk")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="Shoes" type="TextureRect" parent="Control/VBoxContainer/LowerRow2"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("9_6s5ee")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="PocketR" type="TextureRect" parent="Control/VBoxContainer/LowerRow2"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("14_a06uk")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="BottomRow" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Back" type="TextureRect" parent="Control/VBoxContainer/BottomRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("10_yxt6f")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="Belt" type="TextureRect" parent="Control/VBoxContainer/BottomRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("2_om17v")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="PocketL" type="TextureRect" parent="Control/VBoxContainer/BottomRow"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("14_a06uk")
+expand_mode = 3
+stretch_mode = 4

@@ -1,27 +1,26 @@
-[gd_scene load_steps=14 format=3 uid="uid://dfd237ybvqioj"]
+[gd_scene load_steps=13 format=3 uid="uid://dfd237ybvqioj"]
 
 [ext_resource type="Script" path="res://Scripts/BootController.cs" id="1_frm1i"]
 [ext_resource type="PackedScene" uid="uid://gcow2uo4uiia" path="res://Prefabs/NetworkClient.tscn" id="2_doepm"]
 [ext_resource type="Script" path="res://WindowScripts/WindowManager.cs" id="3_tp275"]
 [ext_resource type="Material" uid="uid://jtpiovu64mws" path="res://Materials/BgTile.tres" id="4_bousx"]
-[ext_resource type="Script" path="res://WindowScripts/MainWindow.cs" id="4_w1nj2"]
 [ext_resource type="Texture2D" uid="uid://bq77px6p5wx4x" path="res://Materials/ClientBackground/BgTile.png" id="5_x7gbt"]
+[ext_resource type="PackedScene" uid="uid://bhsoc54o4e5vd" path="res://WindowScripts/Prefabs/MainWindow.tscn" id="6_3ctc2"]
 [ext_resource type="PackedScene" uid="uid://cwhio5wmd2p5p" path="res://WindowScripts/Prefabs/JoinWindow.tscn" id="6_3dkhe"]
 [ext_resource type="Theme" uid="uid://bhltvqg4jt2ie" path="res://Themes/Mechtronic.tres" id="6_5vcwn"]
 [ext_resource type="PackedScene" uid="uid://nqucwtphnshe" path="res://WindowScripts/Prefabs/LoggingWindow.tscn" id="6_foubn"]
 [ext_resource type="PackedScene" uid="uid://biqov4ddbg4pb" path="res://WindowScripts/Prefabs/ChatWindow.tscn" id="7_fsgwk"]
-[ext_resource type="PackedScene" uid="uid://3i31fn5lc1is" path="res://Prefabs/MainGameViewport.tscn" id="8_02qwb"]
 [ext_resource type="PackedScene" uid="uid://c57jnf24l8ao4" path="res://WindowScripts/Prefabs/ServerLoadWindow.tscn" id="12_fv8qr"]
 [ext_resource type="PackedScene" uid="uid://d2sfv8jkfx1c0" path="res://WindowScripts/Prefabs/InventoryWindow.tscn" id="13_0ns7l"]
 
 [node name="BootController" type="Node" node_paths=PackedStringArray("entity_container", "client_container", "client_spawner", "entity_spawner", "chunk_spawner")]
 script = ExtResource("1_frm1i")
-entity_container = NodePath("WindowManager/MainWindow/MainGameViewport/SubViewport/Entities")
-client_container = NodePath("WindowManager/MainWindow/MainGameViewport/SubViewport/Clients")
+entity_container = NodePath("WindowManager/MainWindow/MainGameViewport/GamePort/Entities")
+client_container = NodePath("WindowManager/MainWindow/MainGameViewport/GamePort/Clients")
 client_prefab = ExtResource("2_doepm")
-client_spawner = NodePath("WindowManager/MainWindow/MainGameViewport/SubViewport/ClientSpawner")
-entity_spawner = NodePath("WindowManager/MainWindow/MainGameViewport/SubViewport/EntitySpawner")
-chunk_spawner = NodePath("WindowManager/MainWindow/MainGameViewport/SubViewport/ChunkSpawner")
+client_spawner = NodePath("WindowManager/MainWindow/MainGameViewport/GamePort/ClientSpawner")
+entity_spawner = NodePath("WindowManager/MainWindow/MainGameViewport/GamePort/EntitySpawner")
+chunk_spawner = NodePath("WindowManager/MainWindow/MainGameViewport/GamePort/ChunkSpawner")
 
 [node name="WindowManager" type="Node" parent="." node_paths=PackedStringArray("main_window", "join_window", "chat_window", "logging_window", "server_load_window", "inventory_window")]
 script = ExtResource("3_tp275")
@@ -42,27 +41,8 @@ grow_vertical = 2
 texture = ExtResource("5_x7gbt")
 stretch_mode = 1
 
-[node name="MainWindow" type="Window" parent="WindowManager"]
-title = "Main"
+[node name="MainWindow" parent="WindowManager" instance=ExtResource("6_3ctc2")]
 position = Vector2i(220, 36)
-size = Vector2i(512, 512)
-min_size = Vector2i(128, 128)
-keep_title_visible = true
-theme = ExtResource("6_5vcwn")
-script = ExtResource("4_w1nj2")
-lock_aspect = true
-
-[node name="Panel" type="Panel" parent="WindowManager/MainWindow"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MainGameViewport" parent="WindowManager/MainWindow" instance=ExtResource("8_02qwb")]
-
-[node name="SubViewport" parent="WindowManager/MainWindow/MainGameViewport" index="0"]
-size = Vector2i(512, 512)
 
 [node name="LoggingWindow" parent="WindowManager" instance=ExtResource("6_foubn")]
 position = Vector2i(400, 111)
@@ -81,7 +61,7 @@ position = Vector2i(40, 36)
 theme = ExtResource("6_5vcwn")
 
 [node name="InventoryWindow" parent="WindowManager" instance=ExtResource("13_0ns7l")]
-position = Vector2i(20, 300)
+position = Vector2i(20, 292)
 theme = ExtResource("6_5vcwn")
 
-[editable path="WindowManager/MainWindow/MainGameViewport"]
+[editable path="WindowManager/MainWindow"]
