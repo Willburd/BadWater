@@ -376,7 +376,7 @@ public partial class AssetLoader : Node
                     ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
                 }
             break;
-            /*
+            
             case MainController.DataType.Structure:
                 {
                     PackData data_pack = new StructureData();
@@ -396,7 +396,7 @@ public partial class AssetLoader : Node
                     ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
                 }
             break;
-            */
+            
             case MainController.DataType.Mob:
                 {
                     MobData data_pack = new MobData();
