@@ -1,0 +1,11 @@
+{
+	"parent": "",
+	"name": "Sand",
+	"desc": "It's got grit!",
+	"behavior": "TURF_RAW",
+	"model": "BASE/Turfs/Rough.tscn",
+	"texture": "BASE/Turfs/Floor/Sand.png",
+	"step_sound": "BASE/Footsteps/Sand",
+	"density": 0,
+	"opaque": 0
+}

@@ -1,0 +1,11 @@
+{
+	"parent": "",
+	"name": "Wall",
+	"desc": "It looks solid.",
+	"behavior": "TURF_WALL",
+	"model": "BASE/Turfs/Wall.tscn",
+	"texture": "BASE/Turfs/Wall/Wall.png",
+	"step_sound": "BASE/Footsteps/Generic",
+	"density": 1,
+	"opaque": 1
+}

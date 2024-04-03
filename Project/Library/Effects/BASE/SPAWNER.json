@@ -1,0 +1,11 @@
+{
+	"parent": "",
+	"name": "Spawner",
+	"desc": "Spawns things on the map... You shouldn't see this.",
+	"behavior": "",
+	"model": "BASE/Entities/Effect.tscn",
+	"texture": "BASE/Effects/XGreen.png",
+	"anim_speed": 0,
+	"is_spawner": 1,
+	"cleanable": 0
+}

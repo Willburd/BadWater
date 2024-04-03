@@ -75,8 +75,7 @@ namespace MapLoading
             MapData map_data = AssetLoader.loaded_maps[set_map_id];
             output_map = new MapContainer(set_map_id,set_width, set_height,set_depth);
 
-            Godot.Collections.Dictionary map_list = JsonHandler.ParseJsonFile(map_data.GetFilePath);
-            Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
+            Godot.Collections.Dictionary map_json = JsonHandler.ParseJsonFile(map_data.GetFilePath);
             area_data = (Godot.Collections.Dictionary)map_json["area_data"];
             turf_data = (Godot.Collections.Dictionary)map_json["turf_data"];
             ChatController.DebugLog("LOADING MAP" + map_id + " =========================");
@@ -212,8 +211,7 @@ namespace MapLoading
             output_map = input_map;
 
             MapData map_data = AssetLoader.loaded_maps[map_id];
-            Godot.Collections.Dictionary map_list = JsonHandler.ParseJsonFile(map_data.GetFilePath);
-            Godot.Collections.Dictionary map_json = (Godot.Collections.Dictionary)map_list[map_data.GetUniqueID];
+            Godot.Collections.Dictionary map_json = JsonHandler.ParseJsonFile(map_data.GetFilePath);
             item_data       = (Godot.Collections.Array<string[]>)map_json["items"];     // array of string[EntityID,X,Y,Z,CustomData]
             effect_data     = (Godot.Collections.Array<string[]>)map_json["effects"];   // array of string[EntityID,X,Y,Z,CustomData]
             structure_data  = (Godot.Collections.Array<string[]>)map_json["structures"];// array of string[EntityID,X,Y,Z,CustomData]

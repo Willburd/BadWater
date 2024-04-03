@@ -174,118 +174,25 @@ public partial class AssetLoader : Node
         ConstructTextureAtlas();
         scan_dirs.Clear();
 
-        ChatController.AssetLog("-MAPS");
-        dir = DirAccess.Open(map_path);
-        if (dir != null)
-        {
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-            while (fileName != "" && fileName.GetExtension() == "json")
-            {
-                if (!dir.CurrentIsDir())
-                {
-                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Map);
-                }
-                fileName = dir.GetNext();
-            }
-        }
 
-        ChatController.AssetLog("-AREAS");
-        dir = DirAccess.Open(area_path);
-        if (dir != null)
-        {
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-            while (fileName != "" && fileName.GetExtension() == "json")
-            {
-                if (!dir.CurrentIsDir())
-                {
-                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Area);
-                }
-                fileName = dir.GetNext();
-            }
-        }
+        // Load main library entities
+        ChatController.AssetLog("BUILDING LIBRARY DATA");
+        LoadLibraryWithType( map_path, MainController.DataType.Map);
+        LoadLibraryWithType( area_path, MainController.DataType.Area);
+        LoadLibraryWithType( turf_path, MainController.DataType.Turf);
+        LoadLibraryWithType( struct_path, MainController.DataType.Structure);
+        LoadLibraryWithType( item_path, MainController.DataType.Item);
+        LoadLibraryWithType( effect_path, MainController.DataType.Effect);
+        LoadLibraryWithType( mob_path, MainController.DataType.Mob);
 
-        ChatController.AssetLog("-TURFS");
-        dir = DirAccess.Open(turf_path);
-        if (dir != null)
-        {
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-            while (fileName != "" && fileName.GetExtension() == "json")
-            {
-                if (!dir.CurrentIsDir())
-                {
-                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Turf);
-                }
-                fileName = dir.GetNext();
-            }
-        }
 
-        ChatController.AssetLog("-STRUCTURES");
-        dir = DirAccess.Open(struct_path);
-        if (dir != null)
-        {
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-            while (fileName != "" && fileName.GetExtension() == "json")
-            {
-                if (!dir.CurrentIsDir())
-                {
-                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Structure);
-                }
-                fileName = dir.GetNext();
-            }
-        }
+        // Construct dependant entities
+        ChatController.AssetLog("BUILDING SECONDARY DATA");
+        // TODO - circuitboards etc 
 
-        ChatController.AssetLog("-ITEMS");
-        dir = DirAccess.Open(item_path);
-        if (dir != null)
-        {
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-            while (fileName != "" && fileName.GetExtension() == "json")
-            {
-                if (!dir.CurrentIsDir())
-                {
-                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Item);
-                }
-                fileName = dir.GetNext();
-            }
-        }
 
-        ChatController.AssetLog("-EFFECTS");
-        dir = DirAccess.Open(effect_path);
-        if (dir != null)
-        {
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-            while (fileName != "" && fileName.GetExtension() == "json")
-            {
-                if (!dir.CurrentIsDir())
-                {
-                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Effect);
-                }
-                fileName = dir.GetNext();
-            }
-        }
-
-        ChatController.AssetLog("-MOBS");
-        dir = DirAccess.Open(mob_path);
-        if (dir != null)
-        {
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-            while (fileName != "" && fileName.GetExtension() == "json")
-            {
-                if (!dir.CurrentIsDir())
-                {
-                    ParseData(dir.GetCurrentDir() + "/" + fileName, MainController.DataType.Mob);
-                }
-                fileName = dir.GetNext();
-            }
-        }
-
+        // Load internal REQUIRED types
+        ChatController.AssetLog("FINALIZING DATA");
         ChatController.AssetLog("-PREFABS");
         {   // Base area
             AreaData area = new AreaData();
@@ -295,7 +202,7 @@ public partial class AssetLoader : Node
             data["always_powered"] = 1.0;
             area.Init( "_", "_", "_", MainController.DataType.Area, data);
             loaded_areas[area.GetUniqueModID] = area;
-            all_packs[AssetLoader.AllPackID(area.GetUniqueModID, MainController.DataType.Area)] = area;
+            all_packs[PackTypeID(area.GetUniqueModID, MainController.DataType.Area)] = area;
         }
         {   // Space turf
             TurfData turf = new TurfData();
@@ -305,7 +212,7 @@ public partial class AssetLoader : Node
             data["opaque"] = 0.0;
             turf.Init( "_", "_", "_", MainController.DataType.Turf, data);
             loaded_turfs[turf.GetUniqueModID] = turf;
-            all_packs[AssetLoader.AllPackID(turf.GetUniqueModID, MainController.DataType.Turf)] = turf;
+            all_packs[PackTypeID(turf.GetUniqueModID, MainController.DataType.Turf)] = turf;
         }
         
         ChatController.AssetLog("BUILDING INHERITANCE");
@@ -341,7 +248,7 @@ public partial class AssetLoader : Node
                     continue;
                 }
                 // Check to see if the parent of the current data has it's parentflag set, if so it's ready for inheretance.
-                string getID = AllPackID(data.GetDataParent,data.entity_type);
+                string getID = PackTypeID(data.GetDataParent,data.entity_type);
                 PackData parent = all_packs[getID];
                 if(!parent.ParentFlag)
                 {
@@ -351,13 +258,13 @@ public partial class AssetLoader : Node
                 }
                 // Parent has parentflag set, so we can inheret its data, loop through parent chain, and set data repeatedly from topmost parent to us...
                 Stack<string> parent_chain = new Stack<string>();
-                string parent_search = AllPackID(data.GetUniqueModID,data.entity_type);   
+                string parent_search = PackTypeID(data.GetUniqueModID,data.entity_type);   
                 while(true)
                 {
                     PackData search_parent = all_packs[parent_search];
                     parent_chain.Push(parent_search);
                     if(search_parent.GetDataParent == "") break;
-                    parent_search = AllPackID(search_parent.GetDataParent,data.entity_type);
+                    parent_search = PackTypeID(search_parent.GetDataParent,data.entity_type);
                 }
                 while(parent_chain.Count > 0)
                 {
@@ -373,99 +280,134 @@ public partial class AssetLoader : Node
         }
     }
 
-    private void ParseData(string file_path, MainController.DataType type)
+
+
+    private void LoadLibraryWithType(string dir_path, MainController.DataType type)
     {
-        Godot.Collections.Dictionary data = JsonHandler.ParseJsonFile(file_path);
-        string prefix = Path.GetFileNameWithoutExtension(file_path);
-        ChatController.AssetLog("--PARSING: " + file_path + " " + prefix);
-        foreach( string key in data.Keys )
+        ChatController.AssetLog("-" + type.ToString().ToUpper());
+        DirAccess base_dir = DirAccess.Open(dir_path);
+        if (base_dir != null)
         {
-            Godot.Collections.Dictionary dict_data = (Godot.Collections.Dictionary)data[key];
-            switch(type)
+            // Scan each mod directory
+            base_dir.ListDirBegin();
+            string dirName = base_dir.GetNext();
+            while (dirName != "")
             {
-                case MainController.DataType.Map:
+                if(base_dir.CurrentIsDir())
+                {
+                    // Then scan each json file in each mod directory! 
+                    DirAccess dir = DirAccess.Open(dir_path + "/" + dirName);
+                    if(dir != null)
                     {
-                        MapData data_pack = new MapData();
-                        data_pack.Init( file_path, prefix, key, type, dict_data);
-                        loaded_maps[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                        dir.ListDirBegin();
+                        string fileName = dir.GetNext();
+                        while (fileName != "" && fileName.GetExtension() == "json")
+                        {
+                            if (!dir.CurrentIsDir())
+                            {
+                                ParseData(dir.GetCurrentDir() + "/" + fileName, type, fileName.ToUpper().Replace(".JSON", ""), dirName.ToUpper());
+                            }
+                            fileName = dir.GetNext();
+                        }
                     }
-                break;
-
-                case MainController.DataType.Area:
-                    {
-                        AreaData data_pack = new AreaData();
-                        data_pack.Init( file_path, prefix, key, type, dict_data);
-                        loaded_areas[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
-                    }
-                break;
-
-                case MainController.DataType.Turf:
-                    {
-                        TurfData data_pack = new TurfData();
-                        data_pack.Init( file_path, prefix, key, type, dict_data);
-                        loaded_turfs[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
-                    }
-                break;
-
-                case MainController.DataType.Effect:
-                    {
-                        EffectData data_pack = new EffectData();
-                        data_pack.Init( file_path, prefix, key, type, dict_data);
-                        loaded_effects[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
-                    }       
-                break;
-
-                case MainController.DataType.Item:
-                    {
-                        ItemData data_pack = new ItemData();
-                        data_pack.Init( file_path, prefix, key, type, dict_data);
-                        loaded_items[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
-                    }
-                break;
-                /*
-                case MainController.DataType.Structure:
-                    {
-                        PackData data_pack = new StructureData();
-                        data_pack.Init( file_path, prefix, key, type, dict_data);
-                        loaded_structures[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
-                    }
-                break;
-                
-                case MainController.DataType.Machine:
-                    {
-                        PackData data_pack = new MachineData();
-                        data_pack.Init( file_path, prefix, key, type, dict_data);
-                        loaded_machines[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
-                    }
-                break;
-                */
-                case MainController.DataType.Mob:
-                    {
-                        MobData data_pack = new MobData();
-                        data_pack.Init( file_path, prefix, key, type, dict_data);
-                        loaded_mobs[data_pack.GetUniqueModID] = data_pack;
-                        all_packs[AllPackID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
-                    }
-                break;
+                }
+                dirName = base_dir.GetNext();
             }
         }
     }
 
-    private void ParseMob(string file_path)
+    private void ParseData(string file_path, MainController.DataType type, string key, string prefix)
     {
-        ChatController.AssetLog(file_path);
+        Godot.Collections.Dictionary dict_data = JsonHandler.ParseJsonFile(file_path);
+        if(dict_data == null || dict_data.Keys.Count <= 0) 
+        {
+            ChatController.AssetLog("--Invalid or empty asset json in " + file_path);
+            return;
+        }
+
+        switch(type)
+        {
+            case MainController.DataType.Map:
+                {
+                    MapData data_pack = new MapData();
+                    data_pack.Init( file_path, prefix, key, type, dict_data);
+                    loaded_maps[data_pack.GetUniqueModID] = data_pack;
+                    all_packs[PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                    ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
+                }
+            break;
+
+            case MainController.DataType.Area:
+                {
+                    AreaData data_pack = new AreaData();
+                    data_pack.Init( file_path, prefix, key, type, dict_data);
+                    loaded_areas[data_pack.GetUniqueModID] = data_pack;
+                    all_packs[PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                    ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
+                }
+            break;
+
+            case MainController.DataType.Turf:
+                {
+                    TurfData data_pack = new TurfData();
+                    data_pack.Init( file_path, prefix, key, type, dict_data);
+                    loaded_turfs[data_pack.GetUniqueModID] = data_pack;
+                    all_packs[PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                    ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
+                }
+            break;
+
+            case MainController.DataType.Effect:
+                {
+                    EffectData data_pack = new EffectData();
+                    data_pack.Init( file_path, prefix, key, type, dict_data);
+                    loaded_effects[data_pack.GetUniqueModID] = data_pack;
+                    all_packs[PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                    ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
+                }       
+            break;
+
+            case MainController.DataType.Item:
+                {
+                    ItemData data_pack = new ItemData();
+                    data_pack.Init( file_path, prefix, key, type, dict_data);
+                    loaded_items[data_pack.GetUniqueModID] = data_pack;
+                    all_packs[PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                    ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
+                }
+            break;
+            /*
+            case MainController.DataType.Structure:
+                {
+                    PackData data_pack = new StructureData();
+                    data_pack.Init( file_path, prefix, key, type, dict_data);
+                    loaded_structures[data_pack.GetUniqueModID] = data_pack;
+                    all_packs[PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                    ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
+                }
+            break;
+            
+            case MainController.DataType.Machine:
+                {
+                    PackData data_pack = new MachineData();
+                    data_pack.Init( file_path, prefix, key, type, dict_data);
+                    loaded_machines[data_pack.GetUniqueModID] = data_pack;
+                    all_packs[PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                    ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
+                }
+            break;
+            */
+            case MainController.DataType.Mob:
+                {
+                    MobData data_pack = new MobData();
+                    data_pack.Init( file_path, prefix, key, type, dict_data);
+                    loaded_mobs[data_pack.GetUniqueModID] = data_pack;
+                    all_packs[PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type)] = data_pack;
+                    ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
+                }
+            break;
+        }
     }
-
-    
-
-
 
 
     public readonly struct LoadedTexture
@@ -608,11 +550,11 @@ public partial class AssetLoader : Node
 
     public static PackData GetPackFromRef(PackRef get_pack)
     {
-        return all_packs[AllPackID(get_pack.modid,get_pack.data_type)];
+        return all_packs[PackTypeID(get_pack.modid,get_pack.data_type)];
     }
 
 
-    public static string AllPackID( string modID, MainController.DataType type)
+    public static string PackTypeID( string modID, MainController.DataType type)
     {
         return type.ToString().ToUpper() + ":" + modID;
     }

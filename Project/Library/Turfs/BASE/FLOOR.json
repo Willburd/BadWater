@@ -1,0 +1,11 @@
+{
+	"parent": "",
+	"name": "Floor",
+	"desc": "How menacing.",
+	"behavior": "TURF_FLOOR",
+	"model": "BASE/Turfs/Plane.tscn",
+	"texture": "BASE/Turfs/Floor/Floor.png",
+	"step_sound": "BASE/Footsteps/Generic",
+	"density": 0,
+	"opaque": 0
+}

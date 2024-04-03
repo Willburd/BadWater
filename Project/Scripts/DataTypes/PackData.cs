@@ -10,8 +10,8 @@ public partial class PackData : Resource
     {
         mod_prefix = set_prefix;
         unique_ID = set_ID;
-        source_file_path = set_path;
         entity_type = type;
+        source_file_path = set_path;
         data_parent = set_parent;   // INHERETANCE IS FUN
     }
 
@@ -64,9 +64,6 @@ public partial class PackData : Resource
         entity_type         = source.entity_type;
         data_parent         = source.data_parent;
         temp_file_data      = source.temp_file_data;
-        data_parent         = source.data_parent;
-        mod_prefix          = source.mod_prefix;
-        unique_ID           = source.unique_ID;
         display_name        = source.display_name;
         description         = source.description;
         behaviorID          = source.behaviorID;
@@ -105,7 +102,7 @@ public partial class PackData : Resource
     protected bool loaded_parent;
     protected string data_parent = "";
     protected string mod_prefix = "";
-    protected string unique_ID = "Turf";
+    protected string unique_ID = "";
     // mod_prefix is used to avoid collisions with turfs, by having namespaces for the data
     public string GetModID
     {

@@ -1,0 +1,11 @@
+{
+	"parent": "",
+	"name": "Rock",
+	"desc": "It looks sturdy, but not unbreakable.",
+	"behavior": "TURF_MINEABLE",
+	"model": "BASE/Turfs/Wall.tscn",
+	"texture": "BASE/Turfs/Wall/Rock.png",
+	"step_sound": "BASE/Footsteps/Stone",
+	"density": 1,
+	"opaque": 1
+}

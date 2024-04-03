@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.Linq;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 
 public partial class MapController : DeligateController
@@ -54,7 +55,6 @@ public partial class MapController : DeligateController
             string map_id = loaded[i];
             if(!AssetLoader.loaded_maps.ContainsKey(map_id)) continue;
             MapData map_data = AssetLoader.loaded_maps[map_id];
-            ChatController.DebugLog("-Loading map: " + map_data.display_name);
             loading.Add(new MapLoading.MapLoader(this,map_id,map_data.width,map_data.height,map_data.depth));
         }
         return true;
@@ -205,26 +205,31 @@ public partial class MapController : DeligateController
      ****************************************************************/
     public static bool IsMapLoaded(string mapID)
     {
+        Debug.Assert(active_maps.Count > 0);
         if(mapID == "BAG") return true; // Bags are not nullspace
         if(mapID == "NULL") return false;
         return active_maps.ContainsKey(mapID);
     }
     public static string FallbackMap()
     {
+        Debug.Assert(active_maps.Count > 0);
         return active_maps.First().Key;
     }
     public static Dictionary<string,MapContainer> GetLoadedMaps()
     {
+        Debug.Assert(active_maps.Count > 0);
         return active_maps;
     }
     public static MapContainer GetMap(string mapID)
     {
+        Debug.Assert(active_maps.Count > 0);
         if(mapID == "BAG") return null;
         if(mapID == "NULL") return null;
         return active_maps[mapID];
     }
     public static void SetMap(string mapID, MapContainer new_map)
     {
+        Debug.Assert(active_maps.Count > 0);
         active_maps[mapID] = new_map;
     }
 

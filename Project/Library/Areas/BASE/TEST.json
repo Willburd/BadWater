@@ -1,0 +1,9 @@
+{
+	"parent": "",
+	"name": "Testing",
+	"desc": "Test zone!",
+	"behavior": "",
+	"base_turf": "BASE:SAND",
+	"is_space": 0,
+	"always_powered": 0
+}
