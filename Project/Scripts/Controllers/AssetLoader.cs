@@ -191,30 +191,6 @@ public partial class AssetLoader : Node
         // TODO - circuitboards etc 
 
 
-        // Load internal REQUIRED types
-        ChatController.AssetLog("FINALIZING DATA");
-        ChatController.AssetLog("-PREFABS");
-        {   // Base area
-            AreaData area = new AreaData();
-            Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
-            data["name"] = "Unknown";
-            data["is_space"] = 1.0;
-            data["always_powered"] = 1.0;
-            area.Init( "_", "_", "_", MainController.DataType.Area, data);
-            loaded_areas[area.GetUniqueModID] = area;
-            all_packs[PackTypeID(area.GetUniqueModID, MainController.DataType.Area)] = area;
-        }
-        {   // Space turf
-            TurfData turf = new TurfData();
-            Godot.Collections.Dictionary data = new Godot.Collections.Dictionary();
-            data["name"] = "Space";
-            data["density"] = 0.0;
-            data["opaque"] = 0.0;
-            turf.Init( "_", "_", "_", MainController.DataType.Turf, data);
-            loaded_turfs[turf.GetUniqueModID] = turf;
-            all_packs[PackTypeID(turf.GetUniqueModID, MainController.DataType.Turf)] = turf;
-        }
-        
         ChatController.AssetLog("BUILDING INHERITANCE");
         BuildInheritance(loaded_maps.Values.ToList<PackData>()); // Could be possible, but why would you?
         BuildInheritance(loaded_areas.Values.ToList<PackData>());

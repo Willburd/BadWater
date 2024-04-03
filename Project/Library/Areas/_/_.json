@@ -1,0 +1,9 @@
+{
+	"parent": "",
+	"name": "Unknown",
+	"desc": "Swimming through a sea of stars. Never looking back to shore. Forever, wherever.",
+	"behavior": "",
+	"base_turf": "_:_",
+	"is_space": 1,
+	"always_powered": 1
+}

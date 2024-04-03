@@ -1,0 +1,11 @@
+{
+	"parent": "",
+	"name": "Space",
+	"desc": "Step into the great beyond!",
+	"behavior": "TURF_RAW",
+	"model": "BASE/Turfs/Plane.tscn",
+	"texture": "BASE/Turfs/Floor/Space.png",
+	"step_sound": "",
+	"density": 0,
+	"opaque": 0
+}
