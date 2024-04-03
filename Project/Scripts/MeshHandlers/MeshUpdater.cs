@@ -22,6 +22,8 @@ public partial class MeshUpdater : Node3D
 
 
     
+    private float click_flash = 0f;
+
 
     public static int mesh_count = 0;
     public override void _EnterTree()
@@ -117,6 +119,7 @@ public partial class MeshUpdater : Node3D
             mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)cached_current_texdata.u / AssetLoader.tex_page_size,(float)cached_current_texdata.v / AssetLoader.tex_page_size) );
             mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
             mesh.SetInstanceShaderParameter( "_AA", draw_alpha);
+            mesh.SetInstanceShaderParameter( "_CF", click_flash);
         }
         else
         {
@@ -168,6 +171,7 @@ public partial class MeshUpdater : Node3D
         mesh.SetInstanceShaderParameter( "_XY", new Vector2((float)cached_current_texdata.u / AssetLoader.tex_page_size,(float)cached_current_texdata.v / AssetLoader.tex_page_size) );
         mesh.SetInstanceShaderParameter( "_WH", new Vector2((float)cached_current_texdata.width / AssetLoader.tex_page_size,(float)cached_current_texdata.height / AssetLoader.tex_page_size) );
         mesh.SetInstanceShaderParameter( "_AA", draw_alpha);
+        mesh.SetInstanceShaderParameter( "_CF", click_flash);
     }
 
     public override void _Ready()
@@ -178,12 +182,23 @@ public partial class MeshUpdater : Node3D
     public override void _PhysicsProcess(double delta)
     {
         BillboardFaceCamera();
-        // New animation frame!
-        if(cached_animates && current_data != null)
+        if(current_data != null)
         {
-            int old_anim_frame = Mathf.FloorToInt(animator_value);
-            animator_value += (float)(current_data["anim_speed"].AsDouble() * delta);
-            if(old_anim_frame != Mathf.FloorToInt(animator_value)) TextureUpdated(current_data);
+            // Handle click flash
+            if(click_flash > 0)
+            {
+                click_flash -= (float)delta * 3f;
+                if(click_flash < 0) click_flash = 0;
+                mesh.SetInstanceShaderParameter( "_CF", click_flash);
+            }
+            // New animation frame!
+            if(cached_animates)
+            {
+                
+                int old_anim_frame = Mathf.FloorToInt(animator_value);
+                animator_value += (float)(current_data["anim_speed"].AsDouble() * delta);
+                if(old_anim_frame != Mathf.FloorToInt(animator_value)) TextureUpdated(current_data);
+            }
         }
     }
 
@@ -218,6 +233,7 @@ public partial class MeshUpdater : Node3D
                 {
                     if(button.Pressed)
                     {
+                        click_flash = 1f;
                         (GetParent() as NetworkEntity).ClickPressed(position,button.ButtonIndex);
                     }
                     else

@@ -5,6 +5,7 @@ uniform sampler2D _MainTexture : filter_nearest;
 instance uniform vec2 _XY;
 instance uniform vec2 _WH;
 instance uniform float _AA;
+instance uniform float _CF;
 
 void vertex() {
 	// Called for every vertex the material is visible on.
@@ -12,7 +13,8 @@ void vertex() {
 
 void fragment() {
 	// Called for every pixel the material is visible on.
-	ALBEDO = texture(_MainTexture, _XY + (_WH * UV)).xyz;
+	vec3 col = texture(_MainTexture, _XY + (_WH * UV)).xyz;
+	ALBEDO = mix(col,vec3(1.0,1.0,6.0),_CF * 0.3); 
 	ALPHA = texture(_MainTexture, _XY + (_WH * UV)).a * _AA;
 }
 
