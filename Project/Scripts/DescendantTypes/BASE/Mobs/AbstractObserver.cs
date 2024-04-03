@@ -8,7 +8,7 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Click handling
          ****************************************************************/
-        public override void Clicked( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
+        public override void ClientClicking( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
         {
             // Don't react if click cooldown
             if(CheckClickCooldown()) return;

@@ -229,8 +229,8 @@ public partial class AbstractEntity
         new_pos.ver += mover.Y;
         AbstractTools.Move(this,new_pos);
     }
-    // Clicking other entities
-    public virtual void Clicked( AbstractEntity used_entity, AbstractEntity target, Godot.Collections.Dictionary click_params) 
+    // Clicking other entities while this entity is used by a client, See AbstractSimpleMob for majority of game's click interactions.
+    public virtual void ClientClicking( AbstractEntity used_entity, AbstractEntity target, Godot.Collections.Dictionary click_params) 
     {
         GD.Print(display_name.The(true) + " CLICKED " + target?.display_name.The() + " USING " + used_entity?.display_name.The()); // REPLACE ME!!!
     }

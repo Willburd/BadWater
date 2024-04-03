@@ -283,7 +283,7 @@ namespace Behaviors_BASE
         /*****************************************************************
          * Click handling
          ****************************************************************/
-        public override void Clicked( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
+        public override void ClientClicking( AbstractEntity used_item, AbstractEntity target, Godot.Collections.Dictionary click_params) 
         {
             // Don't react if click cooldown
             if(CheckClickCooldown()) return;
@@ -400,7 +400,7 @@ namespace Behaviors_BASE
             AbstractEntity gloves = SlotGloves; // not typecast specifically enough in defines
             //if(gloves != null && gloves.Touch(target,true)) return;
 
-            if( flags.HASHANDS && (target is AbstractTurf ||  target is AbstractStructure || target is AbstractMachine ) && SelectingIntent != DAT.Intent.Hurt)
+            if( flags.HASHANDS && (target is AbstractTurf ||  target is AbstractStructure || target is AbstractMachine ) && SelectingIntent == DAT.Intent.Help)
             {
                 target.InteractionTouched(this);
                 return;
@@ -426,7 +426,7 @@ namespace Behaviors_BASE
                 }
                 else
                 {
-                    UnarmedAttackTarget(target);
+                    AttemptUnarmedAttackTarget(target);
                 }
             }
         }
@@ -519,7 +519,7 @@ namespace Behaviors_BASE
                 }
         } 
 
-        public void UnarmedAttackTarget(AbstractEntity target)
+        public void AttemptUnarmedAttackTarget(AbstractEntity target)
         {
             if(!MapTools.Adjacent( this, target, false)) return;
             AbstractTurf turf = target.GetTurf();
@@ -532,10 +532,6 @@ namespace Behaviors_BASE
                 HandleAttackDelay(target, attacks.melee_attack_delay.Value); // This will sleep this proc for a bit, which is why waitfor is false.
             }
 
-            // Cooldown testing is done at click code (for players) and interface code (for AI).
-            SetClickCooldown(GetAttackCooldown(null));
-
-            // Returns a value, but will be lost if 
             DoUnarmedAttack( target, turf);
             if(attacks.melee_attack_delay != null && attacks.melee_attack_delay.Value > 0) MeleePostAnimation(target);
         }
@@ -543,12 +539,9 @@ namespace Behaviors_BASE
         public void DoUnarmedAttack(AbstractEntity target, AbstractTurf turf)
         {
             direction = DAT.RotateTowardEntity(this,target);
+            if(target is AbstractTurf) return;
+
             bool missed = false;
-            if(target is AbstractTurf target_turf)
-            {
-                target_turf.AttackTurf(null,this);
-                return;
-            }
             if(!turf.Contents.Contains(target) ) // Turfs don't contain themselves so checking contents is pointless if we're targeting a turf.
             {
                 missed = true;

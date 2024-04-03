@@ -428,7 +428,7 @@ public partial class NetworkClient : Node3D
                     else if(turf != null && focused_entity != null)
                     {
                         DAT.Dir old_dir = focused_entity.direction;
-                        focused_entity?.Clicked( focused_entity?.ActiveHand, turf,client_click_data);
+                        focused_entity?.ClientClicking( focused_entity?.ActiveHand, turf,client_click_data);
                         focused_entity.UpdateNetworkDirection(old_dir);
                     }
                 }
@@ -485,7 +485,7 @@ public partial class NetworkClient : Node3D
                         if(focused_entity != null)
                         {
                             DAT.Dir old_dir = focused_entity.direction;
-                            focused_entity.Clicked(focused_entity?.ActiveHand,ent,JsonHandler.ParseJson(parameters_json));
+                            focused_entity.ClientClicking(focused_entity?.ActiveHand,ent,JsonHandler.ParseJson(parameters_json));
                             focused_entity.UpdateNetworkDirection(old_dir);
                         }
                     }
