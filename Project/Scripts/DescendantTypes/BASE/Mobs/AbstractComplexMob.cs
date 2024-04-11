@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace Behaviors_BASE
+namespace Behaviors
 {
     public class AbstractComplexMob : AbstractSimpleMob
     {

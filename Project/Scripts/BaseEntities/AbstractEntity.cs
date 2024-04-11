@@ -1,4 +1,4 @@
-using Behaviors_BASE;
+using Behaviors;
 using Godot;
 using GodotPlugins.Game;
 using System;
@@ -153,7 +153,7 @@ public partial class AbstractEntity
     }
     public virtual void Init() {} // Called upon creation to set variables or state, usually detected by map information.
     public virtual void LateInit() { } // Same as above, but when we NEED everything else Init() before we can properly tell our state!
-    public virtual void Tick() { } // Called every process tick on the Fire() tick of the subcontroller that owns them
+    public virtual void Tick(int tick_number) { } // Called every process tick on the Fire() tick of the subcontroller that owns them
     public virtual bool PreMove(GridPos destination, bool perform_turf_actions) { return true; } // Called before AbstractTools.Move() finishes movement, and only allows the movement if true is returned
     public virtual void PostMove(GridPos location) { }
     public virtual void Crossed(AbstractEntity crosser) { }
@@ -174,11 +174,11 @@ public partial class AbstractEntity
      * Processing
      ****************************************************************/
     public Vector3 velocity = Vector3.Zero;
-    public void Process()
+    public void Process(int tick_number)
     {
         // Handle the tick!
         DAT.Dir old_dir = direction;
-        Tick();
+        Tick(tick_number);
         ProcessVelocity();
         UpdateNetworkDirection(old_dir);
     }
@@ -219,14 +219,16 @@ public partial class AbstractEntity
     {
         owner_client = null;
     }
+    protected Vector2 input_dir;
     public virtual void ControlUpdate(Godot.Collections.Dictionary client_input_data)
     {
         if(client_input_data.Keys.Count == 0) return;
         // Got an actual control update!
+        input_dir = new Vector2((float)client_input_data["x"].AsDouble(),(float)client_input_data["y"].AsDouble()).Normalized() * MainController.controller.config.input_factor;
+        // Forced move for anything not a mob... Those move in their Tick()
         GridPos new_pos = grid_pos;
-        Vector2 mover = new Vector2((float)client_input_data["x"].AsDouble(),(float)client_input_data["y"].AsDouble()).Normalized() * MainController.controller.config.input_factor;
-        new_pos.hor += mover.X;
-        new_pos.ver += mover.Y;
+        new_pos.hor += input_dir.X;
+        new_pos.ver += input_dir.Y;
         AbstractTools.Move(this,new_pos);
     }
     // Clicking other entities while this entity is used by a client, See AbstractSimpleMob for majority of game's click interactions.

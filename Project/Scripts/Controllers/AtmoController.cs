@@ -31,15 +31,19 @@ public partial class AtmoController : DeligateController
         FinishInit();
     }
 
-    public override void Fire()
+    public override bool Fire()
     {
         //GD.Print(Name + " Fired");
+        if(MainController.server_state == MainController.ServerConfig.Editor) return false; // No life tick in edit mode
+
         while(pending_turfs.Count > 0)
         {
             AbstractTurf turf = pending_turfs[0];
             // PROCESS ATMO - TODO, big growing flood fill that triggers other atmo updates, repeatedly ripping out until satisfied.=================================================================================================================================
             pending_turfs.RemoveAt(0);
         }
+
+        return true;
     }
 
     public override void Shutdown()

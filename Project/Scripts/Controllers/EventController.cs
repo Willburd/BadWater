@@ -11,7 +11,7 @@ public partial class EventController : DeligateController
 
     public override bool CanInit()
     {
-        return true;
+        return IsSubControllerInit(MapController.controller);
     }
 
     public override bool Init()
@@ -26,9 +26,11 @@ public partial class EventController : DeligateController
         FinishInit();
     }
 
-    public override void Fire()
+    public override bool Fire()
     {
         //GD.Print(Name + " Fired");
+
+        return true;
     }
 
     public override void Shutdown()

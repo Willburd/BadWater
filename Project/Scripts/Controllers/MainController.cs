@@ -98,23 +98,20 @@ public partial class MainController : Node
 		server_state = state;
 
 		// Create subcontrollers!
-		if(server_state == ServerConfig.Standard)
+		subcontrollers.Add(new AccountController());	// Player logins and rejoining
+		subcontrollers.Add(new MapController());		// Loaded map processing, and random updates for turfs
+		subcontrollers.Add(new ChemController());		// Chemical reactions processing
+		subcontrollers.Add(new AtmoController());		// Atmospherics system
+		subcontrollers.Add(new MobController());		// Mobs living and dead and their life ticks
+		subcontrollers.Add(new MachineController());	// Machine currently constructed and processing
+		subcontrollers.Add(new ChunkController());		// Loaded chunks, and which clients get those chunks
+		if(server_state == ServerConfig.Editor)
 		{
-			subcontrollers.Add(new AccountController());	// Player logins and rejoining
-			subcontrollers.Add(new MapController());		// Loaded map processing, and random updates for turfs
-			subcontrollers.Add(new ChemController());		// Chemical reactions processing
-			subcontrollers.Add(new AtmoController());		// Atmospherics system
-			subcontrollers.Add(new MachineController());	// Machine currently constructed and processing
-			subcontrollers.Add(new MobController());		// Mobs living and dead and their life ticks
-			subcontrollers.Add(new ChunkController());		// Loaded chunks, and which clients get those chunks
-			subcontrollers.Add(new EventController());		// Event choreographer for station SPICE
-		}
-		else if(server_state == ServerConfig.Editor)
-		{
-			subcontrollers.Add(new AccountController());
-			subcontrollers.Add(new MapController());
 			subcontrollers.Add(new EditorController());		// Editor storage for what objects are placable/searching it, processing placement of new entities/turfs
-			subcontrollers.Add(new ChunkController());
+		}
+		else
+		{
+			subcontrollers.Add(new EventController());		// Event choreographer for station SPICE
 		}
 	}
 

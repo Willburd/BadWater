@@ -18,4 +18,11 @@ public class TickRecord
         for(int q = 0; q < len; q++) acc += time_data[q];
         return acc / len;
     }
+
+    public ulong GetPeak()
+    {
+        ulong peak = 0;
+        for(int q = 0; q < len; q++) if(peak < time_data[q]) peak = time_data[q];
+        return peak;
+    }
 }

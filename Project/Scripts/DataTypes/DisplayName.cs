@@ -61,14 +61,14 @@ public class DisplayName
         {
             an = capitalized ? "A " : "a ";
         }
-        return (proper ? an : "") + raw_name;
+        return (proper ? "" : an) + raw_name;
     }
 
     public string Some(bool capitalized = false)
     {
         if(raw_name == "") return "";
         string some = capitalized ? "Some " : "some ";
-        return (proper ? "" : some) + raw_name;
+        return (proper ? some : "") + raw_name;
     }
 
     public string AutoPlural(bool capitalized = false)

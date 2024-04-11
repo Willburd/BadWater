@@ -1,4 +1,4 @@
-using Behaviors_BASE;
+using Behaviors;
 using Godot;
 using GodotPlugins.Game;
 using System;
@@ -22,7 +22,8 @@ public static class ChatController
         VisibleMessage,
         AttackLog,
         Debug,
-        Asset
+        Asset,
+        Error
     }
     public static string ModePrefix(ChatMode mode)
     {
@@ -50,6 +51,8 @@ public static class ChatController
                 return "DEBUG";
             case ChatMode.Asset:
                 return "ASSET";
+            case ChatMode.Error:
+                return "ERROR";
         }
         return "SPEAK";
     }
@@ -94,6 +97,11 @@ public static class ChatController
     public static void DebugLog(string message)
     {
         SubmitMessage( null, null, message, ChatMode.Debug);
+    }
+
+    public static void ErrorLog(string message)
+    {
+        SubmitMessage( null, null, message, ChatMode.Error);
     }
 
     public static void LogAttack(string message)
@@ -163,64 +171,72 @@ public static class ChatController
 
         // Assemble message
         string output = "";
-        if(mode == ChatMode.Asset)
+        switch(mode)
         {
-            output += "[b][color=cyan]ASSET[/color][/b] " + message;
-        }
-        else if(mode == ChatMode.Debug || mode == ChatMode.AttackLog)
-        {
-            output += "[b][color=orange]LOG[/color][/b] " + message;
-        }
-        else if(mode == ChatMode.Admin)
-        {
-            if(client == null && MainController.controller != null)
-            {
-                // We're the server
-                output += "[b][color=red]SERVER[/color][/b] : " + message;
-            }
-            else
-            {
-                AccountController.Account acc = AccountController.ClientGetAccount(client);
-                output += "[b][color=red]" + acc.id_name + "[/color][/b] : " + message;
-            }
-        }
-        else if(mode == ChatMode.Looc || mode == ChatMode.Gooc)
-        {
-            AccountController.Account acc = AccountController.ClientGetAccount(client);
-            output += "[b][color=blue]" + acc.id_name + "[/color][/b] : " + message;
-        }
-        else
-        {
-            if(speaking_ent != null)
-            {
-                switch(mode)
+            case ChatMode.Asset:
+                output += "[b][color=cyan]ASSET[/color][/b] " + message;
+            break;
+
+            case ChatMode.Error:
+                output += "[b][color=red]LOG[/color][/b] " + message;
+            break;
+
+            case ChatMode.Debug:
+            case ChatMode.AttackLog:
+                output += "[b][color=orange]LOG[/color][/b] " + message;
+            break;
+
+            case ChatMode.Admin:
+                if(client == null && MainController.controller != null)
                 {
-                    case ChatMode.Speak:
-                        output += "[b][color=green]" + speaking_ent.display_name.The(true) + "[/color][/b] says : " + message;
-                        RuneMessage(speaking_ent,message);
-                    break;
-                    case ChatMode.Whisper:
-                        output += "[b][color=green]" + speaking_ent.display_name.The(true) + "[/color][/b] whispers : " + message;
-                        RuneMessage(speaking_ent,message,2);
-                    break;
-                    case ChatMode.Emote:
-                        output += "[b][color=green]" + speaking_ent.display_name.The(true) + "[/color][/b] " + message;
-                        RuneMessage(speaking_ent,message);
-                    break;
-                    case ChatMode.Subtle:
-                        output += "[b][color=green]" + speaking_ent.display_name.The(true) + "[/color][/b] " + message;
-                        RuneMessage(speaking_ent,message,2);
-                    break;
-                    // DIRECT
-                    case ChatMode.VisibleMessage:
-                        output += message;
-                    break;
+                    // We're the server
+                    output += "[b][color=red]SERVER[/color][/b] : " + message;
                 }
-            }
-            else
-            {
-                output += "[b][color=red]The Abyss[/color][/b] whispers : " + message;
-            }
+                else
+                {
+                    AccountController.Account accA = AccountController.ClientGetAccount(client);
+                    output += "[b][color=red]" + accA.id_name + "[/color][/b] : " + message;
+                }
+            break;
+
+            case ChatMode.Looc:
+            case ChatMode.Gooc:
+                AccountController.Account accB = AccountController.ClientGetAccount(client);
+                output += "[b][color=blue]" + accB.id_name + "[/color][/b] : " + message;
+            break;
+
+            default:
+                if(speaking_ent != null)
+                {
+                    switch(mode)
+                    {
+                        case ChatMode.Speak:
+                            output += "[b][color=green]" + speaking_ent.display_name.The(true) + "[/color][/b] says : " + message;
+                            RuneMessage(speaking_ent,message);
+                        break;
+                        case ChatMode.Whisper:
+                            output += "[b][color=green]" + speaking_ent.display_name.The(true) + "[/color][/b] whispers : " + message;
+                            RuneMessage(speaking_ent,message,2);
+                        break;
+                        case ChatMode.Emote:
+                            output += "[b][color=green]" + speaking_ent.display_name.The(true) + "[/color][/b] " + message;
+                            RuneMessage(speaking_ent,message);
+                        break;
+                        case ChatMode.Subtle:
+                            output += "[b][color=green]" + speaking_ent.display_name.The(true) + "[/color][/b] " + message;
+                            RuneMessage(speaking_ent,message,2);
+                        break;
+                        // DIRECT
+                        case ChatMode.VisibleMessage:
+                            output += message;
+                        break;
+                    }
+                }
+                else
+                {
+                    output += "[b][color=red]The Abyss[/color][/b] whispers : " + message;
+                }
+            break;
         }
 
         // Add to chat log and server logging

@@ -9,6 +9,8 @@ using System.Reflection.Metadata;
 
 public partial class MapController : DeligateController
 {
+    public List<AbstractEntity> entities = new List<AbstractEntity>();
+
     public static MapController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
 	public MapController()
     {
@@ -40,7 +42,7 @@ public partial class MapController : DeligateController
 
     public override bool CanInit()
     {
-        return IsSubControllerInit(ChemController.controller);
+        return true;
     }
 
     public override bool Init()
@@ -165,7 +167,7 @@ public partial class MapController : DeligateController
         {
             effects[i].LateInit();
             effects[i].UpdateIcon();
-            if(effects[i].is_spawner)
+            if(effects[i] is Behaviors.AbstractSpawner)
             {
                 string spawn_tag = effects[i].GetTag();
                 if(!spawners.ContainsKey(spawn_tag))
@@ -183,7 +185,9 @@ public partial class MapController : DeligateController
         List<AbstractEntity> all_entities = new List<AbstractEntity>();
         all_entities.AddRange(MapController.controller.entities);
         all_entities.AddRange(MachineController.controller.entities);
-        all_entities.AddRange(MobController.controller.entities);
+        all_entities.AddRange(MobController.controller.living_entities);
+        all_entities.AddRange(MobController.controller.dead_entities);
+        all_entities.AddRange(MobController.controller.ghost_entities);
         ChatController.DebugLog("INIT ENTITIES " + all_entities.Count + " ------------------------------------------------");
         for(int i = 0; i < all_entities.Count; i++) 
         {
@@ -291,15 +295,25 @@ public partial class MapController : DeligateController
     /*****************************************************************
      * GAME UPDATE
      ****************************************************************/
-    public override void Fire()
+    public override bool Fire()
     {
         //GD.Print(Name + " Fired");
+        if(MainController.server_state == MainController.ServerConfig.Editor) return false; // No random ticks in edit mode
+
         // All areas get their update call
         foreach(KeyValuePair<string, AbstractArea> entry in areas)
         {
-            entry.Value.Tick();
+            entry.Value.Tick(MainController.WorldTicks);
         }
+        
+        for(int i = 0; i < entities.Count; i++) 
+        {
+            entities[i].Process(MainController.WorldTicks);
+        }
+
+        return true;
     }
+
     public override void Shutdown()
     {
         

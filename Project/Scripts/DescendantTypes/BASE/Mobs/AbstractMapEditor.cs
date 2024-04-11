@@ -3,7 +3,7 @@ using System;
 
 namespace Behaviors
 {
-    public class AbstractObserver : AbstractMob
+    public class AbstractMapEditor : AbstractMob
     {
         /*****************************************************************
          * Click handling

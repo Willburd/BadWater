@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 
 
-namespace Behaviors_BASE
+namespace Behaviors
 {
     public partial class RuneText : AbstractEffect
     {

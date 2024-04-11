@@ -297,7 +297,7 @@ public partial class AssetLoader : Node
         Godot.Collections.Dictionary dict_data = JsonHandler.ParseJsonFile(file_path);
         if(dict_data == null || dict_data.Keys.Count <= 0) 
         {
-            ChatController.AssetLog("--Invalid or empty asset json in " + file_path);
+            ChatController.ErrorLog("--Invalid or empty asset json in " + file_path);
             return;
         }
 
@@ -430,6 +430,7 @@ public partial class AssetLoader : Node
     }
     private void ConstructTextureAtlas()
     {
+        ChatController.AssetLog("-PACKING TEXTURES");
         int tex_page_ind = 0; // incriments when we max out a page!
         List<LoadedTexture> placed_on_page = new List<LoadedTexture>();
         prepare_textures.ReverseSort();
@@ -493,7 +494,7 @@ public partial class AssetLoader : Node
         }
         if(texture_pages.Count > 0)
         {
-            ChatController.AssetLog("-Creating texture pages. Count: " + texture_pages.Count);
+            ChatController.AssetLog("-TEXTURE PAGES. COUNT: " + texture_pages.Count);
             // Create an entry for each sahder path
             for(int s = 0; s < (int)ShaderConfig.Library.Last; s++) 
             {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Reflection;
 
 [GlobalClass]
 public partial class NetworkClient : Node3D
@@ -88,7 +89,7 @@ public partial class NetworkClient : Node3D
         {
             // TODO - properly handle first spawn!
             ChatController.DebugLog("-No entity stored.");
-            Spawn();
+            Spawn(false);
         }
         else
         {
@@ -100,7 +101,7 @@ public partial class NetworkClient : Node3D
         // Client joins chunk controller
         ChunkController.NewClient(this);
     }
-    public void Spawn()
+    public void Spawn(bool as_ghost)
     {
         camera.Current = false;
         // Check for a spawner!
@@ -112,7 +113,7 @@ public partial class NetworkClient : Node3D
             {
                 ChatController.DebugLog("Client RESPAWN: " + Name);
                 int rand = TOOLS.RandI(spawners.Count);
-                SpawnHostEntity(spawners[rand].GridPos);
+                SpawnHostEntity( spawners[rand].GridPos, as_ghost);
                 return;
             }
             else
@@ -122,14 +123,30 @@ public partial class NetworkClient : Node3D
         }
         // EMERGENCY FALLBACK TO 0,0,0 on first map loaded!
         ChatController.DebugLog("Client FALLBACK RESPAWN: " + Name);
-        SpawnHostEntity(new GridPos(MapController.FallbackMap(),(float)0.5,(float)0.5,0));
+        SpawnHostEntity( new GridPos(MapController.FallbackMap(),(float)0.5,(float)0.5,0), as_ghost);
     }
-    private void SpawnHostEntity(GridPos new_pos)
+    private void SpawnHostEntity(GridPos new_pos, bool as_ghost)
     {
         // SPAWN HOST OBJECT
         if(focused_entity == null) 
         {
-            AbstractEntity new_ent = AbstractTools.CreateEntity(MainController.DataType.Mob,"BASE:TEST",new_pos);
+            // Get object we are going to spawn
+            AbstractEntity new_ent = null;
+            if(MainController.server_state == MainController.ServerConfig.Editor)
+            {
+                new_ent = AbstractTools.CreateEntity(MainController.DataType.Mob,"_:EDITOR",new_pos);
+            }
+            else if(as_ghost)
+            {
+                new_ent = AbstractTools.CreateEntity(MainController.DataType.Mob,"_:GHOST",new_pos);
+            }
+            else
+            {
+                new_ent = AbstractTools.CreateEntity(MainController.DataType.Mob,"BASE:TEST",new_pos);
+            }
+
+            // Create object
+            Debug.Assert(new_ent != null);
             new_ent.SetClientOwner(this);
             SetFocusedEntity(new_ent);
             new_ent.UpdateNetwork(false,true);

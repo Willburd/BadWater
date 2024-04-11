@@ -1,4 +1,4 @@
-using Behaviors_BASE;
+using Behaviors;
 using Godot;
 using GodotPlugins.Game;
 using System;

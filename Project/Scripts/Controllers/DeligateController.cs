@@ -14,8 +14,6 @@ public class DeligateController
     public string display_name = "";
     public TickRecord logged_times = new TickRecord();
 
-    public List<AbstractEntity> entities = new List<AbstractEntity>();
-
     private State current_state = State.not_init;
     protected int tick_rate = 1;                    // Ticks needed to Fire()
     public int GetTickRate()
@@ -94,20 +92,16 @@ public class DeligateController
         if(ticks >= tick_rate)
         {
             // Fire subsystem, and process entities if the controller has them!
-            Fire();
-            for(int i = 0; i < entities.Count; i++) 
-			{
-                entities[i].Process();
-            }
             ticks = 0;
-            return true;
+            return Fire();
         }
         return false;
     }
 
-    public virtual void Fire()          // Called by Tick() at the rate the controller specifies
+    public virtual bool Fire()          // Called by Tick() at the rate the controller specifies
     {
         GD.Print(Name + " Fired");
+        return true;
     }
 
     public void Pause(int ticks)        // Sets a tick delay that must be reached before ticks may continue

@@ -19,24 +19,38 @@ public partial class AbstractMob : AbstractEntity
              * MOB BEHAVIORS (Living creatures and players)
              ****************************************************************/
             case "MOB_SIMPLE": // Life, death, status effects, breathing, eating, reagent processing.
-                new_mob = new Behaviors_BASE.AbstractSimpleMob();
+                new_mob = new Behaviors.AbstractSimpleMob();
             break;
 
             case "MOB_COMPLEX": // Has species, unique markings, Has organs and limbs, DNA, traits, mutations, on top of all the stuff MOB has.
-                new_mob = new Behaviors_BASE.AbstractComplexMob();
+                new_mob = new Behaviors.AbstractComplexMob();
             break;
 
             /*****************************************************************
              * UNIQUE MOB BEHAVIORS (Hyper specialized mobs that need entirely unique features)
              ****************************************************************/
             case "MOB_BORER":
-                new_mob = new Behaviors_BASE.AbstractSimpleMob();
+                new_mob = new Behaviors.AbstractSimpleMob();
+            break;
+
+            /*****************************************************************
+             * OBSERVER BEHAVIORS
+             ****************************************************************/
+            case "MOB_OBSERVER":
+                new_mob = new Behaviors.AbstractObserver();
+            break;
+
+            case "MOB_EDITOR":
+                new_mob = new Behaviors.AbstractMapEditor();
             break;
 
             /*****************************************************************
              * Debugging purposes only.
              ****************************************************************/
             default:
+                GD.PrintErr("INVALID BEHAVIOR: " + data.behaviorID);
+            break;
+
             case "_BEHAVIOR_":
                 new_mob = new AbstractMob();
             break;

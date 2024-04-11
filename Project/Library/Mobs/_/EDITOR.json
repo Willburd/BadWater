@@ -1,0 +1,26 @@
+{
+	"parent": "",
+	"name": "Mapper",
+	"desc": "How productive!",
+	"behavior": "MOB_EDITOR",
+	"model": "BASE/Entities/Small.tscn",
+	"texture": "_/Mobs/Builder/Base.png",
+	"intangible": 1,
+
+	"max_health": 0,
+	"move_speed": 1,
+	"run_speed": 5,
+	
+	"has_hands": 0,
+	"extra_hands": 0,
+	"complex_tools": 0,
+	"wears_hats": 0,
+	"wears_mask": 0,
+	"wears_eyes": 0,
+	"wears_uniform": 0,
+	"wears_suit": 0,
+	"wears_shoe": 0,
+	"wears_ears": 0,
+	"wears_glove": 0,
+	"wears_belt": 0
+}

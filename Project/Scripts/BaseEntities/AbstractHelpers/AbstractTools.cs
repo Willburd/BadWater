@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Diagnostics;
 
 public static class AbstractTools
 {
@@ -255,30 +256,45 @@ public static class AbstractTools
             case MainController.DataType.Effect:
                 typeData = AssetLoader.loaded_effects[type_ID];
                 newEnt = AbstractEffect.CreateEffect(typeData, data_string);
-                MapController.controller.effects.Add(newEnt as AbstractEffect);
+                if(newEnt != null) MapController.controller.effects.Add(newEnt as AbstractEffect);
                 break;
             case MainController.DataType.Item:
                 typeData = AssetLoader.loaded_items[type_ID];
                 newEnt = AbstractItem.CreateItem(typeData, data_string);
-                MapController.controller.entities.Add(newEnt);
+                if(newEnt != null) MapController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Structure:
                 typeData = AssetLoader.loaded_structures[type_ID];
                 newEnt = AbstractStructure.CreateStructure(typeData, data_string);
-                MapController.controller.entities.Add(newEnt);
+                if(newEnt != null) MapController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Machine:
                 typeData = AssetLoader.loaded_machines[type_ID];
                 newEnt = AbstractMachine.CreateMachine(typeData, data_string);
-                MachineController.controller.entities.Add(newEnt);
+                if(newEnt != null) MachineController.controller.entities.Add(newEnt);
                 break;
             case MainController.DataType.Mob:
                 typeData = AssetLoader.loaded_mobs[type_ID];
                 newEnt = AbstractMob.CreateMob(typeData, data_string);
-                MobController.controller.entities.Add(newEnt);
+                if(newEnt != null)
+                {
+                    if(newEnt is Behaviors.AbstractObserver || newEnt is Behaviors.AbstractMapEditor)
+                    {
+                        MobController.controller.ghost_entities.Add(newEnt);
+                    }
+                    else
+                    {
+                        MobController.controller.living_entities.Add(newEnt);
+                    }
+                }
                 break;
         }
         // NetworkEntity init
+        if(newEnt == null)
+        {
+            GD.PrintErr("INVALID SPAWN, TYPE: " + type + " AS: " + type_ID);
+            return null;
+        }
         newEnt.GridPos = new GridPos("NULL",0,0,0); // nullspace till placed
         newEnt.TemplateRead(typeData);
         // Automove to location
@@ -303,8 +319,8 @@ public static class AbstractTools
             case MainController.DataType.Turf:
                 break;
             case MainController.DataType.Effect:
+                if(entity is Behaviors.AbstractSpawner) MapController.controller.spawners[(entity as AbstractEffect).GetTag()].Remove(entity as AbstractEffect);
                 MapController.controller.effects.Remove(entity as AbstractEffect);
-                if((entity as AbstractEffect).is_spawner) MapController.controller.spawners[(entity as AbstractEffect).GetTag()].Remove(entity as AbstractEffect);
                 break;
             case MainController.DataType.Item:
                 MapController.controller.entities.Remove(entity);
@@ -316,7 +332,9 @@ public static class AbstractTools
                 MachineController.controller.entities.Remove(entity);
                 break;
             case MainController.DataType.Mob:
-                MobController.controller.entities.Remove(entity);
+                MobController.controller.living_entities.Remove(entity);
+                MobController.controller.dead_entities.Remove(entity);
+                MobController.controller.ghost_entities.Remove(entity);
                 break;
         }
         if(entity.GetClientOwner() != null)

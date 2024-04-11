@@ -21,6 +21,9 @@ public partial class AbstractMachine : AbstractEntity
              * Debugging purposes only.
              ****************************************************************/
             default:
+                GD.PrintErr("INVALID BEHAVIOR: " + data.behaviorID);
+            break;
+            
             case "_BEHAVIOR_":
                 new_machine = new AbstractMachine();
             break;

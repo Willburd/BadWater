@@ -167,9 +167,11 @@ public partial class AccountController : DeligateController
         FinishInit();
     }
 
-    public override void Fire()
+    public override bool Fire()
     {
         //GD.Print(Name + " Fired");
+
+        return true;
     }
 
     public override void Shutdown()

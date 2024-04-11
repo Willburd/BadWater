@@ -1,4 +1,4 @@
-using Behaviors_BASE;
+using Behaviors;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -47,6 +47,9 @@ public partial class AbstractItem : AbstractEntity
              * Debugging purposes only.
              ****************************************************************/
             default:
+                GD.PrintErr("INVALID BEHAVIOR: " + data.behaviorID);
+            break;
+            
             case "_BEHAVIOR_":
                 new_item = new AbstractItem();
             break;

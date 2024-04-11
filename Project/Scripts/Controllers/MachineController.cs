@@ -1,8 +1,11 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class MachineController : DeligateController
 {
+    public List<AbstractEntity> entities = new List<AbstractEntity>();
+
     public static MachineController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
     public MachineController()
     {
@@ -26,9 +29,17 @@ public partial class MachineController : DeligateController
         FinishInit();
     }
 
-    public override void Fire()
+    public override bool Fire()
     {
         //GD.Print(Name + " Fired");
+        if(MainController.server_state == MainController.ServerConfig.Editor) return false; // No random ticks in edit mode
+
+        for(int i = 0; i < entities.Count; i++) 
+        {
+            entities[i].Process(MainController.WorldTicks);
+        }
+
+        return true;
     }
 
     public override void Shutdown()

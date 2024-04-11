@@ -34,7 +34,7 @@ public partial class ChunkController : DeligateController
         FinishInit();
     }
 
-    public override void Fire()
+    public override bool Fire()
     {
         //GD.Print(Name + " Fired");
 
@@ -49,7 +49,7 @@ public partial class ChunkController : DeligateController
             if(!MapController.IsMapLoaded(client.focused_map_id))
             {
                 GD.PrintErr("CLIENT " + client.Name + " ON UNLOADED MAP " + client.focused_map_id);
-                client.Spawn(); // EMERGENCY RESPAWN
+                client.Spawn( true ); // EMERGENCY RESPAWN
             }
         }
         
@@ -134,6 +134,8 @@ public partial class ChunkController : DeligateController
                 }
             }
         }
+
+        return true;
     }
 
     public static Vector3 GetAlignedPos(Vector3 world_pos)

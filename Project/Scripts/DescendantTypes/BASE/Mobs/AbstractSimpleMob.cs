@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Transactions;
 using System.Threading.Tasks;
 
-namespace Behaviors_BASE
+namespace Behaviors
 {
     public class AbstractSimpleMob : AbstractMob, ICanPull, IPullable
     {
@@ -962,35 +962,28 @@ namespace Behaviors_BASE
                 if(!locked_anim && client_input_data["useheld"].AsBool()) UseActiveHand(null);
 
                 // Move based on mob speed
-                GridPos new_pos = GridPos;
                 float speed = 0f;
                 if(client_input_data["mod_control"].AsBool())
                 {
                     // Inching along with taps at a fixed rate
-                    new_pos.hor += (float)dat_x * 0.5f * MainController.controller.config.input_factor;
-                    new_pos.ver += (float)dat_y * 0.5f * MainController.controller.config.input_factor;
+                    input_dir = new Vector2((float)dat_x * 0.5f * MainController.controller.config.input_factor,(float)dat_y * 0.5f * MainController.controller.config.input_factor);
                 }
                 else if(walking)
                 {
                     // slower safer movement
-                    Vector2 mover = new Vector2((float)dat_x,(float)dat_y).Normalized() * walk_speed * MainController.controller.config.input_factor;
-                    new_pos.hor += mover.X;
-                    new_pos.ver += mover.Y;
+                    input_dir = new Vector2((float)dat_x,(float)dat_y).Normalized() * walk_speed * MainController.controller.config.input_factor;
                     if(!client_input_data["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) direction = DAT.VectorToCardinalDir((float)dat_x,(float)dat_y);
                     speed = walk_speed;
                 }
                 else
                 {
                     // zoomies as normal
-                    Vector2 mover = new Vector2((float)dat_x,(float)dat_y).Normalized() * run_speed * MainController.controller.config.input_factor;
-                    new_pos.hor += mover.X;
-                    new_pos.ver += mover.Y;
+                    input_dir = new Vector2((float)dat_x,(float)dat_y).Normalized() * run_speed * MainController.controller.config.input_factor;
                     if(!client_input_data["mod_alt"].AsBool() && (dat_x != 0 || dat_y != 0)) direction = DAT.VectorToCardinalDir((float)dat_x,(float)dat_y);
                     speed = run_speed;
                 }
                 // math for feet speed
                 if(dat_x != 0 || dat_y != 0) footstep_timer += Mathf.Lerp(0.075f,0.10f, Mathf.Clamp(speed,0,1.5f));
-                AbstractTools.Move(this,new_pos);
                 AbstractEntity newloc = GetLocation();
                 if(footstep_timer > 1)
                 {
@@ -1013,17 +1006,30 @@ namespace Behaviors_BASE
             if(!locked_anim && client_input_data["throw"].AsBool()) GD.Print("throw"); // TODO throw ===============================================================
             if(!locked_anim && client_input_data["drop"].AsBool()) DropActiveHand();
         }
-        public override void Tick()
+        public override void Tick(int tick_number)
         {
-            if(stat != DAT.LifeState.Dead)
+            if(tick_number % MobController.life_tick_mod == 0) // Every four ticks
             {
-                LifeUpdate();
-                ai_holder?.Alive();
+                if(stat != DAT.LifeState.Dead)
+                {
+                    LifeUpdate();
+                    ai_holder?.Alive();
+                }
+                else
+                {
+                    DeathUpdate();
+                    ai_holder?.Dead();
+                }
             }
-            else
+            // Handle movement
+            if(input_dir != Vector2.Zero)
             {
-                DeathUpdate();
-                ai_holder?.Dead();
+                // Input, as solved by ControlUpdate(); is a SCALED value based on mob speed! Not a 0-1 value!
+                GridPos new_pos = GridPos;
+                new_pos.hor += input_dir.X;
+                new_pos.ver += input_dir.Y;
+                AbstractTools.Move(this,new_pos);
+                input_dir = Vector2.Zero;
             }
             ProcessSlotDrops();
         }
@@ -1057,6 +1063,7 @@ namespace Behaviors_BASE
                 DropSlot(DAT.InventorySlot.Back);
                 DropSlot(DAT.InventorySlot.ID);
                 DropSlot(DAT.InventorySlot.Belt);
+                DropSlot(DAT.InventorySlot.Storage);
             }
         }
 

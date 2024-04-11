@@ -235,7 +235,7 @@ namespace MapLoading
                         {
                             entity_pack = item_data[current_x];
                             ent = AbstractTools.CreateEntity(MainController.DataType.Item,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
-                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent?.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                     case 1: // Effect
@@ -243,7 +243,7 @@ namespace MapLoading
                         {
                             entity_pack = effect_data[current_x];
                             ent = AbstractTools.CreateEntity(MainController.DataType.Effect,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
-                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent?.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                     case 2: // Structure
@@ -251,7 +251,7 @@ namespace MapLoading
                         {
                             entity_pack = structure_data[current_x];
                             ent = AbstractTools.CreateEntity(MainController.DataType.Structure,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
-                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent?.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                     case 3: // Machine
@@ -259,7 +259,7 @@ namespace MapLoading
                         {
                             entity_pack = machine_data[current_x];
                             ent = AbstractTools.CreateEntity(MainController.DataType.Machine,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
-                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent?.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                     case 4: // Mobs
@@ -267,7 +267,7 @@ namespace MapLoading
                         {
                             entity_pack = mob_data[current_x];
                             ent = AbstractTools.CreateEntity(MainController.DataType.Mob,entity_pack[0],new GridPos(map_id,float.Parse(entity_pack[1]),float.Parse(entity_pack[2]),float.Parse(entity_pack[3])), true);
-                            if(entity_pack[4].Length > 0) ent.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
+                            if(entity_pack[4].Length > 0) ent?.ApplyMapCustomData(JsonHandler.ParseJson(entity_pack[4])); // Set this object's flags using an embedded string of json!
                         }
                     break;
                 }
