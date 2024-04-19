@@ -1,9 +1,17 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class ChemController : DeligateController
 {
     public static ChemController controller;    // Singleton reference for each controller, mostly used during setup to check if controller has init.
+
+    public static Dictionary<string,Reagent> reagent_library = new Dictionary<string,Reagent>();
+    public static Dictionary<string,GasMix> gasmix_library = new Dictionary<string,GasMix>();
+
+
+
+
     public ChemController()
     {
         controller = this;

@@ -1,0 +1,16 @@
+{
+	"name": "Water",
+	"formula": "H2O",
+	
+	"melting_point": 			273.15,
+	"boiling_point": 			373.15,
+	"triple_point_kelvin": 		273.16,
+	"triple_point_kpa": 		0.611657,
+	"critical_point_kelvin": 	647.096,
+	"critical_point_kpa": 		22064,
+	
+	"molar_mass": 0.0180153,
+	"specific_heat": 2093,
+	"oxidizer": 1,
+	"fuel_gas": 0
+}

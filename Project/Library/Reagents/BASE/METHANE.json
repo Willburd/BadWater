@@ -1,0 +1,16 @@
+{
+	"name": "Nitrous Oxide",
+	"formula": "N2O",
+	
+	"melting_point": 			90.69,
+	"boiling_point": 			111.67,
+	"triple_point_kelvin": 		90.69,
+	"triple_point_kpa": 		11.696,
+	"critical_point_kelvin": 	190.56,
+	"critical_point_kpa": 		4599,
+	
+	"molar_mass": 0.044,
+	"specific_heat": 40,
+	"oxidizer": 1,
+	"fuel_gas": 0
+}

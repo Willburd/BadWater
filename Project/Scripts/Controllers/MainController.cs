@@ -23,7 +23,9 @@ public partial class MainController : Node
         Item,
         Structure,
         Machine,
-        Mob
+        Mob,
+		Reagent,
+		Gasmix
     }
 
 	public enum RPCTransferChannels

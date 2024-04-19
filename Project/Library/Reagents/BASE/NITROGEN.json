@@ -1,0 +1,16 @@
+{
+	"name": "Nitrogen",
+	"formula": "N",
+	
+	"melting_point": 			63.14,
+	"boiling_point": 			77.36,
+	"triple_point_kelvin": 		63.1,
+	"triple_point_kpa": 		12.6,
+	"critical_point_kelvin": 	126.2,
+	"critical_point_kpa": 		3390,
+	
+	"molar_mass": 0.028,
+	"specific_heat": 30,
+	"oxidizer": 0,
+	"fuel_gas": 0
+}

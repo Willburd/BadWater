@@ -65,6 +65,8 @@ public partial class AssetLoader : Node
         string item_path = "res://Library/Items";
         string effect_path = "res://Library/Effects";
         string mob_path = "res://Library/Mobs";
+        string reagent_path = "res://Library/Reagents";
+        string gasmix_path = "res://Library/Gasmixes";
 
         ChatController.AssetLog("-SOUND");
         DirAccess dir;
@@ -184,6 +186,8 @@ public partial class AssetLoader : Node
         LoadLibraryWithType( item_path, MainController.DataType.Item);
         LoadLibraryWithType( effect_path, MainController.DataType.Effect);
         LoadLibraryWithType( mob_path, MainController.DataType.Mob);
+        LoadLibraryWithType( reagent_path, MainController.DataType.Reagent);
+        LoadLibraryWithType( gasmix_path, MainController.DataType.Gasmix);
 
 
         // Construct dependant entities
@@ -382,10 +386,26 @@ public partial class AssetLoader : Node
                     ChatController.AssetLog("--Loaded: " + PackTypeID(data_pack.GetUniqueModID,data_pack.entity_type));
                 }
             break;
+            
+            case MainController.DataType.Reagent:
+                {
+                    string id = prefix + ":" + key;
+                    Reagent reg = new Reagent(id, dict_data);
+                    ChemController.reagent_library.Add( id, reg );
+                    ChatController.AssetLog("--Loaded: " + id);
+                }
+            break;
+            
+            case MainController.DataType.Gasmix:
+                {
+                    string id = prefix + ":" + key;
+                    GasMix mix = new GasMix(dict_data);
+                    ChemController.gasmix_library.Add( id, mix );
+                    ChatController.AssetLog("--Loaded: " + id);
+                }
+            break;
         }
     }
-
-
     public readonly struct LoadedTexture
     {
         public LoadedTexture(string set_path, int set_tex_page, int set_u, int set_v, int set_width, int set_height)

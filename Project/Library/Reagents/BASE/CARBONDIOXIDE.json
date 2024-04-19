@@ -1,0 +1,16 @@
+{
+	"name": "Carbon Dioxide",
+	"formula": "CO2",
+	
+	"melting_point": 			0,
+	"boiling_point": 			194.7,
+	"triple_point_kelvin": 		329.75,
+	"triple_point_kpa": 		518,
+	"critical_point_kelvin": 	304.25,
+	"critical_point_kpa": 		730,
+	
+	"molar_mass": 0.044,
+	"specific_heat": 30,
+	"oxidizer": 0,
+	"fuel_gas": 0
+}

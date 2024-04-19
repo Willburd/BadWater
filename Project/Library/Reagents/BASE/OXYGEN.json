@@ -1,0 +1,16 @@
+{
+	"name": "Oxygen",
+	"formula": "O",
+	
+	"melting_point": 			54.36,
+	"boiling_point": 			90.19,
+	"triple_point_kelvin": 		54.361,
+	"triple_point_kpa": 		0.14625,
+	"critical_point_kelvin": 	154.58,
+	"critical_point_kpa": 		5040,
+	
+	"molar_mass": 0.032,
+	"specific_heat": 30,
+	"oxidizer": 1,
+	"fuel_gas": 0
+}

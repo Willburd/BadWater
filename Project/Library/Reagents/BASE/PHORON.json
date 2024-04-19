@@ -1,0 +1,16 @@
+{
+	"name": "Phoron",
+	"formula": "Pr",
+	
+	"melting_point": 			90.69,
+	"boiling_point": 			111.67,
+	"triple_point_kelvin": 		90.69,
+	"triple_point_kpa": 		11.696,
+	"critical_point_kelvin": 	190.56,
+	"critical_point_kpa": 		4599,
+	
+	"molar_mass": 0.405,
+	"specific_heat": 200,
+	"oxidizer": 0,
+	"fuel_gas": 1
+}
